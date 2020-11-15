@@ -22,11 +22,11 @@ func getUsername() string {
 
 func getPortalURL() (*url.URL, error) {
 	var host string
-	fmt.Print("👉 Litmus Portal URL: ")
+	fmt.Print("👉 Kubera Core URL: ")
 	fmt.Scanln(&host)
 	for host == "" {
 		fmt.Println("⛔ Portal URL can't be empty!!")
-		fmt.Print("👉 Litmus Portal URL: ")
+		fmt.Print("👉 Kubera Core URL: ")
 		fmt.Scanln(&host)
 	}
 	host = strings.TrimRight(host, "/")

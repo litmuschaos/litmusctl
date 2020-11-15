@@ -20,7 +20,13 @@ type Agent struct {
 }
 
 type AgentRegistrationData struct {
-	Data AgentRegister `json:"data"`
+	Errors []Errors      `json:"errors"`
+	Data   AgentRegister `json:"data"`
+}
+
+type Errors struct {
+	Message string   `json:"message"`
+	Path    []string `json:"path"`
 }
 
 type AgentRegister struct {
@@ -110,7 +116,7 @@ func AgentExists(pid, agentName string, t Token, cred Credentials) bool {
 		SetResult(&agents).
 		Post(
 			fmt.Sprintf(
-				"%s/api/query",
+				"%s/chaos/api/graphql/query",
 				cred.Host,
 			),
 		)
@@ -140,7 +146,7 @@ func GetAgentList(pid string, t Token, cred Credentials) {
 		SetResult(&agents).
 		Post(
 			fmt.Sprintf(
-				"%s/api/query",
+				"%s/chaos/api/graphql/query",
 				cred.Host,
 			),
 		)
@@ -170,7 +176,7 @@ func RegisterAgent(c Agent, t Token, cred Credentials) (AgentRegistrationData, e
 		SetResult(&cr).
 		Post(
 			fmt.Sprintf(
-				"%s/api/query",
+				"%s/chaos/api/graphql/query",
 				cred.Host,
 			),
 		)

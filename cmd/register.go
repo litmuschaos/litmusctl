@@ -32,11 +32,11 @@ var registerCmd = &cobra.Command{
 		var c Credentials
 		var pErr error
 		fmt.Println("🔥 Registering Kubera agent")
-		fmt.Println("\n📶 Please enter the Litmus portal details --")
-		// Get litmus portal URL as input
+		fmt.Println("\n📶 Please enter Kubera Core details --")
+		// Get Kubera core URL as input
 		c.Host, pErr = getPortalURL()
 		if pErr != nil {
-			fmt.Printf("\n Portal URL parsing failed: {%s}", pErr.Error())
+			fmt.Printf("\n❌ URL parsing failed: [%s]", pErr.Error())
 			os.Exit(1)
 		}
 		// Get username as input
@@ -45,10 +45,18 @@ var registerCmd = &cobra.Command{
 		c.Password = getPassword()
 		// Fetch authorization token
 		t := login(c)
-		// Fetch user details
-		user, uErr := GetUserDetails(t, c)
+		// Get LaunchProduct token
+		productToken, err := LaunchProduct(t, c, "Chaos")
+		if err != nil {
+			fmt.Printf("\n❌ Fetching LaunchProduct query failed: [%s]", err)
+			os.Exit(1)
+		}
+		// Replace AccessToken with LaunchProduct token
+		t.AccessToken = productToken.Data.LaunchProduct
+		// Fetch project details
+		user, uErr := GetProjectDetails(t, c, "chaos")
 		if uErr != nil {
-			fmt.Printf("\n Fetching user details failed: {%s}", uErr)
+			fmt.Printf("\n❌ Fetching project details failed: [%s]", uErr)
 			os.Exit(1)
 		}
 		// Fetch project id
@@ -70,13 +78,18 @@ var registerCmd = &cobra.Command{
 		// Register agent
 		agent, cerror := RegisterAgent(newAgent, t, c)
 		if cerror != nil {
-			fmt.Printf("\n Agent registration failed: {%s}\n", cerror.Error())
+			fmt.Printf("\n❌ Agent registration failed: [%s]\n", cerror.Error())
 			os.Exit(1)
 		}
-		// Apply agent connection yaml
-		yamlOutput, yerror := ApplyYaml(agent, c)
+		// Print error message in case Data field is null in response
+		if (agent.Data == AgentRegister{}) {
+			fmt.Printf("\n🚫 Agent registration failed: [%s]\n", agent.Errors[0].Message)
+			os.Exit(1)
+		}
+		// Apply agent registration yaml
+		yamlOutput, yerror := ApplyYaml(agent, c, chaosYamlPath)
 		if yerror != nil {
-			fmt.Printf("\n Failed in applying registration yaml: {%s}\n", yerror.Error())
+			fmt.Printf("\n❌ Failed in applying registration yaml: [%s]\n", yerror.Error())
 			os.Exit(1)
 		}
 		fmt.Println("\n", yamlOutput)

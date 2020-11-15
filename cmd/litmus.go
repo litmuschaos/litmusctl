@@ -21,9 +21,9 @@ import (
 
 // litmusCmd represents the litmus command
 var litmusCmd = &cobra.Command{
-	Use:   "litmus",
-	Short: "Kubera Litmus",
-	Long:  `litmus is used to run chaos tests`,
+	Use:   "chaos",
+	Short: "Kubera Chaos",
+	Long:  `Kubera Chaos is used to run chaos tests`,
 	// Run: func(cmd *cobra.Command, args []string) {
 	// 	fmt.Println("litmus called")
 	// },

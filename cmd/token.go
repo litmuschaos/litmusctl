@@ -49,7 +49,7 @@ func getToken(c Credentials) (Token, AuthError) {
 		SetError(&authErr).
 		Post(
 			fmt.Sprintf(
-				"%s/auth/login",
+				"%s/api/auth/v1/token",
 				c.Host,
 			),
 		)

@@ -21,8 +21,11 @@ const (
 	agentType = "external"
 
 	// Default namespace for agent installation
-	defaultNs = "litmus"
+	defaultNs = "kubera"
 
 	// Default service account used for agent installation
-	defaultSA = "litmus"
+	defaultSA = "kubera"
+
+	// Chaos agent registration yaml path
+	chaosYamlPath = "chaos/api/graphql/file"
 )

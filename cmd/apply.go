@@ -5,8 +5,8 @@ import (
 	"os/exec"
 )
 
-func ApplyYaml(c AgentRegistrationData, cred Credentials) (output string, err error) {
-	path := fmt.Sprintf("%s/api/file/%s.yaml", cred.Host, c.Data.UserAgentReg.Token)
+func ApplyYaml(c AgentRegistrationData, cred Credentials, yamlPath string) (output string, err error) {
+	path := fmt.Sprintf("%s/%s/%s.yaml", cred.Host, yamlPath, c.Data.UserAgentReg.Token)
 	args := []string{"kubectl", "apply", "-f", path}
 	stdout, err := exec.Command(args[0], args[1:]...).CombinedOutput()
 	if err != nil {
