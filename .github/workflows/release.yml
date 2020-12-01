@@ -23,3 +23,41 @@ jobs:
           args: release
         env:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+
+      - name: Remove older binaries from /latest folder
+        uses: ItsKarma/aws-cli@v1.70.0
+        with:
+          args: s3 rm s3://asset.mayadata.io/latest --recursive
+        env:
+          # Make sure to add the secrets in the repo settings page
+          # AWS_REGION is set to us-east-1 by default
+          AWS_ACCESS_KEY_ID: ${{ secrets.ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.SECRET_ACCESS_KEY }}
+          AWS_REGION: us-east-1
+
+      - name: Upload binaries to latest directory
+        uses: ItsKarma/aws-cli@v1.70.0
+        with:
+          args: s3 sync dist s3://asset.mayadata.io/latest --exclude "*" --include "*.gz"
+        env:
+          # Make sure to add the secrets in the repo settings page
+          # AWS_REGION is set to us-east-1 by default
+          AWS_ACCESS_KEY_ID: ${{ secrets.ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.SECRET_ACCESS_KEY }}
+          AWS_REGION: us-east-1
+
+      - name: Get release tag
+        shell: bash
+        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF##*/})"
+        id: release_tag
+
+      - name: Upload binaries to the build version directory
+        uses: ItsKarma/aws-cli@v1.70.0
+        with:
+          args: s3 sync dist s3://asset.mayadata.io/${{ steps.release_tag.outputs.branch }} --exclude "*" --include "*.gz"
+        env:
+          # Make sure to add the secrets in the repo settings page
+          # AWS_REGION is set to us-east-1 by default
+          AWS_ACCESS_KEY_ID: ${{ secrets.ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.SECRET_ACCESS_KEY }}
+          AWS_REGION: us-east-1

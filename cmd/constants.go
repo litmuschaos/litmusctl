@@ -3,7 +3,7 @@ package cmd
 const (
 
 	// CLI version
-	cliVersion = "v0.01"
+	cliVersion = "v0.1.0"
 
 	// Default username
 	defaultUsername = "admin"
