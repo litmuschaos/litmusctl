@@ -24,21 +24,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
 
-      - name: Remove older binaries from /latest folder
+      - name: Remove older binaries from latest directory of S3 bucket
         uses: ItsKarma/aws-cli@v1.70.0
         with:
-          args: s3 rm s3://asset.mayadata.io/latest --recursive
-        env:
-          # Make sure to add the secrets in the repo settings page
-          # AWS_REGION is set to us-east-1 by default
-          AWS_ACCESS_KEY_ID: ${{ secrets.ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.SECRET_ACCESS_KEY }}
-          AWS_REGION: us-east-1
-
-      - name: Upload binaries to latest directory
-        uses: ItsKarma/aws-cli@v1.70.0
-        with:
-          args: s3 sync dist s3://asset.mayadata.io/latest --exclude "*" --include "*.gz"
+          args: s3 rm s3://asset.mayadata.io/kuberactl/latest --recursive
         env:
           # Make sure to add the secrets in the repo settings page
           # AWS_REGION is set to us-east-1 by default
@@ -51,10 +40,43 @@ jobs:
         run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF##*/})"
         id: release_tag
 
+      - name: Upload Darwin_x86_64 tar to latest directory of S3 bucket
+        uses: ItsKarma/aws-cli@v1.70.0
+        with:
+          args: s3 cp dist/kuberactl_${{ steps.release_tag.outputs.branch }}_Darwin_x86_64.tar.gz s3://asset.mayadata.io/kuberactl/latest/kuberactl_latest_Darwin_x86_64.tar.gz --acl public-read
+        env:
+          # Make sure to add the secrets in the repo settings page
+          # AWS_REGION is set to us-east-1 by default
+          AWS_ACCESS_KEY_ID: ${{ secrets.ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.SECRET_ACCESS_KEY }}
+          AWS_REGION: us-east-1
+
+      - name: Upload Linux_i386 tar to latest directory of S3 bucket
+        uses: ItsKarma/aws-cli@v1.70.0
+        with:
+          args: s3 cp dist/kuberactl_${{ steps.release_tag.outputs.branch }}_Linux_i386.tar.gz s3://asset.mayadata.io/kuberactl/latest/kuberactl_latest_Linux_i386.tar.gz --acl public-read
+        env:
+          # Make sure to add the secrets in the repo settings page
+          # AWS_REGION is set to us-east-1 by default
+          AWS_ACCESS_KEY_ID: ${{ secrets.ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.SECRET_ACCESS_KEY }}
+          AWS_REGION: us-east-1
+
+      - name: Upload Linux_x86_64 tar to latest directory of S3 bucket
+        uses: ItsKarma/aws-cli@v1.70.0
+        with:
+          args: s3 cp dist/kuberactl_${{ steps.release_tag.outputs.branch }}_Linux_x86_64.tar.gz s3://asset.mayadata.io/kuberactl/latest/kuberactl_latest_Linux_x86_64.tar.gz --acl public-read
+        env:
+          # Make sure to add the secrets in the repo settings page
+          # AWS_REGION is set to us-east-1 by default
+          AWS_ACCESS_KEY_ID: ${{ secrets.ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.SECRET_ACCESS_KEY }}
+          AWS_REGION: us-east-1
+
       - name: Upload binaries to the build version directory
         uses: ItsKarma/aws-cli@v1.70.0
         with:
-          args: s3 sync dist s3://asset.mayadata.io/${{ steps.release_tag.outputs.branch }} --exclude "*" --include "*.gz"
+          args: s3 sync dist s3://asset.mayadata.io/kuberactl/${{ steps.release_tag.outputs.branch }} --exclude "*" --include "*.gz" --acl public-read
         env:
           # Make sure to add the secrets in the repo settings page
           # AWS_REGION is set to us-east-1 by default

@@ -8,7 +8,8 @@ builds:
   - GO111MODULE=on
   - CGO_ENABLED=0
 archives:
-- replacements:
+- name_template: '{{ .ProjectName }}_{{ .Tag }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
+  replacements:
     darwin: Darwin
     linux: Linux
     windows: Windows
