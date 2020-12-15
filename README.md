@@ -14,10 +14,10 @@ The kuberactl CLI requires the following things:
 
 To install the latest version of kuberactl CLI follow the below steps:
 
-- Download the latest kuberactl binary from - `https://github.com/mayadata-io/kuberactl/releases/`
+- Download the latest kuberactl binary from - `http://asset.mayadata.io/kuberactl/latest/kuberactl_latest_Linux_x86_64.tar.gz`
 - Untar the binary
 ```shell
-$ tar -xvzf kuberactl_<Version>_<OS>_<ARCH>.tar.gz
+$ tar -xvzf kuberactl_latest_Linux_x86_64.tar.gz
 ```
 - Move the kuberactl binary to /usr/local/bin
 ```shell
@@ -39,4 +39,8 @@ $ kuberactl version
 To register Kubera Chaos agent:
 ```shell
 $ kuberactl chaos agent register
+```
+To register Kubera Propel agent:
+```shell
+$ kuberactl propel agent register
 ```

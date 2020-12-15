@@ -22,11 +22,11 @@ func getUsername() string {
 
 func getPortalURL() (*url.URL, error) {
 	var host string
-	fmt.Print("👉 Kubera Core URL: ")
+	fmt.Print("👉 Kubera Enterprise URL: ")
 	fmt.Scanln(&host)
 	for host == "" {
-		fmt.Println("⛔ Portal URL can't be empty!!")
-		fmt.Print("👉 Kubera Core URL: ")
+		fmt.Println("⛔ Kubera Enterprise URL can't be empty!!")
+		fmt.Print("👉 Kubera Enterprise URL: ")
 		fmt.Scanln(&host)
 	}
 	host = strings.TrimRight(host, "/")
@@ -72,7 +72,7 @@ func Scanner() string {
 }
 
 // Summary display the agent details based on input
-func Summary(agent Agent) {
+func Summary(agent Agent, product string) {
 	fmt.Println("\n📌 Summary --------------------------")
 	fmt.Println("\nAgent Name:        ", agent.AgentName)
 	fmt.Println("Agent Description: ", agent.Description)
@@ -82,11 +82,13 @@ func Summary(agent Agent) {
 	} else {
 		fmt.Println("Namespace:         ", agent.Namespace, "(new)")
 	}
-	if SAExists(agent.Namespace, agent.ServiceAccount) {
-		fmt.Println("Service Account:   ", agent.ServiceAccount)
-	} else {
-		fmt.Println("Service Account:   ", agent.ServiceAccount, "(new)")
+	if product == "chaos" {
+		if SAExists(agent.Namespace, agent.ServiceAccount) {
+			fmt.Println("Service Account:   ", agent.ServiceAccount)
+		} else {
+			fmt.Println("Service Account:   ", agent.ServiceAccount, "(new)")
+		}
+		fmt.Println("Installation Mode: ", agent.Mode)
 	}
-	fmt.Println("Installation Mode: ", agent.Mode)
 	fmt.Println("\n-------------------------------------")
 }

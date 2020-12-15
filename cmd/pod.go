@@ -26,9 +26,9 @@ func WatchPod(namespace, label string) {
 		if !ok {
 			log.Fatal("unexpected type")
 		}
-		fmt.Println("💡 Waiting for Subscriber pod. Status:", p.Status.Phase)
+		fmt.Println("💡 Connecting agent to Kubera Enterprise.")
 		if p.Status.Phase == "Running" {
-			fmt.Println("🏃 Subscriber pod running!!")
+			fmt.Println("🏃 Agents running!!")
 			watch.Stop()
 			break
 		}

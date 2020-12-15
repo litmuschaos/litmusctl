@@ -19,14 +19,15 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/mayadata-io/kuberactl/pkg/types/propel"
 	"github.com/spf13/cobra"
 )
 
 // registerCmd represents the register command
-var registerCmd = &cobra.Command{
+var propelAgentRegisterCmd = &cobra.Command{
 	Use:   "register",
-	Short: "Register Kubera Chaos agent",
-	Long:  `Register registers the agent to Kubera Chaos`,
+	Short: "Register Kubera Propel agent",
+	Long:  `Register registers the agent to Kubera Propel`,
 	Run: func(cmd *cobra.Command, args []string) {
 
 		var c Credentials
@@ -46,7 +47,7 @@ var registerCmd = &cobra.Command{
 		// Fetch authorization token
 		t := login(c)
 		// Get LaunchProduct token
-		productToken, err := LaunchProduct(t, c, "Chaos")
+		productToken, err := LaunchProduct(t, c, "Propel")
 		if err != nil {
 			fmt.Printf("\n❌ Fetching LaunchProduct query failed: [%s]", err)
 			os.Exit(1)
@@ -54,55 +55,51 @@ var registerCmd = &cobra.Command{
 		// Replace AccessToken with LaunchProduct token
 		t.AccessToken = productToken.Data.LaunchProduct
 		// Fetch project details
-		user, uErr := GetProjectDetails(t, c, "chaos")
+		user, uErr := ListPropelProjects(t, c)
 		if uErr != nil {
 			fmt.Printf("\n❌ Fetching project details failed: [%s]", uErr)
 			os.Exit(1)
 		}
+		if len(user.Errors) != 0 {
+			fmt.Printf("\n❌ Fetching project details failed: [%s]", user.Errors[0].Message)
+			os.Exit(1)
+		}
 		// Fetch project id
-		pid := GetProject(user)
-		// Get mode of installation as input
-		mode := GetMode()
-		// Check if user has sufficient permissions based on mode
-		fmt.Println("\n🏃 Running prerequisites check....")
-		ValidateSAPermissions(mode)
+		pid := SelectPropelProject(user)
 		// Get agent details as input
-		newAgent := GetAgentDetails(pid, t, c)
-		newAgent.Mode = mode
-		// Get service account as input
-		newAgent.ServiceAccount, newAgent.SAExists = ValidSA(newAgent.Namespace)
+		newAgent := GetPropelAgentDetails(pid, t, c)
 		// Display details of agent to be connected
-		Summary(newAgent, "chaos")
+		Summary(newAgent, "propel")
 		// Confirm before connecting the agent
 		confirm()
 		// Register agent
-		agent, cerror := RegisterAgent(newAgent, t, c)
+		agent, cerror := RegisterPropelAgent(newAgent, t, c)
 		if cerror != nil {
 			fmt.Printf("\n❌ Agent registration failed: [%s]\n", cerror.Error())
 			os.Exit(1)
 		}
 		// Print error message in case Data field is null in response
-		if (agent.Data == AgentRegister{}) {
+		if (agent.AgentData == propel.AgentData{}) {
 			fmt.Printf("\n🚫 Agent registration failed: [%s]\n", agent.Errors[0].Message)
 			os.Exit(1)
 		}
 		// Apply agent registration yaml
-		yamlOutput, yerror := ApplyYaml(agent.Data.UserAgentReg.Token, c, chaosYamlPath)
+		yamlOutput, yerror := ApplyYaml(agent.AgentData.AddCluster.ClusterToken, c, propelYamlPath)
 		if yerror != nil {
 			fmt.Printf("\n❌ Failed in applying registration yaml: [%s]\n", yerror.Error())
 			os.Exit(1)
 		}
 		fmt.Println("\n", yamlOutput)
 		// Watch subscriber pod status
-		WatchPod(newAgent.Namespace, chaosAgentLabel)
+		WatchPod(newAgent.Namespace, propelAgentLabel)
 		fmt.Println("\n🚀 Agent Registration Successful!! 🎉")
-		fmt.Println("👉 Kubera agents can be accessed here: " + fmt.Sprintf("%s/%s", c.Host, chaosAgentPath))
+		fmt.Println("👉 Kubera agents can be accessed here: " + fmt.Sprintf("%s/%s", c.Host, propelAgentPath))
 
 	},
 }
 
 func init() {
-	agentCmd.AddCommand(registerCmd)
+	propelAgentCmd.AddCommand(propelAgentRegisterCmd)
 
 	// Here you will define your flags and configuration settings.
 

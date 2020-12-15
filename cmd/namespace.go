@@ -30,8 +30,8 @@ func NsExists(namespace string) (bool, error) {
 	return false, err
 }
 
-// ValidNs takes a valid namespace as input
-func ValidNs() (string, bool) {
+// ValidNs takes a valid namespace as input from user
+func ValidNs(label string) (string, bool) {
 	var namespace string
 	var nsExists bool
 	fmt.Print("📁 Enter the namespace [", defaultNs, "]: ")
@@ -45,9 +45,9 @@ func ValidNs() (string, bool) {
 		os.Exit(1)
 	}
 	if ok {
-		if PodExists(namespace, agentLabel) {
+		if PodExists(namespace, label) {
 			fmt.Println("🚫 Subscriber already present. Please enter a different namespace")
-			namespace, nsExists = ValidNs()
+			namespace, nsExists = ValidNs(label)
 		} else {
 			nsExists = true
 			fmt.Println("👍 Continuing with", namespace, "namespace")
@@ -55,7 +55,7 @@ func ValidNs() (string, bool) {
 	} else {
 		if val, _ := CheckSAPermissions("create", "namespace", false); !val {
 			fmt.Println("🚫 You don't have permissions to create a namespace.\n🙄 Please enter an existing namespace.")
-			namespace, nsExists = ValidNs()
+			namespace, nsExists = ValidNs(label)
 		}
 		nsExists = false
 	}
