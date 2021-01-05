@@ -11,8 +11,11 @@ const (
 	// Default installation mode
 	defaultMode = "namespace"
 
+	// Platform list
+	platformList = "1. AWS\n2. GKE\n3. Openshift\n4. Rancher\n5. Others"
+
 	// Default platform name
-	defaultPlatform = "others"
+	defaultPlatform = "Others"
 
 	// Label of subscriber agent being deployed
 	chaosAgentLabel = "app=subscriber"

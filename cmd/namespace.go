@@ -34,7 +34,7 @@ func NsExists(namespace string) (bool, error) {
 func ValidNs(label string) (string, bool) {
 	var namespace string
 	var nsExists bool
-	fmt.Print("📁 Enter the namespace [", defaultNs, "]: ")
+	fmt.Print("📁 Enter the namespace (new or existing) [", defaultNs, "]: ")
 	fmt.Scanln(&namespace)
 	if namespace == "" {
 		namespace = defaultNs

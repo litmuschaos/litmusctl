@@ -60,6 +60,26 @@ func confirm() {
 	}
 }
 
+func getPlatformName() string {
+	var platform int
+	fmt.Println("📦 Platform List")
+	fmt.Println(platformList)
+	fmt.Print("🔎 Select Platform [", defaultPlatform, "]: ")
+	fmt.Scanln(&platform)
+	switch platform {
+	case 1:
+		return "AWS"
+	case 2:
+		return "GKE"
+	case 3:
+		return "Openshift"
+	case 4:
+		return "Rancher"
+	default:
+		return defaultPlatform
+	}
+}
+
 func Scanner() string {
 	scanner := bufio.NewScanner(os.Stdin)
 	for scanner.Scan() {

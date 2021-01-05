@@ -47,11 +47,11 @@ func GetAgentDetails(pid string, t Token, cred Credentials) Agent {
 	// Get agent name as input
 	fmt.Println("\n🔗 Enter the details of the agent ----")
 	fmt.Print("🤷 Agent Name: ")
-	fmt.Scanln(&newAgent.AgentName)
+	newAgent.AgentName = Scanner()
 	for newAgent.AgentName == "" {
 		fmt.Println("⛔ Agent name cannot be empty. Please enter a valid name.")
 		fmt.Print("🤷 Agent Name: ")
-		fmt.Scanln(&newAgent.AgentName)
+		newAgent.AgentName = Scanner()
 	}
 	i := 0
 	// Check if agent with the given name already exists
@@ -60,25 +60,21 @@ func GetAgentDetails(pid string, t Token, cred Credentials) Agent {
 		if i < 1 {
 			fmt.Println("🚫 Agent with the given name already exists.\n❗ Please enter a different name.")
 			fmt.Print("🤷 Agent Name: ")
-			fmt.Scanln(&newAgent.AgentName)
+			newAgent.AgentName = Scanner()
 			i++
 		} else {
 			fmt.Println("🚫 Agent with the given name already exists.")
 			GetAgentList(pid, t, cred)
 			fmt.Println("❗ Please enter a different name.")
 			fmt.Print("\n🤷 Agent Name: ")
-			fmt.Scanln(&newAgent.AgentName)
+			newAgent.AgentName = Scanner()
 		}
 	}
 	// Get agent description as input
 	fmt.Print("📘 Agent Description: ")
 	newAgent.Description = Scanner()
 	// Get platform name as input
-	fmt.Print("📦 Platform Name [", defaultPlatform, "]: ")
-	fmt.Scanln(&newAgent.PlatformName)
-	if newAgent.PlatformName == "" {
-		newAgent.PlatformName = defaultPlatform
-	}
+	newAgent.PlatformName = getPlatformName()
 	// Set agent type
 	newAgent.ClusterType = agentType
 	// Set project id
@@ -201,11 +197,11 @@ func GetPropelAgentDetails(pid string, t Token, cred Credentials) Agent {
 	// Get agent name as input
 	fmt.Println("\n🔗 Enter the details of the agent ----")
 	fmt.Print("🤷 Agent Name: ")
-	fmt.Scanln(&newAgent.AgentName)
+	newAgent.AgentName = Scanner()
 	for newAgent.AgentName == "" {
 		fmt.Println("⛔ Agent name cannot be empty. Please enter a valid name.")
 		fmt.Print("🤷 Agent Name: ")
-		fmt.Scanln(&newAgent.AgentName)
+		newAgent.AgentName = Scanner()
 	}
 	i := 0
 	// Check if agent with the given name already exists
@@ -214,25 +210,21 @@ func GetPropelAgentDetails(pid string, t Token, cred Credentials) Agent {
 		if i < 1 {
 			fmt.Println("🚫 Agent with the given name already exists.\n❗ Please enter a different name.")
 			fmt.Print("🤷 Agent Name: ")
-			fmt.Scanln(&newAgent.AgentName)
+			newAgent.AgentName = Scanner()
 			i++
 		} else {
 			fmt.Println("🚫 Agent with the given name already exists.")
 			PrintPropelAgents(agentsList)
 			fmt.Println("❗ Please enter a different name.")
 			fmt.Print("\n🤷 Agent Name: ")
-			fmt.Scanln(&newAgent.AgentName)
+			newAgent.AgentName = Scanner()
 		}
 	}
 	// Get agent description as input
 	fmt.Print("📘 Agent Description: ")
 	newAgent.Description = Scanner()
 	// Get platform name as input
-	fmt.Print("📦 Platform Name [", defaultPlatform, "]: ")
-	fmt.Scanln(&newAgent.PlatformName)
-	if newAgent.PlatformName == "" {
-		newAgent.PlatformName = defaultPlatform
-	}
+	newAgent.PlatformName = getPlatformName()
 	// Set agent type
 	newAgent.ClusterType = propelAgentType
 	// Set project id
