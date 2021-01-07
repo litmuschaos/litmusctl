@@ -14,6 +14,12 @@ const (
 	// Platform list
 	platformList = "1. AWS\n2. GKE\n3. Openshift\n4. Rancher\n5. Others"
 
+	// AWS identifier
+	AWSIdentifier = "aws://"
+
+	// Openshift identifier
+	OpenshiftIdentifier = "node.openshift.io/os_id"
+
 	// Default platform name
 	defaultPlatform = "Others"
 

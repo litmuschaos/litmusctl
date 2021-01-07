@@ -60,13 +60,23 @@ func confirm() {
 	}
 }
 
+// getPlatformName displays a list of platforms, takes the
+// platform name as input and returns the selected platform
+//
+// TODO --
+// - Entering any character other than numbers returns 0. Input validation need to be done.
+// - If input is given as "123abc", "abc" will be used for next user input. Buffer need to be read completely.
+// - String literals like "AWS" are used at multiple places. Need to be changed to constants.
 func getPlatformName() string {
 	var platform int
+	discoveredPlatform := discoverPlatform()
 	fmt.Println("📦 Platform List")
 	fmt.Println(platformList)
-	fmt.Print("🔎 Select Platform [", defaultPlatform, "]: ")
+	fmt.Print("🔎 Select Platform [", discoveredPlatform, "]: ")
 	fmt.Scanln(&platform)
 	switch platform {
+	case 0:
+		return discoveredPlatform
 	case 1:
 		return "AWS"
 	case 2:
