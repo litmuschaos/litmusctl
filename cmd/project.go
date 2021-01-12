@@ -10,14 +10,9 @@ import (
 type ProjectDetails struct {
 	Data Data `json:"data"`
 }
-type Members struct {
-	UserUID string `json:"user_uid"`
-	Role    string `json:"role"`
-}
 type GetProjects struct {
-	ID      string    `json:"id"`
-	Name    string    `json:"name"`
-	Members []Members `json:"members"`
+	ID   string `json:"id"`
+	Name string `json:"name"`
 }
 type Data struct {
 	GetProjects []GetProjects `json:"getProjects"`
@@ -27,7 +22,7 @@ type Data struct {
 func GetProjectDetails(t Token, c Credentials, product string) (ProjectDetails, interface{}) {
 	var new ProjectDetails
 	client := resty.New()
-	bodyData := `{"query":"\nquery{\n  getProjects{\n    id\n    name\n    members{\n      user_uid\n      role\n    }\n  }\n}"}`
+	bodyData := `{"query":"\nquery{\n  getProjects{\n    id\n    name\n }\n}"}`
 	resp, err := client.R().
 		SetHeader("Content-Type", "application/json").
 		SetHeader("Authorization", fmt.Sprintf("%s", t.AccessToken)).
@@ -73,7 +68,7 @@ func GetProject(u ProjectDetails) string {
 func ListPropelProjects(t Token, c Credentials) (propel.PropelProjects, interface{}) {
 	var new propel.PropelProjects
 	client := resty.New()
-	bodyData := `{"query":"query{\n  listProjects{\n    projects{\n      id\n      name\n      members{\n        user_id\n        user_name\n        name\n        email\n        role\n      }\n    }\n  }\n}"}`
+	bodyData := `{"query":"query{\n  listProjects{\n    projects{\n      id\n      name\n }\n  }\n}"}`
 	resp, err := client.R().
 		SetHeader("Content-Type", "application/json").
 		SetHeader("Authorization", fmt.Sprintf("%s", t.AccessToken)).
