@@ -1,9 +1,10 @@
-package cmd
+package core
 
 import (
 	"fmt"
 
-	"github.com/go-resty/resty/v2"
+	resty "github.com/go-resty/resty/v2"
+	util "github.com/mayadata-io/cli-utils/pkg/common"
 )
 
 type LaunchProductResponse struct {
@@ -14,7 +15,7 @@ type LaunchProductData struct {
 }
 
 // GetUserDetails fetches details of the input user
-func LaunchProduct(t Token, c Credentials, Product string) (LaunchProductResponse, error) {
+func LaunchProduct(t util.Token, c util.Credentials, Product string) (LaunchProductResponse, error) {
 	var new LaunchProductResponse
 	client := resty.New()
 	bodyData := `{"query":"query{\n  launchProduct(type: ` + fmt.Sprintf("%s", Product) + `)\n}"}`

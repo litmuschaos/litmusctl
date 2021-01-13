@@ -13,32 +13,34 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package cmd
+package version
 
 import (
+	"fmt"
+
+	"github.com/mayadata-io/kuberactl/cmd/constants"
 	"github.com/spf13/cobra"
 )
 
-// agentCmd represents the agent command
-var agentCmd = &cobra.Command{
-	Use:   "agent",
-	Short: "Kubera Agent",
-	Long:  `agent is used to manage Kubera backup and restore agents`,
-	// Run: func(cmd *cobra.Command, args []string) {
-	// 	fmt.Println("agent called")
-	// },
+// versionCmd represents the version command
+var VersionCmd = &cobra.Command{
+	Use:   "version",
+	Short: "Kuberactl version",
+	Long:  `Kuberactl cli version`,
+	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Println("Kuberactl version: ", constants.CLIVersion)
+	},
 }
 
 func init() {
-	litmusCmd.AddCommand(agentCmd)
+	// kuberactl.RootCmd.AddCommand(versionCmd)
 
 	// Here you will define your flags and configuration settings.
 
 	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// agentCmd.PersistentFlags().String("foo", "", "A help for foo")
+	// and all subcommands,
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	// agentCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	// versionCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

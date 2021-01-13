@@ -15,7 +15,7 @@ limitations under the License.
 */
 package main
 
-import "github.com/mayadata-io/kuberactl/cmd"
+import cmd "github.com/mayadata-io/kuberactl/cmd/kuberactl"
 
 func main() {
 	cmd.Execute()
