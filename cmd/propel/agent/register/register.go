@@ -8,6 +8,7 @@ import (
 	"github.com/mayadata-io/cli-utils/pkg/common/k8s"
 	"github.com/mayadata-io/cli-utils/pkg/constants"
 	util "github.com/mayadata-io/kuberactl/cmd/propel/util"
+	"github.com/mayadata-io/kuberactl/core"
 
 	//"github.com/mayadata-io/kuberactl/pkg/types/propel"
 	"github.com/spf13/cobra"
@@ -37,7 +38,7 @@ var RegisterCmd = &cobra.Command{
 		// Fetch authorization token
 		t := common.Login(c)
 		// Get LaunchProduct token
-		productToken, err := common.LaunchProduct(t, c, "Propel")
+		productToken, err := core.LaunchProduct(t, c, "Propel")
 		if err != nil {
 			fmt.Printf("\n❌ Fetching LaunchProduct query failed: [%s]", err)
 			os.Exit(1)

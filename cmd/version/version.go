@@ -18,7 +18,7 @@ package version
 import (
 	"fmt"
 
-	"github.com/mayadata-io/kuberactl/cmd/constants"
+	"github.com/mayadata-io/kuberactl/constants"
 	"github.com/spf13/cobra"
 )
 

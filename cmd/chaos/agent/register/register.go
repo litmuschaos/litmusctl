@@ -6,7 +6,7 @@ import (
 
 	"github.com/mayadata-io/cli-utils/pkg/chaos"
 	utils "github.com/mayadata-io/cli-utils/pkg/common"
-	"github.com/mayadata-io/kuberactl/cmd/core"
+	"github.com/mayadata-io/kuberactl/core"
 	"github.com/spf13/cobra"
 )
 
