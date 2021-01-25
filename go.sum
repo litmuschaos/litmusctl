@@ -292,6 +292,8 @@ github.com/mayadata-io/cli-utils v0.0.0-20210113084301-86afa3dfe6c6 h1:7t5xR3PzJ
 github.com/mayadata-io/cli-utils v0.0.0-20210113084301-86afa3dfe6c6/go.mod h1:K1Zewiz8hyyuxvwH5HtpFB5zFW47aIPKgifJmCTXIKY=
 github.com/mayadata-io/cli-utils v0.0.0-20210115123331-af47ae673e80 h1:waakY23JJfW9YJ9aAAN1YuhP1n+0Ont/3tcsVFVRoxY=
 github.com/mayadata-io/cli-utils v0.0.0-20210115123331-af47ae673e80/go.mod h1:K1Zewiz8hyyuxvwH5HtpFB5zFW47aIPKgifJmCTXIKY=
+github.com/mayadata-io/cli-utils v0.0.0-20210119141112-84fe44fff4e7 h1:BY26QXDvttXA9BMQPf/VyjGzjGeQx9h3Ofinahk8Sxs=
+github.com/mayadata-io/cli-utils v0.0.0-20210119141112-84fe44fff4e7/go.mod h1:K1Zewiz8hyyuxvwH5HtpFB5zFW47aIPKgifJmCTXIKY=
 github.com/miekg/dns v1.0.14/go.mod h1:W1PPwlIAgtquWBMBEV9nkV9Cazfe8ScdGz/Lj7v3Nrg=
 github.com/mitchellh/cli v1.0.0/go.mod h1:hNIlj7HEI86fIcpObd7a0FcrxTWetlwJDGcceTlRvqc=
 github.com/mitchellh/go-homedir v1.0.0/go.mod h1:SfyaCUpYCn1Vlf4IUYiD9fPX4A5wJrkLzIz1N1q0pr0=

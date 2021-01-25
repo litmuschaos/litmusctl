@@ -7,7 +7,7 @@ require (
 	github.com/go-resty/resty v0.0.0-00010101000000-000000000000 // indirect
 	github.com/go-resty/resty/v2 v2.3.0
 	github.com/imdario/mergo v0.3.11 // indirect
-	github.com/mayadata-io/cli-utils v0.0.0-20210115123331-af47ae673e80
+	github.com/mayadata-io/cli-utils v0.0.0-20210119141112-84fe44fff4e7
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/spf13/cobra v1.1.1

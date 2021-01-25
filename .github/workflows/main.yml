@@ -1,25 +1,44 @@
-name: Build
+name: Build CLI binaries
 
-# This workflow will run on master branch and on any pull requests targeting master
+# This workflow will run on all branches
 on:
   push:
     branches:
-      - master
-    tags: []
-  pull_request:
-  
+      - "*"
+  # TODO - build binary for pull requests targeting master branch
+  # pull_request:
+
 jobs:
   build:
-    name: Build
     runs-on: ubuntu-latest
     steps:
-      - name: Set up Go
-        uses: actions/setup-go@v1
-        with:
-          go-version: 1.14
-
-      - name: Check out code
+      - name: Checkout
         uses: actions/checkout@v1
 
-      - name: Build
-        run: make build
+      - name: Get branch name
+        shell: bash
+        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF##*/})"
+        id: branch_name
+
+      - name: Build binaries
+        uses: sosedoff/actions/golang-build@master
+        env:
+          COMPRESS_FILES: "true"
+
+      - name: Remove older binaries from S3 bucket's current branch directory (if present)
+        uses: ItsKarma/aws-cli@v1.70.0
+        with:
+          args: s3 rm s3://asset.mayadata.io/kuberactl/${{ steps.branch_name.outputs.branch }} --recursive
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.SECRET_ACCESS_KEY }}
+          AWS_REGION: us-east-1
+
+      - name: Upload binaries to S3 bucket's current branch directory
+        uses: ItsKarma/aws-cli@v1.70.0
+        with:
+          args: s3 sync .release s3://asset.mayadata.io/kuberactl/${{ steps.branch_name.outputs.branch }} --acl public-read
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.SECRET_ACCESS_KEY }}
+          AWS_REGION: us-east-1
