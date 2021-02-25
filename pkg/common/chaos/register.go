@@ -19,7 +19,7 @@ func Register(t common.Token, c common.Credentials) {
 	// Fetch project id
 	//pid := GetProject(user)
 	// TODO: change this
-	pid := "991043fc-f53b-446a-862e-29be55ba0af7"
+	pid := "ed965069-ed16-45a1-980e-cd0a9e5c32c6"
 	// Get mode of installation as input
 	mode := GetMode()
 	// Check if user has sufficient permissions based on mode
@@ -57,5 +57,5 @@ func Register(t common.Token, c common.Credentials) {
 	// Watch subscriber pod status
 	k8s.WatchPod(newAgent.Namespace, constants.ChaosAgentLabel)
 	fmt.Println("\n🚀 Agent Registration Successful!! 🎉")
-	fmt.Println("👉 Kubera agents can be accessed here: " + fmt.Sprintf("%s/%s", c.Host, constants.ChaosAgentPath))
+	fmt.Println("👉 Litmus agents can be accessed here: " + fmt.Sprintf("%s/%s", c.Host, constants.ChaosAgentPath))
 }

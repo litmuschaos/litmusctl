@@ -3,10 +3,11 @@ package common
 import (
 	"bufio"
 	"fmt"
-	"github.com/litmuschaos/litmusctl/pkg/common/k8s"
 	"net/url"
 	"os"
 	"strings"
+
+	"github.com/litmuschaos/litmusctl/pkg/common/k8s"
 
 	"github.com/litmuschaos/litmusctl/pkg/constants"
 	"golang.org/x/crypto/ssh/terminal"
@@ -24,11 +25,11 @@ func GetUsername() string {
 
 func GetPortalURL() (*url.URL, error) {
 	var host string
-	fmt.Print("👉 Kubera Enterprise URL: ")
+	fmt.Print("👉 Host URL where litmus is installed: ")
 	fmt.Scanln(&host)
 	for host == "" {
-		fmt.Println("⛔ Kubera Enterprise URL can't be empty!!")
-		fmt.Print("👉 Kubera Enterprise URL: ")
+		fmt.Println("⛔ Host URL can't be empty!!")
+		fmt.Print("👉 Host URL: ")
 		fmt.Scanln(&host)
 	}
 	host = strings.TrimRight(host, "/")

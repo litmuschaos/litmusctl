@@ -12,15 +12,15 @@ import (
 // registerCmd represents the register command
 var RegisterCmd = &cobra.Command{
 	Use:   "register",
-	Short: "Register Kubera Chaos agent",
-	Long:  `Register registers the agent to Kubera Chaos`,
+	Short: "Register LitmusChaos agent",
+	Long:  `Register registers the agent to LitmusChaos`,
 	Run: func(cmd *cobra.Command, args []string) {
 
 		var c utils.Credentials
 		var pErr error
-		fmt.Println("🔥 Registering Kubera Enterprise agent")
-		fmt.Println("\n📶 Please enter Kubera Enterprise details --")
-		// Get Kubera Enterprise URL as input
+		fmt.Println("🔥 Registering LitmusChaos agent")
+		fmt.Println("\n📶 Please enter LitmusChaos details --")
+		// Get LitmusChaos URL as input
 		c.Host, pErr = utils.GetPortalURL()
 		if pErr != nil {
 			fmt.Printf("\n❌ URL parsing failed: [%s]", pErr.Error())

@@ -35,29 +35,22 @@ func GetAgentDetails(pid string, t util.Token, cred util.Credentials) util.Agent
 	var newAgent util.Agent
 	// Get agent name as input
 	fmt.Println("\n🔗 Enter the details of the agent ----")
+	// Label for goto statement in case of invalid agent name
+AGENT_NAME:
 	fmt.Print("🤷 Agent Name: ")
 	newAgent.AgentName = util.Scanner()
-	for newAgent.AgentName == "" {
+	if newAgent.AgentName == "" {
 		fmt.Println("⛔ Agent name cannot be empty. Please enter a valid name.")
-		fmt.Print("🤷 Agent Name: ")
-		newAgent.AgentName = util.Scanner()
+		goto AGENT_NAME
 	}
-	i := 0
+
 	// Check if agent with the given name already exists
-	for AgentExists(pid, newAgent.AgentName, t, cred) {
+	if AgentExists(pid, newAgent.AgentName, t, cred) {
+		fmt.Println("🚫 Agent with the given name already exists.")
 		// Print agent list if existing agent name is entered twice
-		if i < 1 {
-			fmt.Println("🚫 Agent with the given name already exists.\n❗ Please enter a different name.")
-			fmt.Print("🤷 Agent Name: ")
-			newAgent.AgentName = util.Scanner()
-			i++
-		} else {
-			fmt.Println("🚫 Agent with the given name already exists.")
-			GetAgentList(pid, t, cred)
-			fmt.Println("❗ Please enter a different name.")
-			fmt.Print("\n🤷 Agent Name: ")
-			newAgent.AgentName = util.Scanner()
-		}
+		GetAgentList(pid, t, cred)
+		fmt.Println("❗ Please enter a different name.")
+		goto AGENT_NAME
 	}
 	// Get agent description as input
 	fmt.Print("📘 Agent Description: ")
@@ -103,15 +96,18 @@ func AgentExists(pid, agentName string, t util.Token, cred util.Credentials) boo
 		SetResult(&agents).
 		Post(
 			fmt.Sprintf(
-				"%s/chaos/api/graphql/query",
+				"%s/api/graphql/query",
 				cred.Host,
 			),
 		)
 	if err != nil || !resp.IsSuccess() {
+		fmt.Println("Error getting agent names: ", err)
+		fmt.Println("host", cred.Host)
 		return true
 	}
 	for i := range agents.Data.GetAgent {
 		if agentName == agents.Data.GetAgent[i].AgentName {
+			fmt.Println(agents.Data.GetAgent[i].AgentName)
 			return true
 		}
 	}
@@ -133,12 +129,12 @@ func GetAgentList(pid string, t util.Token, cred util.Credentials) {
 		SetResult(&agents).
 		Post(
 			fmt.Sprintf(
-				"%s/chaos/api/graphql/query",
+				"%s/api/graphql/query",
 				cred.Host,
 			),
 		)
 	if err != nil || !resp.IsSuccess() {
-		fmt.Println(err)
+		fmt.Println("Error in geting agent list: ", err)
 	}
 	fmt.Println("\n📘 Registered agents list -----------")
 	fmt.Println()
@@ -163,8 +159,8 @@ func RegisterAgent(c util.Agent, t util.Token, cred util.Credentials) (AgentRegi
 		SetResult(&cr).
 		Post(
 			fmt.Sprintf(
-				//"%s/chaos/api/graphql/query",
-				"%s/api/query",
+				//"%s/api",
+				"%s/api/graphql/query",
 				cred.Host,
 			),
 		)
