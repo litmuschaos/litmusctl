@@ -15,7 +15,7 @@ limitations under the License.
 */
 package main
 
-import cmd "github.com/litmuschaos/litmusctl/cmd/litmusctl"
+import cmd "github.com/litmuschaos/litmusctl/pkg/cmd/litmusctl"
 
 func main() {
 	cmd.Execute()

@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/litmuschaos/litmusctl/cmd/version"
+	"github.com/litmuschaos/litmusctl/pkg/cmd/version"
 
-	chaosAgent "github.com/litmuschaos/litmusctl/cmd/agent"
-	chaosRegister "github.com/litmuschaos/litmusctl/cmd/agent/register"
+	chaosAgent "github.com/litmuschaos/litmusctl/pkg/cmd/agent"
+	chaosRegister "github.com/litmuschaos/litmusctl/pkg/cmd/agent/register"
 	"github.com/spf13/cobra"
 )
 

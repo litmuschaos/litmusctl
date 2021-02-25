@@ -18,7 +18,7 @@ package version
 import (
 	"fmt"
 
-	"github.com/litmuschaos/litmusctl/constants"
+	"github.com/litmuschaos/litmusctl/pkg/constants"
 	"github.com/spf13/cobra"
 )
 
