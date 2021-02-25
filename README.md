@@ -16,10 +16,13 @@ To install the latest version of kuberactl CLI follow the below steps:
 
 - Download the latest kuberactl binary from - `http://asset.mayadata.io/kuberactl/latest/kuberactl_latest_Linux_x86_64.tar.gz`
 - Untar the binary
+
 ```shell
 $ tar -xvzf kuberactl_latest_Linux_x86_64.tar.gz
 ```
+
 - Move the kuberactl binary to /usr/local/bin
+
 ```shell
 $ sudo mv kuberactl /usr/local/bin/
 ```
@@ -29,20 +32,25 @@ $ sudo mv kuberactl /usr/local/bin/
 ## Basic Commands
 
 Kuberactl CLI command has the following structure:
+
 ```shell
 $ kuberactl <command> <subcommand> <subcommand> [options and parameters]
 ```
 
 To get the version of the kuberactl CLI:
+
 ```shell
 $ kuberactl version
 ```
 
 To register Kubera Chaos agent:
+
 ```shell
 $ kuberactl chaos agent register
 ```
+
 To register Kubera Propel agent:
+
 ```shell
 $ kuberactl propel agent register
 ```
@@ -52,7 +60,8 @@ $ kuberactl propel agent register
 #### Initial setup
 
 **Fork in the cloud**
-1. Visit https://github.com/mayadata-io/kuberactl.
+
+1. Visit https://github.com/litmuschaos/litmusctl.
 2. Click `Fork` button (top right) to establish a cloud-based fork.
 
 **Clone fork to local host**
@@ -67,7 +76,7 @@ git clone https://github.com/$user/kuberactl.git
 
 # Configure remote upstream
 cd path/to/directory/mayadata-io/kuberactl
-git remote add upstream https://github.com/mayadata-io/kuberactl.git
+git remote add upstream https://github.com/litmuschaos/litmusctl.git
 
 # Never push to upstream master
 git remote set-url --push upstream no_push
@@ -77,6 +86,7 @@ git remote -v
 ```
 
 **Create a new feature branch to work on your issue**
+
 ```
 $ git checkout -b <branch-name>
 Switched to a new branch '<branch-name>'
@@ -84,6 +94,7 @@ Switched to a new branch '<branch-name>'
 
 **Make your changes and test them**
 Once the changes are done, you can build the binary and test them using the following command:
+
 ```
 Get into the cloned directory
 $ cd path/to/directory/mayadata-io/kuberactl
@@ -91,4 +102,5 @@ $ cd path/to/directory/mayadata-io/kuberactl
 $ go install
 Note: This will build a binary at `~/go/bin`
 ```
+
 Test your changes by running the necessary `kuberactl` commands.

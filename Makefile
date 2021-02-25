@@ -1,5 +1,5 @@
-PROJECT_NAME := "kuberactl"
-PKG := "github.com/mayadata-io/$(PROJECT_NAME)"
+PROJECT_NAME := "litmusctl"
+PKG := "github.com/litmuschaos/$(PROJECT_NAME)"
 
 all: build
 
