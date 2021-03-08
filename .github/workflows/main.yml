@@ -24,21 +24,3 @@ jobs:
         uses: sosedoff/actions/golang-build@master
         env:
           COMPRESS_FILES: "true"
-
-      - name: Remove older binaries from S3 bucket's current branch directory (if present)
-        uses: ItsKarma/aws-cli@v1.70.0
-        with:
-          args: s3 rm s3://asset.mayadata.io/kuberactl/${{ steps.branch_name.outputs.branch }} --recursive
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.SECRET_ACCESS_KEY }}
-          AWS_REGION: us-east-1
-
-      - name: Upload binaries to S3 bucket's current branch directory
-        uses: ItsKarma/aws-cli@v1.70.0
-        with:
-          args: s3 sync .release s3://asset.mayadata.io/kuberactl/${{ steps.branch_name.outputs.branch }} --acl public-read
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.SECRET_ACCESS_KEY }}
-          AWS_REGION: us-east-1
