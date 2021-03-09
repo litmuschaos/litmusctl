@@ -26,7 +26,7 @@ func WatchPod(namespace, label string) {
 		if !ok {
 			log.Fatal("unexpected type")
 		}
-		fmt.Println("💡 Connecting agent to Kubera Enterprise.")
+		fmt.Println("💡 Connecting agent to Litmus Portal.")
 		if p.Status.Phase == "Running" {
 			fmt.Println("🏃 Agents running!!")
 			watch.Stop()
