@@ -96,7 +96,7 @@ func AgentExists(pid, agentName string, t util.Token, cred util.Credentials) boo
 		SetResult(&agents).
 		Post(
 			fmt.Sprintf(
-				"%s/api/graphql/query",
+				"%s/api/query",
 				cred.Host,
 			),
 		)
@@ -129,7 +129,7 @@ func GetAgentList(pid string, t util.Token, cred util.Credentials) {
 		SetResult(&agents).
 		Post(
 			fmt.Sprintf(
-				"%s/api/graphql/query",
+				"%s/api/query",
 				cred.Host,
 			),
 		)
@@ -159,8 +159,7 @@ func RegisterAgent(c util.Agent, t util.Token, cred util.Credentials) (AgentRegi
 		SetResult(&cr).
 		Post(
 			fmt.Sprintf(
-				//"%s/api",
-				"%s/api/graphql/query",
+				"%s/api/query",
 				cred.Host,
 			),
 		)

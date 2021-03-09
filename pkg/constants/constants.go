@@ -33,29 +33,14 @@ const (
 	AgentType = "external"
 
 	// Default namespace for agent installation
-	DefaultNs = "kubera"
+	DefaultNs = "litmus"
 
 	// Default service account used for agent installation
-	DefaultSA = "kubera"
+	DefaultSA = "litmus"
 
 	// Chaos agent registration yaml path
 	//ChaosYamlPath = "chaos/api/graphql/file"
 	ChaosYamlPath = "api/file"
 
-	ChaosAgentPath = "chaos/agents"
-)
-
-// Propel constants
-const (
-
-	// Propel agent type
-	PropelAgentType = "External"
-
-	// Propel agent registration yaml path
-	PropelYamlPath = "propel/api/graphql/agent/gen"
-
-	// Propel agent label
-	PropelAgentLabel = "propel.kubera.mayadata.io/app-name=propel-agent-subscriber"
-
-	PropelAgentPath = "propel/clusters/SelfCluster"
+	ChaosAgentPath = "agents"
 )

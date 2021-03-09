@@ -72,9 +72,8 @@ func GetYamlData(inputs GenerateWorkflowInputs) (YAMLData, error) {
 		SetResult(&yamlDataResponse).
 		Post(
 			fmt.Sprintf(
-				"%s/%s/api/graphql/query",
+				"%s/api/query",
 				inputs.URL,
-				"chaos",
 			),
 		)
 
@@ -250,9 +249,8 @@ func GetClustersQuery(project_id string, access_token string, url *url.URL) (Get
 		SetResult(&getClusters).
 		Post(
 			fmt.Sprintf(
-				"%s/%s/api/graphql/query",
+				"%s/api/query",
 				url,
-				"chaos",
 			),
 		)
 	if err != nil || !resp.IsSuccess() {
@@ -277,9 +275,8 @@ func GetHubStatusQuery(project_id string, access_token string, url *url.URL) (Ge
 		SetResult(&getHubStatus).
 		Post(
 			fmt.Sprintf(
-				"%s/%s/api/graphql/query",
+				"%s/api/query",
 				url,
-				"chaos",
 			),
 		)
 	if err != nil || !response.IsSuccess() {
@@ -305,9 +302,8 @@ func ListPkgDataQuery(project_id string, hub_id string, access_token string, url
 		SetResult(&pkgdata).
 		Post(
 			fmt.Sprintf(
-				"%s/%s/api/graphql/query",
+				"%s/api/query",
 				url,
-				"chaos",
 			),
 		)
 	if err != nil || !response.IsSuccess() {
