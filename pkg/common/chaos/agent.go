@@ -102,7 +102,6 @@ func AgentExists(pid, agentName string, t util.Token, cred util.Credentials) boo
 		)
 	if err != nil || !resp.IsSuccess() {
 		fmt.Println("Error getting agent names: ", err)
-		fmt.Println("host", cred.Host)
 		return true
 	}
 	for i := range agents.Data.GetAgent {
@@ -136,8 +135,8 @@ func GetAgentList(pid string, t util.Token, cred util.Credentials) {
 	if err != nil || !resp.IsSuccess() {
 		fmt.Println("Error in geting agent list: ", err)
 	}
-	fmt.Println("\n📘 Registered agents list -----------")
-	fmt.Println()
+	fmt.Print("\n📘 Registered agents list -----------\n\n")
+
 	for i := range agents.Data.GetAgent {
 		fmt.Println("-", agents.Data.GetAgent[i].AgentName)
 	}

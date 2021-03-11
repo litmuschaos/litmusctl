@@ -12,7 +12,6 @@ import (
 func Register(t common.Token, c common.Credentials) {
 	// Fetch project details
 	user, uErr := GetProjectDetails(t, c)
-	fmt.Println("User", user)
 
 	if uErr != nil {
 		fmt.Printf("\n❌ Fetching project details failed: [%s]", uErr)
