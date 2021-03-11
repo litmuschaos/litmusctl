@@ -25,7 +25,7 @@ type Project struct {
 // GetProjectDetails fetches details of the input user
 func GetProjectDetails(t util.Token, c util.Credentials) (ProjectDetails, interface{}) {
 	var user ProjectDetails
-	fmt.Println(c.Username)
+
 	client := resty.New()
 	bodyData := `{"query":"query {\n  getUser(username: \"` + fmt.Sprintf("%s", c.Username) + `\"){\n projects{\n id\n name\n}\n}\n}"}`
 	resp, err := client.R().
