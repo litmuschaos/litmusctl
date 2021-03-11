@@ -29,7 +29,7 @@ const (
 	// Label of subscriber agent being deployed
 	ChaosAgentLabel = "app=subscriber"
 
-	// Agent type is "external" for agents connected via Litmusctl
+	// Agent type is "external" for agents connected via litmusctl
 	AgentType = "external"
 
 	// Default namespace for agent installation

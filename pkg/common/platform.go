@@ -63,7 +63,7 @@ func IsAWSPlatform() (bool, error) {
 //     "kind": "Node",
 //     ....
 //     "spec": {
-//         "providerID": "gce://mayadata-demo-247709/us-central1-c/gke-kuberactl-default-pool-6017d869-62q5"
+//         "providerID": ""
 //     }
 //   }
 // }
