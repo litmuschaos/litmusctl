@@ -6,7 +6,6 @@ on:
   push:
     branches:
       - master
-      - ci-cd
 
 jobs:
   build:
@@ -22,23 +21,22 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-#      - name: gofmt check
-#        run: |
-#          if [ "$(gofmt -s -l . | wc -l)" -ne 0 ]
-#          then
-#           echo "The following files were found to be not go formatted:"
-#           gofmt -s -l .
-#           exit 1
-#          fi
-#
-#      - name: golangci-lint
-#        uses: reviewdog/action-golangci-lint@v1
-#
-#      - name: unused-package check
-#        run: |
-#          make unused-package-check
+      - name: gofmt check
+        run: |
+          if [ "$(gofmt -s -l . | wc -l)" -ne 0 ]
+          then
+           echo "The following files were found to be not go formatted:"
+           gofmt -s -l .
+           exit 1
+          fi
+
+      - name: golangci-lint
+        uses: reviewdog/action-golangci-lint@v1
+
+      - name: unused-package check
+        run: |
+          make unused-package-check
 
       - name: Building litmusctl
         run: |
-          pwd & ls
           make build

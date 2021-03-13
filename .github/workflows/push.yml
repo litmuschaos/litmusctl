@@ -1,4 +1,4 @@
-name: Push
+name: Push-or-Release
 on:
   push:
     branches:
@@ -11,7 +11,7 @@ on:
       - '**'
 
 jobs:
-  build:
+  build-and-push:
     runs-on: ubuntu-latest
     steps:
       # Install golang
@@ -45,13 +45,20 @@ jobs:
           git checkout ${GITHUB_REF##*/}
           make build
 
-#      - name: login to GitHub Container Registry
-#        run: echo ${{ secrets.GPASS }} | docker login -u ${{ secrets.GUNAME }} --password-stdin
+      - name: login to GitHub Container Registry
+        run: echo ${{ secrets.GPASS }} | docker login -u ${{ secrets.GUNAME }} --password-stdin
 
       - name: Push litmusctl to repo
         run: |
-          git config --global user.name 'Litmus Bot'
-          git config --global user.email 'litmus-bot@users.noreply.github.com'
+          git config --global user.name 'litmuschaos-bot'
+          git config --global user.email 'litmuschaos-bot@users.noreply.github.com'
           git remote -v
-          git commit -am "Updating litmusctl"
-          git push
+          if [[ `git status --porcelain` ]]; then
+            echo "changes"
+            git commit -am "Updating litmusctl"
+            git push
+            exit 0;
+          else
+            echo "no changes"
+            exit 0;
+          fi
