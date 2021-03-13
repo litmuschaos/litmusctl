@@ -1,44 +1,44 @@
-name: Build CLI binaries
-
-# This workflow will run on all branches
+name: Push
 on:
   push:
     branches:
-      - "*"
-  # TODO - build binary for pull requests targeting master branch
-  # pull_request:
+      - master
+    tags-ignore:
+      - '**'
+  create:
+    tags:
+      - '**'
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      # Install golang
+      - uses: actions/setup-go@v2
+        with:
+          go-version: 1.14
+
+      # Checkout to the latest commit
+      # On specific directory/path
       - name: Checkout
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
 
-      - name: Get branch name
-        shell: bash
-        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF##*/})"
-        id: branch_name
+      - name: gofmt check
+        run: |
+          if [ "$(gofmt -s -l . | wc -l)" -ne 0 ]
+          then
+           echo "The following files were found to be not go formatted:"
+           gofmt -s -l .
+           exit 1
+          fi
 
-      - name: Build binaries
-        uses: sosedoff/actions/golang-build@master
-        env:
-          COMPRESS_FILES: "true"
+      - name: golangci-lint
+        uses: reviewdog/action-golangci-lint@v1
 
-      - name: Remove older binaries from S3 bucket's current branch directory (if present)
-        uses: ItsKarma/aws-cli@v1.70.0
-        with:
-          args: s3 rm s3://asset.mayadata.io/kuberactl/${{ steps.branch_name.outputs.branch }} --recursive
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.SECRET_ACCESS_KEY }}
-          AWS_REGION: us-east-1
+      - name: unused-package check
+        run: |
+          make unused-package-check
 
-      - name: Upload binaries to S3 bucket's current branch directory
-        uses: ItsKarma/aws-cli@v1.70.0
-        with:
-          args: s3 sync .release s3://asset.mayadata.io/kuberactl/${{ steps.branch_name.outputs.branch }} --acl public-read
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.SECRET_ACCESS_KEY }}
-          AWS_REGION: us-east-1
+      - name: Building litmusctl
+        run: |
+          make build

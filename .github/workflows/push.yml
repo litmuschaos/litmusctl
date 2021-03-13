@@ -1,0 +1,50 @@
+name: Build
+on:
+  pull_request:
+    branches: [master]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      # Install golang
+      - uses: actions/setup-go@v2
+        with:
+          go-version: 1.14
+
+      # Checkout to the latest commit
+      # On specific directory/path
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: gofmt check
+        run: |
+          if [ "$(gofmt -s -l . | wc -l)" -ne 0 ]
+          then
+           echo "The following files were found to be not go formatted:"
+           gofmt -s -l .
+           exit 1
+          fi
+
+      - name: golangci-lint
+        uses: reviewdog/action-golangci-lint@v1
+
+      - name: unused-package check
+        run: |
+          make unused-package-check
+
+      - name: Building litmusctl
+        run: |
+          git checkout ${GITHUB_REF##*/}
+          make build
+
+      - name: login to GitHub Container Registry
+        run: echo ${{ secrets.GPASS }} | docker login -u ${{ secrets.GUNAME }} --password-stdin
+
+      - name: Push litmusctl to repo
+        run: |
+          git config --global user.name 'Litmus Bot'
+          git config --global user.email 'litmus-bot@users.noreply.github.com'
+          git remote -v
+          git commit -am "Updating litmusctl"
+          git push

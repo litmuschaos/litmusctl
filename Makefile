@@ -7,4 +7,14 @@ dep: ## Get the dependencies
 	@go mod download
 
 build: dep ## Build the binary file
-	@go build -i -o build/main $(PKG)
+	@bash scripts/build.sh main.go
+
+.PHONY: unused-package-check
+unused-package-check:
+	@echo "------------------"
+	@echo "--> Check unused packages for the litmusctl"
+	@echo "------------------"
+	@tidy=$$(go mod tidy); \
+	if [ -n "$${tidy}" ]; then \
+		echo "go mod tidy checking failed!"; echo "$${tidy}"; echo; \
+	fi
