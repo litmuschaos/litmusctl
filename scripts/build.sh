@@ -6,7 +6,6 @@ if [[ -z "$package" ]]; then
   exit 1
 fi
 
-#the full list of the platforms: https://golang.org/doc/install/source#environment
 platforms=(
 "linux/amd64"
 "linux/arm"

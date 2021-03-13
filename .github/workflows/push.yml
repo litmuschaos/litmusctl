@@ -45,9 +45,6 @@ jobs:
           git checkout ${GITHUB_REF##*/}
           make build
 
-      - name: login to GitHub Container Registry
-        run: echo ${{ secrets.GPASS }} | docker login -u ${{ secrets.GUNAME }} --password-stdin
-
       - name: Push litmusctl to repo
         run: |
           git config --global user.name 'litmuschaos-bot'
