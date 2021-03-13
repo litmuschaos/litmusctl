@@ -1,7 +1,14 @@
-name: Build
+name: Push
 on:
-  pull_request:
-    branches: [master]
+  push:
+    branches:
+      - master
+      - ci-cd
+    tags-ignore:
+      - '**'
+  create:
+    tags:
+      - '**'
 
 jobs:
   build:
@@ -38,8 +45,8 @@ jobs:
           git checkout ${GITHUB_REF##*/}
           make build
 
-      - name: login to GitHub Container Registry
-        run: echo ${{ secrets.GPASS }} | docker login -u ${{ secrets.GUNAME }} --password-stdin
+#      - name: login to GitHub Container Registry
+#        run: echo ${{ secrets.GPASS }} | docker login -u ${{ secrets.GUNAME }} --password-stdin
 
       - name: Push litmusctl to repo
         run: |

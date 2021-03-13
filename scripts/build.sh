@@ -8,7 +8,6 @@ fi
 
 #the full list of the platforms: https://golang.org/doc/install/source#environment
 platforms=(
-"darwin/arm64"
 "linux/amd64"
 "linux/arm"
 "linux/arm64"
@@ -21,9 +20,6 @@ do
     GOARCH=${platform_split[1]}
     echo 'Building' $GOOS-$GOARCH
     output_name='litmusctl-'$GOOS'-'$GOARCH
-    if [ $GOOS = "windows" ]; then
-        output_name+='.exe'
-    fi
 
     env GOOS=$GOOS GOARCH=$GOARCH go build -v -o platforms/$output_name $package
     if [ $? -ne 0 ]; then
