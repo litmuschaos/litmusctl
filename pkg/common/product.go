@@ -28,7 +28,7 @@ func LaunchProduct(t Token, c Credentials, Product string) (LaunchProductRespons
 		SetResult(&new).
 		Post(
 			fmt.Sprintf(
-				"%s/api/graphql/query",
+				"%s/api/query",
 				c.Host,
 			),
 		)

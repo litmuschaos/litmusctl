@@ -96,13 +96,12 @@ func AgentExists(pid, agentName string, t util.Token, cred util.Credentials) boo
 		SetResult(&agents).
 		Post(
 			fmt.Sprintf(
-				"%s/api/graphql/query",
+				"%s/api/query",
 				cred.Host,
 			),
 		)
 	if err != nil || !resp.IsSuccess() {
 		fmt.Println("Error getting agent names: ", err)
-		fmt.Println("host", cred.Host)
 		return true
 	}
 	for i := range agents.Data.GetAgent {
@@ -129,15 +128,15 @@ func GetAgentList(pid string, t util.Token, cred util.Credentials) {
 		SetResult(&agents).
 		Post(
 			fmt.Sprintf(
-				"%s/api/graphql/query",
+				"%s/api/query",
 				cred.Host,
 			),
 		)
 	if err != nil || !resp.IsSuccess() {
 		fmt.Println("Error in geting agent list: ", err)
 	}
-	fmt.Println("\n📘 Registered agents list -----------")
-	fmt.Println()
+	fmt.Print("\n📘 Registered agents list -----------\n\n")
+
 	for i := range agents.Data.GetAgent {
 		fmt.Println("-", agents.Data.GetAgent[i].AgentName)
 	}
@@ -159,8 +158,7 @@ func RegisterAgent(c util.Agent, t util.Token, cred util.Credentials) (AgentRegi
 		SetResult(&cr).
 		Post(
 			fmt.Sprintf(
-				//"%s/api",
-				"%s/api/graphql/query",
+				"%s/api/query",
 				cred.Host,
 			),
 		)

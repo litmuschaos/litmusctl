@@ -11,15 +11,15 @@ import (
 
 func Register(t common.Token, c common.Credentials) {
 	// Fetch project details
-	_, uErr := GetProjectDetails(t, c, "chaos")
+	user, uErr := GetProjectDetails(t, c)
+
 	if uErr != nil {
 		fmt.Printf("\n❌ Fetching project details failed: [%s]", uErr)
 		os.Exit(1)
 	}
 	// Fetch project id
-	//pid := GetProject(user)
-	// TODO: change this
-	pid := "ed965069-ed16-45a1-980e-cd0a9e5c32c6"
+	pid := GetProject(user)
+
 	// Get mode of installation as input
 	mode := GetMode()
 	// Check if user has sufficient permissions based on mode
