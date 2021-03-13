@@ -51,7 +51,7 @@ jobs:
           git remote -v
           if [[ `git status --porcelain` ]]; then
             echo "changes"
-            git commit -am "Updating litmusctl"
+            git commit -s -m "Updating litmusctl"
             git push
             exit 0;
           else
