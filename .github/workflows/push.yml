@@ -1,0 +1,61 @@
+name: Push-or-Release
+on:
+  push:
+    branches:
+      - master
+    tags-ignore:
+      - '**'
+  create:
+    tags:
+      - '**'
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      # Install golang
+      - uses: actions/setup-go@v2
+        with:
+          go-version: 1.14
+
+      # Checkout to the latest commit
+      # On specific directory/path
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: gofmt check
+        run: |
+          if [ "$(gofmt -s -l . | wc -l)" -ne 0 ]
+          then
+           echo "The following files were found to be not go formatted:"
+           gofmt -s -l .
+           exit 1
+          fi
+
+      - name: golangci-lint
+        uses: reviewdog/action-golangci-lint@v1
+
+      - name: unused-package check
+        run: |
+          make unused-package-check
+
+      - name: Building litmusctl
+        run: |
+          git checkout ${GITHUB_REF##*/}
+          make build
+
+      - name: Push litmusctl to repo
+        run: |
+          git config --global user.name 'litmuschaos-bot'
+          git config --global user.email 'litmuschaos-bot@users.noreply.github.com'
+          git remote -v
+          if [[ `git status --porcelain` ]]; then
+            echo "changes"
+            git add .
+            git commit -s -m "Updating litmusctl"
+            git push
+            exit 0;
+          else
+            echo "no changes"
+            exit 0;
+          fi
