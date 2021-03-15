@@ -42,5 +42,5 @@ const (
 	//ChaosYamlPath = "chaos/api/graphql/file"
 	ChaosYamlPath = "api/file"
 
-	ChaosAgentPath = "agents"
+	ChaosAgentPath = "targets"
 )
