@@ -24,17 +24,16 @@ To install the latest version of litmusctl follow the below steps:
 
 <br>
 
-- Untar the binary
+- Provide necessary permissions
 
 ```shell
 $ chmod +x <filename>
-$ mv <filename> /usr/local/bin/litmusctl
 ```
 
-- Move the litmusctl binary to /usr/local/bin
+- Move the litmusctl binary to /usr/local/bin/litmusctl
 
 ```shell
-$ sudo mv <filename> /usr/local/bin/
+$ sudo mv <filename> /usr/local/bin/litmusctl
 ```
 
 ## Basic Commands
