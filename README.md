@@ -1,6 +1,6 @@
-# litmusctl
+# Litmusctl
 
-This package provides command line interface to connect agents to Litmus services.
+Litmusctl is a command line interface to manage LitmusPortal services.
 
 ## Requirements
 
@@ -12,22 +12,29 @@ The litmusctl CLI requires the following things:
 
 **Linux**
 
-To install the latest version of litmusctl CLI follow the below steps:
+To install the latest version of litmusctl follow the below steps:
 
-- Download the latest litmusctl binary from - `http://asset.mayadata.io/litmusctl/latest/litmusctl_latest_Linux_x86_64.tar.gz`
-- Untar the binary
+- Download the latest litmusctl binary from -
+
+| Platforms             | Download Link                                                                                               |
+|-----------------------|-------------------------------------------------------------------------------------------------------------|
+| litmusctl-linux-amd64 | [Click here](https://github.com/litmuschaos/litmusctl/blob/master/platforms/litmusctl-linux-amd64?raw=true) |
+| litmusctl-linux-arm   | [Click here](https://github.com/litmuschaos/litmusctl/blob/master/platforms/litmusctl-linux-arm?raw=true)   |
+| litmusctl-linux-arm64 | [Click here](https://github.com/litmuschaos/litmusctl/blob/master/platforms/litmusctl-linux-arm64?raw=true) |
+
+<br>
+
+- Provide necessary permissions
 
 ```shell
-$ tar -xvzf litmusctl_latest_Linux_x86_64.tar.gz
+$ chmod +x <filename>
 ```
 
-- Move the litmusctl binary to /usr/local/bin
+- Move the litmusctl binary to /usr/local/bin/litmusctl
 
 ```shell
-$ sudo mv litmusctl /usr/local/bin/
+$ sudo mv <filename> /usr/local/bin/litmusctl
 ```
-
-> NOTE: litmusctl binaries for master and development branches are available in .zip format and can be downloaded from - `http://asset.mayadata.io/litmusctl/<branch-name>/litmusctl_linux_amd64.zip`, `http://asset.mayadata.io/litmusctl/<branch-name>/litmusctl_windows_amd64.zip` and `http://asset.mayadata.io/litmusctl/<branch-name>/litmusctl_darwin_amd64.zip` respectively for Linux, Windows and Darwin.
 
 ## Basic Commands
 
@@ -43,64 +50,105 @@ To get the version of the litmusctl CLI:
 $ litmusctl version
 ```
 
+### Registering an agent
 To register Litmus Chaos agent:
 
 ```shell
-$ litmusctl chaos agent register
+$ litmusctl agent register
 ```
 
-To register Litmus Propel agent:
+Next, you need to enter LitmusPortal details to login into your LitmusPortal account. Fields to be filled in:
+
+**LimtusPortal UI URL:** Enter the URL used to access the Litmus Portal UI.
+Example, http://172.17.0.2:31696/
+
+**Username:** Enter your LitmusPortal username.
+**Password:** Enter your LitmusPortal password.
 
 ```shell
-$ litmusctl propel agent register
+🔥 Registering LitmusChaos agent
+
+📶 Please enter LitmusChaos details --
+👉 Host URL where litmus is installed: http://172.17.0.2:31696/
+🤔 Username [admin]: admin
+🙈 Password: 
+✅ Login Successful!
 ```
 
-## Development workflow
+Upon successful login, there will be a list of exiting projects displayed on the terminal. Select the desired project by entering the sequence number indicated against it.
 
-#### Initial setup
+```shell
+✨ Projects List:
+1.  abc
 
-**Fork in the cloud**
-
-1. Visit https://github.com/litmuschaos/litmusctl.
-2. Click `Fork` button (top right) to establish a cloud-based fork.
-
-**Clone fork to local host**
-Place mayadata-io/litmusctl code in any directory using the following cloning procedure -
-
-```
-mkdir path/to/directory/mayadata-io
-cd mayadata-io
-
-# Note: Here $user is your GitHub profile name
-git clone https://github.com/$user/litmusctl.git
-
-# Configure remote upstream
-cd path/to/directory/mayadata-io/litmusctl
-git remote add upstream https://github.com/litmuschaos/litmusctl.git
-
-# Never push to upstream master
-git remote set-url --push upstream no_push
-
-# Confirm that your remotes make sense
-git remote -v
+🔎 Select Project: 1
 ```
 
-**Create a new feature branch to work on your issue**
+Next, select the installation mode. In case the selected mode was a Cluster there will be a prerequisites check to verify ClusterRole and ClusterRoleBinding.
 
-```
-$ git checkout -b <branch-name>
-Switched to a new branch '<branch-name>'
-```
+```shell
+🔌 Installation Modes:
+1. Cluster
+2. Namespace
 
-**Make your changes and test them**
-Once the changes are done, you can build the binary and test them using the following command:
+👉 Select Mode [cluster]: 1
 
-```
-Get into the cloned directory
-$ cd path/to/directory/mayadata-io/litmusctl
+🏃 Running prerequisites check....
+🔑  clusterrole - ✅
+🔑  clusterrolebinding - ✅
 
-$ go install
-Note: This will build a binary at `~/go/bin`
+🌟 Sufficient permissions. Registering Agent
 ```
 
-Test your changes by running the necessary `litmusctl` commands.
+Next, enter the details of the new agent.
+
+Fields to filled in:
+**Agent Name:** Enter the name for the new agent.
+
+**Agent Description:** Fill in details about the agent.
+
+**Platform Name:** Enter the platform name on which this agent is hosted. For example, AWS, GCP, Rancher etc.
+
+**Enter the namespace:** You can either enter an existing namespace or enter a new namespace. In cases where the namespace does not exist, LimtusPortal creates it for you.
+
+**Enter service account:** Enter a name for your service account.
+
+```shell
+🔗 Enter the details of the agent ----
+🤷 Agent Name: my-agent
+📘 Agent Description: This is a new agent.
+📦 Platform List
+1. AWS
+2. GKE
+3. Openshift
+4. Rancher
+5. Others
+🔎 Select Platform [Others]: 5
+📁 Enter the namespace (new or existing) [litmus]: litmus
+🔑 Enter service account [litmus]: litmus
+```
+
+Once, all these steps are implemented you will be able to see a summary of all the entered fields.
+After verification of these details, you can proceed with the registration of the agent by entering Y. The process of registration might take up to a few seconds.
+
+```shell
+📌 Summary --------------------------
+
+Agent Name:         my-agent
+Agent Description:  This is a new agent.
+Platform Name:      Others
+Namespace:          litmus
+Service Account:    litmus
+Installation Mode:  cluster
+
+-------------------------------------
+
+🤷 Do you want to continue with the above details? [Y/N]: Y
+
+💡 Connecting agent to Litmus Portal.
+🏃 Agents running!!
+🚀 Agent Registration Successful!! 🎉
+👉 Litmus agents can be accessed here: http://172.17.0.2:31696/targets
+```
+
+To verify, if the registration process was successful you can view the list of connected agents from the Targets section on your LitmusPortal and ensure that the connected agent is in Active State.

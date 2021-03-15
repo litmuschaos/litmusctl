@@ -40,8 +40,10 @@ func Register(t common.Token, c common.Credentials) {
 		fmt.Printf("\n❌ Agent registration failed: [%s]\n", cerror.Error())
 		os.Exit(1)
 	}
+
 	path := fmt.Sprintf("%s/%s/%s.yaml", c.Host, constants.ChaosYamlPath, agent.Data.UserAgentReg.Token)
-	fmt.Println(path)
+	fmt.Println("Applying YAML:\n", path)
+
 	// Print error message in case Data field is null in response
 	if (agent.Data == AgentRegister{}) {
 		fmt.Printf("\n🚫 Agent registration failed: [%s]\n", agent.Errors[0].Message)
