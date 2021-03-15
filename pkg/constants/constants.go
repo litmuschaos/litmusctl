@@ -9,7 +9,7 @@ const (
 	DefaultUsername = "admin"
 
 	// Default installation mode
-	DefaultMode = "namespace"
+	DefaultMode = "cluster"
 
 	// Platform list
 	PlatformList = "1. AWS\n2. GKE\n3. Openshift\n4. Rancher\n5. Others"
