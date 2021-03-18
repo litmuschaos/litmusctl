@@ -16,11 +16,17 @@ To install the latest version of litmusctl follow the below steps:
 
 - Download the latest litmusctl binary from -
 
-| Platforms             | Download Link                                                                                               |
-|-----------------------|-------------------------------------------------------------------------------------------------------------|
-| litmusctl-linux-amd64 | [Click here](https://github.com/litmuschaos/litmusctl/blob/master/platforms/litmusctl-linux-amd64?raw=true) |
-| litmusctl-linux-arm   | [Click here](https://github.com/litmuschaos/litmusctl/blob/master/platforms/litmusctl-linux-arm?raw=true)   |
-| litmusctl-linux-arm64 | [Click here](https://github.com/litmuschaos/litmusctl/blob/master/platforms/litmusctl-linux-arm64?raw=true) |
+| Platforms                      | Download Link                                                                                                 |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------- |
+| litmusctl-darwin-386 (MacOS)   | [Click here](https://github.com/litmuschaos/litmusctl/blob/master/platforms/litmusctl-darwin-386?raw=true)    |
+| litmusctl-darwin-amd64 (MacOS) | [Click here](https://github.com/litmuschaos/litmusctl/blob/master/platforms/litmusctl-darwin-amd64?raw=true)  |
+| litmusctl-linux-386            | [Click here](https://github.com/litmuschaos/litmusctl/blob/master/platforms/litmusctl-linux-386?raw=true)     |
+| litmusctl-linux-amd64          | [Click here](https://github.com/litmuschaos/litmusctl/blob/master/platforms/litmusctl-linux-amd64?raw=true)   |
+| litmusctl-linux-arm            | [Click here](https://github.com/litmuschaos/litmusctl/blob/master/platforms/litmusctl-linux-arm?raw=true)     |
+| litmusctl-linux-arm64          | [Click here](https://github.com/litmuschaos/litmusctl/blob/master/platforms/litmusctl-linux-arm64?raw=true)   |
+| litmusctl-windows-386          | [Click here](https://github.com/litmuschaos/litmusctl/blob/master/platforms/litmusctl-windows-386?raw=true)   |
+| litmusctl-windows-amd64        | [Click here](https://github.com/litmuschaos/litmusctl/blob/master/platforms/litmusctl-windows-amd64?raw=true) |
+| litmusctl-windows-arm          | [Click here](https://github.com/litmuschaos/litmusctl/blob/master/platforms/litmusctl-windows-arm?raw=true)   |
 
 <br>
 
@@ -51,6 +57,7 @@ $ litmusctl version
 ```
 
 ### Registering an agent
+
 To register Litmus Chaos agent:
 
 ```shell
@@ -71,7 +78,7 @@ Example, http://172.17.0.2:31696/
 📶 Please enter LitmusChaos details --
 👉 Host URL where litmus is installed: http://172.17.0.2:31696/
 🤔 Username [admin]: admin
-🙈 Password: 
+🙈 Password:
 ✅ Login Successful!
 ```
 
