@@ -7,9 +7,15 @@ if [[ -z "$package" ]]; then
 fi
 
 platforms=(
+"darwin/386"
+"darwin/amd64"
+"linux/386"
 "linux/amd64"
 "linux/arm"
 "linux/arm64"
+"windows/386"
+"windows/amd64"
+"windows/arm"
 )
 
 for platform in "${platforms[@]}"
