@@ -10,8 +10,6 @@ The litmusctl CLI requires the following things:
 
 ## Installation
 
-**Linux**
-
 To install the latest version of litmusctl follow the below steps:
 
 - Download the latest litmusctl binary from -
