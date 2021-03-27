@@ -1,9 +1,6 @@
-name: Build
+name: build-pipeline
 on:
   pull_request:
-    branches:
-      - master
-  push:
     branches:
       - master
 
