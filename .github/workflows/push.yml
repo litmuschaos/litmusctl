@@ -3,10 +3,8 @@ on:
   push:
     branches:
       - master
-      - s3-bucket
-  create:
     tags:
-      - '**'
+      - '*'
 
 jobs:
   build-and-push:
@@ -48,13 +46,13 @@ jobs:
           git checkout ${GITHUB_REF##*/}
           make TAG=${{ steps.tag.outputs.branch }} build
 
-      - name: Configure AWS credentials from Test account
+      - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
-      - name: Copy files to the test website with the AWS CLI
+      - name: Copy binaries to the litmusctl s3 bucket
         run: |
           aws s3 sync platforms-${{ steps.tag.outputs.branch }} s3://${{ secrets.AWS_S3_BUCKET }}

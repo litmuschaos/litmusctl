@@ -12,32 +12,53 @@ The litmusctl CLI requires the following things:
 
 To install the latest version of litmusctl follow the below steps:
 
-- Download the latest litmusctl binary from -
+- Download the stable litmusctl(v0.1.0) binary from:
 
 | Platforms                      | Download Link                                                                                                 |
 | ------------------------------ | ------------------------------------------------------------------------------------------------------------- |
-| litmusctl-darwin-386 (MacOS)   | [Click here](https://github.com/litmuschaos/litmusctl/blob/master/platforms/litmusctl-darwin-386?raw=true)    |
-| litmusctl-darwin-amd64 (MacOS) | [Click here](https://github.com/litmuschaos/litmusctl/blob/master/platforms/litmusctl-darwin-amd64?raw=true)  |
-| litmusctl-linux-386            | [Click here](https://github.com/litmuschaos/litmusctl/blob/master/platforms/litmusctl-linux-386?raw=true)     |
-| litmusctl-linux-amd64          | [Click here](https://github.com/litmuschaos/litmusctl/blob/master/platforms/litmusctl-linux-amd64?raw=true)   |
-| litmusctl-linux-arm            | [Click here](https://github.com/litmuschaos/litmusctl/blob/master/platforms/litmusctl-linux-arm?raw=true)     |
-| litmusctl-linux-arm64          | [Click here](https://github.com/litmuschaos/litmusctl/blob/master/platforms/litmusctl-linux-arm64?raw=true)   |
-| litmusctl-windows-386          | [Click here](https://github.com/litmuschaos/litmusctl/blob/master/platforms/litmusctl-windows-386?raw=true)   |
-| litmusctl-windows-amd64        | [Click here](https://github.com/litmuschaos/litmusctl/blob/master/platforms/litmusctl-windows-amd64?raw=true) |
-| litmusctl-windows-arm          | [Click here](https://github.com/litmuschaos/litmusctl/blob/master/platforms/litmusctl-windows-arm?raw=true)   |
+| litmusctl-darwin-386 (MacOS)   | [Click here](https://litmusctl-bucket.s3-eu-west-1.amazonaws.com/litmusctl-darwin-386-v0.1.0.tar.gz)    |
+| litmusctl-darwin-amd64 (MacOS) | [Click here](https://litmusctl-bucket.s3-eu-west-1.amazonaws.com/litmusctl-darwin-amd64-v0.1.0.tar.gz)  |
+| litmusctl-linux-386            | [Click here](https://litmusctl-bucket.s3-eu-west-1.amazonaws.com/litmusctl-linux-386-v0.1.0.tar.gz)     |
+| litmusctl-linux-amd64          | [Click here](https://litmusctl-bucket.s3-eu-west-1.amazonaws.com/litmusctl-linux-amd64-v0.1.0.tar.gz)   |
+| litmusctl-linux-arm            | [Click here](https://litmusctl-bucket.s3-eu-west-1.amazonaws.com/litmusctl-linux-arm-v0.1.0.tar.gz)     |
+| litmusctl-linux-arm64          | [Click here](https://litmusctl-bucket.s3-eu-west-1.amazonaws.com/litmusctl-linux-arm64-v0.1.0.tar.gz)   |
+| litmusctl-windows-386          | [Click here](https://litmusctl-bucket.s3-eu-west-1.amazonaws.com/litmusctl-windows-386-v0.1.0.tar.gz)   |
+| litmusctl-windows-amd64        | [Click here](https://litmusctl-bucket.s3-eu-west-1.amazonaws.com/litmusctl-windows-amd64-v0.1.0.tar.gz) |
+| litmusctl-windows-arm          | [Click here](https://litmusctl-bucket.s3-eu-west-1.amazonaws.com/litmusctl-windows-arm-v0.1.0.tar.gz)   |
 
 <br>
+
+- Download the latest litmusctl(master) binary from:
+
+| Platforms                      | Download Link                                                                                                 |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------- |
+| litmusctl-darwin-386 (MacOS)   | [Click here](https://litmusctl-bucket.s3-eu-west-1.amazonaws.com/litmusctl-darwin-386-master.tar.gz)    |
+| litmusctl-darwin-amd64 (MacOS) | [Click here](https://litmusctl-bucket.s3-eu-west-1.amazonaws.com/litmusctl-darwin-amd64-master.tar.gz)  |
+| litmusctl-linux-386            | [Click here](https://litmusctl-bucket.s3-eu-west-1.amazonaws.com/litmusctl-linux-386-master.tar.gz)     |
+| litmusctl-linux-amd64          | [Click here](https://litmusctl-bucket.s3-eu-west-1.amazonaws.com/litmusctl-linux-amd64-master.tar.gz)   |
+| litmusctl-linux-arm            | [Click here](https://litmusctl-bucket.s3-eu-west-1.amazonaws.com/litmusctl-linux-arm-master.tar.gz)     |
+| litmusctl-linux-arm64          | [Click here](https://litmusctl-bucket.s3-eu-west-1.amazonaws.com/litmusctl-linux-arm64-master.tar.gz)   |
+| litmusctl-windows-386          | [Click here](https://litmusctl-bucket.s3-eu-west-1.amazonaws.com/litmusctl-windows-386-master.tar.gz)   |
+| litmusctl-windows-amd64        | [Click here](https://litmusctl-bucket.s3-eu-west-1.amazonaws.com/litmusctl-windows-amd64-master.tar.gz) |
+| litmusctl-windows-arm          | [Click here](https://litmusctl-bucket.s3-eu-west-1.amazonaws.com/litmusctl-windows-arm-master.tar.gz)   |
+
+<br>
+
+- Extract the binary
+```shell
+$ tar -zxvf litmusctl-<OS>-<ARCH>-<VERSION>.tar.gz
+``` 
 
 - Provide necessary permissions
 
 ```shell
-$ chmod +x <filename>
+$ chmod +x litmusctl
 ```
 
 - Move the litmusctl binary to /usr/local/bin/litmusctl
 
 ```shell
-$ sudo mv <filename> /usr/local/bin/litmusctl
+$ sudo mv litmusctl /usr/local/bin/litmusctl
 ```
 
 ## Basic Commands
