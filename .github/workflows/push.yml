@@ -1,10 +1,9 @@
-name: Push-or-Release
+name: push-release-pipeline
 on:
   push:
     branches:
       - master
-    tags-ignore:
-      - '**'
+      - s3-bucket
   create:
     tags:
       - '**'
@@ -27,9 +26,9 @@ jobs:
         run: |
           if [ "$(gofmt -s -l . | wc -l)" -ne 0 ]
           then
-           echo "The following files were found to be not go formatted:"
-           gofmt -s -l .
-           exit 1
+          echo "The following files were found to be not go formatted:"
+          gofmt -s -l .
+          exit 1
           fi
 
       - name: golangci-lint
@@ -39,23 +38,23 @@ jobs:
         run: |
           make unused-package-check
 
+      - name: Get tag
+        shell: bash
+        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF##*/})"
+        id: tag
+
       - name: Building litmusctl
         run: |
           git checkout ${GITHUB_REF##*/}
-          make build
+          make TAG=${{ steps.tag.outputs.branch }} build
 
-      - name: Push litmusctl to repo
+      - name: Configure AWS credentials from Test account
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Copy files to the test website with the AWS CLI
         run: |
-          git config --global user.name 'litmuschaos-bot'
-          git config --global user.email 'litmuschaos-bot@users.noreply.github.com'
-          git remote -v
-          if [[ `git status --porcelain` ]]; then
-            echo "changes"
-            git add .
-            git commit -s -m "Updating litmusctl"
-            git push
-            exit 0;
-          else
-            echo "no changes"
-            exit 0;
-          fi
+          aws s3 sync platforms-${{ steps.tag.outputs.branch }} s3://${{ secrets.AWS_S3_BUCKET }}
