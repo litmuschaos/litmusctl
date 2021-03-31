@@ -105,5 +105,5 @@ func ValidateSAPermissions(mode string) {
 			os.Exit(1)
 		}
 	}
-	fmt.Println("\n🌟 Sufficient permissions. Registering Agent")
+	fmt.Println("\n🌟 Sufficient permissions. Connecting Agent")
 }

@@ -9,7 +9,7 @@ import (
 	"github.com/litmuschaos/litmusctl/pkg/constants"
 )
 
-func Register(t common.Token, c common.Credentials) {
+func Connect(t common.Token, c common.Credentials) {
 	// Fetch project details
 	user, uErr := GetProjectDetails(t, c)
 
@@ -34,10 +34,10 @@ func Register(t common.Token, c common.Credentials) {
 	common.Summary(newAgent, "chaos")
 	// Confirm before connecting the agent
 	common.Confirm()
-	// Register agent
-	agent, cerror := RegisterAgent(newAgent, t, c)
+	// Connect agent
+	agent, cerror := ConnectAgent(newAgent, t, c)
 	if cerror != nil {
-		fmt.Printf("\n❌ Agent registration failed: [%s]\n", cerror.Error())
+		fmt.Printf("\n❌ Agent connection failed: [%s]\n", cerror.Error())
 		os.Exit(1)
 	}
 
@@ -45,19 +45,19 @@ func Register(t common.Token, c common.Credentials) {
 	fmt.Println("Applying YAML:\n", path)
 
 	// Print error message in case Data field is null in response
-	if (agent.Data == AgentRegister{}) {
-		fmt.Printf("\n🚫 Agent registration failed: [%s]\n", agent.Errors[0].Message)
+	if (agent.Data == AgentConnect{}) {
+		fmt.Printf("\n🚫 Agent connection failed: [%s]\n", agent.Errors[0].Message)
 		os.Exit(1)
 	}
-	// Apply agent registration yaml
+	// Apply agent connection yaml
 	yamlOutput, yerror := common.ApplyYaml(agent.Data.UserAgentReg.Token, c, constants.ChaosYamlPath)
 	if yerror != nil {
-		fmt.Printf("\n❌ Failed in applying registration yaml: [%s]\n", yerror.Error())
+		fmt.Printf("\n❌ Failed in applying connection yaml: [%s]\n", yerror.Error())
 		os.Exit(1)
 	}
 	fmt.Println("\n", yamlOutput)
 	// Watch subscriber pod status
 	k8s.WatchPod(newAgent.Namespace, constants.ChaosAgentLabel)
-	fmt.Println("\n🚀 Agent Registration Successful!! 🎉")
+	fmt.Println("\n🚀 Agent Connection Successful!! 🎉")
 	fmt.Println("👉 Litmus agents can be accessed here: " + fmt.Sprintf("%s/%s", c.Host, constants.ChaosAgentPath))
 }
