@@ -38,7 +38,7 @@ const (
 	// Default service account used for agent installation
 	DefaultSA = "litmus"
 
-	// Chaos agent registration yaml path
+	// Chaos agent connection yaml path
 	//ChaosYamlPath = "chaos/api/graphql/file"
 	ChaosYamlPath = "api/file"
 

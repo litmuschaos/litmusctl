@@ -10,9 +10,9 @@ import (
 	"github.com/litmuschaos/litmusctl/pkg/constants"
 )
 
-type AgentRegistrationData struct {
-	Errors []Errors      `json:"errors"`
-	Data   AgentRegister `json:"data"`
+type AgentConnectionData struct {
+	Errors []Errors     `json:"errors"`
+	Data   AgentConnect `json:"data"`
 }
 
 type Errors struct {
@@ -20,7 +20,7 @@ type Errors struct {
 	Path    []string `json:"path"`
 }
 
-type AgentRegister struct {
+type AgentConnect struct {
 	UserAgentReg UserAgentReg `json:"userClusterReg"`
 }
 
@@ -135,7 +135,7 @@ func GetAgentList(pid string, t util.Token, cred util.Credentials) {
 	if err != nil || !resp.IsSuccess() {
 		fmt.Println("Error in geting agent list: ", err)
 	}
-	fmt.Print("\n📘 Registered agents list -----------\n\n")
+	fmt.Print("\n📘 Connected agents list -----------\n\n")
 
 	for i := range agents.Data.GetAgent {
 		fmt.Println("-", agents.Data.GetAgent[i].AgentName)
@@ -143,9 +143,9 @@ func GetAgentList(pid string, t util.Token, cred util.Credentials) {
 	fmt.Println("\n-------------------------------------")
 }
 
-// RegisterAgent registers the agent with the given details
-func RegisterAgent(c util.Agent, t util.Token, cred util.Credentials) (AgentRegistrationData, error) {
-	var cr AgentRegistrationData
+// ConnectAgent connects the agent with the given details
+func ConnectAgent(c util.Agent, t util.Token, cred util.Credentials) (AgentConnectionData, error) {
+	var cr AgentConnectionData
 	client := resty.New()
 	bodyData := `{"query":"mutation {\n  userClusterReg(clusterInput: \n    { \n    cluster_name: \"` + fmt.Sprintf("%s", c.AgentName) + `\", \n    description: \"` + fmt.Sprintf("%s", c.Description) + `\",\n  \tplatform_name: \"` + fmt.Sprintf("%s", c.PlatformName) + `\",\n    project_id: \"` + fmt.Sprintf("%s", c.ProjectId) + `\",\n    cluster_type: \"` + fmt.Sprintf("%s", c.ClusterType) + `\",\n  agent_scope: \"` + fmt.Sprintf("%s", c.Mode) + `\",\n    agent_namespace: \"` + fmt.Sprintf("%s", c.Namespace) + `\",\n    serviceaccount: \"` + fmt.Sprintf("%s", c.ServiceAccount) + `\",\n    agent_ns_exists: ` + fmt.Sprintf("%t", c.NsExists) + `,\n    agent_sa_exists: ` + fmt.Sprintf("%t", c.SAExists) + `,\n  }){\n    cluster_id\n    cluster_name\n    token\n  }\n}"}`
 	resp, err := client.R().
@@ -165,7 +165,7 @@ func RegisterAgent(c util.Agent, t util.Token, cred util.Credentials) (AgentRegi
 	if err != nil || !resp.IsSuccess() {
 		fmt.Println(err)
 		fmt.Println(resp.IsSuccess())
-		return AgentRegistrationData{}, err
+		return AgentConnectionData{}, err
 	}
 	return cr, nil
 }

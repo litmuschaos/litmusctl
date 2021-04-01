@@ -76,9 +76,9 @@ func Confirm() {
 	fmt.Print("\n🤷 Do you want to continue with the above details? [Y/N]: ")
 	fmt.Scanln(&wish)
 	if wish == "Y" || wish == "Yes" || wish == "yes" || wish == "y" {
-		fmt.Println("👍 Continuing agent registration!!")
+		fmt.Println("👍 Continuing agent connection!!")
 	} else {
-		fmt.Println("✋ Exiting agent registration!!")
+		fmt.Println("✋ Exiting agent connection!!")
 		os.Exit(1)
 	}
 }

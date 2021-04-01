@@ -1,4 +1,4 @@
-package register
+package connect
 
 import (
 	"fmt"
@@ -9,16 +9,16 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// registerCmd represents the register command
-var RegisterCmd = &cobra.Command{
-	Use:   "register",
-	Short: "Register LitmusChaos agent",
-	Long:  `Register registers the agent to LitmusChaos`,
+// connectCmd represents the connect command
+var ConnectCmd = &cobra.Command{
+	Use:   "connect",
+	Short: "Connect LitmusChaos agent",
+	Long:  `Connect connects the agent to LitmusChaos`,
 	Run: func(cmd *cobra.Command, args []string) {
 
 		var c utils.Credentials
 		var pErr error
-		fmt.Println("🔥 Registering LitmusChaos agent")
+		fmt.Println("🔥 Connecting LitmusChaos agent")
 		fmt.Println("\n📶 Please enter LitmusChaos details --")
 		// Get LitmusChaos URL as input
 		c.Host, pErr = utils.GetPortalURL()
@@ -33,6 +33,6 @@ var RegisterCmd = &cobra.Command{
 		// Fetch authorization token
 		t := utils.Login(c, "auth/login")
 
-		chaos.Register(t, c)
+		chaos.Connect(t, c)
 	},
 }

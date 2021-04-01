@@ -7,7 +7,7 @@ import (
 	"github.com/litmuschaos/litmusctl/pkg/cmd/version"
 
 	chaosAgent "github.com/litmuschaos/litmusctl/pkg/cmd/agent"
-	chaosRegister "github.com/litmuschaos/litmusctl/pkg/cmd/agent/register"
+	chaosConnect "github.com/litmuschaos/litmusctl/pkg/cmd/agent/connect"
 	"github.com/spf13/cobra"
 )
 
@@ -33,7 +33,7 @@ func Execute() {
 func init() {
 	RootCmd.AddCommand(version.VersionCmd)
 	RootCmd.AddCommand(chaosAgent.AgentCmd)
-	chaosAgent.AgentCmd.AddCommand(chaosRegister.RegisterCmd)
+	chaosAgent.AgentCmd.AddCommand(chaosConnect.ConnectCmd)
 
 	// Create a persistent flag for kubeconfig
 	// RootCmd.PersistentFlags().StringP("kubeconfig", "k", "", "absolute path to the kubeconfig file")
