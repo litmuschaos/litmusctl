@@ -10,8 +10,8 @@ import (
 )
 
 // SAExists checks if the given service account exists in the given namespace
-func SAExists(namespace, serviceaccount string) bool {
-	clientset, err := ClientSet()
+func SAExists(namespace, serviceaccount string, kubeconfig *string) bool {
+	clientset, err := ClientSet(kubeconfig)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -27,14 +27,14 @@ func SAExists(namespace, serviceaccount string) bool {
 }
 
 // ValidSA gets a valid service account as input
-func ValidSA(namespace string) (string, bool) {
+func ValidSA(namespace string, kubeconfig *string) (string, bool) {
 	var sa string
 	fmt.Print("🔑 Enter service account [", constants.DefaultSA, "]: ")
 	fmt.Scanln(&sa)
 	if sa == "" {
 		sa = constants.DefaultSA
 	}
-	if SAExists(namespace, sa) {
+	if SAExists(namespace, sa, kubeconfig) {
 		fmt.Println("👍 Using the existing service account")
 		return sa, true
 	}

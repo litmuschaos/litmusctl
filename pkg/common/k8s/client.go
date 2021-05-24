@@ -12,15 +12,17 @@ import (
 )
 
 // Returns a new kubernetes client set
-func ClientSet() (*kubernetes.Clientset, error) {
-	var kubeconfig *string
-	if home := homedir.HomeDir(); home != "" {
-		kcfg := filepath.Join(home, ".kube", "config")
-		kubeconfig = &kcfg
-	} else {
-		fmt.Println("ERROR: Clientset generation failed!")
-		os.Exit(1)
+func ClientSet(kubeconfig *string) (*kubernetes.Clientset, error) {
+	if *kubeconfig == "" {
+		if home := homedir.HomeDir(); home != "" {
+			kcfg := filepath.Join(home, ".kube", "config")
+			kubeconfig = &kcfg
+		} else {
+			fmt.Println("ERROR: Clientset generation failed!")
+			os.Exit(1)
+		}
 	}
+
 	// create the config
 	config, err := clientcmd.BuildConfigFromFlags("", *kubeconfig)
 	if err != nil {

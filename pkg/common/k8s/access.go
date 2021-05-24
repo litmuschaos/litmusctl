@@ -25,12 +25,12 @@ type CanIOptions struct {
 	ResourceName string
 }
 
-func CheckSAPermissions(verb, resource string, print bool) (bool, error) {
+func CheckSAPermissions(verb, resource string, print bool, kubeconfig *string) (bool, error) {
 
 	var o CanIOptions
 	o.Verb = verb
 	o.Resource.Resource = resource
-	client, err := ClientSet()
+	client, err := ClientSet(kubeconfig)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -74,14 +74,14 @@ func CheckSAPermissions(verb, resource string, print bool) (bool, error) {
 	return response.Status.Allowed, nil
 }
 
-func ValidateSAPermissions(mode string) {
+func ValidateSAPermissions(mode string, kubeconfig *string) {
 	var pems [2]bool
 	var err error
 	if mode == "cluster" {
 		resources := [2]string{"clusterrole", "clusterrolebinding"}
 		i := 0
 		for _, resource := range resources {
-			pems[i], err = CheckSAPermissions("create", resource, true)
+			pems[i], err = CheckSAPermissions("create", resource, true, kubeconfig)
 			if err != nil {
 				fmt.Println(err)
 			}
@@ -91,7 +91,7 @@ func ValidateSAPermissions(mode string) {
 		resources := [2]string{"role", "rolebinding"}
 		i := 0
 		for _, resource := range resources {
-			pems[i], err = CheckSAPermissions("create", resource, true)
+			pems[i], err = CheckSAPermissions("create", resource, true, kubeconfig)
 			if err != nil {
 				fmt.Println(err)
 			}

@@ -10,8 +10,8 @@ import (
 )
 
 // WatchPod watches for the pod status
-func WatchPod(namespace, label string) {
-	clientset, err := ClientSet()
+func WatchPod(namespace, label string, kubeconfig *string) {
+	clientset, err := ClientSet(kubeconfig)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -40,8 +40,8 @@ type PodList struct {
 }
 
 // PodExists checks if the pod with the given label already exists in the given namespace
-func PodExists(namespace, label string) bool {
-	clientset, err := ClientSet()
+func PodExists(namespace, label string, kubeconfig *string) bool {
+	clientset, err := ClientSet(kubeconfig)
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -36,5 +36,5 @@ func init() {
 	chaosAgent.AgentCmd.AddCommand(chaosConnect.ConnectCmd)
 
 	// Create a persistent flag for kubeconfig
-	// RootCmd.PersistentFlags().StringP("kubeconfig", "k", "", "absolute path to the kubeconfig file")
+	chaosConnect.ConnectCmd.PersistentFlags().StringP("kubeconfig", "k", "", "absolute path to the kubeconfig file")
 }
