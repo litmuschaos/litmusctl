@@ -12,22 +12,6 @@ The litmusctl CLI requires the following things:
 
 To install the latest version of litmusctl follow the below steps:
 
-- Download the stable litmusctl(v0.1.0) binary from:
-
-| Platforms                      | Download Link                                                                                           |
-| ------------------------------ | ------------------------------------------------------------------------------------------------------- |
-| litmusctl-darwin-386 (MacOS)   | [Click here](https://litmusctl-bucket.s3-eu-west-1.amazonaws.com/litmusctl-darwin-386-v0.1.0.tar.gz)    |
-| litmusctl-darwin-amd64 (MacOS) | [Click here](https://litmusctl-bucket.s3-eu-west-1.amazonaws.com/litmusctl-darwin-amd64-v0.1.0.tar.gz)  |
-| litmusctl-linux-386            | [Click here](https://litmusctl-bucket.s3-eu-west-1.amazonaws.com/litmusctl-linux-386-v0.1.0.tar.gz)     |
-| litmusctl-linux-amd64          | [Click here](https://litmusctl-bucket.s3-eu-west-1.amazonaws.com/litmusctl-linux-amd64-v0.1.0.tar.gz)   |
-| litmusctl-linux-arm            | [Click here](https://litmusctl-bucket.s3-eu-west-1.amazonaws.com/litmusctl-linux-arm-v0.1.0.tar.gz)     |
-| litmusctl-linux-arm64          | [Click here](https://litmusctl-bucket.s3-eu-west-1.amazonaws.com/litmusctl-linux-arm64-v0.1.0.tar.gz)   |
-| litmusctl-windows-386          | [Click here](https://litmusctl-bucket.s3-eu-west-1.amazonaws.com/litmusctl-windows-386-v0.1.0.tar.gz)   |
-| litmusctl-windows-amd64        | [Click here](https://litmusctl-bucket.s3-eu-west-1.amazonaws.com/litmusctl-windows-amd64-v0.1.0.tar.gz) |
-| litmusctl-windows-arm          | [Click here](https://litmusctl-bucket.s3-eu-west-1.amazonaws.com/litmusctl-windows-arm-v0.1.0.tar.gz)   |
-
-<br>
-
 - Download the latest litmusctl(master) binary from:
 
 | Platforms                      | Download Link                                                                                           |
@@ -41,6 +25,22 @@ To install the latest version of litmusctl follow the below steps:
 | litmusctl-windows-386          | [Click here](https://litmusctl-bucket.s3-eu-west-1.amazonaws.com/litmusctl-windows-386-master.tar.gz)   |
 | litmusctl-windows-amd64        | [Click here](https://litmusctl-bucket.s3-eu-west-1.amazonaws.com/litmusctl-windows-amd64-master.tar.gz) |
 | litmusctl-windows-arm          | [Click here](https://litmusctl-bucket.s3-eu-west-1.amazonaws.com/litmusctl-windows-arm-master.tar.gz)   |
+
+<br>
+
+- Download the litmusctl(v0.1.0) binary from:
+
+| Platforms                      | Download Link                                                                                           |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------- |
+| litmusctl-darwin-386 (MacOS)   | [Click here](https://litmusctl-bucket.s3-eu-west-1.amazonaws.com/litmusctl-darwin-386-v0.1.0.tar.gz)    |
+| litmusctl-darwin-amd64 (MacOS) | [Click here](https://litmusctl-bucket.s3-eu-west-1.amazonaws.com/litmusctl-darwin-amd64-v0.1.0.tar.gz)  |
+| litmusctl-linux-386            | [Click here](https://litmusctl-bucket.s3-eu-west-1.amazonaws.com/litmusctl-linux-386-v0.1.0.tar.gz)     |
+| litmusctl-linux-amd64          | [Click here](https://litmusctl-bucket.s3-eu-west-1.amazonaws.com/litmusctl-linux-amd64-v0.1.0.tar.gz)   |
+| litmusctl-linux-arm            | [Click here](https://litmusctl-bucket.s3-eu-west-1.amazonaws.com/litmusctl-linux-arm-v0.1.0.tar.gz)     |
+| litmusctl-linux-arm64          | [Click here](https://litmusctl-bucket.s3-eu-west-1.amazonaws.com/litmusctl-linux-arm64-v0.1.0.tar.gz)   |
+| litmusctl-windows-386          | [Click here](https://litmusctl-bucket.s3-eu-west-1.amazonaws.com/litmusctl-windows-386-v0.1.0.tar.gz)   |
+| litmusctl-windows-amd64        | [Click here](https://litmusctl-bucket.s3-eu-west-1.amazonaws.com/litmusctl-windows-amd64-v0.1.0.tar.gz) |
+| litmusctl-windows-arm          | [Click here](https://litmusctl-bucket.s3-eu-west-1.amazonaws.com/litmusctl-windows-arm-v0.1.0.tar.gz)   |
 
 <br>
 
