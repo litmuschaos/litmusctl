@@ -10,4 +10,3 @@ var AgentCmd = &cobra.Command{
 	Short: "Litmus Agent",
 	Long:  `agent is used to manage Litmus backup and restore agents`,
 }
-
