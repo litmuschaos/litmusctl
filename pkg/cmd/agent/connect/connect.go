@@ -2,10 +2,11 @@ package connect
 
 import (
 	"fmt"
+	"os"
+
 	utils "github.com/litmuschaos/litmusctl/pkg/common"
 	"github.com/litmuschaos/litmusctl/pkg/common/chaos"
 	"github.com/spf13/cobra"
-	"os"
 )
 
 // connectCmd represents the connect command

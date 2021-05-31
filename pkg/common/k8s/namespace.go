@@ -33,10 +33,15 @@ func NsExists(namespace string, kubeconfig *string) (bool, error) {
 
 // ValidNs takes a valid namespace as input from user
 func ValidNs(label string, kubeconfig *string) (string, bool) {
-	var namespace string
-	var nsExists bool
+start:
+	var (
+		namespace string
+		nsExists  bool
+	)
+
 	fmt.Print("📁 Enter the namespace (new or existing) [", constants.DefaultNs, "]: ")
 	fmt.Scanln(&namespace)
+
 	if namespace == "" {
 		namespace = constants.DefaultNs
 	}
@@ -48,7 +53,7 @@ func ValidNs(label string, kubeconfig *string) (string, bool) {
 	if ok {
 		if PodExists(namespace, label, kubeconfig) {
 			fmt.Println("🚫 Subscriber already present. Please enter a different namespace")
-			namespace, nsExists = ValidNs(label, kubeconfig)
+			goto start
 		} else {
 			nsExists = true
 			fmt.Println("👍 Continuing with", namespace, "namespace")
@@ -56,10 +61,11 @@ func ValidNs(label string, kubeconfig *string) (string, bool) {
 	} else {
 		if val, _ := CheckSAPermissions("create", "namespace", false, kubeconfig); !val {
 			fmt.Println("🚫 You don't have permissions to create a namespace.\n🙄 Please enter an existing namespace.")
-			namespace, nsExists = ValidNs(label, kubeconfig)
+			goto start
 		}
 		nsExists = false
 	}
+
 	return namespace, nsExists
 }
 
