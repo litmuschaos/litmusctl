@@ -5,7 +5,7 @@ import (
 	"os"
 
 	utils "github.com/litmuschaos/litmusctl/pkg/common"
-	chaos "github.com/litmuschaos/litmusctl/pkg/common/chaos"
+	"github.com/litmuschaos/litmusctl/pkg/common/chaos"
 	"github.com/spf13/cobra"
 )
 
@@ -15,7 +15,6 @@ var ConnectCmd = &cobra.Command{
 	Short: "Connect LitmusChaos agent",
 	Long:  `Connect connects the agent to LitmusChaos`,
 	Run: func(cmd *cobra.Command, args []string) {
-
 		var c utils.Credentials
 		var pErr error
 		fmt.Println("🔥 Connecting LitmusChaos agent")
@@ -33,6 +32,11 @@ var ConnectCmd = &cobra.Command{
 		// Fetch authorization token
 		t := utils.Login(c, "auth/login")
 
-		chaos.Connect(t, c)
+		kubeconfig, err := cmd.Flags().GetString("kubeconfig")
+		if err != nil {
+			fmt.Print(err)
+		}
+
+		chaos.Connect(t, c, kubeconfig)
 	},
 }

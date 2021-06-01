@@ -10,17 +10,17 @@ import (
 )
 
 // discoverPlatform determines the host platform and returns it
-func DiscoverPlatform() string {
-	if ok, _ := IsAWSPlatform(); ok {
+func DiscoverPlatform(kubeconfig *string) string {
+	if ok, _ := IsAWSPlatform(kubeconfig); ok {
 		return "AWS"
 	}
-	if ok, _ := IsGKEPlatform(); ok {
+	if ok, _ := IsGKEPlatform(kubeconfig); ok {
 		return "GKE"
 	}
-	if ok, _ := IsOpenshiftPlatform(); ok {
+	if ok, _ := IsOpenshiftPlatform(kubeconfig); ok {
 		return "Openshift"
 	}
-	if ok, _ := k8s.NsExists("cattle-system"); ok {
+	if ok, _ := k8s.NsExists("cattle-system", kubeconfig); ok {
 		return "Rancher"
 	}
 	return constants.DefaultPlatform
@@ -39,8 +39,8 @@ func DiscoverPlatform() string {
 //     }
 //   }
 // }
-func IsAWSPlatform() (bool, error) {
-	clientset, err := k8s.ClientSet()
+func IsAWSPlatform(kubeconfig *string) (bool, error) {
+	clientset, err := k8s.ClientSet(kubeconfig)
 	if err != nil {
 		return false, err
 	}
@@ -67,8 +67,8 @@ func IsAWSPlatform() (bool, error) {
 //     }
 //   }
 // }
-func IsGKEPlatform() (bool, error) {
-	clientset, err := k8s.ClientSet()
+func IsGKEPlatform(kubeconfig *string) (bool, error) {
+	clientset, err := k8s.ClientSet(kubeconfig)
 	if err != nil {
 		return false, err
 	}
@@ -97,8 +97,8 @@ func IsGKEPlatform() (bool, error) {
 //    }
 //    ....
 // }
-func IsOpenshiftPlatform() (bool, error) {
-	clientset, err := k8s.ClientSet()
+func IsOpenshiftPlatform(kubeconfig *string) (bool, error) {
+	clientset, err := k8s.ClientSet(kubeconfig)
 	if err != nil {
 		return false, err
 	}

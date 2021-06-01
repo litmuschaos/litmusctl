@@ -90,9 +90,9 @@ func Confirm() {
 // - Entering any character other than numbers returns 0. Input validation need to be done.
 // - If input is given as "123abc", "abc" will be used for next user input. Buffer need to be read completely.
 // - String literals like "AWS" are used at multiple places. Need to be changed to constants.
-func GetPlatformName() string {
+func GetPlatformName(kubeconfig *string) string {
 	var platform int
-	discoveredPlatform := DiscoverPlatform()
+	discoveredPlatform := DiscoverPlatform(kubeconfig)
 	fmt.Println("📦 Platform List")
 	fmt.Println(constants.PlatformList)
 	fmt.Print("🔎 Select Platform [", discoveredPlatform, "]: ")
@@ -125,18 +125,18 @@ func Scanner() string {
 }
 
 // Summary display the agent details based on input
-func Summary(agent Agent, product string) {
+func Summary(agent Agent, product string, kubeconfig *string) {
 	fmt.Println("\n📌 Summary --------------------------")
 	fmt.Println("\nAgent Name:        ", agent.AgentName)
 	fmt.Println("Agent Description: ", agent.Description)
 	fmt.Println("Platform Name:     ", agent.PlatformName)
-	if ok, _ := k8s.NsExists(agent.Namespace); ok {
+	if ok, _ := k8s.NsExists(agent.Namespace, kubeconfig); ok {
 		fmt.Println("Namespace:         ", agent.Namespace)
 	} else {
 		fmt.Println("Namespace:         ", agent.Namespace, "(new)")
 	}
 	if product == "chaos" {
-		if k8s.SAExists(agent.Namespace, agent.ServiceAccount) {
+		if k8s.SAExists(agent.Namespace, agent.ServiceAccount, kubeconfig) {
 			fmt.Println("Service Account:   ", agent.ServiceAccount)
 		} else {
 			fmt.Println("Service Account:   ", agent.ServiceAccount, "(new)")

@@ -14,8 +14,8 @@ import (
 )
 
 // NsExists checks if the given namespace already exists
-func NsExists(namespace string) (bool, error) {
-	clientset, err := ClientSet()
+func NsExists(namespace string, kubeconfig *string) (bool, error) {
+	clientset, err := ClientSet(kubeconfig)
 	if err != nil {
 		return false, err
 	}
@@ -32,40 +32,46 @@ func NsExists(namespace string) (bool, error) {
 }
 
 // ValidNs takes a valid namespace as input from user
-func ValidNs(label string) (string, bool) {
-	var namespace string
-	var nsExists bool
+func ValidNs(label string, kubeconfig *string) (string, bool) {
+start:
+	var (
+		namespace string
+		nsExists  bool
+	)
+
 	fmt.Print("📁 Enter the namespace (new or existing) [", constants.DefaultNs, "]: ")
 	fmt.Scanln(&namespace)
+
 	if namespace == "" {
 		namespace = constants.DefaultNs
 	}
-	ok, err := NsExists(namespace)
+	ok, err := NsExists(namespace, kubeconfig)
 	if err != nil {
 		fmt.Printf("\n Namespace existence check failed: {%s}\n", err.Error())
 		os.Exit(1)
 	}
 	if ok {
-		if PodExists(namespace, label) {
+		if PodExists(namespace, label, kubeconfig) {
 			fmt.Println("🚫 Subscriber already present. Please enter a different namespace")
-			namespace, nsExists = ValidNs(label)
+			goto start
 		} else {
 			nsExists = true
 			fmt.Println("👍 Continuing with", namespace, "namespace")
 		}
 	} else {
-		if val, _ := CheckSAPermissions("create", "namespace", false); !val {
+		if val, _ := CheckSAPermissions("create", "namespace", false, kubeconfig); !val {
 			fmt.Println("🚫 You don't have permissions to create a namespace.\n🙄 Please enter an existing namespace.")
-			namespace, nsExists = ValidNs(label)
+			goto start
 		}
 		nsExists = false
 	}
+
 	return namespace, nsExists
 }
 
 // CreateNs creates the given namespace
-func CreateNs(namespace string) {
-	clientset, err := ClientSet()
+func CreateNs(namespace string, kubeconfig *string) {
+	clientset, err := ClientSet(kubeconfig)
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -9,7 +9,7 @@ import (
 	"github.com/litmuschaos/litmusctl/pkg/constants"
 )
 
-func Connect(t common.Token, c common.Credentials) {
+func Connect(t common.Token, c common.Credentials, kubeconfig string) {
 	// Fetch project details
 	user, uErr := GetProjectDetails(t, c)
 
@@ -24,14 +24,14 @@ func Connect(t common.Token, c common.Credentials) {
 	mode := GetMode()
 	// Check if user has sufficient permissions based on mode
 	fmt.Println("\n🏃 Running prerequisites check....")
-	k8s.ValidateSAPermissions(mode)
+	k8s.ValidateSAPermissions(mode, &kubeconfig)
 	// Get agent details as input
-	newAgent := GetAgentDetails(pid, t, c)
+	newAgent := GetAgentDetails(pid, t, c, &kubeconfig)
 	newAgent.Mode = mode
 	// Get service account as input
-	newAgent.ServiceAccount, newAgent.SAExists = k8s.ValidSA(newAgent.Namespace)
+	newAgent.ServiceAccount, newAgent.SAExists = k8s.ValidSA(newAgent.Namespace, &kubeconfig)
 	// Display details of agent to be connected
-	common.Summary(newAgent, "chaos")
+	common.Summary(newAgent, "chaos", &kubeconfig)
 	// Confirm before connecting the agent
 	common.Confirm()
 	// Connect agent
@@ -49,15 +49,15 @@ func Connect(t common.Token, c common.Credentials) {
 		fmt.Printf("\n🚫 Agent connection failed: [%s]\n", agent.Errors[0].Message)
 		os.Exit(1)
 	}
-	// Apply agent connection yaml
-	yamlOutput, yerror := common.ApplyYaml(agent.Data.UserAgentReg.Token, c, constants.ChaosYamlPath)
+	//Apply agent connection yaml
+	yamlOutput, yerror := common.ApplyYaml(agent.Data.UserAgentReg.Token, c, constants.ChaosYamlPath, kubeconfig)
 	if yerror != nil {
 		fmt.Printf("\n❌ Failed in applying connection yaml: [%s]\n", yerror.Error())
 		os.Exit(1)
 	}
 	fmt.Println("\n", yamlOutput)
 	// Watch subscriber pod status
-	k8s.WatchPod(newAgent.Namespace, constants.ChaosAgentLabel)
+	k8s.WatchPod(newAgent.Namespace, constants.ChaosAgentLabel, &kubeconfig)
 	fmt.Println("\n🚀 Agent Connection Successful!! 🎉")
 	fmt.Println("👉 Litmus agents can be accessed here: " + fmt.Sprintf("%s/%s", c.Host, constants.ChaosAgentPath))
 }
