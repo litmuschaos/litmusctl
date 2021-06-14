@@ -15,8 +15,18 @@ limitations under the License.
 */
 package main
 
-import cmd "github.com/litmuschaos/litmusctl/pkg/cmd/litmusctl"
+import (
+	cmd "github.com/litmuschaos/litmusctl/pkg/cmd/litmusctl"
+	"log"
+	"os"
+)
+
+var CLIVersion string
 
 func main() {
+	err := os.Setenv("CLIVersion", CLIVersion)
+	if err != nil {
+		log.Println("Failed to fetched CLIVersion")
+	}
 	cmd.Execute()
 }
