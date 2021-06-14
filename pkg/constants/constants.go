@@ -2,9 +2,6 @@ package constants
 
 const (
 
-	// CLI version
-	CLIVersion = "v0.1.0"
-
 	// Default username
 	DefaultUsername = "admin"
 

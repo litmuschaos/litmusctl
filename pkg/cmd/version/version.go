@@ -17,8 +17,8 @@ package version
 
 import (
 	"fmt"
+	"os"
 
-	"github.com/litmuschaos/litmusctl/pkg/constants"
 	"github.com/spf13/cobra"
 )
 
@@ -28,6 +28,6 @@ var VersionCmd = &cobra.Command{
 	Short: "Litmusctl version",
 	Long:  `Litmusctl cli version`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Litmusctl version: ", constants.CLIVersion)
+		fmt.Println("Litmusctl version: ", os.Getenv("CLIVersion"))
 	},
 }

@@ -29,7 +29,7 @@ do
     echo 'Building' $GOOS-$GOARCH
     output_name='litmusctl-'$GOOS-$GOARCH
 
-    env GOOS=$GOOS GOARCH=$GOARCH VERSION=$tag go build -v -o platforms-$tag/$output_name $package
+    env GOOS=$GOOS GOARCH=$GOARCH VERSION=$tag go build -ldflags "-X main.CLIVersion=$tag" -v -o platforms-$tag/$output_name $package
 
     if [ $? -ne 0 ]; then
         echo 'An error has occurred! Aborting the script execution...'
