@@ -16,9 +16,10 @@ limitations under the License.
 package main
 
 import (
-	cmd "github.com/litmuschaos/litmusctl/pkg/cmd/litmusctl"
 	"log"
 	"os"
+
+	cmd "github.com/litmuschaos/litmusctl/pkg/cmd/litmusctl"
 )
 
 var CLIVersion string
