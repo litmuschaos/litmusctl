@@ -32,22 +32,31 @@ func NsExists(namespace string, kubeconfig *string) (bool, error) {
 }
 
 // ValidNs takes a valid namespace as input from user
-func ValidNs(label string, kubeconfig *string) (string, bool) {
+func ValidNs(mode string, label string, kubeconfig *string) (string, bool) {
 start:
 	var (
 		namespace string
 		nsExists  bool
 	)
 
-	fmt.Print("📁 Enter the namespace (new or existing) [", constants.DefaultNs, "]: ")
-	fmt.Scanln(&namespace)
+	if mode == "namespace" {
+		fmt.Print("📁 Enter the namespace (existing) [", constants.DefaultNs, "]: ")
+		fmt.Scanln(&namespace)
+
+	} else if mode == "cluster" {
+		fmt.Print("📁 Enter the namespace (new or existing) [", constants.DefaultNs, "]: ")
+		fmt.Scanln(&namespace)
+	} else {
+		fmt.Printf("\n 🚫 No mode selected \n")
+		os.Exit(1)
+	}
 
 	if namespace == "" {
 		namespace = constants.DefaultNs
 	}
 	ok, err := NsExists(namespace, kubeconfig)
 	if err != nil {
-		fmt.Printf("\n Namespace existence check failed: {%s}\n", err.Error())
+		fmt.Printf("\n 🚫 Namespace existence check failed: {%s}\n", err.Error())
 		os.Exit(1)
 	}
 	if ok {

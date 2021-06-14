@@ -31,7 +31,7 @@ type UserAgentReg struct {
 }
 
 // GetAgentDetails take details of agent as input
-func GetAgentDetails(pid string, t util.Token, cred util.Credentials, kubeconfig *string) util.Agent {
+func GetAgentDetails(mode string, pid string, t util.Token, cred util.Credentials, kubeconfig *string) util.Agent {
 	var newAgent util.Agent
 	// Get agent name as input
 	fmt.Println("\n🔗 Enter the details of the agent ----")
@@ -62,7 +62,7 @@ AGENT_NAME:
 	// Set project id
 	newAgent.ProjectId = pid
 	// Get namespace
-	newAgent.Namespace, newAgent.NsExists = k8s.ValidNs(constants.ChaosAgentLabel, kubeconfig)
+	newAgent.Namespace, newAgent.NsExists = k8s.ValidNs(mode, constants.ChaosAgentLabel, kubeconfig)
 
 	return newAgent
 }

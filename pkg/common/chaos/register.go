@@ -26,7 +26,7 @@ func Connect(t common.Token, c common.Credentials, kubeconfig string) {
 	fmt.Println("\n🏃 Running prerequisites check....")
 	k8s.ValidateSAPermissions(mode, &kubeconfig)
 	// Get agent details as input
-	newAgent := GetAgentDetails(pid, t, c, &kubeconfig)
+	newAgent := GetAgentDetails(mode, pid, t, c, &kubeconfig)
 	newAgent.Mode = mode
 	// Get service account as input
 	newAgent.ServiceAccount, newAgent.SAExists = k8s.ValidSA(newAgent.Namespace, &kubeconfig)
