@@ -3,7 +3,6 @@
 ![GitHub Workflow](https://github.com/litmuschaos/litmusctl/actions/workflows/push.yml/badge.svg?branch=master)
 [![GitHub stars](https://img.shields.io/github/stars/litmuschaos/litmusctl?style=social)](https://github.com/litmuschaos/litmusctl/stargazers)
 [![GitHub Release](https://img.shields.io/github/release/litmuschaos/litmusctl.svg?style=flat)]()  
-<br><br><br>
 
 Litmusctl is a command line interface to manage LitmusPortal services.
 
