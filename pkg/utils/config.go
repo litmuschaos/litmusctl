@@ -85,10 +85,11 @@ func UpdateLitmusCtlConfig(account types.Account, filename string) error {
 	for i, act := range obj.Accounts {
 		if act.Endpoint == account.Endpoint {
 			var innerflag = false
-			for _, user := range act.Users{
+			for j, user := range act.Users{
 				if user.Username == account.Users[0].Username {
-					user.Password = account.Users[0].Username
-					user.Token = account.Users[0].Token
+					obj.Accounts[i].Users[j].Username = account.Users[0].Username
+					obj.Accounts[i].Users[j].Token = account.Users[0].Token
+					obj.Accounts[i].Users[j].ExpiresIn = account.Users[0].ExpiresIn
 					innerflag, outerflag = true, true
 				}
 			}

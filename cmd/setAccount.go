@@ -22,6 +22,7 @@ import (
 	"github.com/litmuschaos/litmusctl/pkg/utils"
 	"github.com/spf13/cobra"
 	"os"
+	"time"
 )
 
 
@@ -58,8 +59,11 @@ to quickly create a Cobra application.`,
 				fmt.Println(err)
 			}
 
+			timeNow := time.Now()
+			newTime := timeNow.Add(time.Second * time.Duration(resp.ExpiresIn))
+
 			var user = types.User{
-				ExpiresIn: string(resp.ExpiresIn),
+				ExpiresIn: fmt.Sprint(newTime.Unix()),
 				Password: authInput.Password,
 				Token: resp.AccessToken,
 				Username: authInput.Username,
