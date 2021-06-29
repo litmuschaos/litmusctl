@@ -7,9 +7,9 @@ import (
 	"os"
 	"strings"
 
-	"github.com/litmuschaos/litmusctl/pkg/common/k8s"
+	"github.com/litmuschaos/litmusctl/tmp-pkg/common/k8s"
 
-	"github.com/litmuschaos/litmusctl/pkg/constants"
+	"github.com/litmuschaos/litmusctl/tmp-pkg/constants"
 	"golang.org/x/crypto/ssh/terminal"
 )
 

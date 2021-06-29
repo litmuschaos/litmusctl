@@ -1,0 +1,25 @@
+accounts:
+- users:
+  - expires_in: "\U00015180"
+    password: litmus
+    token: eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjUwODgwMDgsInJvbGUiOiJhZG1pbiIsInVpZCI6ImQ4MjA0Zjk1LTlhMWEtNDA3YS1hMWFhLTc5ZDdhZGQ5MGRmNSIsInVzZXJuYW1lIjoiYWRtaW4ifQ.qvw0FWfqRKKOnvfplx2n2M8OZo0tsWBpx1SNtxOm-ntFYZcpMyrjjkkSPengKHPWRBtJwH7lAe7hojOV3hlFlw
+    username: admin
+  - expires_in: "\U00015180"
+    password: litmus
+    token: eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjUwODg4NTksInJvbGUiOiJ1c2VyIiwidWlkIjoiNzdkZTA3ZjctYzUwNi00YjFlLTkzMDYtZWQwOWIyZDBkOWI1IiwidXNlcm5hbWUiOiJyYWoifQ.13ZuD8r0bhfPX1-LR97MBfjB2eHjCv6oqFkzArKzNB8CChpb2sOZY4yaintYljYU14y5hAZUyj064x2TFutpmA
+    username: raj
+  endpoint: https://litmus.1preview.chaosnative.com
+- users:
+  - expires_in: "\U00015180"
+    password: litmus
+    token: eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjUwODkwNDUsInJvbGUiOiJ1c2VyIiwidWlkIjoiNzdkZTA3ZjctYzUwNi00YjFlLTkzMDYtZWQwOWIyZDBkOWI1IiwidXNlcm5hbWUiOiJyYWoifQ.AESVmnzdbC42Uta6u4AwsCBFbhi2vE1hsFRRt6bclQPaxdzkB0q6-6xXjojaCtIajvzhiIGAacOZkXYzyAb0AA
+    username: raj
+  - expires_in: "\U00015180"
+    password: litmus
+    token: eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjUwODkwNjIsInJvbGUiOiJhZG1pbiIsInVpZCI6ImQ4MjA0Zjk1LTlhMWEtNDA3YS1hMWFhLTc5ZDdhZGQ5MGRmNSIsInVzZXJuYW1lIjoiYWRtaW4ifQ.q-CcvtlHz6u4KELeCwh7iABQwOZsCB6qhG5IVnM2f_xJQDvutnAlimjuLY3za90TY6ABfzDdoXtFt6BgDtuonw
+    username: admin
+  endpoint: https://litmus.preview.chaosnative.com
+apiVersion: v1
+current-account: https://litmus.preview.chaosnative.com
+current-user: admin
+kind: Config

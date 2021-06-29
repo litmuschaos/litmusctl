@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	utils "github.com/litmuschaos/litmusctl/pkg/common"
-	"github.com/litmuschaos/litmusctl/pkg/common/chaos"
+	utils "github.com/litmuschaos/litmusctl/tmp-pkg/common"
+	"github.com/litmuschaos/litmusctl/tmp-pkg/common/chaos"
 	"github.com/spf13/cobra"
 )
 

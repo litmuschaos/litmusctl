@@ -4,8 +4,8 @@ import (
 	"context"
 	"strings"
 
-	"github.com/litmuschaos/litmusctl/pkg/common/k8s"
-	"github.com/litmuschaos/litmusctl/pkg/constants"
+	"github.com/litmuschaos/litmusctl/tmp-pkg/common/k8s"
+	"github.com/litmuschaos/litmusctl/tmp-pkg/constants"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 

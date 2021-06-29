@@ -6,7 +6,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/litmuschaos/litmusctl/pkg/constants"
+	"github.com/litmuschaos/litmusctl/tmp-pkg/constants"
 	v1 "k8s.io/api/core/v1"
 
 	k8serror "k8s.io/apimachinery/pkg/api/errors"

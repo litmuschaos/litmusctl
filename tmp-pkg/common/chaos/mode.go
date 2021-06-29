@@ -3,7 +3,7 @@ package chaos
 import (
 	"fmt"
 
-	"github.com/litmuschaos/litmusctl/pkg/constants"
+	"github.com/litmuschaos/litmusctl/tmp-pkg/constants"
 )
 
 // GetMode gets mode of agent installation as input

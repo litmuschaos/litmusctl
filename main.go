@@ -1,5 +1,5 @@
 /*
-Copyright © 2020 NAME HERE <EMAIL ADDRESS>
+Copyright © 2021 NAME HERE <EMAIL ADDRESS>
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,19 +15,8 @@ limitations under the License.
 */
 package main
 
-import (
-	"log"
-	"os"
-
-	cmd "github.com/litmuschaos/litmusctl/pkg/cmd/litmusctl"
-)
-
-var CLIVersion string
+import "github.com/litmuschaos/litmusctl/cmd"
 
 func main() {
-	err := os.Setenv("CLIVersion", CLIVersion)
-	if err != nil {
-		log.Println("Failed to fetched CLIVersion")
-	}
 	cmd.Execute()
 }

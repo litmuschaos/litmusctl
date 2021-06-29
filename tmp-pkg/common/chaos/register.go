@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/litmuschaos/litmusctl/pkg/common"
-	"github.com/litmuschaos/litmusctl/pkg/common/k8s"
-	"github.com/litmuschaos/litmusctl/pkg/constants"
+	"github.com/litmuschaos/litmusctl/tmp-pkg/common"
+	"github.com/litmuschaos/litmusctl/tmp-pkg/common/k8s"
+	"github.com/litmuschaos/litmusctl/tmp-pkg/constants"
 )
 
 func Connect(t common.Token, c common.Credentials, kubeconfig string) {

@@ -3,7 +3,7 @@ package chaos
 import (
 	"fmt"
 
-	util "github.com/litmuschaos/litmusctl/pkg/common"
+	util "github.com/litmuschaos/litmusctl/tmp-pkg/common"
 
 	resty "github.com/go-resty/resty/v2"
 )
