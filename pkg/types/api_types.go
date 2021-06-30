@@ -7,9 +7,14 @@ type AuthResponse struct {
 	Type        string `json:"type"`
 }
 
-
 type AuthInput struct {
 	Endpoint string
 	Username string
 	Password string
+}
+
+type Credentials struct {
+	Username string
+	Token string
+	Endpoint string
 }

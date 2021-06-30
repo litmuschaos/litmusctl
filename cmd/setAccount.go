@@ -18,8 +18,8 @@ package cmd
 import (
 	"fmt"
 	"github.com/litmuschaos/litmusctl/pkg/apis"
+	config2 "github.com/litmuschaos/litmusctl/pkg/config"
 	"github.com/litmuschaos/litmusctl/pkg/types"
-	"github.com/litmuschaos/litmusctl/pkg/utils"
 	"github.com/spf13/cobra"
 	"os"
 	"time"
@@ -47,8 +47,8 @@ to quickly create a Cobra application.`,
 		authInput.Password, _ = cmd.Flags().GetString("password")
 
 		if authInput.Endpoint != "" && authInput.Username != "" && authInput.Password != "" {
-			exists := utils.FileExists(defaultFileName)
-			lgt, err := utils.GetFileLength(defaultFileName)
+			exists := config2.FileExists(defaultFileName)
+			lgt, err := config2.GetFileLength(defaultFileName)
 			if err != nil {
 				fmt.Println(err)
 				os.Exit(1)
@@ -92,7 +92,7 @@ to quickly create a Cobra application.`,
 					Accounts: accounts,
 				}
 
-				err := utils.CreateNewLitmusCtlConfig(defaultFileName, config)
+				err := config2.CreateNewLitmusCtlConfig(defaultFileName, config)
 				if err != nil {
 					fmt.Println(err)
 					os.Exit(1)
@@ -101,13 +101,13 @@ to quickly create a Cobra application.`,
 				os.Exit(0)
 			} else {
 				// checking syntax
-				err = utils.ConfigSyntaxCheck(defaultFileName)
+				err = config2.ConfigSyntaxCheck(defaultFileName)
 				if err != nil {
 					fmt.Println(err)
 					os.Exit(1)
 				}
 
-				err = utils.UpdateLitmusCtlConfig(account, defaultFileName)
+				err = config2.UpdateLitmusCtlConfig(account, defaultFileName)
 				if err != nil {
 					fmt.Println(err)
 					os.Exit(1)

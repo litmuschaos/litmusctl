@@ -17,8 +17,8 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/litmuschaos/litmusctl/pkg/config"
 	"github.com/litmuschaos/litmusctl/pkg/types"
-	"github.com/litmuschaos/litmusctl/pkg/utils"
 	"io/ioutil"
 	"os"
 
@@ -38,7 +38,7 @@ to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 
 		defaultFileName := types.DefaultFileName
-		exists := utils.FileExists(defaultFileName)
+		exists := config.FileExists(defaultFileName)
 		if !exists {
 			fmt.Println("File reading error open ",defaultFileName ,": no such file or directory. Use --config or -c flag to point the configfile")
 			os.Exit(1)

@@ -17,8 +17,8 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/litmuschaos/litmusctl/pkg/config"
 	"github.com/litmuschaos/litmusctl/pkg/types"
-	"github.com/litmuschaos/litmusctl/pkg/utils"
 	"os"
 	"text/tabwriter"
 
@@ -37,7 +37,7 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		//fmt.Println("getAccounts called")
-		obj, err := utils.YamltoObject(types.DefaultFileName)
+		obj, err := config.YamltoObject(types.DefaultFileName)
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
@@ -45,14 +45,13 @@ to quickly create a Cobra application.`,
 
 		writer := tabwriter.NewWriter(os.Stdout, 0, 8, 1, '\t', tabwriter.AlignRight)
 		fmt.Fprintln(writer, "CURRENT\tENDPOINT\tUSERNAME\tEXPIRESIN")
-		for _, account := range obj.Accounts{
+		for _, account := range obj.Accounts {
 			for _, user := range account.Users {
 				if obj.CurrentUser == user.Username && obj.CurrentAccount == account.Endpoint {
-					fmt.Fprintln(writer, "*"+"\t"+account.Endpoint+"\t"+user.Username + "\t" + user.ExpiresIn)
+					fmt.Fprintln(writer, "*" + "\t"+account.Endpoint + "\t" + user.Username + "\t" + user.ExpiresIn)
 				} else {
-					fmt.Fprintln(writer, ""+"\t"+account.Endpoint+"\t"+user.Username + "\t" + user.ExpiresIn)
+					fmt.Fprintln(writer, "" + "\t" + account.Endpoint + "\t" + user.Username + "\t" + user.ExpiresIn)
 				}
-
 			}
 		}
 		writer.Flush()
