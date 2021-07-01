@@ -1,0 +1,11 @@
+accounts:
+- users:
+  - expires_in: "1625185532"
+    password: litmus
+    token: eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjUxODU1MzIsInJvbGUiOiJhZG1pbiIsInVpZCI6ImQ4MjA0Zjk1LTlhMWEtNDA3YS1hMWFhLTc5ZDdhZGQ5MGRmNSIsInVzZXJuYW1lIjoiYWRtaW4ifQ.nvM96ATPL4frBHyR8Yo0aSTtZRrwaBUF8kBmO8IuQCh9P-czIcpypPNBmgTGifzVgLE3SLwrpgKYqSb8XbjW8Q
+    username: admin
+  endpoint: https://litmus.preview.chaosnative.com
+apiVersion: v1
+current-account: https://litmus.preview.chaosnative.com
+current-user: admin
+kind: Config

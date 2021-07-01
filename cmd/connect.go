@@ -52,6 +52,11 @@ to quickly create a Cobra application.`,
 		printError(err)
 
 
+		if obj.CurrentUser == "" || obj.CurrentAccount == "" {
+			fmt.Println("Current user or current account is not set")
+			os.Exit(1)
+		}
+
 		var token string
 		for _, account := range obj.Accounts {
 			if account.Endpoint == obj.CurrentAccount {

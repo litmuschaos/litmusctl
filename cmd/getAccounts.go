@@ -19,10 +19,9 @@ import (
 	"fmt"
 	"github.com/litmuschaos/litmusctl/pkg/config"
 	"github.com/litmuschaos/litmusctl/pkg/types"
+	"github.com/spf13/cobra"
 	"os"
 	"text/tabwriter"
-
-	"github.com/spf13/cobra"
 )
 
 // getAccountsCmd represents the getAccounts command

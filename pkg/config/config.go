@@ -122,3 +122,31 @@ func UpdateLitmusCtlConfig(account types.Account, filename string) error {
 
 	return nil
 }
+
+func UpdateCurrent(current types.Current, filename string) error {
+	obj, err:= YamltoObject(filename)
+	if err != nil {
+		return err
+	}
+
+	obj.CurrentUser = current.CurrentUser
+	obj.CurrentAccount = current.CurrentAccount
+
+	_, err = os.OpenFile(filename, os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		return err
+	}
+
+	byteObj, err := yaml.Marshal(obj)
+	if err != nil {
+		return err
+	}
+
+	err = ioutil.WriteFile(filename, byteObj, 0644)
+	if err != nil {
+		return err
+	}
+
+	return nil
+
+}

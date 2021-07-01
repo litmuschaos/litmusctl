@@ -64,7 +64,6 @@ to quickly create a Cobra application.`,
 
 			var user = types.User{
 				ExpiresIn: fmt.Sprint(newTime.Unix()),
-				Password: authInput.Password,
 				Token: resp.AccessToken,
 				Username: authInput.Username,
 			}

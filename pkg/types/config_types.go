@@ -2,7 +2,7 @@ package types
 
 type User struct {
 	ExpiresIn string `yaml:"expires_in",json:"expires_in"`
-	Password   string `yaml:"password",json:"password"`
+	//Password   string `yaml:"password",json:"password"`
 	Token      string `yaml:"token",json:"token"`
 	Username   string `yaml:"username",json:"username"`
 }
@@ -20,5 +20,10 @@ type LitmuCtlConfig struct {
 	Kind           string `yaml:"kind",json:"kind"`
 }
 
-const DefaultFileName = "test.yaml"
+type Current struct {
+	CurrentAccount string `yaml:"current-account",json:"current-account"`
+	CurrentUser string `yaml:"current-user",json:"current-user"`
+}
+
+const DefaultFileName = "litmusconfig.yaml"
 

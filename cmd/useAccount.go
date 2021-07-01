@@ -17,8 +17,10 @@ package cmd
 
 import (
 	"fmt"
-
+	config "github.com/litmuschaos/litmusctl/pkg/config"
+	"github.com/litmuschaos/litmusctl/pkg/types"
 	"github.com/spf13/cobra"
+	"os"
 )
 
 // useAccountCmd represents the useAccount command
@@ -32,8 +34,41 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("useAccount called")
-		
+		username, err  := cmd.Flags().GetString("username")
+		if err != nil{
+			fmt.Print(err)
+			os.Exit(1)
+		}
+
+		endpoint, err := cmd.Flags().GetString("endpoint")
+		if err != nil{
+			fmt.Print(err)
+			os.Exit(1)
+		}
+		defaultFileName := types.DefaultFileName
+		exists := config.FileExists(defaultFileName)
+
+		err = config.ConfigSyntaxCheck(defaultFileName)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+
+
+		if exists {
+			err = config.UpdateCurrent(types.Current{
+				CurrentAccount: endpoint,
+				CurrentUser: username,
+			}, defaultFileName)
+			if err != nil {
+				fmt.Println(err)
+				os.Exit(1)
+			}
+
+		} else {
+			fmt.Println("File Not exists")
+		}
+
 	},
 }
 
