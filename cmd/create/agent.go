@@ -16,12 +16,10 @@ limitations under the License.
 package create
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/litmuschaos/litmusctl/pkg/agent"
 	"github.com/litmuschaos/litmusctl/pkg/apis"
-	"github.com/litmuschaos/litmusctl/pkg/config"
 	"github.com/litmuschaos/litmusctl/pkg/k8s"
 	"github.com/litmuschaos/litmusctl/pkg/types"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
@@ -35,7 +33,7 @@ import (
 var agentCmd = &cobra.Command{
 	Use:   "agent",
 	Short: "Create an external agent.",
-	Long: `Create an external agent`,
+	Long:  `Create an external agent`,
 	Run: func(cmd *cobra.Command, args []string) {
 		var configFilePath string
 		configFilePath, err := cmd.Flags().GetString("config")
@@ -45,30 +43,8 @@ var agentCmd = &cobra.Command{
 			configFilePath = utils.DefaultFileName
 		}
 
-		obj, err := config.YamltoObject(configFilePath)
+		credentials, err := utils.GetCredentials(configFilePath)
 		utils.PrintError(err)
-
-		if obj.CurrentUser == "" || obj.CurrentAccount == "" {
-			fmt.Println("Current user or current account is not set")
-			os.Exit(1)
-		}
-
-		var token string
-		for _, account := range obj.Accounts {
-			if account.Endpoint == obj.CurrentAccount {
-				for _, user := range account.Users {
-					if user.Username == obj.CurrentUser {
-						token = user.Token
-					}
-				}
-			}
-		}
-
-		var credentials = types.Credentials{
-			Username: obj.CurrentUser,
-			Token:    token,
-			Endpoint: obj.CurrentAccount,
-		}
 
 		nonInteractive, err := cmd.Flags().GetBool("non-interactive")
 
@@ -112,35 +88,26 @@ var agentCmd = &cobra.Command{
 				newAgent.Mode = utils.DefaultMode
 			}
 
+			fmt.Println(newAgent)
+
 			// Check if user has sufficient permissions based on mode
 			fmt.Println("\n🏃 Running prerequisites check....")
 			agent.ValidateSAPermissions(newAgent.Mode, &kubeconfig)
 
-			agent, err := apis.GetAgentList(credentials, newAgent.ProjectId)
+			agents, err := apis.GetAgentList(credentials, newAgent.ProjectId)
 			utils.PrintError(err)
 
 			// Duplicate agent check
 			var isAgentExist = false
-			for i := range agent.Data.GetAgent {
-				if newAgent.AgentName == agent.Data.GetAgent[i].AgentName {
-					fmt.Println(agent.Data.GetAgent[i].AgentName)
+			for i := range agents.Data.GetAgent {
+				if newAgent.AgentName == agents.Data.GetAgent[i].AgentName {
+					fmt.Println(agents.Data.GetAgent[i].AgentName)
 					isAgentExist = true
 				}
 			}
 
-			fmt.Println(isAgentExist)
 			if isAgentExist {
-				fmt.Println("🚫 Agent with the given name already exists.")
-				// Print agent list if existing agent name is entered twice
-				fmt.Print("\n📘 Connected agents list -----------\n\n")
-
-				for i := range agent.Data.GetAgent {
-					fmt.Println("-", agent.Data.GetAgent[i].AgentName)
-				}
-
-				fmt.Println("\n-------------------------------------")
-
-				fmt.Println("❗ Please enter a different name.")
+				agent.PrintExistingAgents(agents)
 				os.Exit(1)
 			}
 
@@ -169,24 +136,35 @@ var agentCmd = &cobra.Command{
 		}
 
 		agent, err := apis.ConnectAgent(newAgent, credentials)
-		utils.PrintError(errors.New("\n❌ Agent connection failed: " + err.Error() + "\n"))
+		if err != nil {
+			fmt.Println("\n❌ Agent connection failed: " + err.Error() + "\n")
+			os.Exit(1)
+		}
 
 		path := fmt.Sprintf("%s/%s/%s.yaml", credentials.Endpoint, utils.ChaosYamlPath, agent.Data.UserAgentReg.Token)
 		fmt.Println("Applying YAML:\n", path)
 
 		// Print error message in case Data field is null in response
 		if (agent.Data == apis.AgentConnect{}) {
-			utils.PrintError(errors.New("\n🚫 Agent connection failed: " + agent.Errors[0].Message + "\n"))
+			fmt.Println("\n🚫 Agent connection failed: " + agent.Errors[0].Message + "\n")
+			os.Exit(1)
 		}
 
 		//Apply agent connection yaml
-		yamlOutput, err := utils.ApplyYaml(agent.Data.UserAgentReg.Token, credentials.Endpoint, utils.ChaosYamlPath, kubeconfig)
-		utils.PrintError(errors.New("\n❌ Failed in applying connection yaml: " + err.Error() + "\n"))
+		yamlOutput, err := utils.ApplyYaml(utils.ApplyYamlPrams{
+			Token:    agent.Data.UserAgentReg.Token,
+			Endpoint: credentials.Endpoint,
+			YamlPath: utils.ChaosYamlPath,
+		}, kubeconfig)
+		if err != nil {
+			fmt.Println("\n❌ Failed in applying connection yaml: " + err.Error() + "\n")
+			os.Exit(1)
+		}
 
 		fmt.Println("\n", yamlOutput)
 
 		// Watch subscriber pod status
-		k8s.WatchPod(newAgent.Namespace, utils.ChaosAgentLabel, &kubeconfig)
+		k8s.WatchPod(k8s.WatchPodParams{newAgent.Namespace, utils.ChaosAgentLabel}, &kubeconfig)
 
 		fmt.Println("\n🚀 Agent Connection Successful!! 🎉")
 		fmt.Println("👉 Litmus agents can be accessed here: " + fmt.Sprintf("%s/%s", credentials.Endpoint, utils.ChaosAgentPath))

@@ -49,6 +49,11 @@ to quickly create a Cobra application.`,
 		endpoint, err := cmd.Flags().GetString("endpoint")
 		utils.PrintError(err)
 
+		if username == "" || endpoint == "" {
+			fmt.Println("endpoint or username is not set")
+			os.Exit(1)
+		}
+
 		exists := config.FileExists(configFilePath)
 
 		err = config.ConfigSyntaxCheck(configFilePath)
@@ -66,8 +71,8 @@ to quickly create a Cobra application.`,
 
 		} else {
 			fmt.Println("File Not exists")
+			os.Exit(1)
 		}
-
 	},
 }
 

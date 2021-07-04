@@ -46,11 +46,17 @@ func NsExists(namespace string, kubeconfig *string) (bool, error) {
 	return false, err
 }
 
-func CheckSAPermissions(verb, resource string, print bool, kubeconfig *string) (bool, error) {
+type CheckSAPermissionsParams struct {
+	Verb     string
+	Resource string
+	Print    bool
+}
+
+func CheckSAPermissions(params CheckSAPermissionsParams, kubeconfig *string) (bool, error) {
 
 	var o CanIOptions
-	o.Verb = verb
-	o.Resource.Resource = resource
+	o.Verb = params.Verb
+	o.Resource.Resource = params.Resource
 	client, err := ClientSet(kubeconfig)
 	if err != nil {
 		log.Fatal(err)
@@ -77,12 +83,12 @@ func CheckSAPermissions(verb, resource string, print bool, kubeconfig *string) (
 	}
 
 	if response.Status.Allowed {
-		if print {
-			fmt.Println("🔑 ", resource, "- ✅")
+		if params.Print {
+			fmt.Println("🔑 ", params.Resource, "- ✅")
 		}
 	} else {
-		if print {
-			fmt.Println("🔑 ", resource, "- ❌")
+		if params.Print {
+			fmt.Println("🔑 ", params.Resource, "- ❌")
 		}
 		if len(response.Status.Reason) > 0 {
 			fmt.Println(response.Status.Reason)
@@ -124,7 +130,7 @@ start:
 		os.Exit(1)
 	}
 	if ok {
-		if PodExists(namespace, label, kubeconfig) {
+		if podExists(podExistsParams{namespace, label}, kubeconfig) {
 			fmt.Println("🚫 Subscriber already present. Please enter a different namespace")
 			goto start
 		} else {
@@ -132,7 +138,7 @@ start:
 			fmt.Println("👍 Continuing with", namespace, "namespace")
 		}
 	} else {
-		if val, _ := CheckSAPermissions("create", "namespace", false, kubeconfig); !val {
+		if val, _ := CheckSAPermissions(CheckSAPermissionsParams{"create", "namespace", false}, kubeconfig); !val {
 			fmt.Println("🚫 You don't have permissions to create a namespace.\n🙄 Please enter an existing namespace.")
 			goto start
 		}
@@ -142,14 +148,19 @@ start:
 	return namespace, nsExists
 }
 
+type WatchPodParams struct {
+	Namespace string
+	Label     string
+}
+
 // WatchPod watches for the pod status
-func WatchPod(namespace, label string, kubeconfig *string) {
+func WatchPod(params WatchPodParams, kubeconfig *string) {
 	clientset, err := ClientSet(kubeconfig)
 	if err != nil {
 		log.Fatal(err)
 	}
-	watch, err := clientset.CoreV1().Pods(namespace).Watch(context.TODO(), metav1.ListOptions{
-		LabelSelector: label,
+	watch, err := clientset.CoreV1().Pods(params.Namespace).Watch(context.TODO(), metav1.ListOptions{
+		LabelSelector: params.Label,
 	})
 	if err != nil {
 		log.Fatal(err.Error())
@@ -172,32 +183,45 @@ type PodList struct {
 	Items []string
 }
 
+type podExistsParams struct {
+	Namespace string
+	Label     string
+}
+
 // PodExists checks if the pod with the given label already exists in the given namespace
-func PodExists(namespace, label string, kubeconfig *string) bool {
+func podExists(params podExistsParams, kubeconfig *string) bool {
 	clientset, err := ClientSet(kubeconfig)
 	if err != nil {
 		log.Fatal(err)
+		return false
 	}
-	watch, err := clientset.CoreV1().Pods(namespace).List(context.TODO(), metav1.ListOptions{
-		LabelSelector: label,
+	watch, err := clientset.CoreV1().Pods(params.Namespace).List(context.TODO(), metav1.ListOptions{
+		LabelSelector: params.Label,
 	})
 	if err != nil {
 		log.Fatal(err.Error())
+		return false
 	}
 	if len(watch.Items) >= 1 {
 		return true
 	}
+
 	return false
 }
 
+type SAExistsParams struct {
+	Namespace      string
+	Serviceaccount string
+}
+
 // SAExists checks if the given service account exists in the given namespace
-func SAExists(namespace, serviceaccount string, kubeconfig *string) bool {
+func SAExists(params SAExistsParams, kubeconfig *string) bool {
 	clientset, err := ClientSet(kubeconfig)
 	if err != nil {
 		log.Fatal(err)
 	}
-	msg := fmt.Sprintf("serviceaccounts \"%s\" not found", serviceaccount)
-	_, newErr := clientset.CoreV1().ServiceAccounts(namespace).Get(context.TODO(), serviceaccount, metav1.GetOptions{})
+	msg := fmt.Sprintf("serviceaccounts \"%s\" not found", params.Serviceaccount)
+	_, newErr := clientset.CoreV1().ServiceAccounts(params.Namespace).Get(context.TODO(), params.Serviceaccount, metav1.GetOptions{})
 	if newErr != nil {
 		if newErr.Error() == msg {
 			return false
@@ -215,7 +239,7 @@ func ValidSA(namespace string, kubeconfig *string) (string, bool) {
 	if sa == "" {
 		sa = utils.DefaultSA
 	}
-	if SAExists(namespace, sa, kubeconfig) {
+	if SAExists(SAExistsParams{namespace, sa}, kubeconfig) {
 		fmt.Println("👍 Using the existing service account")
 		return sa, true
 	}

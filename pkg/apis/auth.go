@@ -1,7 +1,6 @@
 package apis
 
 import (
-	"bytes"
 	"encoding/json"
 	"errors"
 	"io/ioutil"
@@ -11,32 +10,20 @@ import (
 )
 
 func Auth(input types.AuthInput) (types.AuthResponse, error) {
-
 	type Payload struct {
 		Username string `json:"username"`
 		Password string `json:"password"`
 	}
 
-	data := Payload{
+	payloadBytes, err := json.Marshal(Payload{
 		Username: input.Username,
 		Password: input.Password,
-	}
-	payloadBytes, err := json.Marshal(data)
+	})
 	if err != nil {
 		return types.AuthResponse{}, err
 	}
 
-	body := bytes.NewReader(payloadBytes)
-	ep := input.Endpoint + "/auth/login"
-
-	req, err := http.NewRequest("POST", ep, body)
-	if err != nil {
-		return types.AuthResponse{}, err
-	}
-
-	req.Header.Set("Content-Type", "application/json")
-
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := SendRequest(SendRequestParams{input.Endpoint + "/auth/login", ""}, payloadBytes)
 	if err != nil {
 		return types.AuthResponse{}, err
 	}

@@ -11,6 +11,20 @@ import (
 	"github.com/litmuschaos/litmusctl/pkg/utils"
 )
 
+func PrintExistingAgents(agent apis.AgentData) {
+	fmt.Println("🚫 Agent with the given name already exists.")
+	// Print agent list if existing agent name is entered twice
+	fmt.Print("\n📘 Connected agents list -----------\n\n")
+
+	for i := range agent.Data.GetAgent {
+		fmt.Println("-", agent.Data.GetAgent[i].AgentName)
+	}
+
+	fmt.Println("\n-------------------------------------")
+
+	fmt.Println("❗ Please enter a different name.")
+}
+
 // GetProject display list of projects and returns the project id based on input
 func GetProjectID(u apis.ProjectDetails) string {
 	var pid int
@@ -55,26 +69,6 @@ repeat:
 	return utils.DefaultMode
 }
 
-type AgentConnectionData struct {
-	Errors []Errors     `json:"errors"`
-	Data   AgentConnect `json:"data"`
-}
-
-type Errors struct {
-	Message string   `json:"message"`
-	Path    []string `json:"path"`
-}
-
-type AgentConnect struct {
-	UserAgentReg UserAgentReg `json:"userClusterReg"`
-}
-
-type UserAgentReg struct {
-	ClusterID   string `json:"cluster_id"`
-	ClusterName string `json:"cluster_name"`
-	Token       string `json:"token"`
-}
-
 // GetAgentDetails take details of agent as input
 func GetAgentDetails(mode string, pid string, c types.Credentials, kubeconfig *string) (types.Agent, error) {
 	var newAgent types.Agent
@@ -105,17 +99,7 @@ AGENT_NAME:
 	}
 
 	if isAgentExist {
-		fmt.Println("🚫 Agent with the given name already exists.")
-		// Print agent list if existing agent name is entered twice
-		fmt.Print("\n📘 Connected agents list -----------\n\n")
-
-		for i := range agent.Data.GetAgent {
-			fmt.Println("-", agent.Data.GetAgent[i].AgentName)
-		}
-
-		fmt.Println("\n-------------------------------------")
-
-		fmt.Println("❗ Please enter a different name.")
+		PrintExistingAgents(agent)
 		goto AGENT_NAME
 	}
 
@@ -144,7 +128,7 @@ func ValidateSAPermissions(mode string, kubeconfig *string) {
 		resources := [2]string{"clusterrole", "clusterrolebinding"}
 		i := 0
 		for _, resource := range resources {
-			pems[i], err = k8s.CheckSAPermissions("create", resource, true, kubeconfig)
+			pems[i], err = k8s.CheckSAPermissions(k8s.CheckSAPermissionsParams{"create", resource, true}, kubeconfig)
 			if err != nil {
 				fmt.Println(err)
 			}
@@ -154,7 +138,7 @@ func ValidateSAPermissions(mode string, kubeconfig *string) {
 		resources := [2]string{"role", "rolebinding"}
 		i := 0
 		for _, resource := range resources {
-			pems[i], err = k8s.CheckSAPermissions("create", resource, true, kubeconfig)
+			pems[i], err = k8s.CheckSAPermissions(k8s.CheckSAPermissionsParams{"create", resource, true}, kubeconfig)
 			if err != nil {
 				fmt.Println(err)
 			}
@@ -174,25 +158,20 @@ func ValidateSAPermissions(mode string, kubeconfig *string) {
 
 // Summary display the agent details based on input
 func Summary(agent types.Agent, kubeconfig *string) {
-	fmt.Println("\n📌 Summary --------------------------")
-	fmt.Println("\nAgent Name:        ", agent.AgentName)
-	fmt.Println("Agent Description: ", agent.Description)
-	fmt.Println("Platform Name:     ", agent.PlatformName)
+	fmt.Printf("\n📌 Summary -------------------------- \nAgent Name: %s\nAgent Description: %s\nPlatform Name: %s", agent.AgentName, agent.Description, agent.PlatformName)
 	if ok, _ := k8s.NsExists(agent.Namespace, kubeconfig); ok {
-		fmt.Println("Namespace:         ", agent.Namespace)
+		fmt.Println("Namespace: ", agent.Namespace)
 	} else {
-		fmt.Println("Namespace:         ", agent.Namespace, "(new)")
+		fmt.Println("Namespace: ", agent.Namespace, "(new)")
 	}
 
-	if k8s.SAExists(agent.Namespace, agent.ServiceAccount, kubeconfig) {
-		fmt.Println("Service Account:   ", agent.ServiceAccount)
+	if k8s.SAExists(k8s.SAExistsParams{agent.Namespace, agent.ServiceAccount}, kubeconfig) {
+		fmt.Println("Service Account: ", agent.ServiceAccount)
 	} else {
-		fmt.Println("Service Account:   ", agent.ServiceAccount, "(new)")
+		fmt.Println("Service Account: ", agent.ServiceAccount, "(new)")
 	}
 
-	fmt.Println("Installation Mode: ", agent.Mode)
-
-	fmt.Println("\n-------------------------------------")
+	fmt.Printf("\nInstallation Mode: %s\n-------------------------------------", agent.Mode)
 }
 
 func ConfirmInstallation() {

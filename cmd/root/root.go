@@ -17,8 +17,8 @@ package rootCmd
 
 import (
 	"fmt"
-	"github.com/litmuschaos/litmusctl/pkg/utils"
 	"github.com/litmuschaos/litmusctl/cmd/version"
+	"github.com/litmuschaos/litmusctl/pkg/utils"
 	"os"
 
 	"github.com/litmuschaos/litmusctl/cmd/config"
@@ -36,7 +36,7 @@ var cfgFile string
 var rootCmd = &cobra.Command{
 	Use:   "litmusctl",
 	Short: "Litmusctl controls the litmuschaos agent plane",
-	Long:  `Litmusctl controls the litmuschaos agent plane. `+ "\n" +` Find more information at: https://github.com/litmuschaos/litmusctl`,
+	Long:  `Litmusctl controls the litmuschaos agent plane. ` + "\n" + ` Find more information at: https://github.com/litmuschaos/litmusctl`,
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.

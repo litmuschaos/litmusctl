@@ -21,18 +21,18 @@ func GetPlatformName(kubeconfig *string) string {
 	fmt.Print("🔎 Select Platform [", discoveredPlatform, "]: ")
 	fmt.Scanln(&platform)
 	switch platform {
-		case 0:
-			return discoveredPlatform
-		case 1:
-			return "AWS"
-		case 2:
-			return "GKE"
-		case 3:
-			return "Openshift"
-		case 4:
-			return "Rancher"
-		default:
-			return utils.DefaultPlatform
+	case 0:
+		return discoveredPlatform
+	case 1:
+		return "AWS"
+	case 2:
+		return "GKE"
+	case 3:
+		return "Openshift"
+	case 4:
+		return "Rancher"
+	default:
+		return utils.DefaultPlatform
 	}
 }
 

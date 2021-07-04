@@ -20,8 +20,6 @@ import (
 	"os"
 
 	"github.com/litmuschaos/litmusctl/pkg/apis"
-	"github.com/litmuschaos/litmusctl/pkg/config"
-	"github.com/litmuschaos/litmusctl/pkg/types"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
 
 	"github.com/spf13/cobra"
@@ -31,11 +29,7 @@ import (
 var projectCmd = &cobra.Command{
 	Use:   "project",
 	Short: "Create a project",
-	Long: `Create a project For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Long:  `Create a project`,
 	Run: func(cmd *cobra.Command, args []string) {
 		var configFilePath string
 		configFilePath, err := cmd.Flags().GetString("config")
@@ -45,25 +39,8 @@ to quickly create a Cobra application.`,
 			configFilePath = utils.DefaultFileName
 		}
 
-		obj, err := config.YamltoObject(configFilePath)
+		credentials, err := utils.GetCredentials(configFilePath)
 		utils.PrintError(err)
-
-		var token string
-		for _, account := range obj.Accounts {
-			if account.Endpoint == obj.CurrentAccount {
-				for _, user := range account.Users {
-					if user.Username == obj.CurrentUser {
-						token = user.Token
-					}
-				}
-			}
-		}
-
-		var credentials = types.Credentials{
-			Username: obj.CurrentUser,
-			Token:    token,
-			Endpoint: obj.CurrentAccount,
-		}
 
 		projectName, err := cmd.Flags().GetString("name")
 		utils.PrintError(err)

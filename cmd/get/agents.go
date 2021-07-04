@@ -16,30 +16,20 @@ limitations under the License.
 package get
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
 	"os"
 	"text/tabwriter"
 
 	"github.com/litmuschaos/litmusctl/pkg/apis"
-	"github.com/litmuschaos/litmusctl/pkg/config"
-	"github.com/litmuschaos/litmusctl/pkg/types"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
 	"github.com/spf13/cobra"
-	"gopkg.in/yaml.v2"
 )
 
 // agentsCmd represents the agents command
 var agentsCmd = &cobra.Command{
 	Use:   "agents",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "Display list of agents within the project",
+	Long:  `Display list of agents within the project`,
 	Run: func(cmd *cobra.Command, args []string) {
 		var configFilePath string
 		configFilePath, err := cmd.Flags().GetString("config")
@@ -49,25 +39,8 @@ to quickly create a Cobra application.`,
 			configFilePath = utils.DefaultFileName
 		}
 
-		obj, err := config.YamltoObject(configFilePath)
+		credentials, err := utils.GetCredentials(configFilePath)
 		utils.PrintError(err)
-
-		var token string
-		for _, account := range obj.Accounts {
-			if account.Endpoint == obj.CurrentAccount {
-				for _, user := range account.Users {
-					if user.Username == obj.CurrentUser {
-						token = user.Token
-					}
-				}
-			}
-		}
-
-		var credentials = types.Credentials{
-			Username: obj.CurrentUser,
-			Token:    token,
-			Endpoint: obj.CurrentAccount,
-		}
 
 		projectID, err := cmd.Flags().GetString("project-id")
 		utils.PrintError(err)
@@ -105,20 +78,11 @@ to quickly create a Cobra application.`,
 			break
 
 		case "json":
-			var out bytes.Buffer
-			byt, err := json.Marshal(agents.Data)
-			utils.PrintError(err)
-
-			err = json.Indent(&out, byt, "", "  ")
-			utils.PrintError(err)
-
-			fmt.Println(out.String())
+			utils.PrintInJsonFormat(agents.Data)
 			break
 
 		case "yaml":
-			byt, err := yaml.Marshal(agents.Data)
-			utils.PrintError(err)
-			fmt.Println(string(byt))
+			utils.PrintInYamlFormat(agents.Data)
 			break
 		}
 
