@@ -26,7 +26,7 @@ import (
 	"github.com/litmuschaos/litmusctl/cmd/get"
 	"github.com/spf13/cobra"
 
-	homedir "github.com/mitchellh/go-homedir"
+	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/viper"
 )
 
@@ -37,9 +37,6 @@ var rootCmd = &cobra.Command{
 	Use:   "litmusctl",
 	Short: "Litmusctl controls the litmuschaos agent plane",
 	Long:  `Litmusctl controls the litmuschaos agent plane. `+ "\n" +` Find more information at: https://github.com/litmuschaos/litmusctl`,
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
-	// Run: func(cmd *cobra.Command, args []string) { },
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -61,7 +58,6 @@ func init() {
 	// will be global for your application.
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.litmusctl.yaml)")
-	// Create a persistent flag for kubeconfig
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -74,7 +70,7 @@ func initConfig() {
 		home, err := homedir.Dir()
 		cobra.CheckErr(err)
 
-		// Search config in home directory with name ".litmusctl" (without extension).
+		// Search config in home directory with name ".litmusconfig" (without extension).
 		viper.AddConfigPath(home)
 		viper.SetConfigName(utils.DefaultFileName)
 	}
