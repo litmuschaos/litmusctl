@@ -1,0 +1,16 @@
+accounts:
+- users:
+  - expires_in: "1625491325"
+    token: eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjU0OTEzMjUsInJvbGUiOiJ1c2VyIiwidWlkIjoiNzdkZTA3ZjctYzUwNi00YjFlLTkzMDYtZWQwOWIyZDBkOWI1IiwidXNlcm5hbWUiOiJyYWoifQ.L2dP8RsY70SBFrAXdcYL9vWLYzUDiyGr7i7dJ91aWR6haiYRTmtXO6OCxmEARu5j3rLHyBQH3P3IzDETpoi4Aw
+    username: raj
+  - expires_in: "1625337680"
+    token: ""
+    username: rajs
+  - expires_in: "1625494377"
+    token: eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjU0OTQzNzcsInJvbGUiOiJhZG1pbiIsInVpZCI6ImQ4MjA0Zjk1LTlhMWEtNDA3YS1hMWFhLTc5ZDdhZGQ5MGRmNSIsInVzZXJuYW1lIjoiYWRtaW4ifQ.Vdr5ZrAfNJc9KQm6U37bBA5DGvE59GaKh6QGOdL42Qv2o0GLr9IKxe61VmR2Bexht74v18LpEHJe5Zu456RdMA
+    username: admin
+  endpoint: https://litmus.preview.chaosnative.com
+apiVersion: v1
+current-account: https://litmus.preview.chaosnative.com
+current-user: admin
+kind: Config

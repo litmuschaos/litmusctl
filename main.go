@@ -15,8 +15,10 @@ limitations under the License.
 */
 package main
 
-import "github.com/litmuschaos/litmusctl/cmd"
+import (
+	"github.com/litmuschaos/litmusctl/cmd/root"
+)
 
 func main() {
-	cmd.Execute()
+	rootCmd.Execute()
 }

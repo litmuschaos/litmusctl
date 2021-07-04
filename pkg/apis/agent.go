@@ -9,52 +9,6 @@ import (
 	"net/http"
 )
 
-type ProjectDetails struct {
-	Data Data `json:"data"`
-}
-
-type Data struct {
-	GetUser GetUser `json:"getUser"`
-}
-
-type GetUser struct {
-	Projects []Project `json:"projects"`
-}
-
-type Project struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
-}
-
-
-// GetProjectDetails fetches details of the input user
-func GetProjectDetails(c types.Credentials) (ProjectDetails, error) {
-	query := `{"query":"query {\n  getUser(username: \"` + c.Username + `\"){\n projects{\n id\n name\n}\n}\n}"}`
-	resp, err := SendRequest(c.Endpoint + "/api/query", c.Token, []byte(query))
-	if err != nil {
-		return ProjectDetails{}, err
-	}
-
-	bodyBytes, err := ioutil.ReadAll(resp.Body)
-	defer resp.Body.Close()
-	if err != nil {
-		return ProjectDetails{}, err
-	}
-
-	if resp.StatusCode == http.StatusOK {
-		var project ProjectDetails
-		err = json.Unmarshal(bodyBytes, &project)
-		if err != nil {
-			return ProjectDetails{}, err
-		}
-
-		return project, nil
-	} else {
-		return ProjectDetails{}, errors.New("Unmatached status code:" + string(bodyBytes))
-	}
-
-	return ProjectDetails{}, nil
-}
 
 type AgentData struct {
 	Data AgentList `json:"data"`
@@ -71,7 +25,7 @@ type AgentList struct {
 
 // GetAgentList lists the agent connected to the specified project
 func GetAgentList(c types.Credentials, pid string) (AgentData, error) {
-	query := `{"query":"query{\n  getCluster(project_id: \"` + pid + `\"){\n    cluster_name\n  }\n}"}`
+	query := `{"query":"query{\n  getCluster(project_id: \"` + pid + `\"){\n  cluster_id cluster_name is_active \n  }\n}"}`
 	resp, err := SendRequest(c.Endpoint +  "/api/query", c.Token, []byte(query))
 	if err != nil {
 		fmt.Println("Error in getting agent list: ", err)

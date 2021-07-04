@@ -10,7 +10,10 @@ litmuctl config unset-account <endpoint>
 
 litmusctl config get-accounts
 
-
+// password should hidden --done
+// schema for agent connect
+// project creation --donw
+// pass creds as secret
 
 litmusctl agent connect --name --project --installation-mode --description --platform --namespace --service-account --yes
 

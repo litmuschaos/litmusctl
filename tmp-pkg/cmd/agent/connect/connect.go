@@ -9,9 +9,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// connectCmd represents the connect command
+// connectCmd represents the agent command
 var ConnectCmd = &cobra.Command{
-	Use:   "connect",
+	Use:   "agent",
 	Short: "Connect LitmusChaos agent",
 	Long:  `Connect connects the agent to LitmusChaos`,
 	Run: func(cmd *cobra.Command, args []string) {

@@ -4,8 +4,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
-	"github.com/litmuschaos/litmusctl/tmp-pkg/common/k8s"
-	"github.com/litmuschaos/litmusctl/tmp-pkg/constants"
 	authorizationv1 "k8s.io/api/authorization/v1"
 	v1 "k8s.io/api/core/v1"
 	k8serror "k8s.io/apimachinery/pkg/api/errors"
@@ -53,7 +51,7 @@ func CheckSAPermissions(verb, resource string, print bool, kubeconfig *string) (
 	var o CanIOptions
 	o.Verb = verb
 	o.Resource.Resource = resource
-	client, err := k8s.ClientSet(kubeconfig)
+	client, err := ClientSet(kubeconfig)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -106,11 +104,11 @@ start:
 	)
 
 	if mode == "namespace" {
-		fmt.Print("📁 Enter the namespace (existing) [", constants.DefaultNs, "]: ")
+		fmt.Print("📁 Enter the namespace (existing) [", utils.DefaultNs, "]: ")
 		fmt.Scanln(&namespace)
 
 	} else if mode == "cluster" {
-		fmt.Print("📁 Enter the namespace (new or existing) [", constants.DefaultNs, "]: ")
+		fmt.Print("📁 Enter the namespace (new or existing) [", utils.DefaultNs, "]: ")
 		fmt.Scanln(&namespace)
 	} else {
 		fmt.Printf("\n 🚫 No mode selected \n")
@@ -212,10 +210,10 @@ func SAExists(namespace, serviceaccount string, kubeconfig *string) bool {
 // ValidSA gets a valid service account as input
 func ValidSA(namespace string, kubeconfig *string) (string, bool) {
 	var sa string
-	fmt.Print("🔑 Enter service account [", constants.DefaultSA, "]: ")
+	fmt.Print("🔑 Enter service account [", utils.DefaultSA, "]: ")
 	fmt.Scanln(&sa)
 	if sa == "" {
-		sa = constants.DefaultSA
+		sa = utils.DefaultSA
 	}
 	if SAExists(namespace, sa, kubeconfig) {
 		fmt.Println("👍 Using the existing service account")

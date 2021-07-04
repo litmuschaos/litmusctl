@@ -85,7 +85,7 @@ $ litmusctl version
 To connect Litmus Chaos agent:
 
 ```shell
-$ litmusctl agent connect
+$ litmusctl agent agent
 ```
 
 Next, you need to enter LitmusPortal details to login into your LitmusPortal account. Fields to be filled in:
