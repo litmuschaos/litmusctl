@@ -30,9 +30,8 @@ import (
 // projectCmd represents the project command
 var projectCmd = &cobra.Command{
 	Use:   "project",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
+	Short: "Create a project",
+	Long: `Create a project For example:
 
 Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
@@ -43,7 +42,7 @@ to quickly create a Cobra application.`,
 		utils.PrintError(err)
 
 		if configFilePath == "" {
-			configFilePath = types.DefaultFileName
+			configFilePath = utils.DefaultFileName
 		}
 
 		obj, err := config.YamltoObject(configFilePath)

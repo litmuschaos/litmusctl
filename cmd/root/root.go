@@ -17,7 +17,8 @@ package rootCmd
 
 import (
 	"fmt"
-	"github.com/litmuschaos/litmusctl/tmp-pkg/cmd/version"
+	"github.com/litmuschaos/litmusctl/pkg/utils"
+	"github.com/litmuschaos/litmusctl/cmd/version"
 	"os"
 
 	"github.com/litmuschaos/litmusctl/cmd/config"
@@ -34,13 +35,8 @@ var cfgFile string
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "litmusctl",
-	Short: "A brief description of your application",
-	Long: `A longer description that spans multiple lines and likely contains
-examples and usage of using your application. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "Litmusctl controls the litmuschaos agent plane",
+	Long:  `Litmusctl controls the litmuschaos agent plane. `+ "\n" +` Find more information at: https://github.com/litmuschaos/litmusctl`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	// Run: func(cmd *cobra.Command, args []string) { },
@@ -80,7 +76,7 @@ func initConfig() {
 
 		// Search config in home directory with name ".litmusctl" (without extension).
 		viper.AddConfigPath(home)
-		viper.SetConfigName(".litmusctl")
+		viper.SetConfigName(utils.DefaultFileName)
 	}
 
 	viper.AutomaticEnv() // read in environment variables that match

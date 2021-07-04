@@ -30,5 +30,3 @@ type UpdateLitmusCtlConfig struct {
 	CurrentUser    string  `yaml:"current-user",json:"current-user"`
 	Account        Account `yaml:"account",json:"account"`
 }
-
-const DefaultFileName = "litmusconfig.yaml"

@@ -1,6 +1,7 @@
 package utils
 
 const (
+	DefaultFileName = ".litmusconfig"
 
 	// Default username
 	DefaultUsername = "admin"

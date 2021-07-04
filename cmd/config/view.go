@@ -16,27 +16,21 @@ limitations under the License.
 package config
 
 import (
-	"errors"
 	"fmt"
-
 	"github.com/litmuschaos/litmusctl/pkg/utils"
-
-	//"github.com/litmuschaos/litmusctl/cmd/root"
 	"io/ioutil"
+
 	"os"
 
 	"github.com/litmuschaos/litmusctl/pkg/config"
-	"github.com/litmuschaos/litmusctl/pkg/types"
-
 	"github.com/spf13/cobra"
 )
 
 // viewCmd represents the view command
 var viewCmd = &cobra.Command{
 	Use:   "view",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
+	Short: "Display litmusconfig settings or a specified litmusconfig file",
+	Long: `Display litmusconfig settings or a specified litmusconfig file. For example:
 
 Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
@@ -47,7 +41,7 @@ to quickly create a Cobra application.`,
 		utils.PrintError(err)
 
 		if configFilePath == "" {
-			configFilePath = types.DefaultFileName
+			configFilePath = utils.DefaultFileName
 		}
 
 		exists := config.FileExists(configFilePath)
@@ -57,7 +51,7 @@ to quickly create a Cobra application.`,
 		}
 
 		data, err := ioutil.ReadFile(configFilePath)
-		utils.PrintError(errors.New("File reading error " + err.Error()))
+		utils.PrintError(err)
 
 		//Printing the config map
 		fmt.Print(string(data))

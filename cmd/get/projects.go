@@ -46,7 +46,7 @@ to quickly create a Cobra application.`,
 		utils.PrintError(err)
 
 		if configFilePath == "" {
-			configFilePath = types.DefaultFileName
+			configFilePath = utils.DefaultFileName
 		}
 
 		obj, err := config.YamltoObject(configFilePath)
@@ -109,5 +109,5 @@ to quickly create a Cobra application.`,
 func init() {
 	GetCmd.AddCommand(projectsCmd)
 
-	projectsCmd.Flags().StringP("output", "o", "", "Help message for toggle")
+	projectsCmd.Flags().StringP("output", "o", "", "Output format. One of:\njson|yaml")
 }

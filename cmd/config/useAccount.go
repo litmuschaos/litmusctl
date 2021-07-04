@@ -28,9 +28,8 @@ import (
 // useAccountCmd represents the useAccount command
 var useAccountCmd = &cobra.Command{
 	Use:   "use-account",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
+	Short: "Sets the current-account and current-username in a litmusconfig file",
+	Long: `Sets the current-account and current-username in a litmusconfig file. For example:
 
 Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
@@ -41,7 +40,7 @@ to quickly create a Cobra application.`,
 		utils.PrintError(err)
 
 		if configFilePath == "" {
-			configFilePath = types.DefaultFileName
+			configFilePath = utils.DefaultFileName
 		}
 
 		username, err := cmd.Flags().GetString("username")
