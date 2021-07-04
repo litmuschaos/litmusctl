@@ -69,29 +69,32 @@ to quickly create a Cobra application.`,
 		utils.PrintError(err)
 
 		switch output {
-		case "": 	writer := tabwriter.NewWriter(os.Stdout, 0, 8, 1, '\t', tabwriter.AlignRight)
-					fmt.Fprintln(writer, "PROJECT ID\tPROJECT NAME\tCREATEDAT")
-					for _, project := range projects.Data.ListProjects {
-						fmt.Fprintln(writer, project.ID + "\t"+ project.Name + "\t" + project.CreatedAt + "\t")
-					}
-					writer.Flush()
-					break
+		case "":
+			writer := tabwriter.NewWriter(os.Stdout, 0, 8, 1, '\t', tabwriter.AlignRight)
+			fmt.Fprintln(writer, "PROJECT ID\tPROJECT NAME\tCREATEDAT")
+			for _, project := range projects.Data.ListProjects {
+				fmt.Fprintln(writer, project.ID+"\t"+project.Name+"\t"+project.CreatedAt+"\t")
+			}
+			writer.Flush()
+			break
 
-		case "json":	var out bytes.Buffer
-						byt, err := json.Marshal(projects.Data)
-						utils.PrintError(err)
+		case "json":
+			var out bytes.Buffer
+			byt, err := json.Marshal(projects.Data)
+			utils.PrintError(err)
 
-						err = json.Indent(&out, byt, "", "  ")
-						utils.PrintError(err)
+			err = json.Indent(&out, byt, "", "  ")
+			utils.PrintError(err)
 
-						fmt.Println(out.String())
-						break
+			fmt.Println(out.String())
+			break
 
-		case "yaml":	byt, err := yaml.Marshal(projects.Data)
-						utils.PrintError(err)
+		case "yaml":
+			byt, err := yaml.Marshal(projects.Data)
+			utils.PrintError(err)
 
-						fmt.Println(string(byt))
-						break
+			fmt.Println(string(byt))
+			break
 		}
 	},
 }
@@ -99,7 +102,7 @@ to quickly create a Cobra application.`,
 func init() {
 	GetCmd.AddCommand(projectsCmd)
 
-	projectsCmd.Flags().StringP("output","o","","Help message for toggle")
+	projectsCmd.Flags().StringP("output", "o", "", "Help message for toggle")
 
 	// Here you will define your flags and configuration settings.
 

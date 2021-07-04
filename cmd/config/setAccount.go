@@ -18,7 +18,7 @@ package config
 import (
 	"fmt"
 	"github.com/litmuschaos/litmusctl/pkg/apis"
-	config2 "github.com/litmuschaos/litmusctl/pkg/config"
+	"github.com/litmuschaos/litmusctl/pkg/config"
 	"github.com/litmuschaos/litmusctl/pkg/types"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
 	"github.com/litmuschaos/litmusctl/tmp-pkg/constants"
@@ -29,7 +29,6 @@ import (
 	"strings"
 	"time"
 )
-
 
 // setAccountCmd represents the setAccount command
 var setAccountCmd = &cobra.Command{
@@ -43,10 +42,17 @@ This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(command *cobra.Command, args []string) {
 		var (
-			authInput types.AuthInput
-			defaultFileName = types.DefaultFileName
-			err error
+			authInput      types.AuthInput
+			configFilePath string
+			err            error
 		)
+
+		configFilePath, err = command.Flags().GetString("config")
+		utils.PrintError(err)
+
+		if configFilePath == "" {
+			configFilePath = types.DefaultFileName
+		}
 
 		authInput.Endpoint, err = command.Flags().GetString("endpoint")
 		utils.PrintError(err)
@@ -96,16 +102,15 @@ to quickly create a Cobra application.`,
 		}
 
 		if authInput.Endpoint != "" && authInput.Username != "" && authInput.Password != "" {
-			exists := config2.FileExists(defaultFileName)
-			lgt, err := config2.GetFileLength(defaultFileName)
+			exists := config.FileExists(configFilePath)
+			lgt, err := config.GetFileLength(configFilePath)
 			utils.PrintError(err)
-
 
 			resp, err := apis.Auth(authInput)
 			utils.PrintError(err)
 
 			var (
-				timeNow =  time.Now()
+				timeNow = time.Now()
 				newTime = timeNow.Add(time.Second * time.Duration(resp.ExpiresIn))
 			)
 
@@ -120,7 +125,7 @@ to quickly create a Cobra application.`,
 
 			var account = types.Account{
 				Endpoint: authInput.Endpoint,
-				Users: users,
+				Users:    users,
 			}
 
 			// If config file doesn't exist or length of the file is zero.
@@ -129,59 +134,43 @@ to quickly create a Cobra application.`,
 				var accounts []types.Account
 				accounts = append(accounts, account)
 
-				var config = types.LitmuCtlConfig{
-					APIVersion: "v1",
-					Kind: "Config",
+				var litmuCtlConfig = types.LitmuCtlConfig{
+					APIVersion:     "v1",
+					Kind:           "Config",
 					CurrentAccount: authInput.Endpoint,
-					CurrentUser: authInput.Username,
-					Accounts: accounts,
+					CurrentUser:    authInput.Username,
+					Accounts:       accounts,
 				}
 
-				err := config2.CreateNewLitmusCtlConfig(defaultFileName, config)
+				err := config.CreateNewLitmusCtlConfig(configFilePath, litmuCtlConfig)
 				utils.PrintError(err)
 
 				os.Exit(0)
 			} else {
 				// checking syntax
-				err = config2.ConfigSyntaxCheck(defaultFileName)
+				err = config.ConfigSyntaxCheck(configFilePath)
 				utils.PrintError(err)
-
 
 				var updateLitmusCtlConfig = types.UpdateLitmusCtlConfig{
-					Account: account,
+					Account:        account,
 					CurrentAccount: authInput.Endpoint,
-					CurrentUser: authInput.Username,
+					CurrentUser:    authInput.Username,
 				}
 
-				err = config2.UpdateLitmusCtlConfig(updateLitmusCtlConfig, defaultFileName)
+				err = config.UpdateLitmusCtlConfig(updateLitmusCtlConfig, configFilePath)
 				utils.PrintError(err)
-
 			}
 
 		} else {
 			fmt.Println("Error: some flags are missing. Run 'litmusctl config set-account --help' for usage. ")
 		}
-
-
 	},
 }
 
 func init() {
 	ConfigCmd.AddCommand(setAccountCmd)
 
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// setAccountCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// setAccountCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-	//setAccountCmd.Flags().BoolP("non-interactive", "n", false, "Set it to true for non-interactive usages (Default false)")
-	setAccountCmd.Flags().StringP("endpoint", "e", "" , "Account endpoint. Mandatory")
+	setAccountCmd.Flags().StringP("endpoint", "e", "", "Account endpoint. Mandatory")
 	setAccountCmd.Flags().StringP("username", "u", "", "Account username. Mandatory")
 	setAccountCmd.Flags().StringP("password", "p", "", "Account password. Mandatory")
-
-	//litmusctl config set-account --endpoint --username --password
 }

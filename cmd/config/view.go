@@ -44,12 +44,12 @@ to quickly create a Cobra application.`,
 		defaultFileName := types.DefaultFileName
 		exists := config.FileExists(defaultFileName)
 		if !exists {
-			fmt.Println("File reading error open ", defaultFileName,": no such file or directory. Use --config or -c flag to point the configfile")
+			fmt.Println("File reading error open ", defaultFileName, ": no such file or directory. Use --config or -c flag to point the configfile")
 			os.Exit(1)
 		}
 
 		data, err := ioutil.ReadFile(defaultFileName)
-		utils.PrintError(errors.New("File reading error "+ err.Error()))
+		utils.PrintError(errors.New("File reading error " + err.Error()))
 
 		//Printing the config map
 		fmt.Print(string(data))

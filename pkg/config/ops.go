@@ -11,17 +11,17 @@ import (
 func CreateNewLitmusCtlConfig(filename string, config types.LitmuCtlConfig) error {
 
 	configByte, err := yaml.Marshal(config)
-	if err != nil{
+	if err != nil {
 		return err
 	}
 
 	_, err = os.OpenFile(filename, os.O_CREATE|os.O_WRONLY, 0644)
-	if err != nil{
+	if err != nil {
 		return err
 	}
 
 	err = ioutil.WriteFile(filename, configByte, 0644)
-	if err != nil{
+	if err != nil {
 		return err
 	}
 
@@ -49,7 +49,7 @@ func GetFileLength(filename string) (int, error) {
 func YamltoObject(filename string) (types.LitmuCtlConfig, error) {
 	data, err := ioutil.ReadFile(filename)
 	if err != nil {
-		return types.LitmuCtlConfig{}, errors.New("File reading error "+ err.Error())
+		return types.LitmuCtlConfig{}, errors.New("File reading error " + err.Error())
 	}
 
 	obj := &types.LitmuCtlConfig{}
@@ -63,8 +63,8 @@ func YamltoObject(filename string) (types.LitmuCtlConfig, error) {
 
 func ConfigSyntaxCheck(filename string) error {
 
-	obj, err:= YamltoObject(filename)
-	if err != nil{
+	obj, err := YamltoObject(filename)
+	if err != nil {
 		return err
 	}
 
@@ -76,7 +76,7 @@ func ConfigSyntaxCheck(filename string) error {
 }
 
 func UpdateLitmusCtlConfig(litmusconfig types.UpdateLitmusCtlConfig, filename string) error {
-	obj, err:= YamltoObject(filename)
+	obj, err := YamltoObject(filename)
 	if err != nil {
 		return err
 	}
@@ -85,7 +85,7 @@ func UpdateLitmusCtlConfig(litmusconfig types.UpdateLitmusCtlConfig, filename st
 	for i, act := range obj.Accounts {
 		if act.Endpoint == litmusconfig.Account.Endpoint {
 			var innerflag = false
-			for j, user := range act.Users{
+			for j, user := range act.Users {
 				if user.Username == litmusconfig.Account.Users[0].Username {
 					obj.Accounts[i].Users[j].Username = litmusconfig.Account.Users[0].Username
 					obj.Accounts[i].Users[j].Token = litmusconfig.Account.Users[0].Token
@@ -127,7 +127,7 @@ func UpdateLitmusCtlConfig(litmusconfig types.UpdateLitmusCtlConfig, filename st
 }
 
 func UpdateCurrent(current types.Current, filename string) error {
-	obj, err:= YamltoObject(filename)
+	obj, err := YamltoObject(filename)
 	if err != nil {
 		return err
 	}

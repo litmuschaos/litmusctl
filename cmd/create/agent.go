@@ -13,7 +13,6 @@ import (
 	"os"
 )
 
-
 // agentCmd represents the agent command
 var agentCmd = &cobra.Command{
 	Use:   "agent",
@@ -80,10 +79,8 @@ to quickly create a Cobra application.`,
 			newAgent.Description, err = command.Flags().GetString("agent-description")
 			utils.PrintError(err)
 
-
 			newAgent.PlatformName, err = command.Flags().GetString("platform-name")
 			utils.PrintError(err)
-
 
 			newAgent.ClusterType, err = command.Flags().GetString("cluster-type")
 			utils.PrintError(err)
@@ -193,14 +190,14 @@ func init() {
 
 	agentCmd.Flags().BoolP("non-interactive", "n", false, "Help message for toggle")
 	agentCmd.Flags().StringP("kubeconfig", "k", "", "Help message for toggle")
-	agentCmd.Flags().String("project-id", "","Help message for toggle")
-	agentCmd.Flags().String("installation-mode", "","Help message for toggle")
-	agentCmd.Flags().String("agent-name", "","Help message for toggle")
-	agentCmd.Flags().String("agent-description", "","Help message for toggle")
-	agentCmd.Flags().String("platform-name", "","Help message for toggle")
-	agentCmd.Flags().String("cluster-type", "","Help message for toggle")
-	agentCmd.Flags().String("namespace", "","Help message for toggle")
-	agentCmd.Flags().String("service-account", "","Help message for toggle")
-	agentCmd.Flags().Bool("ns-exists", false,"Help message for toggle")
-	agentCmd.Flags().Bool("sa-exists", false,"Help message for toggle")
+	agentCmd.Flags().String("project-id", "", "Help message for toggle")
+	agentCmd.Flags().String("installation-mode", "", "Help message for toggle")
+	agentCmd.Flags().String("agent-name", "", "Help message for toggle")
+	agentCmd.Flags().String("agent-description", "", "Help message for toggle")
+	agentCmd.Flags().String("platform-name", "", "Help message for toggle")
+	agentCmd.Flags().String("cluster-type", "", "Help message for toggle")
+	agentCmd.Flags().String("namespace", "", "Help message for toggle")
+	agentCmd.Flags().String("service-account", "", "Help message for toggle")
+	agentCmd.Flags().Bool("ns-exists", false, "Help message for toggle")
+	agentCmd.Flags().Bool("sa-exists", false, "Help message for toggle")
 }

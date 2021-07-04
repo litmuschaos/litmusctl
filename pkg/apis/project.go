@@ -18,9 +18,9 @@ type createProjectResponse struct {
 }
 
 func CreateProjectRequest(projectName string, cred types.Credentials) error {
-	query := `{"query":"mutation{createProject(projectName: \"`+ projectName +`\"){name}}"}`
+	query := `{"query":"mutation{createProject(projectName: \"` + projectName + `\"){name}}"}`
 
-	resp, err := SendRequest(cred.Endpoint + "/api/query", cred.Token, []byte(query))
+	resp, err := SendRequest(cred.Endpoint+"/api/query", cred.Token, []byte(query))
 	if err != nil {
 		return err
 	}
@@ -55,9 +55,10 @@ type listProjectResponse struct {
 		} `json:"listProjects"`
 	} `json:"data"`
 }
+
 func ListProject(cred types.Credentials) (listProjectResponse, error) {
 	query := `{"query":"query{listProjects{id name created_at}}"}`
-	resp, err := SendRequest(cred.Endpoint + "/api/query", cred.Token, []byte(query))
+	resp, err := SendRequest(cred.Endpoint+"/api/query", cred.Token, []byte(query))
 	if err != nil {
 		return listProjectResponse{}, err
 	}
@@ -95,16 +96,15 @@ type GetUser struct {
 }
 
 type Project struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
+	ID        string `json:"id"`
+	Name      string `json:"name"`
 	CreatedAt string `json:"created_at"`
 }
-
 
 // GetProjectDetails fetches details of the input user
 func GetProjectDetails(c types.Credentials) (ProjectDetails, error) {
 	query := `{"query":"query {\n  getUser(username: \"` + c.Username + `\"){\n projects{\n id\n name\n}\n}\n}"}`
-	resp, err := SendRequest(c.Endpoint + "/api/query", c.Token, []byte(query))
+	resp, err := SendRequest(c.Endpoint+"/api/query", c.Token, []byte(query))
 	if err != nil {
 		return ProjectDetails{}, err
 	}

@@ -15,7 +15,7 @@ func GetProjectID(u apis.ProjectDetails) string {
 	var pid int
 	fmt.Println("\n✨ Projects List:")
 	for index := range u.Data.GetUser.Projects {
-		fmt.Printf("%d.  %s\n", index + 1, u.Data.GetUser.Projects[index].Name)
+		fmt.Printf("%d.  %s\n", index+1, u.Data.GetUser.Projects[index].Name)
 	}
 
 repeat:
@@ -27,7 +27,7 @@ repeat:
 		goto repeat
 	}
 
-	return u.Data.GetUser.Projects[pid - 1].ID
+	return u.Data.GetUser.Projects[pid-1].ID
 }
 
 // GetMode gets mode of agent installation as input
@@ -37,7 +37,7 @@ func GetModeType() string {
 	fmt.Print("\n👉 Select Mode [", utils.DefaultMode, "]: ")
 	fmt.Scanln(&mode)
 
-	repeat:
+repeat:
 	if mode == 1 {
 		return "cluster"
 	}
@@ -53,7 +53,6 @@ func GetModeType() string {
 
 	return utils.DefaultMode
 }
-
 
 type AgentConnectionData struct {
 	Errors []Errors     `json:"errors"`
@@ -137,7 +136,7 @@ AGENT_NAME:
 func ValidateSAPermissions(mode string, kubeconfig *string) {
 	var (
 		pems [2]bool
-		err error
+		err  error
 	)
 
 	if mode == "cluster" {
@@ -207,4 +206,3 @@ func ConfirmInstallation() {
 		os.Exit(1)
 	}
 }
-

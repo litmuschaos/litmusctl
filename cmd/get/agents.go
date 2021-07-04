@@ -60,7 +60,6 @@ to quickly create a Cobra application.`,
 			Endpoint: obj.CurrentAccount,
 		}
 
-
 		projectID, err := cmd.Flags().GetString("project-id")
 		utils.PrintError(err)
 
@@ -81,36 +80,39 @@ to quickly create a Cobra application.`,
 		utils.PrintError(err)
 
 		switch output {
-			case "": 		writer := tabwriter.NewWriter(os.Stdout, 0, 8, 1, '\t', tabwriter.AlignRight)
-							fmt.Fprintln(writer, "AGENT ID\tAGENT NAME\tSTATUS")
-							for _, agent := range agents.Data.GetAgent {
-								var status string
-								if agent.IsActive {
-									status = "ACTIVE"
-								} else {
-									status = "INACTIVE"
-								}
-								fmt.Fprintln(writer, agent.ClusterID+"\t"+agent.AgentName+"\t"+status)
-							}
-							writer.Flush()
-							break
-
-			case "json":	var out bytes.Buffer
-							byt, err := json.Marshal(agents.Data)
-							utils.PrintError(err)
-
-							err = json.Indent(&out, byt, "", "  ")
-							utils.PrintError(err)
-
-							fmt.Println(out.String())
-							break
-
-			case "yaml":	byt, err := yaml.Marshal(agents.Data)
-							utils.PrintError(err)
-							fmt.Println(string(byt))
-
-							break
+		case "":
+			writer := tabwriter.NewWriter(os.Stdout, 0, 8, 1, '\t', tabwriter.AlignRight)
+			fmt.Fprintln(writer, "AGENT ID\tAGENT NAME\tSTATUS")
+			for _, agent := range agents.Data.GetAgent {
+				var status string
+				if agent.IsActive {
+					status = "ACTIVE"
+				} else {
+					status = "INACTIVE"
+				}
+				fmt.Fprintln(writer, agent.ClusterID+"\t"+agent.AgentName+"\t"+status)
 			}
+			writer.Flush()
+			break
+
+		case "json":
+			var out bytes.Buffer
+			byt, err := json.Marshal(agents.Data)
+			utils.PrintError(err)
+
+			err = json.Indent(&out, byt, "", "  ")
+			utils.PrintError(err)
+
+			fmt.Println(out.String())
+			break
+
+		case "yaml":
+			byt, err := yaml.Marshal(agents.Data)
+			utils.PrintError(err)
+			fmt.Println(string(byt))
+
+			break
+		}
 
 	},
 }
@@ -126,7 +128,7 @@ func init() {
 
 	// Cobra supports local flags which will only run when this command
 	// is called directly, e.g.:
-	agentsCmd.Flags().String("project-id","","Help message for toggle")
-	agentsCmd.Flags().StringP("output","o","","Help message for toggle")
+	agentsCmd.Flags().String("project-id", "", "Help message for toggle")
+	agentsCmd.Flags().StringP("output", "o", "", "Help message for toggle")
 
 }

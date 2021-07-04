@@ -9,7 +9,6 @@ import (
 	"net/http"
 )
 
-
 type AgentData struct {
 	Data AgentList `json:"data"`
 }
@@ -26,7 +25,7 @@ type AgentList struct {
 // GetAgentList lists the agent connected to the specified project
 func GetAgentList(c types.Credentials, pid string) (AgentData, error) {
 	query := `{"query":"query{\n  getCluster(project_id: \"` + pid + `\"){\n  cluster_id cluster_name is_active \n  }\n}"}`
-	resp, err := SendRequest(c.Endpoint +  "/api/query", c.Token, []byte(query))
+	resp, err := SendRequest(c.Endpoint+"/api/query", c.Token, []byte(query))
 	if err != nil {
 		fmt.Println("Error in getting agent list: ", err)
 	}
@@ -76,7 +75,7 @@ type UserAgentReg struct {
 // ConnectAgent connects the agent with the given details
 func ConnectAgent(agent types.Agent, cred types.Credentials) (AgentConnectionData, error) {
 	query := `{"query":"mutation {\n  userClusterReg(clusterInput: \n    { \n    cluster_name: \"` + fmt.Sprintf("%s", agent.AgentName) + `\", \n    description: \"` + fmt.Sprintf("%s", agent.Description) + `\",\n  \tplatform_name: \"` + fmt.Sprintf("%s", agent.PlatformName) + `\",\n    project_id: \"` + fmt.Sprintf("%s", agent.ProjectId) + `\",\n    cluster_type: \"` + fmt.Sprintf("%s", agent.ClusterType) + `\",\n  agent_scope: \"` + fmt.Sprintf("%s", agent.Mode) + `\",\n    agent_namespace: \"` + fmt.Sprintf("%s", agent.Namespace) + `\",\n    serviceaccount: \"` + fmt.Sprintf("%s", agent.ServiceAccount) + `\",\n    agent_ns_exists: ` + fmt.Sprintf("%t", agent.NsExists) + `,\n    agent_sa_exists: ` + fmt.Sprintf("%t", agent.SAExists) + `,\n  }){\n    cluster_id\n    cluster_name\n    token\n  }\n}"}`
-	resp, err := SendRequest(cred.Endpoint + "/api/query", cred.Token, []byte(query))
+	resp, err := SendRequest(cred.Endpoint+"/api/query", cred.Token, []byte(query))
 	if err != nil {
 		return AgentConnectionData{}, errors.New("Error in registering agent: " + err.Error())
 	}

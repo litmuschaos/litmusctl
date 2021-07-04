@@ -9,7 +9,7 @@ import (
 	"net/http"
 )
 
-func Auth(input types.AuthInput)(types.AuthResponse, error){
+func Auth(input types.AuthInput) (types.AuthResponse, error) {
 
 	type Payload struct {
 		Username string `json:"username"`
@@ -35,7 +35,6 @@ func Auth(input types.AuthInput)(types.AuthResponse, error){
 
 	req.Header.Set("Content-Type", "application/json")
 
-
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		return types.AuthResponse{}, err
@@ -60,4 +59,3 @@ func Auth(input types.AuthInput)(types.AuthResponse, error){
 
 	return types.AuthResponse{}, nil
 }
-

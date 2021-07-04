@@ -27,7 +27,6 @@ type CanIOptions struct {
 	ResourceName string
 }
 
-
 // NsExists checks if the given namespace already exists
 func NsExists(namespace string, kubeconfig *string) (bool, error) {
 	clientset, err := ClientSet(kubeconfig)
@@ -221,4 +220,3 @@ func ValidSA(namespace string, kubeconfig *string) (string, bool) {
 	}
 	return sa, false
 }
-

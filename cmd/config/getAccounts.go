@@ -47,9 +47,9 @@ to quickly create a Cobra application.`,
 		for _, account := range obj.Accounts {
 			for _, user := range account.Users {
 				if obj.CurrentUser == user.Username && obj.CurrentAccount == account.Endpoint {
-					fmt.Fprintln(writer, "*" + "\t"+account.Endpoint + "\t" + user.Username + "\t" + user.ExpiresIn)
+					fmt.Fprintln(writer, "*"+"\t"+account.Endpoint+"\t"+user.Username+"\t"+user.ExpiresIn)
 				} else {
-					fmt.Fprintln(writer, "" + "\t" + account.Endpoint + "\t" + user.Username + "\t" + user.ExpiresIn)
+					fmt.Fprintln(writer, ""+"\t"+account.Endpoint+"\t"+user.Username+"\t"+user.ExpiresIn)
 				}
 			}
 		}

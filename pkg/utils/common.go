@@ -35,10 +35,9 @@ func ApplyYaml(token string, endpoint string, yamlPath string, kubeconfig string
 	return string(stdout), err
 }
 
-func PrintError(err error)  {
+func PrintError(err error) {
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
 }
-

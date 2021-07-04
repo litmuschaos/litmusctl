@@ -12,4 +12,3 @@ type Agent struct {
 	NsExists       bool
 	SAExists       bool
 }
-
