@@ -1,5 +1,5 @@
 /*
-Copyright © 2021 NAME HERE <EMAIL ADDRESS>
+Copyright © 2021 The LitmusChaos Authors
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@ package rootCmd
 
 import (
 	"fmt"
+	"github.com/litmuschaos/litmusctl/tmp-pkg/cmd/version"
 	"os"
 
 	"github.com/litmuschaos/litmusctl/cmd/config"
@@ -31,7 +32,7 @@ import (
 var cfgFile string
 
 // rootCmd represents the base command when called without any subcommands
-var RootCmd = &cobra.Command{
+var rootCmd = &cobra.Command{
 	Use:   "litmusctl",
 	Short: "A brief description of your application",
 	Long: `A longer description that spans multiple lines and likely contains
@@ -48,25 +49,26 @@ to quickly create a Cobra application.`,
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
-	cobra.CheckErr(RootCmd.Execute())
+	cobra.CheckErr(rootCmd.Execute())
 }
 
 func init() {
 	cobra.OnInitialize(initConfig)
 
-	RootCmd.AddCommand(config.ConfigCmd)
-	RootCmd.AddCommand(create.CreateCmd)
-	RootCmd.AddCommand(get.GetCmd)
+	rootCmd.AddCommand(config.ConfigCmd)
+	rootCmd.AddCommand(create.CreateCmd)
+	rootCmd.AddCommand(get.GetCmd)
+	rootCmd.AddCommand(version.VersionCmd)
 
 	// Here you will define your flags and configuration settings.
 	// Cobra supports persistent flags, which, if defined here,
 	// will be global for your application.
 
-	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.litmusctl.yaml)")
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.litmusctl.yaml)")
 
 	// Cobra also supports local flags, which will only run
 	// when this action is called directly.
-	RootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
 
 // initConfig reads in config file and ENV variables if set.
