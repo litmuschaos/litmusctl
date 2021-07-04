@@ -16,6 +16,7 @@ limitations under the License.
 package create
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/litmuschaos/litmusctl/pkg/agent"
@@ -174,29 +175,26 @@ to quickly create a Cobra application.`,
 
 		}
 
-		agent, cerror := apis.ConnectAgent(newAgent, credentials)
-		if cerror != nil {
-			fmt.Printf("\n❌ Agent connection failed: [%s]\n", cerror.Error())
-			os.Exit(1)
-		}
+		agent, err := apis.ConnectAgent(newAgent, credentials)
+		utils.PrintError(errors.New("\n❌ Agent connection failed: " + err.Error() + "\n"))
 
 		path := fmt.Sprintf("%s/%s/%s.yaml", credentials.Endpoint, utils.ChaosYamlPath, agent.Data.UserAgentReg.Token)
 		fmt.Println("Applying YAML:\n", path)
 
 		// Print error message in case Data field is null in response
 		if (agent.Data == apis.AgentConnect{}) {
-			fmt.Printf("\n🚫 Agent connection failed: [%s]\n", agent.Errors[0].Message)
-			os.Exit(1)
+			utils.PrintError(errors.New("\n🚫 Agent connection failed: " + agent.Errors[0].Message + "\n"))
 		}
+
 		//Apply agent connection yaml
-		yamlOutput, yerror := utils.ApplyYaml(agent.Data.UserAgentReg.Token, credentials.Endpoint, utils.ChaosYamlPath, kubeconfig)
-		if yerror != nil {
-			fmt.Printf("\n❌ Failed in applying connection yaml: [%s]\n", yerror.Error())
-			os.Exit(1)
-		}
+		yamlOutput, err := utils.ApplyYaml(agent.Data.UserAgentReg.Token, credentials.Endpoint, utils.ChaosYamlPath, kubeconfig)
+		utils.PrintError(errors.New("\n❌ Failed in applying connection yaml: " + err.Error() + "\n"))
+
 		fmt.Println("\n", yamlOutput)
+
 		// Watch subscriber pod status
 		k8s.WatchPod(newAgent.Namespace, utils.ChaosAgentLabel, &kubeconfig)
+
 		fmt.Println("\n🚀 Agent Connection Successful!! 🎉")
 		fmt.Println("👉 Litmus agents can be accessed here: " + fmt.Sprintf("%s/%s", credentials.Endpoint, utils.ChaosAgentPath))
 	},

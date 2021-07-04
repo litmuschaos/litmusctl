@@ -26,7 +26,6 @@ import (
 	"github.com/litmuschaos/litmusctl/pkg/config"
 	"github.com/litmuschaos/litmusctl/pkg/types"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
-	"github.com/litmuschaos/litmusctl/tmp-pkg/constants"
 	"github.com/spf13/cobra"
 	"golang.org/x/crypto/ssh/terminal"
 )
@@ -82,10 +81,10 @@ to quickly create a Cobra application.`,
 		}
 
 		if authInput.Username == "" {
-			fmt.Print("🤔 Username [", constants.DefaultUsername, "]: ")
+			fmt.Print("🤔 Username [", utils.DefaultUsername, "]: ")
 			fmt.Scanln(&authInput.Username)
 			if authInput.Username == "" {
-				authInput.Username = constants.DefaultUsername
+				authInput.Username = utils.DefaultUsername
 			}
 		}
 

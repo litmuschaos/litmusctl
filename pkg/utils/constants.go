@@ -36,7 +36,6 @@ const (
 	DefaultSA = "litmus"
 
 	// Chaos agent connection yaml path
-	//ChaosYamlPath = "chaos/api/graphql/file"
 	ChaosYamlPath = "api/file"
 
 	ChaosAgentPath = "targets"
