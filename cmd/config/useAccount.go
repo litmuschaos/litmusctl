@@ -34,24 +34,31 @@ and usage of using your command. For example:
 Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
-	Run: func(command *cobra.Command, args []string) {
-		username, err := command.Flags().GetString("username")
+	Run: func(cmd *cobra.Command, args []string) {
+		var configFilePath string
+		configFilePath, err := cmd.Flags().GetString("config")
 		utils.PrintError(err)
 
-		endpoint, err := command.Flags().GetString("endpoint")
+		if configFilePath == "" {
+			configFilePath = types.DefaultFileName
+		}
+
+		username, err := cmd.Flags().GetString("username")
 		utils.PrintError(err)
 
-		defaultFileName := types.DefaultFileName
-		exists := config.FileExists(defaultFileName)
+		endpoint, err := cmd.Flags().GetString("endpoint")
+		utils.PrintError(err)
 
-		err = config.ConfigSyntaxCheck(defaultFileName)
+		exists := config.FileExists(configFilePath)
+
+		err = config.ConfigSyntaxCheck(configFilePath)
 		utils.PrintError(err)
 
 		if exists {
 			err = config.UpdateCurrent(types.Current{
 				CurrentAccount: endpoint,
 				CurrentUser:    username,
-			}, defaultFileName)
+			}, configFilePath)
 			if err != nil {
 				fmt.Println(err)
 				os.Exit(1)

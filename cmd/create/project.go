@@ -36,11 +36,16 @@ and usage of using your command. For example:
 Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
-	Run: func(command *cobra.Command, args []string) {
+	Run: func(cmd *cobra.Command, args []string) {
+		var configFilePath string
+		configFilePath, err := cmd.Flags().GetString("config")
+		utils.PrintError(err)
 
-		defaultFileName := types.DefaultFileName
+		if configFilePath == "" {
+			configFilePath = types.DefaultFileName
+		}
 
-		obj, err := config.YamltoObject(defaultFileName)
+		obj, err := config.YamltoObject(configFilePath)
 		utils.PrintError(err)
 
 		var token string
@@ -60,7 +65,7 @@ to quickly create a Cobra application.`,
 			Endpoint: obj.CurrentAccount,
 		}
 
-		projectName, err := command.Flags().GetString("name")
+		projectName, err := cmd.Flags().GetString("name")
 		utils.PrintError(err)
 
 		if projectName == "" {

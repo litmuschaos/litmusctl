@@ -40,7 +40,15 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		obj, err := config.YamltoObject(types.DefaultFileName)
+		var configFilePath string
+		configFilePath, err := cmd.Flags().GetString("config")
+		utils.PrintError(err)
+
+		if configFilePath == "" {
+			configFilePath = types.DefaultFileName
+		}
+
+		obj, err := config.YamltoObject(configFilePath)
 		utils.PrintError(err)
 
 		var token string
@@ -110,7 +118,6 @@ to quickly create a Cobra application.`,
 			byt, err := yaml.Marshal(agents.Data)
 			utils.PrintError(err)
 			fmt.Println(string(byt))
-
 			break
 		}
 
@@ -120,15 +127,6 @@ to quickly create a Cobra application.`,
 func init() {
 	GetCmd.AddCommand(agentsCmd)
 
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// agentsCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
 	agentsCmd.Flags().String("project-id", "", "Help message for toggle")
 	agentsCmd.Flags().StringP("output", "o", "", "Help message for toggle")
-
 }

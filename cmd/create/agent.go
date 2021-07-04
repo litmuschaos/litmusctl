@@ -23,9 +23,9 @@ and usage of using your command. For example:
 Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
-	Run: func(command *cobra.Command, args []string) {
+	Run: func(cmd *cobra.Command, args []string) {
 		var configFilePath string
-		configFilePath, err := command.Flags().GetString("config")
+		configFilePath, err := cmd.Flags().GetString("config")
 		utils.PrintError(err)
 
 		if configFilePath == "" {
@@ -59,42 +59,42 @@ to quickly create a Cobra application.`,
 			Endpoint: obj.CurrentAccount,
 		}
 
-		nonInteractive, err := command.Flags().GetBool("non-interactive")
+		nonInteractive, err := cmd.Flags().GetBool("non-interactive")
 
-		kubeconfig, err := command.Flags().GetString("kubeconfig")
+		kubeconfig, err := cmd.Flags().GetString("kubeconfig")
 		utils.PrintError(err)
 
 		var newAgent types.Agent
 
 		if nonInteractive {
-			newAgent.ProjectId, err = command.Flags().GetString("project-id")
+			newAgent.ProjectId, err = cmd.Flags().GetString("project-id")
 			utils.PrintError(err)
 
-			newAgent.Mode, err = command.Flags().GetString("installation-mode")
+			newAgent.Mode, err = cmd.Flags().GetString("installation-mode")
 			utils.PrintError(err)
 
-			newAgent.AgentName, err = command.Flags().GetString("agent-name")
+			newAgent.AgentName, err = cmd.Flags().GetString("agent-name")
 			utils.PrintError(err)
 
-			newAgent.Description, err = command.Flags().GetString("agent-description")
+			newAgent.Description, err = cmd.Flags().GetString("agent-description")
 			utils.PrintError(err)
 
-			newAgent.PlatformName, err = command.Flags().GetString("platform-name")
+			newAgent.PlatformName, err = cmd.Flags().GetString("platform-name")
 			utils.PrintError(err)
 
-			newAgent.ClusterType, err = command.Flags().GetString("cluster-type")
+			newAgent.ClusterType, err = cmd.Flags().GetString("cluster-type")
 			utils.PrintError(err)
 
-			newAgent.Namespace, err = command.Flags().GetString("namespace")
+			newAgent.Namespace, err = cmd.Flags().GetString("namespace")
 			utils.PrintError(err)
 
-			newAgent.ServiceAccount, err = command.Flags().GetString("service-account")
+			newAgent.ServiceAccount, err = cmd.Flags().GetString("service-account")
 			utils.PrintError(err)
 
-			newAgent.NsExists, err = command.Flags().GetBool("ns-exists")
+			newAgent.NsExists, err = cmd.Flags().GetBool("ns-exists")
 			utils.PrintError(err)
 
-			newAgent.SAExists, err = command.Flags().GetBool("sa-exists")
+			newAgent.SAExists, err = cmd.Flags().GetBool("sa-exists")
 			utils.PrintError(err)
 
 			if newAgent.Mode == "" {

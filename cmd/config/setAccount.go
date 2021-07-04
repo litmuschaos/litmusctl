@@ -40,27 +40,27 @@ and usage of using your command. For example:
 Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
-	Run: func(command *cobra.Command, args []string) {
+	Run: func(cmd *cobra.Command, args []string) {
 		var (
 			authInput      types.AuthInput
 			configFilePath string
 			err            error
 		)
 
-		configFilePath, err = command.Flags().GetString("config")
+		configFilePath, err = cmd.Flags().GetString("config")
 		utils.PrintError(err)
 
 		if configFilePath == "" {
 			configFilePath = types.DefaultFileName
 		}
 
-		authInput.Endpoint, err = command.Flags().GetString("endpoint")
+		authInput.Endpoint, err = cmd.Flags().GetString("endpoint")
 		utils.PrintError(err)
 
-		authInput.Username, err = command.Flags().GetString("username")
+		authInput.Username, err = cmd.Flags().GetString("username")
 		utils.PrintError(err)
 
-		authInput.Password, err = command.Flags().GetString("password")
+		authInput.Password, err = cmd.Flags().GetString("password")
 		utils.PrintError(err)
 
 		if authInput.Endpoint == "" {

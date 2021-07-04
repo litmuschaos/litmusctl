@@ -39,16 +39,22 @@ and usage of using your command. For example:
 Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
-	Run: func(command *cobra.Command, args []string) {
+	Run: func(cmd *cobra.Command, args []string) {
+		var configFilePath string
+		configFilePath, err := cmd.Flags().GetString("config")
+		utils.PrintError(err)
 
-		defaultFileName := types.DefaultFileName
-		exists := config.FileExists(defaultFileName)
+		if configFilePath == "" {
+			configFilePath = types.DefaultFileName
+		}
+
+		exists := config.FileExists(configFilePath)
 		if !exists {
-			fmt.Println("File reading error open ", defaultFileName, ": no such file or directory. Use --config or -c flag to point the configfile")
+			fmt.Println("File reading error open ", configFilePath, ": no such file or directory. Use --config or -c flag to point the configfile")
 			os.Exit(1)
 		}
 
-		data, err := ioutil.ReadFile(defaultFileName)
+		data, err := ioutil.ReadFile(configFilePath)
 		utils.PrintError(errors.New("File reading error " + err.Error()))
 
 		//Printing the config map
@@ -58,14 +64,4 @@ to quickly create a Cobra application.`,
 
 func init() {
 	ConfigCmd.AddCommand(viewCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// viewCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// viewCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }
