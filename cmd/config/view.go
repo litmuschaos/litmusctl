@@ -18,13 +18,15 @@ package config
 import (
 	"errors"
 	"fmt"
+
 	"github.com/litmuschaos/litmusctl/pkg/utils"
 
 	//"github.com/litmuschaos/litmusctl/cmd/root"
-	"github.com/litmuschaos/litmusctl/pkg/config"
-	"github.com/litmuschaos/litmusctl/pkg/types"
 	"io/ioutil"
 	"os"
+
+	"github.com/litmuschaos/litmusctl/pkg/config"
+	"github.com/litmuschaos/litmusctl/pkg/types"
 
 	"github.com/spf13/cobra"
 )

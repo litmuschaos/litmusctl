@@ -17,6 +17,11 @@ package config
 
 import (
 	"fmt"
+	"net/url"
+	"os"
+	"strings"
+	"time"
+
 	"github.com/litmuschaos/litmusctl/pkg/apis"
 	"github.com/litmuschaos/litmusctl/pkg/config"
 	"github.com/litmuschaos/litmusctl/pkg/types"
@@ -24,10 +29,6 @@ import (
 	"github.com/litmuschaos/litmusctl/tmp-pkg/constants"
 	"github.com/spf13/cobra"
 	"golang.org/x/crypto/ssh/terminal"
-	"net/url"
-	"os"
-	"strings"
-	"time"
 )
 
 // setAccountCmd represents the setAccount command

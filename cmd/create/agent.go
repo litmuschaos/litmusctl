@@ -2,6 +2,7 @@ package create
 
 import (
 	"fmt"
+
 	"github.com/litmuschaos/litmusctl/pkg/agent"
 	"github.com/litmuschaos/litmusctl/pkg/apis"
 	"github.com/litmuschaos/litmusctl/pkg/config"
@@ -9,8 +10,9 @@ import (
 	"github.com/litmuschaos/litmusctl/pkg/types"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
 
-	"github.com/spf13/cobra"
 	"os"
+
+	"github.com/spf13/cobra"
 )
 
 // agentCmd represents the agent command

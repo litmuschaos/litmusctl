@@ -4,9 +4,10 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"github.com/litmuschaos/litmusctl/pkg/types"
 	"io/ioutil"
 	"net/http"
+
+	"github.com/litmuschaos/litmusctl/pkg/types"
 )
 
 func Auth(input types.AuthInput) (types.AuthResponse, error) {

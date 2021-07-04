@@ -2,12 +2,13 @@ package agent
 
 import (
 	"fmt"
+	"os"
+	"strings"
+
 	"github.com/litmuschaos/litmusctl/pkg/apis"
 	"github.com/litmuschaos/litmusctl/pkg/k8s"
 	"github.com/litmuschaos/litmusctl/pkg/types"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
-	"os"
-	"strings"
 )
 
 // GetProject display list of projects and returns the project id based on input

@@ -2,10 +2,11 @@ package config
 
 import (
 	"errors"
-	"github.com/litmuschaos/litmusctl/pkg/types"
-	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"os"
+
+	"github.com/litmuschaos/litmusctl/pkg/types"
+	"gopkg.in/yaml.v2"
 )
 
 func CreateNewLitmusCtlConfig(filename string, config types.LitmuCtlConfig) error {

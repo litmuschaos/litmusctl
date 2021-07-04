@@ -17,11 +17,12 @@ package rootCmd
 
 import (
 	"fmt"
+	"os"
+
 	"github.com/litmuschaos/litmusctl/cmd/config"
 	"github.com/litmuschaos/litmusctl/cmd/create"
 	"github.com/litmuschaos/litmusctl/cmd/get"
 	"github.com/spf13/cobra"
-	"os"
 
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/viper"

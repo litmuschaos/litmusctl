@@ -19,14 +19,15 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"os"
+	"text/tabwriter"
+
 	"github.com/litmuschaos/litmusctl/pkg/apis"
 	"github.com/litmuschaos/litmusctl/pkg/config"
 	"github.com/litmuschaos/litmusctl/pkg/types"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v2"
-	"os"
-	"text/tabwriter"
 )
 
 // projectCmd represents the project command

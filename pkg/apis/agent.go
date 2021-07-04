@@ -4,9 +4,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	types "github.com/litmuschaos/litmusctl/pkg/types"
 	"io/ioutil"
 	"net/http"
+
+	types "github.com/litmuschaos/litmusctl/pkg/types"
 )
 
 type AgentData struct {

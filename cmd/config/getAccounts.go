@@ -17,12 +17,13 @@ package config
 
 import (
 	"fmt"
+	"os"
+	"text/tabwriter"
+
 	"github.com/litmuschaos/litmusctl/pkg/config"
 	"github.com/litmuschaos/litmusctl/pkg/types"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
 	"github.com/spf13/cobra"
-	"os"
-	"text/tabwriter"
 )
 
 // getAccountsCmd represents the getAccounts command

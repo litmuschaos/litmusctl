@@ -3,6 +3,9 @@ package k8s
 import (
 	"context"
 	"fmt"
+	"log"
+	"os"
+
 	"github.com/litmuschaos/litmusctl/pkg/utils"
 	authorizationv1 "k8s.io/api/authorization/v1"
 	v1 "k8s.io/api/core/v1"
@@ -11,8 +14,6 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/discovery"
 	authorizationv1client "k8s.io/client-go/kubernetes/typed/authorization/v1"
-	"log"
-	"os"
 )
 
 type CanIOptions struct {
