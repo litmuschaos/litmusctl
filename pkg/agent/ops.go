@@ -122,27 +122,19 @@ func ValidateSAPermissions(mode string, kubeconfig *string) {
 	var (
 		pems [2]bool
 		err  error
+		resources [2]string
 	)
 
 	if mode == "cluster" {
-		resources := [2]string{"clusterrole", "clusterrolebinding"}
-		i := 0
-		for _, resource := range resources {
-			pems[i], err = k8s.CheckSAPermissions(k8s.CheckSAPermissionsParams{"create", resource, true}, kubeconfig)
-			if err != nil {
-				fmt.Println(err)
-			}
-			i++
-		}
+		resources = [2]string{"clusterrole", "clusterrolebinding"}
 	} else {
-		resources := [2]string{"role", "rolebinding"}
-		i := 0
-		for _, resource := range resources {
-			pems[i], err = k8s.CheckSAPermissions(k8s.CheckSAPermissionsParams{"create", resource, true}, kubeconfig)
-			if err != nil {
-				fmt.Println(err)
-			}
-			i++
+		resources = [2]string{"role", "rolebinding"}
+	}
+
+	for i, resource := range resources {
+		pems[i], err = k8s.CheckSAPermissions(k8s.CheckSAPermissionsParams{"create", resource, true}, kubeconfig)
+		if err != nil {
+			fmt.Println(err)
 		}
 	}
 

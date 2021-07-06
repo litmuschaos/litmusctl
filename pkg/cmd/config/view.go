@@ -30,13 +30,8 @@ import (
 var viewCmd = &cobra.Command{
 	Use:   "view",
 	Short: "Display litmusconfig settings or a specified litmusconfig file",
-	Long: `Display litmusconfig settings or a specified litmusconfig file. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Long: `Display litmusconfig settings or a specified litmusconfig file. `,
 	Run: func(cmd *cobra.Command, args []string) {
-		var configFilePath string
 		configFilePath, err := cmd.Flags().GetString("config")
 		utils.PrintError(err)
 

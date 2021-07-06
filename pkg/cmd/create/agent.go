@@ -35,19 +35,11 @@ var agentCmd = &cobra.Command{
 	Short: "Create an external agent.",
 	Long:  `Create an external agent`,
 	Run: func(cmd *cobra.Command, args []string) {
-		var configFilePath string
-		configFilePath, err := cmd.Flags().GetString("config")
-		utils.PrintError(err)
-
-		if configFilePath == "" {
-			configFilePath = utils.DefaultFileName
-		}
-
-		credentials, err := utils.GetCredentials(configFilePath)
+		credentials, err := utils.GetCredentials(cmd)
 		utils.PrintError(err)
 
 		nonInteractive, err := cmd.Flags().GetBool("non-interactive")
-
+		
 		kubeconfig, err := cmd.Flags().GetString("kubeconfig")
 		utils.PrintError(err)
 
@@ -87,8 +79,6 @@ var agentCmd = &cobra.Command{
 			if newAgent.Mode == "" {
 				newAgent.Mode = utils.DefaultMode
 			}
-
-			fmt.Println(newAgent)
 
 			// Check if user has sufficient permissions based on mode
 			fmt.Println("\n🏃 Running prerequisites check....")

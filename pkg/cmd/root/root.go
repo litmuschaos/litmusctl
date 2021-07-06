@@ -17,13 +17,13 @@ package rootCmd
 
 import (
 	"fmt"
-	"github.com/litmuschaos/litmusctl/cmd/version"
+	"github.com/litmuschaos/litmusctl/pkg/cmd/version"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
 	"os"
 
-	"github.com/litmuschaos/litmusctl/cmd/config"
-	"github.com/litmuschaos/litmusctl/cmd/create"
-	"github.com/litmuschaos/litmusctl/cmd/get"
+	"github.com/litmuschaos/litmusctl/pkg/cmd/config"
+	"github.com/litmuschaos/litmusctl/pkg/cmd/create"
+	"github.com/litmuschaos/litmusctl/pkg/cmd/get"
 	"github.com/spf13/cobra"
 
 	"github.com/mitchellh/go-homedir"

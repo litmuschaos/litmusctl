@@ -17,12 +17,11 @@ package get
 
 import (
 	"fmt"
-	"os"
-	"text/tabwriter"
-
 	"github.com/litmuschaos/litmusctl/pkg/apis"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
 	"github.com/spf13/cobra"
+	"os"
+	"text/tabwriter"
 )
 
 // agentsCmd represents the agents command
@@ -31,15 +30,7 @@ var agentsCmd = &cobra.Command{
 	Short: "Display list of agents within the project",
 	Long:  `Display list of agents within the project`,
 	Run: func(cmd *cobra.Command, args []string) {
-		var configFilePath string
-		configFilePath, err := cmd.Flags().GetString("config")
-		utils.PrintError(err)
-
-		if configFilePath == "" {
-			configFilePath = utils.DefaultFileName
-		}
-
-		credentials, err := utils.GetCredentials(configFilePath)
+		credentials, err := utils.GetCredentials(cmd)
 		utils.PrintError(err)
 
 		projectID, err := cmd.Flags().GetString("project-id")
@@ -62,6 +53,14 @@ var agentsCmd = &cobra.Command{
 		utils.PrintError(err)
 
 		switch output {
+		case "json":
+			utils.PrintInJsonFormat(agents.Data)
+			break
+
+		case "yaml":
+			utils.PrintInYamlFormat(agents.Data)
+			break
+
 		case "":
 			writer := tabwriter.NewWriter(os.Stdout, 0, 8, 1, '\t', tabwriter.AlignRight)
 			fmt.Fprintln(writer, "AGENT ID\tAGENT NAME\tSTATUS")
@@ -76,16 +75,7 @@ var agentsCmd = &cobra.Command{
 			}
 			writer.Flush()
 			break
-
-		case "json":
-			utils.PrintInJsonFormat(agents.Data)
-			break
-
-		case "yaml":
-			utils.PrintInYamlFormat(agents.Data)
-			break
 		}
-
 	},
 }
 

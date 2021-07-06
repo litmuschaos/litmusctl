@@ -31,15 +31,7 @@ var projectCmd = &cobra.Command{
 	Short: "Create a project",
 	Long:  `Create a project`,
 	Run: func(cmd *cobra.Command, args []string) {
-		var configFilePath string
-		configFilePath, err := cmd.Flags().GetString("config")
-		utils.PrintError(err)
-
-		if configFilePath == "" {
-			configFilePath = utils.DefaultFileName
-		}
-
-		credentials, err := utils.GetCredentials(configFilePath)
+		credentials, err := utils.GetCredentials(cmd)
 		utils.PrintError(err)
 
 		projectName, err := cmd.Flags().GetString("name")

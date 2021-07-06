@@ -31,15 +31,7 @@ var projectsCmd = &cobra.Command{
 	Short: "Display list of projects",
 	Long:  `Display list of projects`,
 	Run: func(cmd *cobra.Command, args []string) {
-		var configFilePath string
-		configFilePath, err := cmd.Flags().GetString("config")
-		utils.PrintError(err)
-
-		if configFilePath == "" {
-			configFilePath = utils.DefaultFileName
-		}
-
-		credentials, err := utils.GetCredentials(configFilePath)
+		credentials, err := utils.GetCredentials(cmd)
 		utils.PrintError(err)
 
 		projects, err := apis.ListProject(credentials)
@@ -49,21 +41,21 @@ var projectsCmd = &cobra.Command{
 		utils.PrintError(err)
 
 		switch output {
-		case "":
-			writer := tabwriter.NewWriter(os.Stdout, 0, 8, 1, '\t', tabwriter.AlignRight)
-			fmt.Fprintln(writer, "PROJECT ID\tPROJECT NAME\tCREATEDAT")
-			for _, project := range projects.Data.ListProjects {
-				fmt.Fprintln(writer, project.ID+"\t"+project.Name+"\t"+project.CreatedAt+"\t")
-			}
-			writer.Flush()
-			break
-
 		case "json":
 			utils.PrintInJsonFormat(projects.Data)
 			break
 
 		case "yaml":
 			utils.PrintInYamlFormat(projects.Data)
+			break
+
+		case "":
+			writer := tabwriter.NewWriter(os.Stdout, 8, 8, 8, '\t', tabwriter.AlignRight)
+			fmt.Fprintln(writer, "PROJECT ID\tPROJECT NAME\tCREATEDAT")
+			for _, project := range projects.Data.ListProjects {
+				fmt.Fprintln(writer, project.ID + "\t" + project.Name +"\t"+project.CreatedAt+"\t")
+			}
+			writer.Flush()
 			break
 		}
 	},

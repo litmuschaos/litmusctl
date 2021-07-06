@@ -29,13 +29,8 @@ import (
 var getAccountsCmd = &cobra.Command{
 	Use:   "get-accounts",
 	Short: "Display accounts defined in the litmusconfig",
-	Long: `Display accounts defined in the litmusconfig For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Long: `Display accounts defined in the litmusconfig`,
 	Run: func(cmd *cobra.Command, args []string) {
-		var configFilePath string
 		configFilePath, err := cmd.Flags().GetString("config")
 		utils.PrintError(err)
 

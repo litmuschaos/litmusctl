@@ -13,26 +13,15 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package version
+package config
 
 import (
-	"fmt"
-	"os"
-
 	"github.com/spf13/cobra"
 )
 
-// versionCmd represents the version command
-var VersionCmd = &cobra.Command{
-	Use:   "version",
+// configCmd represents the config command
+var ConfigCmd = &cobra.Command{
+	Use:   "config",
 	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Litmusctl version: ", os.Getenv("CLIVersion"))
-	},
+	Long: ``,
 }

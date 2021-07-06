@@ -29,13 +29,8 @@ import (
 var useAccountCmd = &cobra.Command{
 	Use:   "use-account",
 	Short: "Sets the current-account and current-username in a litmusconfig file",
-	Long: `Sets the current-account and current-username in a litmusconfig file. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Long: `Sets the current-account and current-username in a litmusconfig file`,
 	Run: func(cmd *cobra.Command, args []string) {
-		var configFilePath string
 		configFilePath, err := cmd.Flags().GetString("config")
 		utils.PrintError(err)
 

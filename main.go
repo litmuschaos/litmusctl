@@ -16,7 +16,7 @@ limitations under the License.
 package main
 
 import (
-	"github.com/litmuschaos/litmusctl/cmd/root"
+	"github.com/litmuschaos/litmusctl/pkg/cmd/root"
 )
 
 func main() {

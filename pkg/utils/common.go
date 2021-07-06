@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"github.com/litmuschaos/litmusctl/pkg/config"
 	"github.com/litmuschaos/litmusctl/pkg/types"
+	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v2"
 	"os"
 	"os/exec"
@@ -55,8 +56,15 @@ func PrintError(err error) {
 	}
 }
 
-func GetCredentials(filename string) (types.Credentials, error) {
-	obj, err := config.YamltoObject(filename)
+func GetCredentials(cmd *cobra.Command) (types.Credentials, error) {
+	configFilePath, err := cmd.Flags().GetString("config")
+	PrintError(err)
+
+	if configFilePath == "" {
+		configFilePath = DefaultFileName
+	}
+
+	obj, err := config.YamltoObject(configFilePath)
 	PrintError(err)
 
 	if obj.CurrentUser == "" || obj.CurrentAccount == "" {
@@ -99,3 +107,4 @@ func PrintInYamlFormat(inf interface{}) {
 
 	fmt.Println(string(byt))
 }
+
