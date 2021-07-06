@@ -165,7 +165,7 @@ func ValidateSAPermissions(mode string, kubeconfig *string) {
 
 // Summary display the agent details based on input
 func Summary(agent types.Agent, kubeconfig *string) {
-	fmt.Printf("\n📌 Summary -------------------------- \nAgent Name: %s\nAgent Description: %s\nPlatform Name: %s", agent.AgentName, agent.Description, agent.PlatformName)
+	fmt.Printf("\n📌 Summary -------------------------- \nAgent Name: %s\nAgent Description: %s\nPlatform Name: %s\n", agent.AgentName, agent.Description, agent.PlatformName)
 	if ok, _ := k8s.NsExists(agent.Namespace, kubeconfig); ok {
 		fmt.Println("Namespace: ", agent.Namespace)
 	} else {
@@ -178,7 +178,7 @@ func Summary(agent types.Agent, kubeconfig *string) {
 		fmt.Println("Service Account: ", agent.ServiceAccount, "(new)")
 	}
 
-	fmt.Printf("\nInstallation Mode: %s\n-------------------------------------", agent.Mode)
+	fmt.Printf("\nInstallation Mode: %s\n-------------------------------------\n", agent.Mode)
 }
 
 func ConfirmInstallation() {
@@ -192,4 +192,16 @@ func ConfirmInstallation() {
 		fmt.Println("✋ Exiting agent connection!!")
 		os.Exit(1)
 	}
+}
+
+func CreateRandomProject(cred types.Credentials) string {
+	rand, err := utils.GenerateRandomString(10)
+	utils.PrintError(err)
+
+	projectName := cred.Username + "-" + rand
+
+	project, err := apis.CreateProjectRequest(projectName, cred)
+	utils.PrintError(err)
+
+	return project.Data.CreateProject.ID
 }

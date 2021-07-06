@@ -17,13 +17,11 @@ package create
 
 import (
 	"fmt"
-
 	"github.com/litmuschaos/litmusctl/pkg/agent"
 	"github.com/litmuschaos/litmusctl/pkg/apis"
 	"github.com/litmuschaos/litmusctl/pkg/k8s"
 	"github.com/litmuschaos/litmusctl/pkg/types"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
-
 	"os"
 
 	"github.com/spf13/cobra"
@@ -31,9 +29,17 @@ import (
 
 // agentCmd represents the agent command
 var agentCmd = &cobra.Command{
-	Use:   "agent",
-	Short: "Create an external agent.",
-	Long:  `Create an external agent`,
+	Use: "agent",
+	Short: `Create an external agent.
+	Example(s):
+	#create an agent
+	litmusctl create agent --agent-name="new-agent" --create-project --non-interactive
+
+	#create an agent within a project
+	litmusctl create agent --agent-name="new-agent" --project-id="d861b650-1549-4574-b2ba-ab754058dd04" --non-interactive
+	
+	Note: The default location of the config file is $HOME/.litmusconfig, and can be overridden by a --config flag
+`,
 	Run: func(cmd *cobra.Command, args []string) {
 		credentials, err := utils.GetCredentials(cmd)
 		utils.PrintError(err)
@@ -43,17 +49,41 @@ var agentCmd = &cobra.Command{
 		kubeconfig, err := cmd.Flags().GetString("kubeconfig")
 		utils.PrintError(err)
 
+		isCreateProject, err := cmd.Flags().GetBool("create-project")
+		utils.PrintError(err)
+
 		var newAgent types.Agent
 
 		if nonInteractive {
 			newAgent.ProjectId, err = cmd.Flags().GetString("project-id")
 			utils.PrintError(err)
 
+			// if projectid is empty and create a new project is false
+			if newAgent.ProjectId == "" && !isCreateProject {
+				fmt.Print("Error: --project-id flag is empty | Suggestion: Apply `litmusctl get projects` to see the list of projects and if the user is not part of any project, then pass --create-project flag to create a new project\n")
+				os.Exit(1)
+			}
+
+			if newAgent.ProjectId != "" && isCreateProject {
+				fmt.Println("Both --project-id and --create-project flags can't set together")
+				os.Exit(1)
+			}
+
 			newAgent.Mode, err = cmd.Flags().GetString("installation-mode")
 			utils.PrintError(err)
 
+			if newAgent.Mode == "" {
+				fmt.Print("Error: --installation-mode flag is empty")
+				os.Exit(1)
+			}
+
 			newAgent.AgentName, err = cmd.Flags().GetString("agent-name")
 			utils.PrintError(err)
+
+			if newAgent.AgentName == "" {
+				fmt.Print("Error: --agent-name flag is empty")
+				os.Exit(1)
+			}
 
 			newAgent.Description, err = cmd.Flags().GetString("agent-description")
 			utils.PrintError(err)
@@ -61,8 +91,17 @@ var agentCmd = &cobra.Command{
 			newAgent.PlatformName, err = cmd.Flags().GetString("platform-name")
 			utils.PrintError(err)
 
+			if newAgent.PlatformName == "" {
+				fmt.Print("Error: --platform-name flag is empty")
+				os.Exit(1)
+			}
+
 			newAgent.ClusterType, err = cmd.Flags().GetString("cluster-type")
 			utils.PrintError(err)
+			if newAgent.ClusterType == "" {
+				fmt.Print("Error: --cluster-type flag is empty")
+				os.Exit(1)
+			}
 
 			newAgent.Namespace, err = cmd.Flags().GetString("namespace")
 			utils.PrintError(err)
@@ -78,6 +117,10 @@ var agentCmd = &cobra.Command{
 
 			if newAgent.Mode == "" {
 				newAgent.Mode = utils.DefaultMode
+			}
+
+			if isCreateProject {
+				newAgent.ProjectId = agent.CreateRandomProject(credentials)
 			}
 
 			// Check if user has sufficient permissions based on mode
@@ -102,27 +145,33 @@ var agentCmd = &cobra.Command{
 			}
 
 		} else {
+			if isCreateProject {
+				fmt.Println("Creating a random project...")
+				newAgent.ProjectId = agent.CreateRandomProject(credentials)
+			} else {
+				userDetails, err := apis.GetProjectDetails(credentials)
+				utils.PrintError(err)
 
-			userDetails, err := apis.GetProjectDetails(credentials)
-			utils.PrintError(err)
-
-			// Fetch project id
-			projectID := agent.GetProjectID(userDetails)
+				// Fetch project id
+				newAgent.ProjectId = agent.GetProjectID(userDetails)
+			}
 
 			modeType := agent.GetModeType()
 
 			// Check if user has sufficient permissions based on mode
 			fmt.Println("\n🏃 Running prerequisites check....")
 			agent.ValidateSAPermissions(modeType, &kubeconfig)
-			newAgent, err = agent.GetAgentDetails(modeType, projectID, credentials, &kubeconfig)
+			newAgent, err = agent.GetAgentDetails(modeType, newAgent.ProjectId, credentials, &kubeconfig)
 			utils.PrintError(err)
 
 			newAgent.ServiceAccount, newAgent.SAExists = k8s.ValidSA(newAgent.Namespace, &kubeconfig)
 			newAgent.Mode = modeType
-			agent.Summary(newAgent, &kubeconfig)
+		}
 
+		agent.Summary(newAgent, &kubeconfig)
+
+		if !nonInteractive {
 			agent.ConfirmInstallation()
-
 		}
 
 		agent, err := apis.ConnectAgent(newAgent, credentials)
@@ -166,10 +215,11 @@ func init() {
 
 	agentCmd.Flags().BoolP("non-interactive", "n", false, "Set it to true for non interactive mode | Note: Always set the boolean flag as --non-interactive=Boolean")
 	agentCmd.Flags().StringP("kubeconfig", "k", "", "Set to pass kubeconfig file if it is not in the default location ($HOME/.kube/config)")
+	agentCmd.Flags().Bool("create-project", false, "Set it to --create-project=true for new project creation if the user is not part of any project or --project-id flag is empty | Note: Always set the boolean flag as --create-project=Boolean and this flag can be used in both interactive and non-interactive mode")
 	agentCmd.Flags().String("project-id", "", "Set the project-id to install agent for the particular project. To see the projects, apply litmusctl get projects")
 	agentCmd.Flags().String("installation-mode", "cluster", "Set the installation mode for the kind of agent | Supported=cluster/namespace")
 	agentCmd.Flags().String("agent-name", "", "Set the agent name")
-	agentCmd.Flags().String("agent-description", "", "Set the agent description")
+	agentCmd.Flags().String("agent-description", "---", "Set the agent description")
 	agentCmd.Flags().String("platform-name", "Others", "Set the platform name. Supported- AWS/GKE/Openshift/Rancher/Others")
 	agentCmd.Flags().String("cluster-type", "external", "Set the cluster-type to external for external agents | Supported=external/internal")
 	agentCmd.Flags().String("namespace", "litmus", "Set the namespace for the agent installation")

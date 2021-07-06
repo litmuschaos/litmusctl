@@ -27,9 +27,14 @@ import (
 
 // projectCmd represents the project command
 var projectCmd = &cobra.Command{
-	Use:   "project",
-	Short: "Create a project",
-	Long:  `Create a project`,
+	Use: "project",
+	Short: `Create a project
+	Example:
+	#create a project
+	litmusctl create project --name new-proj
+
+	Note: The default location of the config file is $HOME/.litmusconfig, and can be overridden by a --config flag
+	`,
 	Run: func(cmd *cobra.Command, args []string) {
 		credentials, err := utils.GetCredentials(cmd)
 		utils.PrintError(err)
@@ -46,22 +51,12 @@ var projectCmd = &cobra.Command{
 			}
 		}
 
-		err = apis.CreateProjectRequest(projectName, credentials)
+		_, err = apis.CreateProjectRequest(projectName, credentials)
 		utils.PrintError(err)
-
 	},
 }
 
 func init() {
 	CreateCmd.AddCommand(projectCmd)
-
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// projectCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	projectCmd.Flags().String("name", "", "Help message for toggle")
+	projectCmd.Flags().String("name", "", "Set the project name to create it")
 }

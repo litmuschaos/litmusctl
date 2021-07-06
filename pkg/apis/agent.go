@@ -29,12 +29,14 @@ import (
 type AgentData struct {
 	Data AgentList `json:"data"`
 }
+
 type AgentDetails struct {
 	AgentName    string `json:"cluster_name"`
 	IsActive     bool   `json:"is_active"`
 	IsRegistered bool   `json:"is_registered"`
 	ClusterID    string `json:"cluster_id"`
 }
+
 type AgentList struct {
 	GetAgent []AgentDetails `json:"getCluster"`
 }

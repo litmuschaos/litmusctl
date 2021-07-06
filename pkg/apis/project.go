@@ -30,21 +30,22 @@ type createProjectResponse struct {
 	Data struct {
 		CreateProject struct {
 			Name string `json:"name"`
+			ID   string `json:"id"`
 		} `json:"createProject"`
 	} `json:"data"`
 }
 
-func CreateProjectRequest(projectName string, cred types.Credentials) error {
+func CreateProjectRequest(projectName string, cred types.Credentials) (createProjectResponse, error) {
 	query := `{"query":"mutation{createProject(projectName: \"` + projectName + `\"){name}}"}`
 
 	resp, err := SendRequest(SendRequestParams{Endpoint: cred.Endpoint + utils.GQLAPIPath, Token: cred.Token}, []byte(query))
 	if err != nil {
-		return err
+		return createProjectResponse{}, err
 	}
 
 	bodyBytes, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return err
+		return createProjectResponse{}, err
 	}
 
 	defer resp.Body.Close()
@@ -53,13 +54,13 @@ func CreateProjectRequest(projectName string, cred types.Credentials) error {
 		var project createProjectResponse
 		err = json.Unmarshal(bodyBytes, &project)
 		if err != nil {
-			return err
+			return createProjectResponse{}, err
 		}
 
 		fmt.Println("project/" + project.Data.CreateProject.Name + " created")
-		return nil
+		return project, nil
 	} else {
-		return errors.New("Unmatched status code:" + string(bodyBytes))
+		return createProjectResponse{}, errors.New("Unmatched status code:" + string(bodyBytes))
 	}
 }
 

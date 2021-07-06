@@ -21,7 +21,14 @@ import (
 
 // getCmd represents the get command
 var GetCmd = &cobra.Command{
-	Use:   "get",
-	Short: "A brief description of your command",
-	Long:  ``,
+	Use: "get",
+	Short: `Examples:
+		#get list of projects accessed by the user
+		litmusctl get projects
+
+		#get list of agents within the project
+		litmusctl get agents --project-id=""
+
+		Note: The default location of the config file is $HOME/.litmusconfig, and can be overridden by a --config flag
+	`,
 }
