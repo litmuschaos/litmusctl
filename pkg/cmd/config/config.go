@@ -23,5 +23,5 @@ import (
 var ConfigCmd = &cobra.Command{
 	Use:   "config",
 	Short: "A brief description of your command",
-	Long: ``,
+	Long:  ``,
 }

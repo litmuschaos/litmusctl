@@ -29,20 +29,12 @@ import (
 var getAccountsCmd = &cobra.Command{
 	Use:   "get-accounts",
 	Short: "Display accounts defined in the litmusconfig",
-	Long: `Display accounts defined in the litmusconfig`,
+	Long:  `Display accounts defined in the litmusconfig`,
 	Run: func(cmd *cobra.Command, args []string) {
-		configFilePath, err := cmd.Flags().GetString("config")
-		utils.PrintError(err)
-
-		if configFilePath == "" {
-			configFilePath = utils.DefaultFileName
-		}
+		configFilePath := utils.GetLitmusConfigPath(cmd)
 
 		obj, err := config.YamltoObject(configFilePath)
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
+		utils.PrintError(err)
 
 		writer := tabwriter.NewWriter(os.Stdout, 0, 8, 1, '\t', tabwriter.AlignRight)
 		fmt.Fprintln(writer, "CURRENT\tENDPOINT\tUSERNAME\tEXPIRESIN")

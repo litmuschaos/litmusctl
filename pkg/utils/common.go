@@ -1,3 +1,18 @@
+/*
+Copyright © 2021 The LitmusChaos Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
 package utils
 
 import (
@@ -8,6 +23,7 @@ import (
 	"fmt"
 	"github.com/litmuschaos/litmusctl/pkg/config"
 	"github.com/litmuschaos/litmusctl/pkg/types"
+	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v2"
 	"os"
@@ -56,13 +72,22 @@ func PrintError(err error) {
 	}
 }
 
-func GetCredentials(cmd *cobra.Command) (types.Credentials, error) {
+func GetLitmusConfigPath(cmd *cobra.Command) string {
 	configFilePath, err := cmd.Flags().GetString("config")
 	PrintError(err)
 
 	if configFilePath == "" {
-		configFilePath = DefaultFileName
+		home, err := homedir.Dir()
+		PrintError(err)
+
+		configFilePath = home + "/" + DefaultFileName
 	}
+
+	return configFilePath
+}
+
+func GetCredentials(cmd *cobra.Command) (types.Credentials, error) {
+	configFilePath := GetLitmusConfigPath(cmd)
 
 	obj, err := config.YamltoObject(configFilePath)
 	PrintError(err)
@@ -107,4 +132,3 @@ func PrintInYamlFormat(inf interface{}) {
 
 	fmt.Println(string(byt))
 }
-

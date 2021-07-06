@@ -23,5 +23,5 @@ import (
 var CreateCmd = &cobra.Command{
 	Use:   "create",
 	Short: "A brief description of your command",
-	Long: ``,
+	Long:  ``,
 }

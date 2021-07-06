@@ -23,5 +23,5 @@ import (
 var GetCmd = &cobra.Command{
 	Use:   "get",
 	Short: "A brief description of your command",
-	Long: ``,
+	Long:  ``,
 }

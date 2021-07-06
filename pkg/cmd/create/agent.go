@@ -39,7 +39,7 @@ var agentCmd = &cobra.Command{
 		utils.PrintError(err)
 
 		nonInteractive, err := cmd.Flags().GetBool("non-interactive")
-		
+
 		kubeconfig, err := cmd.Flags().GetString("kubeconfig")
 		utils.PrintError(err)
 
@@ -164,16 +164,16 @@ var agentCmd = &cobra.Command{
 func init() {
 	CreateCmd.AddCommand(agentCmd)
 
-	agentCmd.Flags().BoolP("non-interactive", "n", false, "Help message for toggle")
-	agentCmd.Flags().StringP("kubeconfig", "k", "", "Help message for toggle")
-	agentCmd.Flags().String("project-id", "", "Help message for toggle")
-	agentCmd.Flags().String("installation-mode", "", "Help message for toggle")
-	agentCmd.Flags().String("agent-name", "", "Help message for toggle")
-	agentCmd.Flags().String("agent-description", "", "Help message for toggle")
-	agentCmd.Flags().String("platform-name", "", "Help message for toggle")
-	agentCmd.Flags().String("cluster-type", "", "Help message for toggle")
-	agentCmd.Flags().String("namespace", "", "Help message for toggle")
-	agentCmd.Flags().String("service-account", "", "Help message for toggle")
-	agentCmd.Flags().Bool("ns-exists", false, "Help message for toggle")
-	agentCmd.Flags().Bool("sa-exists", false, "Help message for toggle")
+	agentCmd.Flags().BoolP("non-interactive", "n", false, "Set it to true for non interactive mode | Note: Always set the boolean flag as --non-interactive=Boolean")
+	agentCmd.Flags().StringP("kubeconfig", "k", "", "Set to pass kubeconfig file if it is not in the default location ($HOME/.kube/config)")
+	agentCmd.Flags().String("project-id", "", "Set the project-id to install agent for the particular project. To see the projects, apply litmusctl get projects")
+	agentCmd.Flags().String("installation-mode", "cluster", "Set the installation mode for the kind of agent | Supported=cluster/namespace")
+	agentCmd.Flags().String("agent-name", "", "Set the agent name")
+	agentCmd.Flags().String("agent-description", "", "Set the agent description")
+	agentCmd.Flags().String("platform-name", "Others", "Set the platform name. Supported- AWS/GKE/Openshift/Rancher/Others")
+	agentCmd.Flags().String("cluster-type", "external", "Set the cluster-type to external for external agents | Supported=external/internal")
+	agentCmd.Flags().String("namespace", "litmus", "Set the namespace for the agent installation")
+	agentCmd.Flags().String("service-account", "litmus", "Set the service account to be used by the agent")
+	agentCmd.Flags().Bool("ns-exists", false, "Set the --ns-exists=false if the namespace mentioned in the --namespace flag is not existed else set it to --ns-exists=true | Note: Always set the boolean flag as --ns-exists=Boolean")
+	agentCmd.Flags().Bool("sa-exists", false, "Set the --sa-exists=false if the service-account mentioned in the --service-account flag is not existed else set it to --sa-exists=true | Note: Always set the boolean flag as --sa-exists=Boolean\"\n")
 }

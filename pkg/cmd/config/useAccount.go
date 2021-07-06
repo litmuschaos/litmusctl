@@ -29,14 +29,9 @@ import (
 var useAccountCmd = &cobra.Command{
 	Use:   "use-account",
 	Short: "Sets the current-account and current-username in a litmusconfig file",
-	Long: `Sets the current-account and current-username in a litmusconfig file`,
+	Long:  `Sets the current-account and current-username in a litmusconfig file`,
 	Run: func(cmd *cobra.Command, args []string) {
-		configFilePath, err := cmd.Flags().GetString("config")
-		utils.PrintError(err)
-
-		if configFilePath == "" {
-			configFilePath = utils.DefaultFileName
-		}
+		configFilePath := utils.GetLitmusConfigPath(cmd)
 
 		username, err := cmd.Flags().GetString("username")
 		utils.PrintError(err)
@@ -59,10 +54,7 @@ var useAccountCmd = &cobra.Command{
 				CurrentAccount: endpoint,
 				CurrentUser:    username,
 			}, configFilePath)
-			if err != nil {
-				fmt.Println(err)
-				os.Exit(1)
-			}
+			utils.PrintError(err)
 
 		} else {
 			fmt.Println("File Not exists")

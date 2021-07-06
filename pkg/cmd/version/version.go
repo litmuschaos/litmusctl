@@ -26,7 +26,7 @@ import (
 var VersionCmd = &cobra.Command{
 	Use:   "version",
 	Short: "A brief description of your command",
-	Long: ``,
+	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("Litmusctl version: ", os.Getenv("CLIVersion"))
 	},

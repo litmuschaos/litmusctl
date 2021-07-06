@@ -30,14 +30,9 @@ import (
 var viewCmd = &cobra.Command{
 	Use:   "view",
 	Short: "Display litmusconfig settings or a specified litmusconfig file",
-	Long: `Display litmusconfig settings or a specified litmusconfig file. `,
+	Long:  `Display litmusconfig settings or a specified litmusconfig file. `,
 	Run: func(cmd *cobra.Command, args []string) {
-		configFilePath, err := cmd.Flags().GetString("config")
-		utils.PrintError(err)
-
-		if configFilePath == "" {
-			configFilePath = utils.DefaultFileName
-		}
+		configFilePath := utils.GetLitmusConfigPath(cmd)
 
 		exists := config.FileExists(configFilePath)
 		if !exists {
