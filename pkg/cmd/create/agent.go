@@ -49,25 +49,37 @@ var agentCmd = &cobra.Command{
 		kubeconfig, err := cmd.Flags().GetString("kubeconfig")
 		utils.PrintError(err)
 
-		isCreateProject, err := cmd.Flags().GetBool("create-project")
-		utils.PrintError(err)
-
 		var newAgent types.Agent
 
-		if nonInteractive {
-			newAgent.ProjectId, err = cmd.Flags().GetString("project-id")
+		newAgent.ProjectId, err = cmd.Flags().GetString("project-id")
+		utils.PrintError(err)
+
+		if newAgent.ProjectId == "" {
+			userDetails, err := apis.GetProjectDetails(credentials)
 			utils.PrintError(err)
 
-			// if projectid is empty and create a new project is false
-			if newAgent.ProjectId == "" && !isCreateProject {
-				fmt.Print("Error: --project-id flag is empty | Suggestion: Apply `litmusctl get projects` to see the list of projects and if the user is not part of any project, then pass --create-project flag to create a new project\n")
-				os.Exit(1)
+			var (
+				userID        = userDetails.Data.GetUser.ID
+				projectExists = false
+			)
+
+		outerloop:
+			for _, project := range userDetails.Data.GetUser.Projects {
+				for _, member := range project.Members {
+					if (member.UserID == userID) && (member.Role == "Owner" || member.Role == "Editor") {
+						projectExists = true
+						break outerloop
+					}
+				}
 			}
 
-			if newAgent.ProjectId != "" && isCreateProject {
-				fmt.Println("Both --project-id and --create-project flags can't set together")
-				os.Exit(1)
+			if !projectExists {
+				fmt.Println("Creating a random project...")
+				newAgent.ProjectId = agent.CreateRandomProject(credentials)
 			}
+		}
+
+		if nonInteractive {
 
 			newAgent.Mode, err = cmd.Flags().GetString("installation-mode")
 			utils.PrintError(err)
@@ -119,8 +131,9 @@ var agentCmd = &cobra.Command{
 				newAgent.Mode = utils.DefaultMode
 			}
 
-			if isCreateProject {
-				newAgent.ProjectId = agent.CreateRandomProject(credentials)
+			if newAgent.ProjectId == "" {
+				fmt.Println("Error: --project-id flag is empty")
+				os.Exit(1)
 			}
 
 			// Check if user has sufficient permissions based on mode
@@ -145,13 +158,10 @@ var agentCmd = &cobra.Command{
 			}
 
 		} else {
-			if isCreateProject {
-				fmt.Println("Creating a random project...")
-				newAgent.ProjectId = agent.CreateRandomProject(credentials)
-			} else {
-				userDetails, err := apis.GetProjectDetails(credentials)
-				utils.PrintError(err)
+			userDetails, err := apis.GetProjectDetails(credentials)
+			utils.PrintError(err)
 
+			if newAgent.ProjectId == "" {
 				// Fetch project id
 				newAgent.ProjectId = agent.GetProjectID(userDetails)
 			}

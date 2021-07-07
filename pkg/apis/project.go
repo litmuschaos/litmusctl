@@ -36,7 +36,7 @@ type createProjectResponse struct {
 }
 
 func CreateProjectRequest(projectName string, cred types.Credentials) (createProjectResponse, error) {
-	query := `{"query":"mutation{createProject(projectName: \"` + projectName + `\"){name}}"}`
+	query := `{"query":"mutation{createProject(projectName: \"` + projectName + `\"){name id}}"}`
 
 	resp, err := SendRequest(SendRequestParams{Endpoint: cred.Endpoint + utils.GQLAPIPath, Token: cred.Token}, []byte(query))
 	if err != nil {
@@ -110,18 +110,26 @@ type Data struct {
 }
 
 type GetUser struct {
+	ID       string    `json:"id"`
 	Projects []Project `json:"projects"`
 }
 
+type Member struct {
+	Role     string `json:"role"`
+	UserID   string `json:"user_id"`
+	UserName string `json:"user_name"`
+}
+
 type Project struct {
-	ID        string `json:"id"`
-	Name      string `json:"name"`
-	CreatedAt string `json:"created_at"`
+	ID        string   `json:"id"`
+	Name      string   `json:"name"`
+	CreatedAt string   `json:"created_at"`
+	Members   []Member `json:"members"`
 }
 
 // GetProjectDetails fetches details of the input user
 func GetProjectDetails(c types.Credentials) (ProjectDetails, error) {
-	query := `{"query":"query {\n  getUser(username: \"` + c.Username + `\"){\n projects{\n id\n name\n}\n}\n}"}`
+	query := `{"query":"query {\n  getUser(username: \"` + c.Username + `\"){\n id name created_at projects{ id name members{ role user_id } }\n}\n}"}`
 	resp, err := SendRequest(SendRequestParams{Endpoint: c.Endpoint + utils.GQLAPIPath, Token: c.Token}, []byte(query))
 	if err != nil {
 		return ProjectDetails{}, err
