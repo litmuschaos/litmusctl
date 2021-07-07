@@ -152,6 +152,4 @@ func GetProjectDetails(c types.Credentials) (ProjectDetails, error) {
 	} else {
 		return ProjectDetails{}, errors.New("Unmatched status code:" + string(bodyBytes))
 	}
-
-	return ProjectDetails{}, nil
 }

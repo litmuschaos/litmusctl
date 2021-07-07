@@ -62,6 +62,4 @@ func Auth(input types.AuthInput) (types.AuthResponse, error) {
 	} else {
 		return types.AuthResponse{}, errors.New("Unmatched status code:" + string(bodyBytes))
 	}
-
-	return types.AuthResponse{}, nil
 }

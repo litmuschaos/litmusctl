@@ -27,7 +27,7 @@ import (
 	"github.com/litmuschaos/litmusctl/pkg/types"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
 	"github.com/spf13/cobra"
-	"golang.org/x/crypto/ssh/terminal"
+	"golang.org/x/term"
 )
 
 // setAccountCmd represents the setAccount command
@@ -81,7 +81,7 @@ to quickly create a Cobra application.`,
 
 		if authInput.Password == "" {
 			fmt.Print("🙈 Password: ")
-			pass, err := terminal.ReadPassword(0)
+			pass, err := term.ReadPassword(0)
 			utils.PrintError(err)
 
 			if pass == nil {

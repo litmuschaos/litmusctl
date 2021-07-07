@@ -67,8 +67,6 @@ func GetAgentList(c types.Credentials, pid string) (AgentData, error) {
 	} else {
 		return AgentData{}, err
 	}
-
-	return AgentData{}, err
 }
 
 type AgentConnectionData struct {
@@ -116,6 +114,4 @@ func ConnectAgent(agent types.Agent, cred types.Credentials) (AgentConnectionDat
 	} else {
 		return AgentConnectionData{}, err
 	}
-
-	return AgentConnectionData{}, err
 }

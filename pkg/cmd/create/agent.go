@@ -45,6 +45,7 @@ var agentCmd = &cobra.Command{
 		utils.PrintError(err)
 
 		nonInteractive, err := cmd.Flags().GetBool("non-interactive")
+		utils.PrintError(err)
 
 		kubeconfig, err := cmd.Flags().GetString("kubeconfig")
 		utils.PrintError(err)
@@ -225,7 +226,6 @@ func init() {
 
 	agentCmd.Flags().BoolP("non-interactive", "n", false, "Set it to true for non interactive mode | Note: Always set the boolean flag as --non-interactive=Boolean")
 	agentCmd.Flags().StringP("kubeconfig", "k", "", "Set to pass kubeconfig file if it is not in the default location ($HOME/.kube/config)")
-	agentCmd.Flags().Bool("create-project", false, "Set it to --create-project=true for new project creation if the user is not part of any project or --project-id flag is empty | Note: Always set the boolean flag as --create-project=Boolean and this flag can be used in both interactive and non-interactive mode")
 	agentCmd.Flags().String("project-id", "", "Set the project-id to install agent for the particular project. To see the projects, apply litmusctl get projects")
 	agentCmd.Flags().String("installation-mode", "cluster", "Set the installation mode for the kind of agent | Supported=cluster/namespace")
 	agentCmd.Flags().String("agent-name", "", "Set the agent name")
