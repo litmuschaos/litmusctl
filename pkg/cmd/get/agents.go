@@ -55,11 +55,9 @@ var agentsCmd = &cobra.Command{
 		switch output {
 		case "json":
 			utils.PrintInJsonFormat(agents.Data)
-			break
 
 		case "yaml":
 			utils.PrintInYamlFormat(agents.Data)
-			break
 
 		case "":
 			writer := tabwriter.NewWriter(os.Stdout, 0, 8, 1, '\t', tabwriter.AlignRight)
@@ -74,7 +72,6 @@ var agentsCmd = &cobra.Command{
 				fmt.Fprintln(writer, agent.ClusterID+"\t"+agent.AgentName+"\t"+status)
 			}
 			writer.Flush()
-			break
 		}
 	},
 }

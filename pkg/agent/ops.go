@@ -147,7 +147,7 @@ func ValidateSAPermissions(mode string, kubeconfig *string) {
 	}
 
 	for i, resource := range resources {
-		pems[i], err = k8s.CheckSAPermissions(k8s.CheckSAPermissionsParams{"create", resource, true}, kubeconfig)
+		pems[i], err = k8s.CheckSAPermissions(k8s.CheckSAPermissionsParams{Verb: "create", Resource: resource, Print: true}, kubeconfig)
 		if err != nil {
 			fmt.Println(err)
 		}
@@ -172,7 +172,7 @@ func Summary(agent types.Agent, kubeconfig *string) {
 		fmt.Println("Namespace: ", agent.Namespace, "(new)")
 	}
 
-	if k8s.SAExists(k8s.SAExistsParams{agent.Namespace, agent.ServiceAccount}, kubeconfig) {
+	if k8s.SAExists(k8s.SAExistsParams{Namespace: agent.Namespace, Serviceaccount: agent.ServiceAccount}, kubeconfig) {
 		fmt.Println("Service Account: ", agent.ServiceAccount)
 	} else {
 		fmt.Println("Service Account: ", agent.ServiceAccount, "(new)")

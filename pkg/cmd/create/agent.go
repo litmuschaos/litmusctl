@@ -213,7 +213,7 @@ var agentCmd = &cobra.Command{
 		fmt.Println("\n", yamlOutput)
 
 		// Watch subscriber pod status
-		k8s.WatchPod(k8s.WatchPodParams{newAgent.Namespace, utils.ChaosAgentLabel}, &kubeconfig)
+		k8s.WatchPod(k8s.WatchPodParams{Namespace: newAgent.Namespace, Label: utils.ChaosAgentLabel}, &kubeconfig)
 
 		fmt.Println("\n🚀 Agent Connection Successful!! 🎉")
 		fmt.Println("👉 Litmus agents can be accessed here: " + fmt.Sprintf("%s/%s", credentials.Endpoint, utils.ChaosAgentPath))

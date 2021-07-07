@@ -43,11 +43,9 @@ var projectsCmd = &cobra.Command{
 		switch output {
 		case "json":
 			utils.PrintInJsonFormat(projects.Data)
-			break
 
 		case "yaml":
 			utils.PrintInYamlFormat(projects.Data)
-			break
 
 		case "":
 			writer := tabwriter.NewWriter(os.Stdout, 8, 8, 8, '\t', tabwriter.AlignRight)
@@ -56,7 +54,6 @@ var projectsCmd = &cobra.Command{
 				fmt.Fprintln(writer, project.ID+"\t"+project.Name+"\t"+project.CreatedAt+"\t")
 			}
 			writer.Flush()
-			break
 		}
 	},
 }

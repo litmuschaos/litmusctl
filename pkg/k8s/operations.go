@@ -78,8 +78,7 @@ func CheckSAPermissions(params CheckSAPermissionsParams, kubeconfig *string) (bo
 	}
 	AuthClient := client.AuthorizationV1()
 
-	var sar *authorizationv1.SelfSubjectAccessReview
-	sar = &authorizationv1.SelfSubjectAccessReview{
+	sar := &authorizationv1.SelfSubjectAccessReview{
 		Spec: authorizationv1.SelfSubjectAccessReviewSpec{
 			ResourceAttributes: &authorizationv1.ResourceAttributes{
 				Namespace:   o.Namespace,
