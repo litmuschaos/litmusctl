@@ -17,8 +17,8 @@ package types
 
 type User struct {
 	ExpiresIn string `yaml:"expires_in",json:"expires_in"`
-	Token    string `yaml:"token",json:"token"`
-	Username string `yaml:"username",json:"username"`
+	Token     string `yaml:"token",json:"token"`
+	Username  string `yaml:"username",json:"username"`
 }
 
 type Account struct {
