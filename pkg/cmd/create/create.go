@@ -13,21 +13,26 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package version
+package create
 
 import (
-	"fmt"
-	"os"
-
 	"github.com/spf13/cobra"
 )
 
-// versionCmd represents the version command
-var VersionCmd = &cobra.Command{
-	Use:   "version",
-	Short: "Displays the version of litmusctl",
-	Long:  ``,
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Litmusctl version: ", os.Getenv("CLIVersion"))
-	},
+// createCmd represents the create command
+var CreateCmd = &cobra.Command{
+	Use: "create",
+	Short: `Create resources for LitmusChaos agent plane.
+		Examples:
+		#create a project
+		litmusctl create project --name new-proj
+
+		#create an agent
+		litmusctl create agent --agent-name="new-agent" --non-interactive
+
+		#create an agent within a project
+		litmusctl create agent --agent-name="new-agent" --project-id="d861b650-1549-4574-b2ba-ab754058dd04" --non-interactive
+		
+		Note: The default location of the config file is $HOME/.litmusconfig, and can be overridden by a --config flag
+	`,
 }

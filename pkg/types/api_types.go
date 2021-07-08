@@ -13,21 +13,22 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package version
+package types
 
-import (
-	"fmt"
-	"os"
+type AuthResponse struct {
+	AccessToken string `json:"access_token"`
+	ExpiresIn   int64  `json:"expires_in"`
+	Type        string `json:"type"`
+}
 
-	"github.com/spf13/cobra"
-)
+type AuthInput struct {
+	Endpoint string
+	Username string
+	Password string
+}
 
-// versionCmd represents the version command
-var VersionCmd = &cobra.Command{
-	Use:   "version",
-	Short: "Displays the version of litmusctl",
-	Long:  ``,
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Litmusctl version: ", os.Getenv("CLIVersion"))
-	},
+type Credentials struct {
+	Username string
+	Token    string
+	Endpoint string
 }

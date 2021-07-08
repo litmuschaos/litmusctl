@@ -13,21 +13,31 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package version
+package apis
 
 import (
-	"fmt"
-	"os"
-
-	"github.com/spf13/cobra"
+	"bytes"
+	"net/http"
 )
 
-// versionCmd represents the version command
-var VersionCmd = &cobra.Command{
-	Use:   "version",
-	Short: "Displays the version of litmusctl",
-	Long:  ``,
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Litmusctl version: ", os.Getenv("CLIVersion"))
-	},
+type SendRequestParams struct {
+	Endpoint string
+	Token    string
+}
+
+func SendRequest(params SendRequestParams, payload []byte) (*http.Response, error) {
+	req, err := http.NewRequest("POST", params.Endpoint, bytes.NewBuffer(payload))
+	if err != nil {
+		return &http.Response{}, err
+	}
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", params.Token)
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return &http.Response{}, err
+	}
+
+	return resp, nil
 }

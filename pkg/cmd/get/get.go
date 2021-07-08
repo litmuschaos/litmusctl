@@ -13,21 +13,22 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package version
+package get
 
 import (
-	"fmt"
-	"os"
-
 	"github.com/spf13/cobra"
 )
 
-// versionCmd represents the version command
-var VersionCmd = &cobra.Command{
-	Use:   "version",
-	Short: "Displays the version of litmusctl",
-	Long:  ``,
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Litmusctl version: ", os.Getenv("CLIVersion"))
-	},
+// getCmd represents the get command
+var GetCmd = &cobra.Command{
+	Use: "get",
+	Short: `Examples:
+		#get list of projects accessed by the user
+		litmusctl get projects
+
+		#get list of agents within the project
+		litmusctl get agents --project-id=""
+
+		Note: The default location of the config file is $HOME/.litmusconfig, and can be overridden by a --config flag
+	`,
 }

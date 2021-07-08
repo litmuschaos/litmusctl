@@ -13,21 +13,17 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package version
+package types
 
-import (
-	"fmt"
-	"os"
-
-	"github.com/spf13/cobra"
-)
-
-// versionCmd represents the version command
-var VersionCmd = &cobra.Command{
-	Use:   "version",
-	Short: "Displays the version of litmusctl",
-	Long:  ``,
-	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Litmusctl version: ", os.Getenv("CLIVersion"))
-	},
+type Agent struct {
+	AgentName      string `json:"cluster_name"`
+	Mode           string
+	Description    string `json:"description,omitempty"`
+	PlatformName   string `json:"platform_name"`
+	ProjectId      string `json:"project_id"`
+	ClusterType    string `json:"cluster_type"`
+	Namespace      string
+	ServiceAccount string
+	NsExists       bool
+	SAExists       bool
 }
