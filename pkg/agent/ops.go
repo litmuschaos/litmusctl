@@ -62,12 +62,12 @@ repeat:
 
 // GetMode gets mode of agent installation as input
 func GetModeType() string {
-	var mode int = 1
+repeat:
+	var mode = 1
 	fmt.Println("\n🔌 Installation Modes:\n1. Cluster\n2. Namespace")
 	fmt.Print("\n👉 Select Mode [", utils.DefaultMode, "]: ")
 	fmt.Scanln(&mode)
 
-repeat:
 	if mode == 1 {
 		return "cluster"
 	}
@@ -76,7 +76,7 @@ repeat:
 		return "namespace"
 	}
 
-	for mode < 1 || mode > 2 {
+	if mode != 1 || mode != 2 {
 		fmt.Println("🚫 Invalid mode. Please enter the correct mode")
 		goto repeat
 	}
