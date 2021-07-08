@@ -79,7 +79,7 @@ var agentsCmd = &cobra.Command{
 func init() {
 	GetCmd.AddCommand(agentsCmd)
 
-	agentsCmd.Flags().String("project-id", "", "Help message for toggle")
+	agentsCmd.Flags().String("project-id", "", "Set the project-id. To retrieve projects. Apply `litmusctl get projects`")
 
 	agentsCmd.Flags().StringP("output", "o", "", "Output format. One of:\njson|yaml")
 }

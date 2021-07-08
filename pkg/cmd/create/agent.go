@@ -33,7 +33,7 @@ var agentCmd = &cobra.Command{
 	Short: `Create an external agent.
 	Example(s):
 	#create an agent
-	litmusctl create agent --agent-name="new-agent" --create-project --non-interactive
+	litmusctl create agent --agent-name="new-agent" --non-interactive
 
 	#create an agent within a project
 	litmusctl create agent --agent-name="new-agent" --project-id="d861b650-1549-4574-b2ba-ab754058dd04" --non-interactive
