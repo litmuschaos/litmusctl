@@ -21,6 +21,7 @@ import (
 	"github.com/fatih/color"
 	"log"
 	"os"
+	"os/exec"
 
 	"github.com/litmuschaos/litmusctl/pkg/utils"
 	authorizationv1 "k8s.io/api/authorization/v1"
@@ -30,6 +31,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/discovery"
 	authorizationv1client "k8s.io/client-go/kubernetes/typed/authorization/v1"
+
 )
 
 type CanIOptions struct {
@@ -45,7 +47,7 @@ type CanIOptions struct {
 }
 
 var (
-	cyan = color.New(color.FgCyan)
+	cyan = color.New(color.FgCyan, color.Bold)
 	red = color.New(color.FgRed)
 )
 
@@ -81,8 +83,9 @@ func CheckSAPermissions(params CheckSAPermissionsParams, kubeconfig *string) (bo
 	o.Resource.Resource = params.Resource
 	client, err := ClientSet(kubeconfig)
 	if err != nil {
-		log.Fatal(err)
+		return false, err
 	}
+
 	AuthClient := client.AuthorizationV1()
 
 	sar := &authorizationv1.SelfSubjectAccessReview{
@@ -105,11 +108,11 @@ func CheckSAPermissions(params CheckSAPermissionsParams, kubeconfig *string) (bo
 
 	if response.Status.Allowed {
 		if params.Print {
-			cyan.Println("🔑 ", params.Resource, "- ✅")
+			cyan.Print("\n🔑 ", params.Resource, " ✅")
 		}
 	} else {
 		if params.Print {
-			cyan.Println("🔑 ", params.Resource, "- ❌")
+			cyan.Print("\n🔑 ", params.Resource, " ❌")
 		}
 		if len(response.Status.Reason) > 0 {
 			cyan.Println(response.Status.Reason)
@@ -131,11 +134,13 @@ start:
 	)
 
 	if mode == "namespace" {
-		cyan.Print("\nEnter the namespace (existing) [Default: ", utils.DefaultNs, "]: ")
+		cyan.Print("\nEnter the namespace (existing namespace) [Default: ", utils.DefaultNs, "]: ")
 		fmt.Scanln(&namespace)
 
+
+
 	} else if mode == "cluster" {
-		cyan.Print("\nEnter the namespace (new or existing) [Default: ", utils.DefaultNs, "]: ")
+		cyan.Print("\nEnter the namespace (new or existing namespace) [Default: ", utils.DefaultNs, "]: ")
 		fmt.Scanln(&namespace)
 	} else {
 		red.Printf("\n 🚫 No mode selected \n")
@@ -265,4 +270,28 @@ func ValidSA(namespace string, kubeconfig *string) (string, bool) {
 		return sa, true
 	}
 	return sa, false
+}
+
+type ApplyYamlPrams struct {
+	Token    string
+	Endpoint string
+	YamlPath string
+}
+
+func ApplyYaml(params ApplyYamlPrams, kubeconfig string) (output string, err error) {
+	path := fmt.Sprintf("%s/%s/%s.yaml", params.Endpoint, params.YamlPath, params.Token)
+
+	var args []string
+	if kubeconfig != "" {
+		args = []string{"kubectl", "apply", "-f", path, "--kubeconfig", kubeconfig}
+	} else {
+		args = []string{"kubectl", "apply", "-f", path}
+	}
+
+	stdout, err := exec.Command(args[0], args[1:]...).CombinedOutput()
+	if err != nil {
+		return string(stdout), err
+	}
+
+	return string(stdout), err
 }

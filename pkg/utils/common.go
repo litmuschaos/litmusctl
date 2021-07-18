@@ -30,7 +30,6 @@ import (
 	"gopkg.in/yaml.v2"
 	"math/big"
 	"os"
-	"os/exec"
 )
 
 func Scanner() string {
@@ -42,30 +41,6 @@ func Scanner() string {
 		fmt.Fprintln(os.Stderr, "reading standard input:", err)
 	}
 	return ""
-}
-
-type ApplyYamlPrams struct {
-	Token    string
-	Endpoint string
-	YamlPath string
-}
-
-func ApplyYaml(params ApplyYamlPrams, kubeconfig string) (output string, err error) {
-	path := fmt.Sprintf("%s/%s/%s.yaml", params.Endpoint, params.YamlPath, params.Token)
-
-	var args []string
-	if kubeconfig != "" {
-		args = []string{"kubectl", "apply", "-f", path, "--kubeconfig", kubeconfig}
-	} else {
-		args = []string{"kubectl", "apply", "-f", path}
-	}
-
-	stdout, err := exec.Command(args[0], args[1:]...).CombinedOutput()
-	if err != nil {
-		return "", err
-	}
-
-	return string(stdout), err
 }
 
 func PrintError(err error) {

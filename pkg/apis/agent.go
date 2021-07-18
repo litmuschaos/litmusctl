@@ -43,7 +43,7 @@ type AgentList struct {
 }
 
 var (
-	cyan = color.New(color.FgCyan)
+	cyan = color.New(color.FgCyan, color.Bold)
 	red = color.New(color.FgRed)
 )
 

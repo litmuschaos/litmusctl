@@ -206,13 +206,13 @@ var agentCmd = &cobra.Command{
 		}
 
 		//Apply agent connection yaml
-		yamlOutput, err := utils.ApplyYaml(utils.ApplyYamlPrams{
+		yamlOutput, err := k8s.ApplyYaml(k8s.ApplyYamlPrams{
 			Token:    agent.Data.UserAgentReg.Token,
 			Endpoint: credentials.Endpoint,
 			YamlPath: utils.ChaosYamlPath,
 		}, kubeconfig)
 		if err != nil {
-			cyan.Println("\n❌ Failed in applying connection yaml: " + err.Error() + "\n")
+			cyan.Println("\n❌ Failed in applying connection yaml: \n" + yamlOutput)
 			os.Exit(1)
 		}
 

@@ -28,7 +28,7 @@ import (
 )
 
 var (
-	cyan = color.New(color.FgCyan)
+	cyan = color.New(color.FgCyan, color.Bold)
 	red = color.New(color.FgRed)
 )
 
@@ -53,7 +53,7 @@ func GetProjectID(u apis.ProjectDetails) string {
 	}
 
 repeat:
-	cyan.Printf("\nSelect a project [1-%s]: ", fmt.Sprint(len(u.Data.GetUser.Projects)))
+	cyan.Printf("\nSelect a project [Range: 1-%s]: ", fmt.Sprint(len(u.Data.GetUser.Projects)))
 	fmt.Scanln(&pid)
 
 	for pid < 1 || pid > len(u.Data.GetUser.Projects) {
