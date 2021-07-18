@@ -16,7 +16,7 @@ limitations under the License.
 package config
 
 import (
-	"fmt"
+	"github.com/fatih/color"
 	"os"
 	"text/tabwriter"
 
@@ -36,14 +36,18 @@ var getAccountsCmd = &cobra.Command{
 		obj, err := config.YamltoObject(configFilePath)
 		utils.PrintError(err)
 
+		var (
+			cyan_b = color.New(color.FgCyan, color.Bold)
+			cyan = color.New(color.FgCyan)
+		)
 		writer := tabwriter.NewWriter(os.Stdout, 0, 8, 1, '\t', tabwriter.AlignRight)
-		fmt.Fprintln(writer, "CURRENT\tENDPOINT\tUSERNAME\tEXPIRESIN")
+		cyan_b.Fprintln(writer, "CURRENT\tENDPOINT\tUSERNAME\tEXPIRESIN")
 		for _, account := range obj.Accounts {
 			for _, user := range account.Users {
 				if obj.CurrentUser == user.Username && obj.CurrentAccount == account.Endpoint {
-					fmt.Fprintln(writer, "*"+"\t"+account.Endpoint+"\t"+user.Username+"\t"+user.ExpiresIn)
+					cyan.Fprintln(writer, "*"+"\t"+account.Endpoint+"\t"+user.Username+"\t"+user.ExpiresIn)
 				} else {
-					fmt.Fprintln(writer, ""+"\t"+account.Endpoint+"\t"+user.Username+"\t"+user.ExpiresIn)
+					cyan.Fprintln(writer, ""+"\t"+account.Endpoint+"\t"+user.Username+"\t"+user.ExpiresIn)
 				}
 			}
 		}

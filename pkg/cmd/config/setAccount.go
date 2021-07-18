@@ -17,6 +17,7 @@ package config
 
 import (
 	"fmt"
+	"github.com/fatih/color"
 	"net/url"
 	"os"
 	"strings"
@@ -33,17 +34,18 @@ import (
 // setAccountCmd represents the setAccount command
 var setAccountCmd = &cobra.Command{
 	Use:   "set-account",
-	Short: "Sets an account entry in litmusconfig",
-	Long: `Sets an account entry in litmusconfig. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: `Sets an account entry in litmusconfig.
+		Examples(s)
+		#set a new account
+		litmusctl config set-account  --endpoint "" --password "" --username ""
+		`,
 	Run: func(cmd *cobra.Command, args []string) {
 		configFilePath := utils.GetLitmusConfigPath(cmd)
 
 		var (
 			authInput types.AuthInput
+			cyan = color.New(color.FgCyan, color.Bold)
+			red = color.New(color.FgRed)
 			err       error
 		)
 
@@ -57,10 +59,12 @@ to quickly create a Cobra application.`,
 		utils.PrintError(err)
 
 		if authInput.Endpoint == "" {
-			fmt.Print("\n👉 Host endpoint where litmus is installed: ")
+			cyan.Print("\nHost endpoint where litmus is installed: ")
 			fmt.Scanln(&authInput.Endpoint)
+
+
 			for authInput.Endpoint == "" {
-				fmt.Println("⛔ Host URL can't be empty!!")
+				red.Println("\n⛔ Host URL can't be empty!!")
 				os.Exit(1)
 			}
 
@@ -72,7 +76,7 @@ to quickly create a Cobra application.`,
 		}
 
 		if authInput.Username == "" {
-			fmt.Print("🤔 Username [", utils.DefaultUsername, "]: ")
+			cyan.Print("\nUsername [Default: ", utils.DefaultUsername, "]: ")
 			fmt.Scanln(&authInput.Username)
 			if authInput.Username == "" {
 				authInput.Username = utils.DefaultUsername
@@ -80,12 +84,12 @@ to quickly create a Cobra application.`,
 		}
 
 		if authInput.Password == "" {
-			fmt.Print("🙈 Password: ")
+			cyan.Print("\nPassword: ")
 			pass, err := term.ReadPassword(0)
 			utils.PrintError(err)
 
 			if pass == nil {
-				fmt.Println("\n⛔ Password cannot be empty!")
+				red.Println("\n⛔ Password cannot be empty!")
 				os.Exit(1)
 			}
 
@@ -94,19 +98,17 @@ to quickly create a Cobra application.`,
 
 		if authInput.Endpoint != "" && authInput.Username != "" && authInput.Password != "" {
 			exists := config.FileExists(configFilePath)
-			lgt, err := config.GetFileLength(configFilePath)
-			utils.PrintError(err)
+			var lgt int
+			if exists {
+				lgt, err = config.GetFileLength(configFilePath)
+				utils.PrintError(err)
+			}
 
 			resp, err := apis.Auth(authInput)
 			utils.PrintError(err)
 
-			var (
-				timeNow = time.Now()
-				newTime = timeNow.Add(time.Second * time.Duration(resp.ExpiresIn))
-			)
-
 			var user = types.User{
-				ExpiresIn: fmt.Sprint(newTime.Unix()),
+				ExpiresIn: fmt.Sprint(time.Now().Add(time.Second * time.Duration(resp.ExpiresIn)).Unix()),
 				Token:     resp.AccessToken,
 				Username:  authInput.Username,
 			}
@@ -151,9 +153,10 @@ to quickly create a Cobra application.`,
 				err = config.UpdateLitmusCtlConfig(updateLitmusCtlConfig, configFilePath)
 				utils.PrintError(err)
 			}
+			cyan.Printf("\naccount.username/%s configured", authInput.Username)
 
 		} else {
-			fmt.Println("Error: some flags are missing. Run 'litmusctl config set-account --help' for usage. ")
+			red.Println("\nError: some flags are missing. Run 'litmusctl config set-account --help' for usage. ")
 		}
 	},
 }

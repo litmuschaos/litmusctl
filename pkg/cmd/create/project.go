@@ -17,8 +17,7 @@ package create
 
 import (
 	"fmt"
-	"os"
-
+	"github.com/fatih/color"
 	"github.com/litmuschaos/litmusctl/pkg/apis"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
 
@@ -42,13 +41,11 @@ var projectCmd = &cobra.Command{
 		projectName, err := cmd.Flags().GetString("name")
 		utils.PrintError(err)
 
+		var cyan = color.New(color.FgCyan, color.Bold)
+
 		if projectName == "" {
-			fmt.Print("\n📁 Enter the project name: ")
+			cyan.Print("\nEnter a project name: ")
 			fmt.Scanln(&projectName)
-			for projectName == "" {
-				fmt.Println("⛔ Project name can't be empty!!")
-				os.Exit(1)
-			}
 		}
 
 		_, err = apis.CreateProjectRequest(projectName, credentials)

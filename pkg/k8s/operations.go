@@ -18,6 +18,7 @@ package k8s
 import (
 	"context"
 	"fmt"
+	"github.com/fatih/color"
 	"log"
 	"os"
 
@@ -42,6 +43,12 @@ type CanIOptions struct {
 	Subresource  string
 	ResourceName string
 }
+
+var (
+	cyan = color.New(color.FgCyan)
+	red = color.New(color.FgRed)
+)
+
 
 // NsExists checks if the given namespace already exists
 func NsExists(namespace string, kubeconfig *string) (bool, error) {
@@ -98,17 +105,17 @@ func CheckSAPermissions(params CheckSAPermissionsParams, kubeconfig *string) (bo
 
 	if response.Status.Allowed {
 		if params.Print {
-			fmt.Println("🔑 ", params.Resource, "- ✅")
+			cyan.Println("🔑 ", params.Resource, "- ✅")
 		}
 	} else {
 		if params.Print {
-			fmt.Println("🔑 ", params.Resource, "- ❌")
+			cyan.Println("🔑 ", params.Resource, "- ❌")
 		}
 		if len(response.Status.Reason) > 0 {
-			fmt.Println(response.Status.Reason)
+			cyan.Println(response.Status.Reason)
 		}
 		if len(response.Status.EvaluationError) > 0 {
-			fmt.Println(response.Status.EvaluationError)
+			red.Println(response.Status.EvaluationError)
 		}
 	}
 
@@ -124,14 +131,14 @@ start:
 	)
 
 	if mode == "namespace" {
-		fmt.Print("📁 Enter the namespace (existing) [", utils.DefaultNs, "]: ")
+		cyan.Print("\nEnter the namespace (existing) [Default: ", utils.DefaultNs, "]: ")
 		fmt.Scanln(&namespace)
 
 	} else if mode == "cluster" {
-		fmt.Print("📁 Enter the namespace (new or existing) [", utils.DefaultNs, "]: ")
+		cyan.Print("\nEnter the namespace (new or existing) [Default: ", utils.DefaultNs, "]: ")
 		fmt.Scanln(&namespace)
 	} else {
-		fmt.Printf("\n 🚫 No mode selected \n")
+		red.Printf("\n 🚫 No mode selected \n")
 		os.Exit(1)
 	}
 
@@ -140,20 +147,20 @@ start:
 	}
 	ok, err := NsExists(namespace, kubeconfig)
 	if err != nil {
-		fmt.Printf("\n 🚫 Namespace existence check failed: {%s}\n", err.Error())
+		red.Printf("\n 🚫 Namespace existence check failed: {%s}\n", err.Error())
 		os.Exit(1)
 	}
 	if ok {
 		if podExists(podExistsParams{namespace, label}, kubeconfig) {
-			fmt.Println("🚫 Subscriber already present. Please enter a different namespace")
+			red.Println("🚫 Subscriber already present. Please enter a different namespace")
 			goto start
 		} else {
 			nsExists = true
-			fmt.Println("👍 Continuing with", namespace, "namespace")
+			cyan.Println("👍 Continuing with", namespace, "namespace")
 		}
 	} else {
 		if val, _ := CheckSAPermissions(CheckSAPermissionsParams{"create", "namespace", false}, kubeconfig); !val {
-			fmt.Println("🚫 You don't have permissions to create a namespace.\n🙄 Please enter an existing namespace.")
+			red.Println("🚫 You don't have permissions to create a namespace.\n🙄 Please enter an existing namespace.")
 			goto start
 		}
 		nsExists = false
@@ -184,9 +191,9 @@ func WatchPod(params WatchPodParams, kubeconfig *string) {
 		if !ok {
 			log.Fatal("unexpected type")
 		}
-		fmt.Println("💡 Connecting agent to Litmus Portal.")
+		cyan.Println("💡 Connecting agent to Litmus Portal.")
 		if p.Status.Phase == "Running" {
-			fmt.Println("🏃 Agents running!!")
+			cyan.Println("🏃 Agents running!!")
 			watch.Stop()
 			break
 		}
@@ -248,13 +255,13 @@ func SAExists(params SAExistsParams, kubeconfig *string) bool {
 // ValidSA gets a valid service account as input
 func ValidSA(namespace string, kubeconfig *string) (string, bool) {
 	var sa string
-	fmt.Print("🔑 Enter service account [", utils.DefaultSA, "]: ")
+	cyan.Print("\nEnter service account [Default: ", utils.DefaultSA, "]: ")
 	fmt.Scanln(&sa)
 	if sa == "" {
 		sa = utils.DefaultSA
 	}
 	if SAExists(SAExistsParams{namespace, sa}, kubeconfig) {
-		fmt.Println("👍 Using the existing service account")
+		cyan.Print("\n👍 Using the existing service account")
 		return sa, true
 	}
 	return sa, false

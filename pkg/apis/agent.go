@@ -19,6 +19,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/fatih/color"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
 	"io/ioutil"
 	"net/http"
@@ -41,25 +42,30 @@ type AgentList struct {
 	GetAgent []AgentDetails `json:"getCluster"`
 }
 
+var (
+	cyan = color.New(color.FgCyan)
+	red = color.New(color.FgRed)
+)
+
 // GetAgentList lists the agent connected to the specified project
 func GetAgentList(c types.Credentials, pid string) (AgentData, error) {
 	query := `{"query":"query{\n  getCluster(project_id: \"` + pid + `\"){\n  cluster_id cluster_name is_active \n  }\n}"}`
 	resp, err := SendRequest(SendRequestParams{Endpoint: c.Endpoint + utils.GQLAPIPath, Token: c.Token}, []byte(query))
 	if err != nil {
-		fmt.Println("Error in getting agent list: ", err)
+		red.Println("Error in getting agent list: ", err)
 	}
 
 	bodyBytes, err := ioutil.ReadAll(resp.Body)
 	defer resp.Body.Close()
 	if err != nil {
-		fmt.Println("Error in getting agent list: ", err)
+		red.Println("Error in getting agent list: ", err)
 	}
 
 	if resp.StatusCode == http.StatusOK {
 		var agent AgentData
 		err = json.Unmarshal(bodyBytes, &agent)
 		if err != nil {
-			fmt.Println("Error in getting agent list: ", err)
+			red.Println("Error in getting agent list: ", err)
 		}
 
 		return agent, nil

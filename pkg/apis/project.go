@@ -18,7 +18,6 @@ package apis
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
 	"io/ioutil"
 	"net/http"
@@ -33,6 +32,10 @@ type createProjectResponse struct {
 			ID   string `json:"id"`
 		} `json:"createProject"`
 	} `json:"data"`
+	Errors []struct {
+		Message string   `json:"message"`
+		Path    []string `json:"path"`
+	} `json:"errors"`
 }
 
 func CreateProjectRequest(projectName string, cred types.Credentials) (createProjectResponse, error) {
@@ -57,7 +60,11 @@ func CreateProjectRequest(projectName string, cred types.Credentials) (createPro
 			return createProjectResponse{}, err
 		}
 
-		fmt.Println("project/" + project.Data.CreateProject.Name + " created")
+		if len(project.Errors) > 0 {
+			return createProjectResponse{}, errors.New(project.Errors[0].Message)
+		}
+
+		cyan.Println("project/" + project.Data.CreateProject.Name + " created")
 		return project, nil
 	} else {
 		return createProjectResponse{}, errors.New("Unmatched status code:" + string(bodyBytes))

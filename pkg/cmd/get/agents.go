@@ -17,6 +17,7 @@ package get
 
 import (
 	"fmt"
+	"github.com/fatih/color"
 	"github.com/litmuschaos/litmusctl/pkg/apis"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
 	"github.com/spf13/cobra"
@@ -36,12 +37,18 @@ var agentsCmd = &cobra.Command{
 		projectID, err := cmd.Flags().GetString("project-id")
 		utils.PrintError(err)
 
+		var (
+			cyan_b = color.New(color.FgCyan, color.Bold)
+			cyan = color.New(color.FgCyan)
+			red = color.New(color.FgRed)
+		)
+
 		if projectID == "" {
-			fmt.Print("\n📁 Enter the Project ID: ")
+			cyan_b.Print("\nEnter the Project ID: ")
 			fmt.Scanln(&projectID)
 
 			for projectID == "" {
-				fmt.Println("⛔ Project ID can't be empty!!")
+				red.Println("⛔ Project ID can't be empty!!")
 				os.Exit(1)
 			}
 		}
@@ -60,8 +67,10 @@ var agentsCmd = &cobra.Command{
 			utils.PrintInYamlFormat(agents.Data)
 
 		case "":
-			writer := tabwriter.NewWriter(os.Stdout, 0, 8, 1, '\t', tabwriter.AlignRight)
-			fmt.Fprintln(writer, "AGENT ID\tAGENT NAME\tSTATUS")
+
+			writer := tabwriter.NewWriter(os.Stdout, 10, 10, 10, '\t', tabwriter.AlignRight)
+			cyan_b.Fprintln(writer, "AGENT ID\tAGENT NAME\tSTATUS")
+
 			for _, agent := range agents.Data.GetAgent {
 				var status string
 				if agent.IsActive {
@@ -69,7 +78,7 @@ var agentsCmd = &cobra.Command{
 				} else {
 					status = "INACTIVE"
 				}
-				fmt.Fprintln(writer, agent.ClusterID+"\t"+agent.AgentName+"\t"+status)
+				cyan.Fprintln(writer, agent.ClusterID + "\t" + agent.AgentName + "\t" + status + "\t")
 			}
 			writer.Flush()
 		}

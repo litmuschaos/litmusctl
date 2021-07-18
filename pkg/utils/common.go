@@ -22,6 +22,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/fatih/color"
 	"github.com/litmuschaos/litmusctl/pkg/config"
 	"github.com/litmuschaos/litmusctl/pkg/types"
 	"github.com/mitchellh/go-homedir"
@@ -69,7 +70,7 @@ func ApplyYaml(params ApplyYamlPrams, kubeconfig string) (output string, err err
 
 func PrintError(err error) {
 	if err != nil {
-		fmt.Println(err)
+		color.New(color.FgRed).Println(err)
 		os.Exit(1)
 	}
 }

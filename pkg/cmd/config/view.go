@@ -17,6 +17,7 @@ package config
 
 import (
 	"fmt"
+	"github.com/fatih/color"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
 	"io/ioutil"
 
@@ -36,7 +37,7 @@ var viewCmd = &cobra.Command{
 
 		exists := config.FileExists(configFilePath)
 		if !exists {
-			fmt.Println("File reading error open ", configFilePath, ": no such file or directory. Use --config or -c flag to point the configfile")
+			color.New(color.FgRed).Println("File reading error open ", configFilePath, ": no such file or directory. Use --config or -c flag to point the configfile")
 			os.Exit(1)
 		}
 

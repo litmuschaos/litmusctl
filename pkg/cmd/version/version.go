@@ -16,7 +16,7 @@ limitations under the License.
 package version
 
 import (
-	"fmt"
+	"github.com/fatih/color"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -28,6 +28,6 @@ var VersionCmd = &cobra.Command{
 	Short: "Displays the version of litmusctl",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Litmusctl version: ", os.Getenv("CLIVersion"))
+		color.New(color.FgCyan, color.Bold).Println("Litmusctl version: ", os.Getenv("CLIVersion"))
 	},
 }
