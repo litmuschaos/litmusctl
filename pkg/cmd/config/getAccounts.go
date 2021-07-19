@@ -18,7 +18,9 @@ package config
 import (
 	"fmt"
 	"os"
+	"strconv"
 	"text/tabwriter"
+	"time"
 
 	"github.com/litmuschaos/litmusctl/pkg/config"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
@@ -40,8 +42,13 @@ var getAccountsCmd = &cobra.Command{
 		fmt.Fprintln(writer, "CURRENT\tENDPOINT\tUSERNAME\tEXPIRESIN")
 		for _, account := range obj.Accounts {
 			for _, user := range account.Users {
+				intTime, err := strconv.ParseInt(user.ExpiresIn, 10, 64)
+				utils.PrintError(err)
+
+				humanTime := time.Unix(intTime, 0)
+
 				if obj.CurrentUser == user.Username && obj.CurrentAccount == account.Endpoint {
-					fmt.Fprintln(writer, "*"+"\t"+account.Endpoint+"\t"+user.Username+"\t"+user.ExpiresIn)
+					fmt.Fprintln(writer, "*"+"\t"+account.Endpoint+"\t"+user.Username+"\t"+humanTime.String())
 				} else {
 					fmt.Fprintln(writer, ""+"\t"+account.Endpoint+"\t"+user.Username+"\t"+user.ExpiresIn)
 				}
