@@ -16,7 +16,6 @@ limitations under the License.
 package get
 
 import (
-	"github.com/fatih/color"
 	"os"
 	"text/tabwriter"
 
@@ -40,11 +39,6 @@ var projectsCmd = &cobra.Command{
 		output, err := cmd.Flags().GetString("output")
 		utils.PrintError(err)
 
-		var (
-			cyan_b = color.New(color.FgCyan, color.Bold)
-			cyan = color.New(color.FgCyan)
-		)
-
 		switch output {
 		case "json":
 			utils.PrintInJsonFormat(projects.Data)
@@ -54,9 +48,9 @@ var projectsCmd = &cobra.Command{
 
 		case "":
 			writer := tabwriter.NewWriter(os.Stdout, 8, 8, 8, '\t', tabwriter.AlignRight)
-			cyan_b.Fprintln(writer, "PROJECT ID\tPROJECT NAME\tCREATEDAT")
+			utils.White_B.Fprintln(writer, "PROJECT ID\tPROJECT NAME\tCREATEDAT")
 			for _, project := range projects.Data.ListProjects {
-				cyan.Fprintln(writer, project.ID+"\t"+project.Name+"\t"+project.CreatedAt+"\t")
+				utils.White.Fprintln(writer, project.ID+"\t"+project.Name+"\t"+project.CreatedAt+"\t")
 			}
 			writer.Flush()
 		}

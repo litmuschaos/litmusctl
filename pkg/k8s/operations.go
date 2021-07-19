@@ -18,7 +18,6 @@ package k8s
 import (
 	"context"
 	"fmt"
-	"github.com/fatih/color"
 	"log"
 	"os"
 	"os/exec"
@@ -31,7 +30,6 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/discovery"
 	authorizationv1client "k8s.io/client-go/kubernetes/typed/authorization/v1"
-
 )
 
 type CanIOptions struct {
@@ -45,12 +43,6 @@ type CanIOptions struct {
 	Subresource  string
 	ResourceName string
 }
-
-var (
-	cyan = color.New(color.FgCyan, color.Bold)
-	red = color.New(color.FgRed)
-)
-
 
 // NsExists checks if the given namespace already exists
 func NsExists(namespace string, kubeconfig *string) (bool, error) {
@@ -108,17 +100,17 @@ func CheckSAPermissions(params CheckSAPermissionsParams, kubeconfig *string) (bo
 
 	if response.Status.Allowed {
 		if params.Print {
-			cyan.Print("\n🔑 ", params.Resource, " ✅")
+			utils.White_B.Print("\n🔑 ", params.Resource, " ✅")
 		}
 	} else {
 		if params.Print {
-			cyan.Print("\n🔑 ", params.Resource, " ❌")
+			utils.White_B.Print("\n🔑 ", params.Resource, " ❌")
 		}
 		if len(response.Status.Reason) > 0 {
-			cyan.Println(response.Status.Reason)
+			utils.White_B.Println(response.Status.Reason)
 		}
 		if len(response.Status.EvaluationError) > 0 {
-			red.Println(response.Status.EvaluationError)
+			utils.Red.Println(response.Status.EvaluationError)
 		}
 	}
 
@@ -134,16 +126,14 @@ start:
 	)
 
 	if mode == "namespace" {
-		cyan.Print("\nEnter the namespace (existing namespace) [Default: ", utils.DefaultNs, "]: ")
+		utils.White_B.Print("\nEnter the namespace (existing namespace) [Default: ", utils.DefaultNs, "]: ")
 		fmt.Scanln(&namespace)
-
-
 
 	} else if mode == "cluster" {
-		cyan.Print("\nEnter the namespace (new or existing namespace) [Default: ", utils.DefaultNs, "]: ")
+		utils.White_B.Print("\nEnter the namespace (new or existing namespace) [Default: ", utils.DefaultNs, "]: ")
 		fmt.Scanln(&namespace)
 	} else {
-		red.Printf("\n 🚫 No mode selected \n")
+		utils.Red.Printf("\n 🚫 No mode selected \n")
 		os.Exit(1)
 	}
 
@@ -152,20 +142,20 @@ start:
 	}
 	ok, err := NsExists(namespace, kubeconfig)
 	if err != nil {
-		red.Printf("\n 🚫 Namespace existence check failed: {%s}\n", err.Error())
+		utils.Red.Printf("\n 🚫 Namespace existence check failed: {%s}\n", err.Error())
 		os.Exit(1)
 	}
 	if ok {
 		if podExists(podExistsParams{namespace, label}, kubeconfig) {
-			red.Println("🚫 Subscriber already present. Please enter a different namespace")
+			utils.Red.Println("🚫 Subscriber already present. Please enter a different namespace")
 			goto start
 		} else {
 			nsExists = true
-			cyan.Println("👍 Continuing with", namespace, "namespace")
+			utils.White_B.Println("👍 Continuing with", namespace, "namespace")
 		}
 	} else {
 		if val, _ := CheckSAPermissions(CheckSAPermissionsParams{"create", "namespace", false}, kubeconfig); !val {
-			red.Println("🚫 You don't have permissions to create a namespace.\n🙄 Please enter an existing namespace.")
+			utils.Red.Println("🚫 You don't have permissions to create a namespace.\n🙄 Please enter an existing namespace.")
 			goto start
 		}
 		nsExists = false
@@ -196,9 +186,9 @@ func WatchPod(params WatchPodParams, kubeconfig *string) {
 		if !ok {
 			log.Fatal("unexpected type")
 		}
-		cyan.Println("💡 Connecting agent to Litmus Portal.")
+		utils.White_B.Println("💡 Connecting agent to Litmus Portal.")
 		if p.Status.Phase == "Running" {
-			cyan.Println("🏃 Agents running!!")
+			utils.White_B.Println("🏃 Agents running!!")
 			watch.Stop()
 			break
 		}
@@ -260,13 +250,13 @@ func SAExists(params SAExistsParams, kubeconfig *string) bool {
 // ValidSA gets a valid service account as input
 func ValidSA(namespace string, kubeconfig *string) (string, bool) {
 	var sa string
-	cyan.Print("\nEnter service account [Default: ", utils.DefaultSA, "]: ")
+	utils.White_B.Print("\nEnter service account [Default: ", utils.DefaultSA, "]: ")
 	fmt.Scanln(&sa)
 	if sa == "" {
 		sa = utils.DefaultSA
 	}
 	if SAExists(SAExistsParams{namespace, sa}, kubeconfig) {
-		cyan.Print("\n👍 Using the existing service account")
+		utils.White_B.Print("\n👍 Using the existing service account")
 		return sa, true
 	}
 	return sa, false

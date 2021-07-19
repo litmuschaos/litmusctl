@@ -64,7 +64,7 @@ func CreateProjectRequest(projectName string, cred types.Credentials) (createPro
 			return createProjectResponse{}, errors.New(project.Errors[0].Message)
 		}
 
-		cyan.Println("project/" + project.Data.CreateProject.Name + " created")
+		utils.White_B.Println("project/" + project.Data.CreateProject.Name + " created")
 		return project, nil
 	} else {
 		return createProjectResponse{}, errors.New("Unmatched status code:" + string(bodyBytes))
@@ -79,6 +79,10 @@ type listProjectResponse struct {
 			CreatedAt string `json:"created_at"`
 		} `json:"listProjects"`
 	} `json:"data"`
+	Errors []struct {
+		Message string   `json:"message"`
+		Path    []string `json:"path"`
+	} `json:"errors"`
 }
 
 func ListProject(cred types.Credentials) (listProjectResponse, error) {
@@ -102,6 +106,10 @@ func ListProject(cred types.Credentials) (listProjectResponse, error) {
 			return listProjectResponse{}, err
 		}
 
+		if len(data.Errors) > 0 {
+			return listProjectResponse{}, errors.New(data.Errors[0].Message)
+		}
+
 		return data, nil
 	} else {
 		return listProjectResponse{}, errors.New("Unmatched status code:" + string(bodyBytes))
@@ -109,7 +117,11 @@ func ListProject(cred types.Credentials) (listProjectResponse, error) {
 }
 
 type ProjectDetails struct {
-	Data Data `json:"data"`
+	Data   Data `json:"data"`
+	Errors []struct {
+		Message string   `json:"message"`
+		Path    []string `json:"path"`
+	} `json:"errors"`
 }
 
 type Data struct {
@@ -153,6 +165,10 @@ func GetProjectDetails(c types.Credentials) (ProjectDetails, error) {
 		err = json.Unmarshal(bodyBytes, &project)
 		if err != nil {
 			return ProjectDetails{}, err
+		}
+
+		if len(project.Errors) > 0 {
+			return ProjectDetails{}, errors.New(project.Errors[0].Message)
 		}
 
 		return project, nil

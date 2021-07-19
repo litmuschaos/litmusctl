@@ -19,7 +19,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/fatih/color"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
 	"io/ioutil"
 	"net/http"
@@ -28,7 +27,11 @@ import (
 )
 
 type AgentData struct {
-	Data AgentList `json:"data"`
+	Data   AgentList `json:"data"`
+	Errors []struct {
+		Message string   `json:"message"`
+		Path    []string `json:"path"`
+	} `json:"errors"`
 }
 
 type AgentDetails struct {
@@ -42,42 +45,43 @@ type AgentList struct {
 	GetAgent []AgentDetails `json:"getCluster"`
 }
 
-var (
-	cyan = color.New(color.FgCyan, color.Bold)
-	red = color.New(color.FgRed)
-)
-
 // GetAgentList lists the agent connected to the specified project
 func GetAgentList(c types.Credentials, pid string) (AgentData, error) {
 	query := `{"query":"query{\n  getCluster(project_id: \"` + pid + `\"){\n  cluster_id cluster_name is_active \n  }\n}"}`
 	resp, err := SendRequest(SendRequestParams{Endpoint: c.Endpoint + utils.GQLAPIPath, Token: c.Token}, []byte(query))
 	if err != nil {
-		red.Println("Error in getting agent list: ", err)
+		utils.Red.Println("Error in getting agent list: ", err)
 	}
 
 	bodyBytes, err := ioutil.ReadAll(resp.Body)
 	defer resp.Body.Close()
 	if err != nil {
-		red.Println("Error in getting agent list: ", err)
+		utils.Red.Println("Error in getting agent list: ", err)
 	}
 
 	if resp.StatusCode == http.StatusOK {
 		var agent AgentData
 		err = json.Unmarshal(bodyBytes, &agent)
 		if err != nil {
-			red.Println("Error in getting agent list: ", err)
+			utils.Red.Println("Error in getting agent list: ", err)
+		}
+
+		if len(agent.Errors) > 0 {
+			return AgentData{}, errors.New(agent.Errors[0].Message)
 		}
 
 		return agent, nil
-
 	} else {
 		return AgentData{}, err
 	}
 }
 
 type AgentConnectionData struct {
-	Errors []Errors     `json:"errors"`
-	Data   AgentConnect `json:"data"`
+	Errors []struct {
+		Message string   `json:"message"`
+		Path    []string `json:"path"`
+	} `json:"errors"`
+	Data AgentConnect `json:"data"`
 }
 
 type Errors struct {
@@ -116,6 +120,9 @@ func ConnectAgent(agent types.Agent, cred types.Credentials) (AgentConnectionDat
 			return AgentConnectionData{}, errors.New("Error in registering agent: " + err.Error())
 		}
 
+		if len(connectAgent.Errors) > 0 {
+			return AgentConnectionData{}, errors.New(connectAgent.Errors[0].Message)
+		}
 		return connectAgent, nil
 	} else {
 		return AgentConnectionData{}, err

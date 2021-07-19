@@ -17,7 +17,6 @@ package config
 
 import (
 	"fmt"
-	"github.com/fatih/color"
 	"github.com/litmuschaos/litmusctl/pkg/config"
 	"github.com/litmuschaos/litmusctl/pkg/types"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
@@ -33,21 +32,15 @@ var useAccountCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		configFilePath := utils.GetLitmusConfigPath(cmd)
 
-		var (
-			red = color.New(color.FgRed)
-			cyan = color.New(color.FgCyan, color.Bold)
-		)
-
 		endpoint, err := cmd.Flags().GetString("endpoint")
 		utils.PrintError(err)
 
 		if endpoint == "" {
-			cyan.Print("\nHost endpoint where litmus is installed: ")
+			utils.White_B.Print("\nHost endpoint where litmus is installed: ")
 			fmt.Scanln(&endpoint)
 
-
 			for endpoint == "" {
-				red.Println("\n⛔ Host URL can't be empty!!")
+				utils.Red.Println("\n⛔ Host URL can't be empty!!")
 				os.Exit(1)
 			}
 		}
@@ -56,18 +49,17 @@ var useAccountCmd = &cobra.Command{
 		utils.PrintError(err)
 
 		if username == "" {
-			cyan.Print("\nUsername: ")
+			utils.White_B.Print("\nUsername: ")
 			fmt.Scanln(&username)
 
-
 			for username == "" {
-				red.Println("\n⛔ Username cannot be empty!!")
+				utils.Red.Println("\n⛔ Username cannot be empty!!")
 				os.Exit(1)
 			}
 		}
 
 		if username == "" || endpoint == "" {
-			red.Println("endpoint or username is not set")
+			utils.Red.Println("endpoint or username is not set")
 			os.Exit(1)
 		}
 
@@ -88,11 +80,11 @@ var useAccountCmd = &cobra.Command{
 				}, configFilePath)
 				utils.PrintError(err)
 			} else {
-				red.Println("\n⛔ Account not exists")
+				utils.Red.Println("\n⛔ Account not exists")
 				os.Exit(1)
 			}
 		} else {
-			red.Println("\n⛔ File not exists")
+			utils.Red.Println("\n⛔ File not exists")
 			os.Exit(1)
 		}
 	},

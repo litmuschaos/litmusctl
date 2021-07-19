@@ -17,7 +17,6 @@ package create
 
 import (
 	"fmt"
-	"github.com/fatih/color"
 	"github.com/litmuschaos/litmusctl/pkg/apis"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
 
@@ -41,10 +40,8 @@ var projectCmd = &cobra.Command{
 		projectName, err := cmd.Flags().GetString("name")
 		utils.PrintError(err)
 
-		var cyan = color.New(color.FgCyan, color.Bold)
-
 		if projectName == "" {
-			cyan.Print("\nEnter a project name: ")
+			utils.White_B.Print("\nEnter a project name: ")
 			fmt.Scanln(&projectName)
 		}
 

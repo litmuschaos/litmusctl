@@ -17,7 +17,6 @@ package config
 
 import (
 	"fmt"
-	"github.com/fatih/color"
 	"net/url"
 	"os"
 	"strings"
@@ -33,7 +32,7 @@ import (
 
 // setAccountCmd represents the setAccount command
 var setAccountCmd = &cobra.Command{
-	Use:   "set-account",
+	Use: "set-account",
 	Short: `Sets an account entry in litmusconfig.
 		Examples(s)
 		#set a new account
@@ -44,8 +43,6 @@ var setAccountCmd = &cobra.Command{
 
 		var (
 			authInput types.AuthInput
-			cyan = color.New(color.FgCyan, color.Bold)
-			red = color.New(color.FgRed)
 			err       error
 		)
 
@@ -59,12 +56,11 @@ var setAccountCmd = &cobra.Command{
 		utils.PrintError(err)
 
 		if authInput.Endpoint == "" {
-			cyan.Print("\nHost endpoint where litmus is installed: ")
+			utils.White_B.Print("\nHost endpoint where litmus is installed: ")
 			fmt.Scanln(&authInput.Endpoint)
 
-
 			for authInput.Endpoint == "" {
-				red.Println("\n⛔ Host URL can't be empty!!")
+				utils.Red.Println("\n⛔ Host URL can't be empty!!")
 				os.Exit(1)
 			}
 
@@ -76,7 +72,7 @@ var setAccountCmd = &cobra.Command{
 		}
 
 		if authInput.Username == "" {
-			cyan.Print("\nUsername [Default: ", utils.DefaultUsername, "]: ")
+			utils.White_B.Print("\nUsername [Default: ", utils.DefaultUsername, "]: ")
 			fmt.Scanln(&authInput.Username)
 			if authInput.Username == "" {
 				authInput.Username = utils.DefaultUsername
@@ -84,12 +80,12 @@ var setAccountCmd = &cobra.Command{
 		}
 
 		if authInput.Password == "" {
-			cyan.Print("\nPassword: ")
+			utils.White_B.Print("\nPassword: ")
 			pass, err := term.ReadPassword(0)
 			utils.PrintError(err)
 
 			if pass == nil {
-				red.Println("\n⛔ Password cannot be empty!")
+				utils.Red.Println("\n⛔ Password cannot be empty!")
 				os.Exit(1)
 			}
 
@@ -153,10 +149,10 @@ var setAccountCmd = &cobra.Command{
 				err = config.UpdateLitmusCtlConfig(updateLitmusCtlConfig, configFilePath)
 				utils.PrintError(err)
 			}
-			cyan.Printf("\naccount.username/%s configured", authInput.Username)
+			utils.White_B.Printf("\naccount.username/%s configured", authInput.Username)
 
 		} else {
-			red.Println("\nError: some flags are missing. Run 'litmusctl config set-account --help' for usage. ")
+			utils.Red.Println("\nError: some flags are missing. Run 'litmusctl config set-account --help' for usage. ")
 		}
 	},
 }

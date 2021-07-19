@@ -32,6 +32,12 @@ import (
 	"os"
 )
 
+var (
+	Red     = color.New(color.FgRed)
+	White_B = color.New(color.FgWhite, color.Bold)
+	White   = color.New(color.FgWhite)
+)
+
 func Scanner() string {
 	scanner := bufio.NewScanner(os.Stdin)
 	for scanner.Scan() {
@@ -42,10 +48,9 @@ func Scanner() string {
 	}
 	return ""
 }
-
 func PrintError(err error) {
 	if err != nil {
-		color.New(color.FgRed).Println(err)
+		Red.Println(err)
 		os.Exit(1)
 	}
 }
@@ -100,7 +105,7 @@ func PrintInJsonFormat(inf interface{}) {
 	err = json.Indent(&out, byt, "", "  ")
 	PrintError(err)
 
-	fmt.Println(out.String())
+	White.Println(out.String())
 
 }
 
@@ -108,7 +113,7 @@ func PrintInYamlFormat(inf interface{}) {
 	byt, err := yaml.Marshal(inf)
 	PrintError(err)
 
-	fmt.Println(string(byt))
+	White.Println(string(byt))
 }
 
 func GenerateRandomString(n int) (string, error) {
