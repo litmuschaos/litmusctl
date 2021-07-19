@@ -37,11 +37,11 @@ var agentsCmd = &cobra.Command{
 		utils.PrintError(err)
 
 		if projectID == "" {
-			fmt.Print("\n📁 Enter the Project ID: ")
+			utils.White_B.Print("\nEnter the Project ID: ")
 			fmt.Scanln(&projectID)
 
 			for projectID == "" {
-				fmt.Println("⛔ Project ID can't be empty!!")
+				utils.Red.Println("⛔ Project ID can't be empty!!")
 				os.Exit(1)
 			}
 		}
@@ -60,8 +60,10 @@ var agentsCmd = &cobra.Command{
 			utils.PrintInYamlFormat(agents.Data)
 
 		case "":
-			writer := tabwriter.NewWriter(os.Stdout, 0, 8, 1, '\t', tabwriter.AlignRight)
-			fmt.Fprintln(writer, "AGENT ID\tAGENT NAME\tSTATUS")
+
+			writer := tabwriter.NewWriter(os.Stdout, 10, 10, 10, '\t', tabwriter.AlignRight)
+			utils.White_B.Fprintln(writer, "AGENT ID\tAGENT NAME\tSTATUS")
+
 			for _, agent := range agents.Data.GetAgent {
 				var status string
 				if agent.IsActive {
@@ -69,7 +71,7 @@ var agentsCmd = &cobra.Command{
 				} else {
 					status = "INACTIVE"
 				}
-				fmt.Fprintln(writer, agent.ClusterID+"\t"+agent.AgentName+"\t"+status)
+				utils.White.Fprintln(writer, agent.ClusterID+"\t"+agent.AgentName+"\t"+status+"\t")
 			}
 			writer.Flush()
 		}

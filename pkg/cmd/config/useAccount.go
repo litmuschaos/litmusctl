@@ -17,12 +17,11 @@ package config
 
 import (
 	"fmt"
-	"os"
-
 	"github.com/litmuschaos/litmusctl/pkg/config"
 	"github.com/litmuschaos/litmusctl/pkg/types"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
 	"github.com/spf13/cobra"
+	"os"
 )
 
 // useAccountCmd represents the useAccount command
@@ -33,14 +32,34 @@ var useAccountCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		configFilePath := utils.GetLitmusConfigPath(cmd)
 
-		username, err := cmd.Flags().GetString("username")
-		utils.PrintError(err)
-
 		endpoint, err := cmd.Flags().GetString("endpoint")
 		utils.PrintError(err)
 
+		if endpoint == "" {
+			utils.White_B.Print("\nHost endpoint where litmus is installed: ")
+			fmt.Scanln(&endpoint)
+
+			for endpoint == "" {
+				utils.Red.Println("\n⛔ Host URL can't be empty!!")
+				os.Exit(1)
+			}
+		}
+
+		username, err := cmd.Flags().GetString("username")
+		utils.PrintError(err)
+
+		if username == "" {
+			utils.White_B.Print("\nUsername: ")
+			fmt.Scanln(&username)
+
+			for username == "" {
+				utils.Red.Println("\n⛔ Username cannot be empty!!")
+				os.Exit(1)
+			}
+		}
+
 		if username == "" || endpoint == "" {
-			fmt.Println("endpoint or username is not set")
+			utils.Red.Println("endpoint or username is not set")
 			os.Exit(1)
 		}
 
@@ -50,14 +69,22 @@ var useAccountCmd = &cobra.Command{
 		utils.PrintError(err)
 
 		if exists {
-			err = config.UpdateCurrent(types.Current{
-				CurrentAccount: endpoint,
-				CurrentUser:    username,
-			}, configFilePath)
+			litmusconfig, err := config.YamltoObject(configFilePath)
 			utils.PrintError(err)
 
+			isAccountExist := config.IsAccountExists(litmusconfig, username, endpoint)
+			if isAccountExist {
+				err = config.UpdateCurrent(types.Current{
+					CurrentAccount: endpoint,
+					CurrentUser:    username,
+				}, configFilePath)
+				utils.PrintError(err)
+			} else {
+				utils.Red.Println("\n⛔ Account not exists")
+				os.Exit(1)
+			}
 		} else {
-			fmt.Println("File Not exists")
+			utils.Red.Println("\n⛔ File not exists")
 			os.Exit(1)
 		}
 	},

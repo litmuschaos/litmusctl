@@ -16,7 +16,7 @@ limitations under the License.
 package k8s
 
 import (
-	"fmt"
+	"github.com/litmuschaos/litmusctl/pkg/utils"
 	"os"
 	"path/filepath"
 
@@ -33,7 +33,7 @@ func ClientSet(kubeconfig *string) (*kubernetes.Clientset, error) {
 			kcfg := filepath.Join(home, ".kube", "config")
 			kubeconfig = &kcfg
 		} else {
-			fmt.Println("ERROR: Clientset generation failed!")
+			utils.Red.Println("ERROR: Clientset generation failed!")
 			os.Exit(1)
 		}
 	}
@@ -41,13 +41,14 @@ func ClientSet(kubeconfig *string) (*kubernetes.Clientset, error) {
 	// create the config
 	config, err := clientcmd.BuildConfigFromFlags("", *kubeconfig)
 	if err != nil {
-		fmt.Println("ERROR: ", err.Error())
+		utils.Red.Println("ERROR: ", err.Error())
 		os.Exit(1)
 	}
+
 	// create the clientset
 	clientset, err := kubernetes.NewForConfig(config)
 	if err != nil {
-		fmt.Println("ERROR: ", err.Error())
+		utils.Red.Println("ERROR: ", err.Error())
 		os.Exit(1)
 	}
 	return clientset, err

@@ -167,3 +167,17 @@ func writeObjToFile(obj types.LitmuCtlConfig, filename string) error {
 
 	return nil
 }
+
+func IsAccountExists(obj types.LitmuCtlConfig, username string, endpoint string) bool {
+	for _, account := range obj.Accounts {
+		if account.Endpoint == endpoint {
+			for _, user := range account.Users {
+				if username == user.Username {
+					return true
+				}
+			}
+		}
+	}
+
+	return false
+}

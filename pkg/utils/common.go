@@ -22,6 +22,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/fatih/color"
 	"github.com/litmuschaos/litmusctl/pkg/config"
 	"github.com/litmuschaos/litmusctl/pkg/types"
 	"github.com/mitchellh/go-homedir"
@@ -29,7 +30,12 @@ import (
 	"gopkg.in/yaml.v2"
 	"math/big"
 	"os"
-	"os/exec"
+)
+
+var (
+	Red     = color.New(color.FgRed)
+	White_B = color.New(color.FgWhite, color.Bold)
+	White   = color.New(color.FgWhite)
 )
 
 func Scanner() string {
@@ -42,34 +48,9 @@ func Scanner() string {
 	}
 	return ""
 }
-
-type ApplyYamlPrams struct {
-	Token    string
-	Endpoint string
-	YamlPath string
-}
-
-func ApplyYaml(params ApplyYamlPrams, kubeconfig string) (output string, err error) {
-	path := fmt.Sprintf("%s/%s/%s.yaml", params.Endpoint, params.YamlPath, params.Token)
-
-	var args []string
-	if kubeconfig != "" {
-		args = []string{"kubectl", "apply", "-f", path, "--kubeconfig", kubeconfig}
-	} else {
-		args = []string{"kubectl", "apply", "-f", path}
-	}
-
-	stdout, err := exec.Command(args[0], args[1:]...).CombinedOutput()
-	if err != nil {
-		return "", err
-	}
-
-	return string(stdout), err
-}
-
 func PrintError(err error) {
 	if err != nil {
-		fmt.Println(err)
+		Red.Println(err)
 		os.Exit(1)
 	}
 }
@@ -124,7 +105,7 @@ func PrintInJsonFormat(inf interface{}) {
 	err = json.Indent(&out, byt, "", "  ")
 	PrintError(err)
 
-	fmt.Println(out.String())
+	White.Println(out.String())
 
 }
 
@@ -132,7 +113,7 @@ func PrintInYamlFormat(inf interface{}) {
 	byt, err := yaml.Marshal(inf)
 	PrintError(err)
 
-	fmt.Println(string(byt))
+	White.Println(string(byt))
 }
 
 func GenerateRandomString(n int) (string, error) {

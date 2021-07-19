@@ -18,7 +18,6 @@ package apis
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
 	"io/ioutil"
 	"net/http"
@@ -33,6 +32,10 @@ type createProjectResponse struct {
 			ID   string `json:"id"`
 		} `json:"createProject"`
 	} `json:"data"`
+	Errors []struct {
+		Message string   `json:"message"`
+		Path    []string `json:"path"`
+	} `json:"errors"`
 }
 
 func CreateProjectRequest(projectName string, cred types.Credentials) (createProjectResponse, error) {
@@ -57,7 +60,11 @@ func CreateProjectRequest(projectName string, cred types.Credentials) (createPro
 			return createProjectResponse{}, err
 		}
 
-		fmt.Println("project/" + project.Data.CreateProject.Name + " created")
+		if len(project.Errors) > 0 {
+			return createProjectResponse{}, errors.New(project.Errors[0].Message)
+		}
+
+		utils.White_B.Println("project/" + project.Data.CreateProject.Name + " created")
 		return project, nil
 	} else {
 		return createProjectResponse{}, errors.New("Unmatched status code:" + string(bodyBytes))
@@ -72,6 +79,10 @@ type listProjectResponse struct {
 			CreatedAt string `json:"created_at"`
 		} `json:"listProjects"`
 	} `json:"data"`
+	Errors []struct {
+		Message string   `json:"message"`
+		Path    []string `json:"path"`
+	} `json:"errors"`
 }
 
 func ListProject(cred types.Credentials) (listProjectResponse, error) {
@@ -95,6 +106,10 @@ func ListProject(cred types.Credentials) (listProjectResponse, error) {
 			return listProjectResponse{}, err
 		}
 
+		if len(data.Errors) > 0 {
+			return listProjectResponse{}, errors.New(data.Errors[0].Message)
+		}
+
 		return data, nil
 	} else {
 		return listProjectResponse{}, errors.New("Unmatched status code:" + string(bodyBytes))
@@ -102,7 +117,11 @@ func ListProject(cred types.Credentials) (listProjectResponse, error) {
 }
 
 type ProjectDetails struct {
-	Data Data `json:"data"`
+	Data   Data `json:"data"`
+	Errors []struct {
+		Message string   `json:"message"`
+		Path    []string `json:"path"`
+	} `json:"errors"`
 }
 
 type Data struct {
@@ -146,6 +165,10 @@ func GetProjectDetails(c types.Credentials) (ProjectDetails, error) {
 		err = json.Unmarshal(bodyBytes, &project)
 		if err != nil {
 			return ProjectDetails{}, err
+		}
+
+		if len(project.Errors) > 0 {
+			return ProjectDetails{}, errors.New(project.Errors[0].Message)
 		}
 
 		return project, nil
