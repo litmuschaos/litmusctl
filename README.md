@@ -1,22 +1,23 @@
 # Litmusctl
-
+[![BCH compliance](https://bettercodehub.com/edge/badge/litmuschaos/litmusctl?branch=master)](https://bettercodehub.com/)
 ![GitHub Workflow](https://github.com/litmuschaos/litmusctl/actions/workflows/push.yml/badge.svg?branch=master)
 [![GitHub stars](https://img.shields.io/github/stars/litmuschaos/litmusctl?style=social)](https://github.com/litmuschaos/litmusctl/stargazers)
-[![GitHub Release](https://img.shields.io/github/release/litmuschaos/litmusctl.svg?style=flat)]()  
+[![GitHub Release](https://img.shields.io/github/release/litmuschaos/litmusctl.svg?style=flat)]()
 
-Litmusctl is a command line interface to manage LitmusPortal services.
+The Litmuschaos command-line tool, litmusctl, allows you to manage litmuschaos's agent plane. 
+You can use litmusctl to create agents, project, and manage multiple litmuschaos accounts. For more information including a complete list of litmusctl operations, see the litmusctl reference documentation.
 
 ## Requirements
 
 The litmusctl CLI requires the following things:
 
-- Kubeconfig - litmusctl needs the kubeconfig of the k8s cluster where we need to connect litmus agents. The CLI currently uses the default path of kubeconfig i.e. `~/.kube/config`.
+- kubeconfig - litmusctl needs the kubeconfig of the k8s cluster where we need to connect litmus agents. The CLI currently uses the default path of kubeconfig i.e. `~/.kube/config`.
+- kubectl- litmusctl is using kubectl under the hood to apply the manifest. To install kubectl, follow:  ![install kubectl](https://kubernetes.io/docs/tasks/tools/#kubectl)]
+
 
 ## Installation
 
 To install the latest version of litmusctl follow the below steps:
-
-- Download the latest litmusctl(master) binary from:
 
 <table>
   <th>Platforms</th>
@@ -80,50 +81,45 @@ To install the latest version of litmusctl follow the below steps:
 <table>
 
 
-- Download the litmusctl(v0.2.0) binary from:
+### Linux/MacOS
 
-| Platforms                      | Download Link                                                                                           |
-| ------------------------------ | ------------------------------------------------------------------------------------------------------- |
-| litmusctl-darwin-386 (MacOS)   | [Click here](https://litmusctl-bucket.s3-eu-west-1.amazonaws.com/litmusctl-darwin-386-v0.2.0.tar.gz)    |
-| litmusctl-darwin-amd64 (MacOS) | [Click here](https://litmusctl-bucket.s3-eu-west-1.amazonaws.com/litmusctl-darwin-amd64-v0.2.0.tar.gz)  |
-| litmusctl-linux-386            | [Click here](https://litmusctl-bucket.s3-eu-west-1.amazonaws.com/litmusctl-linux-386-v0.2.0.tar.gz)     |
-| litmusctl-linux-amd64          | [Click here](https://litmusctl-bucket.s3-eu-west-1.amazonaws.com/litmusctl-linux-amd64-v0.2.0.tar.gz)   |
-| litmusctl-linux-arm            | [Click here](https://litmusctl-bucket.s3-eu-west-1.amazonaws.com/litmusctl-linux-arm-v0.2.0.tar.gz)     |
-| litmusctl-linux-arm64          | [Click here](https://litmusctl-bucket.s3-eu-west-1.amazonaws.com/litmusctl-linux-arm64-v0.2.0.tar.gz)   |
-| litmusctl-windows-386          | [Click here](https://litmusctl-bucket.s3-eu-west-1.amazonaws.com/litmusctl-windows-386-v0.2.0.tar.gz)   |
-| litmusctl-windows-amd64        | [Click here](https://litmusctl-bucket.s3-eu-west-1.amazonaws.com/litmusctl-windows-amd64-v0.2.0.tar.gz) |
-| litmusctl-windows-arm          | [Click here](https://litmusctl-bucket.s3-eu-west-1.amazonaws.com/litmusctl-windows-arm-v0.2.0.tar.gz)   |
-
-<br>
-
-- Extract the binary
+* Extract the binary
 
 ```shell
 tar -zxvf litmusctl-<OS>-<ARCH>-<VERSION>.tar.gz
 ```
 
-- Provide necessary permissions
+* Provide necessary permissions
 
 ```shell
 chmod +x litmusctl
 ```
 
-- Move the litmusctl binary to /usr/local/bin/litmusctl
+* Move the litmusctl binary to /usr/local/bin/litmusctl. Note: Make sure to use root user or use sudo as a prefix
 
 ```shell
-sudo mv litmusctl /usr/local/bin/litmusctl
+mv litmusctl /usr/local/bin/litmusctl
 ```
 
-## Basic Commands
-
-litmusctl CLI command has the following structure:
+* You can run the litmusctl command in Linux/macOS:
 
 ```shell
 litmusctl <command> <subcommand> <subcommand> [options and parameters]
 ```
 
-To get the version of the litmusctl CLI:
+### Windows
+
+* Extract the binary from the zip using WinZip or any other extraction tool.
+
+
+* You can run the litmusctl command in windows:
+```shell
+litmusctl.exe <command> <subcommand> <subcommand> [options and parameters]
+```
+
+* To check the version of the litmusctl:
 
 ```shell
 litmusctl version
 ```
+

@@ -17,8 +17,6 @@ package create
 
 import (
 	"fmt"
-	"os"
-
 	"github.com/litmuschaos/litmusctl/pkg/apis"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
 
@@ -43,12 +41,8 @@ var projectCmd = &cobra.Command{
 		utils.PrintError(err)
 
 		if projectName == "" {
-			fmt.Print("\n📁 Enter the project name: ")
+			utils.White_B.Print("\nEnter a project name: ")
 			fmt.Scanln(&projectName)
-			for projectName == "" {
-				fmt.Println("⛔ Project name can't be empty!!")
-				os.Exit(1)
-			}
 		}
 
 		_, err = apis.CreateProjectRequest(projectName, credentials)

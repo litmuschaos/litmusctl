@@ -27,33 +27,31 @@ import (
 )
 
 func PrintExistingAgents(agent apis.AgentData) {
-	fmt.Println("🚫 Agent with the given name already exists.")
+	utils.Red.Println("\nAgent with the given name already exists.")
 	// Print agent list if existing agent name is entered twice
-	fmt.Print("\n📘 Connected agents list -----------\n\n")
+	utils.White_B.Println("\nConnected agents list:")
 
 	for i := range agent.Data.GetAgent {
-		fmt.Println("-", agent.Data.GetAgent[i].AgentName)
+		utils.White_B.Println("-", agent.Data.GetAgent[i].AgentName)
 	}
 
-	fmt.Println("\n-------------------------------------")
-
-	fmt.Println("❗ Please enter a different name.")
+	utils.White_B.Println("\n❗ Please enter a different name.")
 }
 
 // GetProject display list of projects and returns the project id based on input
 func GetProjectID(u apis.ProjectDetails) string {
 	var pid int
-	fmt.Println("\n✨ Projects List:")
+	utils.White_B.Println("Project list:")
 	for index := range u.Data.GetUser.Projects {
-		fmt.Printf("%d.  %s\n", index+1, u.Data.GetUser.Projects[index].Name)
+		utils.White_B.Printf("%d.  %s\n", index+1, u.Data.GetUser.Projects[index].Name)
 	}
 
 repeat:
-	fmt.Print("\n🔎 Select Project: ")
+	utils.White_B.Printf("\nSelect a project [Range: 1-%s]: ", fmt.Sprint(len(u.Data.GetUser.Projects)))
 	fmt.Scanln(&pid)
 
 	for pid < 1 || pid > len(u.Data.GetUser.Projects) {
-		fmt.Println("❗ Invalid Project. Please select a correct one.")
+		utils.Red.Println("❗ Invalid Project. Please select a correct one.")
 		goto repeat
 	}
 
@@ -69,8 +67,8 @@ repeat:
 		mode         = cluster_no
 	)
 
-	fmt.Println("\n🔌 Installation Modes:\n1. Cluster\n2. Namespace")
-	fmt.Print("\n👉 Select Mode [", utils.DefaultMode, "]: ")
+	utils.White_B.Println("\nInstallation Modes:\n1. Cluster\n2. Namespace")
+	utils.White_B.Print("\nSelect Mode [Default: ", utils.DefaultMode, "] [Range: 1-2]: ")
 	fmt.Scanln(&mode)
 
 	if mode == 1 {
@@ -82,7 +80,7 @@ repeat:
 	}
 
 	if (mode != cluster_no) || (mode != namespace_no) {
-		fmt.Println("🚫 Invalid mode. Please enter the correct mode")
+		utils.Red.Println("🚫 Invalid mode. Please enter the correct mode")
 		goto repeat
 	}
 
@@ -93,14 +91,14 @@ repeat:
 func GetAgentDetails(mode string, pid string, c types.Credentials, kubeconfig *string) (types.Agent, error) {
 	var newAgent types.Agent
 	// Get agent name as input
-	fmt.Println("\n🔗 Enter the details of the agent ----")
+	utils.White_B.Println("\nEnter the details of the agent")
 	// Label for goto statement in case of invalid agent name
 
 AGENT_NAME:
-	fmt.Print("🤷 Agent Name: ")
+	utils.White_B.Print("\nAgent Name: ")
 	newAgent.AgentName = utils.Scanner()
 	if newAgent.AgentName == "" {
-		fmt.Println("⛔ Agent name cannot be empty. Please enter a valid name.")
+		utils.Red.Println("⛔ Agent name cannot be empty. Please enter a valid name.")
 		goto AGENT_NAME
 	}
 
@@ -113,7 +111,7 @@ AGENT_NAME:
 	var isAgentExist = false
 	for i := range agent.Data.GetAgent {
 		if newAgent.AgentName == agent.Data.GetAgent[i].AgentName {
-			fmt.Println(agent.Data.GetAgent[i].AgentName)
+			utils.White_B.Println(agent.Data.GetAgent[i].AgentName)
 			isAgentExist = true
 		}
 	}
@@ -124,8 +122,21 @@ AGENT_NAME:
 	}
 
 	// Get agent description as input
-	fmt.Print("📘 Agent Description: ")
+	utils.White_B.Print("\nAgent Description: ")
 	newAgent.Description = utils.Scanner()
+
+	utils.White_B.Print("\nDo you want NodeSelector to be added in the agent deployments (Y/N) (Default: N): ")
+	nodeSelectorDescision := utils.Scanner()
+
+	if strings.ToLower(nodeSelectorDescision) == "y" {
+		utils.White_B.Print("\nEnter the NodeSelector (Format: key1=value1,key2=value2): ")
+		nodeSelector := utils.Scanner()
+		newAgent.NodeSelector = &nodeSelector
+
+		if ok := utils.CheckKeyValueFormat(*newAgent.NodeSelector); !ok{
+			os.Exit(1)
+		}
+	}
 	// Get platform name as input
 	newAgent.PlatformName = GetPlatformName(kubeconfig)
 	// Set agent type
@@ -154,47 +165,47 @@ func ValidateSAPermissions(mode string, kubeconfig *string) {
 	for i, resource := range resources {
 		pems[i], err = k8s.CheckSAPermissions(k8s.CheckSAPermissionsParams{Verb: "create", Resource: resource, Print: true}, kubeconfig)
 		if err != nil {
-			fmt.Println(err)
+			utils.Red.Println(err)
 		}
 	}
 
 	for _, pem := range pems {
 		if !pem {
-			fmt.Println("\n🚫 You don't have sufficient permissions.\n🙄 Please use a service account with sufficient permissions.")
+			utils.Red.Println("\n🚫 You don't have sufficient permissions.\n🙄 Please use a service account with sufficient permissions.")
 			os.Exit(1)
 		}
 	}
 
-	fmt.Println("\n🌟 Sufficient permissions. Connecting Agent")
+	utils.White_B.Println("\n🌟 Sufficient permissions. Installing the Agent...")
 }
 
 // Summary display the agent details based on input
 func Summary(agent types.Agent, kubeconfig *string) {
-	fmt.Printf("\n📌 Summary -------------------------- \nAgent Name: %s\nAgent Description: %s\nPlatform Name: %s\n", agent.AgentName, agent.Description, agent.PlatformName)
+	utils.White_B.Printf("\n📌 Summary \nAgent Name: %s\nAgent Description: %s\nPlatform Name: %s\n", agent.AgentName, agent.Description, agent.PlatformName)
 	if ok, _ := k8s.NsExists(agent.Namespace, kubeconfig); ok {
-		fmt.Println("Namespace: ", agent.Namespace)
+		utils.White_B.Println("Namespace: ", agent.Namespace)
 	} else {
-		fmt.Println("Namespace: ", agent.Namespace, "(new)")
+		utils.White_B.Println("Namespace: ", agent.Namespace, "(new)")
 	}
 
 	if k8s.SAExists(k8s.SAExistsParams{Namespace: agent.Namespace, Serviceaccount: agent.ServiceAccount}, kubeconfig) {
-		fmt.Println("Service Account: ", agent.ServiceAccount)
+		utils.White_B.Println("Service Account: ", agent.ServiceAccount)
 	} else {
-		fmt.Println("Service Account: ", agent.ServiceAccount, "(new)")
+		utils.White_B.Println("Service Account: ", agent.ServiceAccount, "(new)")
 	}
 
-	fmt.Printf("\nInstallation Mode: %s\n-------------------------------------\n", agent.Mode)
+	utils.White_B.Printf("\nInstallation Mode: %s\n", agent.Mode)
 }
 
 func ConfirmInstallation() {
 	var descision string
-	fmt.Print("\n🤷 Do you want to continue with the above details? [Y/N]: ")
+	utils.White_B.Print("\n🤷 Do you want to continue with the above details? [Y/N]: ")
 	fmt.Scanln(&descision)
 
 	if strings.ToLower(descision) == "yes" || strings.ToLower(descision) == "y" {
-		fmt.Println("👍 Continuing agent connection!!")
+		utils.White_B.Println("👍 Continuing agent connection!!")
 	} else {
-		fmt.Println("✋ Exiting agent connection!!")
+		utils.Red.Println("✋ Exiting agent connection!!")
 		os.Exit(1)
 	}
 }

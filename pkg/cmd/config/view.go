@@ -36,7 +36,7 @@ var viewCmd = &cobra.Command{
 
 		exists := config.FileExists(configFilePath)
 		if !exists {
-			fmt.Println("File reading error open ", configFilePath, ": no such file or directory. Use --config or -c flag to point the configfile")
+			utils.Red.Println("File reading error open ", configFilePath, ": no such file or directory. Use --config or -c flag to point the configfile")
 			os.Exit(1)
 		}
 

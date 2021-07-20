@@ -31,9 +31,9 @@ import (
 func GetPlatformName(kubeconfig *string) string {
 	var platform int
 	discoveredPlatform := DiscoverPlatform(kubeconfig)
-	fmt.Println("📦 Platform List")
-	fmt.Println(utils.PlatformList)
-	fmt.Print("🔎 Select Platform [", discoveredPlatform, "]: ")
+	utils.White_B.Println("\nPlatform List: ")
+	utils.White_B.Println(utils.PlatformList)
+	utils.White_B.Print("\nSelect a platform [Default: ", discoveredPlatform, "] [Range: 1-5]: ")
 	fmt.Scanln(&platform)
 	switch platform {
 	case 0:

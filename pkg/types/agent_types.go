@@ -22,6 +22,7 @@ type Agent struct {
 	PlatformName   string `json:"platform_name"`
 	ProjectId      string `json:"project_id"`
 	ClusterType    string `json:"cluster_type"`
+	NodeSelector   *string `json:"node_selector"`
 	Namespace      string
 	ServiceAccount string
 	NsExists       bool

@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"os/exec"
 
 	"github.com/litmuschaos/litmusctl/pkg/utils"
 	authorizationv1 "k8s.io/api/authorization/v1"
@@ -74,8 +75,9 @@ func CheckSAPermissions(params CheckSAPermissionsParams, kubeconfig *string) (bo
 	o.Resource.Resource = params.Resource
 	client, err := ClientSet(kubeconfig)
 	if err != nil {
-		log.Fatal(err)
+		return false, err
 	}
+
 	AuthClient := client.AuthorizationV1()
 
 	sar := &authorizationv1.SelfSubjectAccessReview{
@@ -98,17 +100,17 @@ func CheckSAPermissions(params CheckSAPermissionsParams, kubeconfig *string) (bo
 
 	if response.Status.Allowed {
 		if params.Print {
-			fmt.Println("🔑 ", params.Resource, "- ✅")
+			utils.White_B.Print("\n🔑 ", params.Resource, " ✅")
 		}
 	} else {
 		if params.Print {
-			fmt.Println("🔑 ", params.Resource, "- ❌")
+			utils.White_B.Print("\n🔑 ", params.Resource, " ❌")
 		}
 		if len(response.Status.Reason) > 0 {
-			fmt.Println(response.Status.Reason)
+			utils.White_B.Println(response.Status.Reason)
 		}
 		if len(response.Status.EvaluationError) > 0 {
-			fmt.Println(response.Status.EvaluationError)
+			utils.Red.Println(response.Status.EvaluationError)
 		}
 	}
 
@@ -124,14 +126,14 @@ start:
 	)
 
 	if mode == "namespace" {
-		fmt.Print("📁 Enter the namespace (existing) [", utils.DefaultNs, "]: ")
+		utils.White_B.Print("\nEnter the namespace (existing namespace) [Default: ", utils.DefaultNs, "]: ")
 		fmt.Scanln(&namespace)
 
 	} else if mode == "cluster" {
-		fmt.Print("📁 Enter the namespace (new or existing) [", utils.DefaultNs, "]: ")
+		utils.White_B.Print("\nEnter the namespace (new or existing namespace) [Default: ", utils.DefaultNs, "]: ")
 		fmt.Scanln(&namespace)
 	} else {
-		fmt.Printf("\n 🚫 No mode selected \n")
+		utils.Red.Printf("\n 🚫 No mode selected \n")
 		os.Exit(1)
 	}
 
@@ -140,20 +142,20 @@ start:
 	}
 	ok, err := NsExists(namespace, kubeconfig)
 	if err != nil {
-		fmt.Printf("\n 🚫 Namespace existence check failed: {%s}\n", err.Error())
+		utils.Red.Printf("\n 🚫 Namespace existence check failed: {%s}\n", err.Error())
 		os.Exit(1)
 	}
 	if ok {
 		if podExists(podExistsParams{namespace, label}, kubeconfig) {
-			fmt.Println("🚫 Subscriber already present. Please enter a different namespace")
+			utils.Red.Println("\n🚫 There is an agent already present in this namespace. Please enter a different namespace")
 			goto start
 		} else {
 			nsExists = true
-			fmt.Println("👍 Continuing with", namespace, "namespace")
+			utils.White_B.Println("👍 Continuing with", namespace, "namespace")
 		}
 	} else {
 		if val, _ := CheckSAPermissions(CheckSAPermissionsParams{"create", "namespace", false}, kubeconfig); !val {
-			fmt.Println("🚫 You don't have permissions to create a namespace.\n🙄 Please enter an existing namespace.")
+			utils.Red.Println("🚫 You don't have permissions to create a namespace.\n Please enter an existing namespace.")
 			goto start
 		}
 		nsExists = false
@@ -184,9 +186,9 @@ func WatchPod(params WatchPodParams, kubeconfig *string) {
 		if !ok {
 			log.Fatal("unexpected type")
 		}
-		fmt.Println("💡 Connecting agent to Litmus Portal.")
+		utils.White_B.Println("💡 Connecting agent to Litmus Portal.")
 		if p.Status.Phase == "Running" {
-			fmt.Println("🏃 Agents running!!")
+			utils.White_B.Println("🏃 Agents are running!!")
 			watch.Stop()
 			break
 		}
@@ -248,14 +250,38 @@ func SAExists(params SAExistsParams, kubeconfig *string) bool {
 // ValidSA gets a valid service account as input
 func ValidSA(namespace string, kubeconfig *string) (string, bool) {
 	var sa string
-	fmt.Print("🔑 Enter service account [", utils.DefaultSA, "]: ")
+	utils.White_B.Print("\nEnter service account [Default: ", utils.DefaultSA, "]: ")
 	fmt.Scanln(&sa)
 	if sa == "" {
 		sa = utils.DefaultSA
 	}
 	if SAExists(SAExistsParams{namespace, sa}, kubeconfig) {
-		fmt.Println("👍 Using the existing service account")
+		utils.White_B.Print("\n👍 Using the existing service account")
 		return sa, true
 	}
 	return sa, false
+}
+
+type ApplyYamlPrams struct {
+	Token    string
+	Endpoint string
+	YamlPath string
+}
+
+func ApplyYaml(params ApplyYamlPrams, kubeconfig string) (output string, err error) {
+	path := fmt.Sprintf("%s/%s/%s.yaml", params.Endpoint, params.YamlPath, params.Token)
+
+	var args []string
+	if kubeconfig != "" {
+		args = []string{"kubectl", "apply", "-f", path, "--kubeconfig", kubeconfig}
+	} else {
+		args = []string{"kubectl", "apply", "-f", path}
+	}
+
+	stdout, err := exec.Command(args[0], args[1:]...).CombinedOutput()
+	if err != nil {
+		return string(stdout), err
+	}
+
+	return string(stdout), err
 }

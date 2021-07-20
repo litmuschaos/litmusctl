@@ -75,7 +75,7 @@ var agentCmd = &cobra.Command{
 			}
 
 			if !projectExists {
-				fmt.Println("Creating a random project...")
+				utils.White_B.Print("Creating a random project...")
 				newAgent.ProjectId = agent.CreateRandomProject(credentials)
 			}
 		}
@@ -86,7 +86,7 @@ var agentCmd = &cobra.Command{
 			utils.PrintError(err)
 
 			if newAgent.Mode == "" {
-				fmt.Print("Error: --installation-mode flag is empty")
+				utils.Red.Print("Error: --installation-mode flag is empty")
 				os.Exit(1)
 			}
 
@@ -94,7 +94,7 @@ var agentCmd = &cobra.Command{
 			utils.PrintError(err)
 
 			if newAgent.AgentName == "" {
-				fmt.Print("Error: --agent-name flag is empty")
+				utils.Red.Print("Error: --agent-name flag is empty")
 				os.Exit(1)
 			}
 
@@ -105,15 +105,24 @@ var agentCmd = &cobra.Command{
 			utils.PrintError(err)
 
 			if newAgent.PlatformName == "" {
-				fmt.Print("Error: --platform-name flag is empty")
+				utils.Red.Print("Error: --platform-name flag is empty")
 				os.Exit(1)
 			}
 
 			newAgent.ClusterType, err = cmd.Flags().GetString("cluster-type")
 			utils.PrintError(err)
 			if newAgent.ClusterType == "" {
-				fmt.Print("Error: --cluster-type flag is empty")
+				utils.Red.Print("Error: --cluster-type flag is empty")
 				os.Exit(1)
+			}
+
+			nodeSelector, err := cmd.Flags().GetString("node-selector")
+			newAgent.NodeSelector =  &nodeSelector
+			utils.PrintError(err)
+			if *newAgent.NodeSelector != ""{
+				if ok := utils.CheckKeyValueFormat(*newAgent.NodeSelector); !ok{
+					os.Exit(1)
+				}
 			}
 
 			newAgent.Namespace, err = cmd.Flags().GetString("namespace")
@@ -133,12 +142,12 @@ var agentCmd = &cobra.Command{
 			}
 
 			if newAgent.ProjectId == "" {
-				fmt.Println("Error: --project-id flag is empty")
+				utils.Red.Println("Error: --project-id flag is empty")
 				os.Exit(1)
 			}
 
 			// Check if user has sufficient permissions based on mode
-			fmt.Println("\n🏃 Running prerequisites check....")
+			utils.White_B.Print("\n🏃 Running prerequisites check....")
 			agent.ValidateSAPermissions(newAgent.Mode, &kubeconfig)
 
 			agents, err := apis.GetAgentList(credentials, newAgent.ProjectId)
@@ -148,7 +157,7 @@ var agentCmd = &cobra.Command{
 			var isAgentExist = false
 			for i := range agents.Data.GetAgent {
 				if newAgent.AgentName == agents.Data.GetAgent[i].AgentName {
-					fmt.Println(agents.Data.GetAgent[i].AgentName)
+					utils.White_B.Print(agents.Data.GetAgent[i].AgentName)
 					isAgentExist = true
 				}
 			}
@@ -170,7 +179,7 @@ var agentCmd = &cobra.Command{
 			modeType := agent.GetModeType()
 
 			// Check if user has sufficient permissions based on mode
-			fmt.Println("\n🏃 Running prerequisites check....")
+			utils.White_B.Print("\n🏃 Running prerequisites check....")
 			agent.ValidateSAPermissions(modeType, &kubeconfig)
 			newAgent, err = agent.GetAgentDetails(modeType, newAgent.ProjectId, credentials, &kubeconfig)
 			utils.PrintError(err)
@@ -187,37 +196,37 @@ var agentCmd = &cobra.Command{
 
 		agent, err := apis.ConnectAgent(newAgent, credentials)
 		if err != nil {
-			fmt.Println("\n❌ Agent connection failed: " + err.Error() + "\n")
+			utils.Red.Println("\n❌ Agent connection failed: " + err.Error() + "\n")
 			os.Exit(1)
 		}
 
 		path := fmt.Sprintf("%s/%s/%s.yaml", credentials.Endpoint, utils.ChaosYamlPath, agent.Data.UserAgentReg.Token)
-		fmt.Println("Applying YAML:\n", path)
+		utils.White_B.Print("Applying YAML:\n", path)
 
 		// Print error message in case Data field is null in response
 		if (agent.Data == apis.AgentConnect{}) {
-			fmt.Println("\n🚫 Agent connection failed: " + agent.Errors[0].Message + "\n")
+			utils.White_B.Print("\n🚫 Agent connection failed: " + agent.Errors[0].Message + "\n")
 			os.Exit(1)
 		}
 
 		//Apply agent connection yaml
-		yamlOutput, err := utils.ApplyYaml(utils.ApplyYamlPrams{
+		yamlOutput, err := k8s.ApplyYaml(k8s.ApplyYamlPrams{
 			Token:    agent.Data.UserAgentReg.Token,
 			Endpoint: credentials.Endpoint,
 			YamlPath: utils.ChaosYamlPath,
 		}, kubeconfig)
 		if err != nil {
-			fmt.Println("\n❌ Failed in applying connection yaml: " + err.Error() + "\n")
+			utils.White_B.Print("\n❌ Failed in applying connection yaml: \n" + yamlOutput)
 			os.Exit(1)
 		}
 
-		fmt.Println("\n", yamlOutput)
+		utils.White_B.Print("\n", yamlOutput)
 
 		// Watch subscriber pod status
 		k8s.WatchPod(k8s.WatchPodParams{Namespace: newAgent.Namespace, Label: utils.ChaosAgentLabel}, &kubeconfig)
 
-		fmt.Println("\n🚀 Agent Connection Successful!! 🎉")
-		fmt.Println("👉 Litmus agents can be accessed here: " + fmt.Sprintf("%s/%s", credentials.Endpoint, utils.ChaosAgentPath))
+		utils.White_B.Println("\n🚀 Agent Connection Successful!! 🎉")
+		utils.White_B.Println("👉 Litmus agents can be accessed here: " + fmt.Sprintf("%s/%s", credentials.Endpoint, utils.ChaosAgentPath))
 	},
 }
 
@@ -232,6 +241,7 @@ func init() {
 	agentCmd.Flags().String("agent-description", "---", "Set the agent description")
 	agentCmd.Flags().String("platform-name", "Others", "Set the platform name. Supported- AWS/GKE/Openshift/Rancher/Others")
 	agentCmd.Flags().String("cluster-type", "external", "Set the cluster-type to external for external agents | Supported=external/internal")
+	agentCmd.Flags().String("node-selector", "", "Set the node-selector for agent components | Format: \"key1=value1,key2=value2\")")
 	agentCmd.Flags().String("namespace", "litmus", "Set the namespace for the agent installation")
 	agentCmd.Flags().String("service-account", "litmus", "Set the service account to be used by the agent")
 	agentCmd.Flags().Bool("ns-exists", false, "Set the --ns-exists=false if the namespace mentioned in the --namespace flag is not existed else set it to --ns-exists=true | Note: Always set the boolean flag as --ns-exists=Boolean")

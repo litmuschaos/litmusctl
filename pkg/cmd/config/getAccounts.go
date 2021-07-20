@@ -16,7 +16,6 @@ limitations under the License.
 package config
 
 import (
-	"fmt"
 	"os"
 	"strconv"
 	"text/tabwriter"
@@ -39,7 +38,7 @@ var getAccountsCmd = &cobra.Command{
 		utils.PrintError(err)
 
 		writer := tabwriter.NewWriter(os.Stdout, 0, 8, 1, '\t', tabwriter.AlignRight)
-		fmt.Fprintln(writer, "CURRENT\tENDPOINT\tUSERNAME\tEXPIRESIN")
+		utils.White_B.Fprintln(writer, "CURRENT\tENDPOINT\tUSERNAME\tEXPIRESIN")
 		for _, account := range obj.Accounts {
 			for _, user := range account.Users {
 				intTime, err := strconv.ParseInt(user.ExpiresIn, 10, 64)
@@ -48,9 +47,9 @@ var getAccountsCmd = &cobra.Command{
 				humanTime := time.Unix(intTime, 0)
 
 				if obj.CurrentUser == user.Username && obj.CurrentAccount == account.Endpoint {
-					fmt.Fprintln(writer, "*"+"\t"+account.Endpoint+"\t"+user.Username+"\t"+humanTime.String())
+					utils.White.Fprintln(writer, "*" + "\t" + account.Endpoint + "\t" + user.Username + "\t" + humanTime.String())
 				} else {
-					fmt.Fprintln(writer, ""+"\t"+account.Endpoint+"\t"+user.Username+"\t"+user.ExpiresIn)
+					utils.White.Fprintln(writer, "" + "\t" + account.Endpoint+"\t" + user.Username+"\t" + humanTime.String())
 				}
 			}
 		}

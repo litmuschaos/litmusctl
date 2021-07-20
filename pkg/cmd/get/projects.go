@@ -16,7 +16,6 @@ limitations under the License.
 package get
 
 import (
-	"fmt"
 	"os"
 	"strconv"
 	"text/tabwriter"
@@ -51,14 +50,14 @@ var projectsCmd = &cobra.Command{
 
 		case "":
 			writer := tabwriter.NewWriter(os.Stdout, 8, 8, 8, '\t', tabwriter.AlignRight)
-			fmt.Fprintln(writer, "PROJECT ID\tPROJECT NAME\tCREATEDAT")
+			utils.White_B.Fprintln(writer, "PROJECT ID\tPROJECT NAME\tCREATEDAT")
 			for _, project := range projects.Data.ListProjects {
 				intTime, err := strconv.ParseInt(project.CreatedAt, 10, 64)
 				utils.PrintError(err)
 
 				humanTime := time.Unix(intTime, 0)
 
-				fmt.Fprintln(writer, project.ID+"\t"+project.Name+"\t"+humanTime.String()+"\t")
+				utils.White.Fprintln(writer, project.ID+"\t"+project.Name+"\t"+humanTime.String()+"\t")
 			}
 			writer.Flush()
 		}
