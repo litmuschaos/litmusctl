@@ -17,7 +17,9 @@ package get
 
 import (
 	"os"
+	"strconv"
 	"text/tabwriter"
+	"time"
 
 	"github.com/litmuschaos/litmusctl/pkg/apis"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
@@ -50,7 +52,12 @@ var projectsCmd = &cobra.Command{
 			writer := tabwriter.NewWriter(os.Stdout, 8, 8, 8, '\t', tabwriter.AlignRight)
 			utils.White_B.Fprintln(writer, "PROJECT ID\tPROJECT NAME\tCREATEDAT")
 			for _, project := range projects.Data.ListProjects {
-				utils.White.Fprintln(writer, project.ID+"\t"+project.Name+"\t"+project.CreatedAt+"\t")
+				intTime, err := strconv.ParseInt(project.CreatedAt, 10, 64)
+				utils.PrintError(err)
+
+				humanTime := time.Unix(intTime, 0)
+
+				utils.White.Fprintln(writer, project.ID+"\t"+project.Name+"\t"+humanTime.String()+"\t")
 			}
 			writer.Flush()
 		}

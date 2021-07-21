@@ -116,6 +116,15 @@ var agentCmd = &cobra.Command{
 				os.Exit(1)
 			}
 
+			nodeSelector, err := cmd.Flags().GetString("node-selector")
+			newAgent.NodeSelector = &nodeSelector
+			utils.PrintError(err)
+			if *newAgent.NodeSelector != "" {
+				if ok := utils.CheckKeyValueFormat(*newAgent.NodeSelector); !ok {
+					os.Exit(1)
+				}
+			}
+
 			newAgent.Namespace, err = cmd.Flags().GetString("namespace")
 			utils.PrintError(err)
 
@@ -216,7 +225,7 @@ var agentCmd = &cobra.Command{
 		// Watch subscriber pod status
 		k8s.WatchPod(k8s.WatchPodParams{Namespace: newAgent.Namespace, Label: utils.ChaosAgentLabel}, &kubeconfig)
 
-		utils.White_B.Print("\n🚀 Agent Connection Successful!! 🎉")
+		utils.White_B.Println("\n🚀 Agent Connection Successful!! 🎉")
 		utils.White_B.Println("👉 Litmus agents can be accessed here: " + fmt.Sprintf("%s/%s", credentials.Endpoint, utils.ChaosAgentPath))
 	},
 }
@@ -232,6 +241,7 @@ func init() {
 	agentCmd.Flags().String("agent-description", "---", "Set the agent description")
 	agentCmd.Flags().String("platform-name", "Others", "Set the platform name. Supported- AWS/GKE/Openshift/Rancher/Others")
 	agentCmd.Flags().String("cluster-type", "external", "Set the cluster-type to external for external agents | Supported=external/internal")
+	agentCmd.Flags().String("node-selector", "", "Set the node-selector for agent components | Format: \"key1=value1,key2=value2\")")
 	agentCmd.Flags().String("namespace", "litmus", "Set the namespace for the agent installation")
 	agentCmd.Flags().String("service-account", "litmus", "Set the service account to be used by the agent")
 	agentCmd.Flags().Bool("ns-exists", false, "Set the --ns-exists=false if the namespace mentioned in the --namespace flag is not existed else set it to --ns-exists=true | Note: Always set the boolean flag as --ns-exists=Boolean")

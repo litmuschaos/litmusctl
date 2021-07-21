@@ -147,7 +147,7 @@ start:
 	}
 	if ok {
 		if podExists(podExistsParams{namespace, label}, kubeconfig) {
-			utils.Red.Println("🚫 Subscriber already present. Please enter a different namespace")
+			utils.Red.Println("\n🚫 There is an agent already present in this namespace. Please enter a different namespace")
 			goto start
 		} else {
 			nsExists = true
@@ -155,7 +155,7 @@ start:
 		}
 	} else {
 		if val, _ := CheckSAPermissions(CheckSAPermissionsParams{"create", "namespace", false}, kubeconfig); !val {
-			utils.Red.Println("🚫 You don't have permissions to create a namespace.\n🙄 Please enter an existing namespace.")
+			utils.Red.Println("🚫 You don't have permissions to create a namespace.\n Please enter an existing namespace.")
 			goto start
 		}
 		nsExists = false
@@ -188,7 +188,7 @@ func WatchPod(params WatchPodParams, kubeconfig *string) {
 		}
 		utils.White_B.Println("💡 Connecting agent to Litmus Portal.")
 		if p.Status.Phase == "Running" {
-			utils.White_B.Println("🏃 Agents running!!")
+			utils.White_B.Println("🏃 Agents are running!!")
 			watch.Stop()
 			break
 		}

@@ -30,6 +30,7 @@ import (
 	"gopkg.in/yaml.v2"
 	"math/big"
 	"os"
+	"strings"
 )
 
 var (
@@ -128,4 +129,22 @@ func GenerateRandomString(n int) (string, error) {
 	}
 
 	return string(ret), nil
+}
+
+func CheckKeyValueFormat(str string) bool {
+	selectors := strings.Split(str, ",")
+
+	for _, el := range selectors {
+		kv := strings.Split(el, "=")
+		if len(kv) != 2 {
+			Red.Println("nodeselector is not correct. Correct format: \"key1=value2,key2=value2\"")
+			return false
+		}
+
+		if strings.Contains(kv[0], "\"") || strings.Contains(kv[1], "\"") {
+			Red.Println("nodeselector contains escape character(s). Correct format: \"key1=value2,key2=value2\"")
+			return false
+		}
+	}
+	return true
 }

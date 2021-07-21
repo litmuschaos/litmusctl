@@ -124,6 +124,19 @@ AGENT_NAME:
 	// Get agent description as input
 	utils.White_B.Print("\nAgent Description: ")
 	newAgent.Description = utils.Scanner()
+
+	utils.White_B.Print("\nDo you want NodeSelector to be added in the agent deployments (Y/N) (Default: N): ")
+	nodeSelectorDescision := utils.Scanner()
+
+	if strings.ToLower(nodeSelectorDescision) == "y" {
+		utils.White_B.Print("\nEnter the NodeSelector (Format: key1=value1,key2=value2): ")
+		nodeSelector := utils.Scanner()
+		newAgent.NodeSelector = &nodeSelector
+
+		if ok := utils.CheckKeyValueFormat(*newAgent.NodeSelector); !ok {
+			os.Exit(1)
+		}
+	}
 	// Get platform name as input
 	newAgent.PlatformName = GetPlatformName(kubeconfig)
 	// Set agent type
@@ -163,7 +176,7 @@ func ValidateSAPermissions(mode string, kubeconfig *string) {
 		}
 	}
 
-	utils.White_B.Println("\n🌟 Sufficient permissions. Connecting Agent")
+	utils.White_B.Println("\n🌟 Sufficient permissions. Installing the Agent...")
 }
 
 // Summary display the agent details based on input
