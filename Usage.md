@@ -1,4 +1,4 @@
-# Usage
+# Usage: Litmusctl
 > Note: For litmusctl v0.3.0 or latest
 
 ### litmusctl Syntax
