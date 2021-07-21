@@ -116,11 +116,10 @@ var agentCmd = &cobra.Command{
 				os.Exit(1)
 			}
 
-			nodeSelector, err := cmd.Flags().GetString("node-selector")
-			newAgent.NodeSelector = &nodeSelector
+			newAgent.NodeSelector, err = cmd.Flags().GetString("node-selector")
 			utils.PrintError(err)
-			if *newAgent.NodeSelector != "" {
-				if ok := utils.CheckKeyValueFormat(*newAgent.NodeSelector); !ok {
+			if newAgent.NodeSelector != "" {
+				if ok := utils.CheckKeyValueFormat(newAgent.NodeSelector); !ok {
 					os.Exit(1)
 				}
 			}
