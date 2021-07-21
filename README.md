@@ -6,13 +6,15 @@
 
 The Litmuschaos command-line tool, litmusctl, allows you to manage litmuschaos's agent plane. 
 You can use litmusctl to create agents, project, and manage multiple litmuschaos accounts. For more information including a complete list of litmusctl operations, see the litmusctl reference documentation.
+* For v0.3.0 or latest:   <a href="https://github.com/litmuschaos/litmusctl/blob/master/Usage.md">Click here</a>
+* For v0.2.0 or earlier:  <a href="https://github.com/litmuschaos/litmusctl/blob/master/Usage_v0.2.0.md">Click here</a>
 
 ## Requirements
 
 The litmusctl CLI requires the following things:
 
 - kubeconfig - litmusctl needs the kubeconfig of the k8s cluster where we need to connect litmus agents. The CLI currently uses the default path of kubeconfig i.e. `~/.kube/config`.
-- kubectl- litmusctl is using kubectl under the hood to apply the manifest. To install kubectl, follow:  ![install kubectl](https://kubernetes.io/docs/tasks/tools/#kubectl)]
+- kubectl- litmusctl is using kubectl under the hood to apply the manifest. To install kubectl, follow:  [kubectl](https://kubernetes.io/docs/tasks/tools/#kubectl)
 
 
 ## Installation
@@ -25,19 +27,13 @@ To install the latest version of litmusctl follow the below steps:
   <th>v0.2.0 </th>
   <th>master(Unreleased)</th>
   <tr>
-    <td>litmusctl-darwin-386 (MacOS)</td>
-    <td><a href="https://litmusctl-bucket.s3-eu-west-1.amazonaws.com/litmusctl-darwin-386-v0.3.0.tar.gz">Click here</a></td>
-    <td><a href="https://litmusctl-bucket.s3-eu-west-1.amazonaws.com/litmusctl-darwin-386-v0.2.0.tar.gz">Click here</a></td>
-    <td><a href="https://litmusctl-bucket.s3-eu-west-1.amazonaws.com/litmusctl-darwin-386-master.tar.gz">Click here</a></td>
-  </tr>
-  <tr>
     <td>litmusctl-darwin-amd64 (MacOS)</td>
     <td><a href="https://litmusctl-bucket.s3-eu-west-1.amazonaws.com/litmusctl-darwin-amd64-v0.3.0.tar.gz">Click here</a></td>
     <td><a href="https://litmusctl-bucket.s3-eu-west-1.amazonaws.com/litmusctl-darwin-amd64-v0.2.0.tar.gz">Click here</a></td>
     <td><a href="https://litmusctl-bucket.s3-eu-west-1.amazonaws.com/litmusctl-darwin-amd64-master.tar.gz">Click here</a></td>
   </tr>
   <tr>
-    <td>litmusctl-darwin-386 (MacOS)</td>
+    <td>litmusctl-linux-386</td>
     <td><a href="https://litmusctl-bucket.s3-eu-west-1.amazonaws.com/litmusctl-linux-386-v0.3.0.tar.gz">Click here</a></td>
     <td><a href="https://litmusctl-bucket.s3-eu-west-1.amazonaws.com/litmusctl-linux-386-v0.2.0.tar.gz">Click here</a></td>
     <td><a href="https://litmusctl-bucket.s3-eu-west-1.amazonaws.com/litmusctl-linux-386-master.tar.gz">Click here</a></td>
@@ -78,8 +74,7 @@ To install the latest version of litmusctl follow the below steps:
     <td><a href="https://litmusctl-bucket.s3-eu-west-1.amazonaws.com/litmusctl-windows-arm-v0.2.0.tar.gz">Click here</a></td>
     <td><a href="https://litmusctl-bucket.s3-eu-west-1.amazonaws.com/litmusctl-windows-arm-master.tar.gz">Click here</a></td>
   </tr>
-<table>
-
+</table>
 
 ### Linux/MacOS
 
@@ -111,8 +106,8 @@ litmusctl <command> <subcommand> <subcommand> [options and parameters]
 
 * Extract the binary from the zip using WinZip or any other extraction tool.
 
-
 * You can run the litmusctl command in windows:
+
 ```shell
 litmusctl.exe <command> <subcommand> <subcommand> [options and parameters]
 ```
@@ -123,3 +118,4 @@ litmusctl.exe <command> <subcommand> <subcommand> [options and parameters]
 litmusctl version
 ```
 
+----

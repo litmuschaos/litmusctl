@@ -133,7 +133,7 @@ AGENT_NAME:
 		nodeSelector := utils.Scanner()
 		newAgent.NodeSelector = &nodeSelector
 
-		if ok := utils.CheckKeyValueFormat(*newAgent.NodeSelector); !ok{
+		if ok := utils.CheckKeyValueFormat(*newAgent.NodeSelector); !ok {
 			os.Exit(1)
 		}
 	}

@@ -47,9 +47,9 @@ var getAccountsCmd = &cobra.Command{
 				humanTime := time.Unix(intTime, 0)
 
 				if obj.CurrentUser == user.Username && obj.CurrentAccount == account.Endpoint {
-					utils.White.Fprintln(writer, "*" + "\t" + account.Endpoint + "\t" + user.Username + "\t" + humanTime.String())
+					utils.White.Fprintln(writer, "*"+"\t"+account.Endpoint+"\t"+user.Username+"\t"+humanTime.String())
 				} else {
-					utils.White.Fprintln(writer, "" + "\t" + account.Endpoint+"\t" + user.Username+"\t" + humanTime.String())
+					utils.White.Fprintln(writer, ""+"\t"+account.Endpoint+"\t"+user.Username+"\t"+humanTime.String())
 				}
 			}
 		}

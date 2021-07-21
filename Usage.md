@@ -1,128 +1,209 @@
 # Usage
-### Note: For litmusctl v0.3.0 or latest
+> Note: For litmusctl v0.3.0 or latest
 
-* To authenticate an account with litmusctl 
+### litmusctl Syntax
+`litmusctl` has a syntax to use as follows:
 
+```shell
+litmusctl [command] [TYPE] [flags]
+```
+* Command: refers to what you do want to perform (create, get and config)
+* Type: refers to the feature type you are performing a command against (agent, project etc.)
+* Flags: It takes some additional information for resource operations. For example, `--installation-mode` allows you to specify an installation mode.
+
+Litmusctl is using the `.litmusconfig` config file to manage multiple accounts
+1. If the --config flag is set, then only the given file is loaded. The flag may only be set once and no merging takes place.
+2. Otherwise, the ${HOME}/.litmusconfig file is used, and no merging takes place.
+
+Litmusctl supports both interactive and non-interactive(flag based) modes.
+> Only `litmusctl create agent`  command needs --non-interactive flag, other commands don't need this flag to be in non-interactive mode. If mandatory flags aren't passed, then litmusctl takes input in an interactive mode.
+
+### Minimal steps to create an agent
+
+* To setup an account with litmusctl
 ```shell
 litmusctl config set-account --endpoint="" --username="" --password=""
 ```
 
-* To create an agent
+* To create an agent without a project
+>Note: If the user doesn't have any project, it will create a random project and add the agent in that random project.
 ```shell
-
-```
-* To view the .litmusconfig
-```shell
-litmusctl config view account
+litmusctl create agent --agent-name="" --non-interactive
 ```
 
-* 
+### Or,
 
-    
-
-    ----
-
-### Note: For litmusctl v0.2.0 or earlier
-### Connecting an agent
-
-To connect Litmus Chaos agent:
+* To create an agent with an existing project
+> Note: To get `project-id`. Apply `litmusctl get projects`
 
 ```shell
-litmusctl agent connect
+litmusctl create agent --agent-name="" --project-id="" --non-interactive
 ```
 
-Next, you need to enter LitmusPortal details to login into your LitmusPortal account. Fields to be filled in:
+### Flags for `create agent` command
+<table>
+<tr>
+    <th>Flag</th>
+    <th>Short Flag</th>
+    <th>Type</th>
+    <th>Description</th>
+    <tr>
+        <td>--agent-description</td>
+        <td></td>
+        <td>String</td>
+        <td>Set the agent description (default "---")</td>
+    </tr>
+    <tr>
+        <td>--agent-name</td>
+        <td></td>
+        <td>String</td>
+        <td>Set the cluster-type to external for external agents | Supported=external/internal (default "external")</td>
+    </tr>
+    <tr>
+        <td>--cluster-type</td>
+        <td></td>
+        <td>String</td>
+        <td>Set the cluster-type to external for external agents | Supported=external/internal (default "external")</td>
+    </tr>
+    <tr>
+        <td>--installation-mode</td>
+        <td></td>
+        <td>String</td>
+        <td>Set the installation mode for the kind of agent | Supported=cluster/namespace (default "cluster")</td>
+    </tr>
+    <tr>
+        <td>--kubeconfig</td>
+        <td>-k</td>
+        <td>String</td>
+        <td>Set to pass kubeconfig file if it is not in the default location ($HOME/.kube/config)</td>
+    </tr>
+    <tr>
+        <td>--namespace</td>
+        <td></td>
+        <td>String</td>
+        <td>Set the namespace for the agent installation (default "litmus")</td>
+    </tr>
+    <tr>
+        <td>--node-selector</td>
+        <td></td>
+        <td>String</td>
+        <td>Set the node-selector for agent components | Format: key1=value1,key2=value2)
+    </tr>
+    <tr>
+        <td>--non-interactive</td>
+        <td>-n</td>
+        <td>String</td>
+        <td>Set it to true for non interactive mode | Note: Always set the boolean flag as --non-interactive=Boolean</td>
+    </tr>
+    <tr>
+        <td>--ns-exists</td>
+        <td></td>
+        <td>Boolean</td>
+        <td>Set the --ns-exists=false if the namespace mentioned in the --namespace flag is not existed else set it to --ns-exists=true | Note: Always set the boolean flag as --ns-exists=Boolean</td>
+    </tr>
+    <tr>
+        <td>--platform-name</td>
+        <td></td>
+        <td>String</td>
+        <td>Set the platform name. Supported- AWS/GKE/Openshift/Rancher/Others (default "Others")</td>
+    </tr>
+    <tr>
+        <td>--sa-exists</td>
+        <td></td>
+        <td>Boolean</td>
+        <td>Set the --sa-exists=false if the service-account mentioned in the --service-account flag is not existed else set it to --sa-exists=true | Note: Always set the boolean flag as --sa-exists=Boolean"</td>
+    </tr>
+    <tr>
+        <td>--service-account</td>
+        <td></td>
+        <td>String</td>
+        <td>Set the service account to be used by the agent (default "litmus")</td>
+    </tr>
+    <tr>
+        <td>--config</td>
+        <td></td>
+        <td>String</td>
+        <td>config file (default is $HOME/.litmusctl)</td>
+    </tr>
+</table>
 
-**LimtusPortal UI URL:** Enter the URL used to access the Litmus Portal UI.
-Example, http://172.17.0.2:31696/
 
-**Username:** Enter your LitmusPortal username.
-**Password:** Enter your LitmusPortal password.
+### Additional commands
+
+* To view the current configuration of `.litmusconfig`, type:
+```shell
+litmusctl config view
+```
+
+**Output:**
+```
+accounts:
+- users:
+  - expires_in: "1626897027"
+    token: eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjY4OTcwMjcsInJvbGUiOiJhZG1pbiIsInVpZCI6ImVlODZkYTljLTNmODAtNGRmMy04YzQyLTExNzlhODIzOTVhOSIsInVzZXJuYW1lIjoiYWRtaW4ifQ.O_hFcIhxP4rhyUN9NEVlQmWesoWlpgHpPFL58VbJHnhvJllP5_MNPbrRMKyFvzW3hANgXK2u8437u
+    username: admin
+  - expires_in: "1626944602"
+    token: eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjY5NDQ2MDIsInJvbGUiOiJ1c2VyIiwidWlkIjoiNjFmMDY4M2YtZWY0OC00MGE1LWIzMjgtZTU2ZDA2NjM1MTE4IiwidXNlcm5hbWUiOiJyYWoifQ.pks7xjkFdJD649RjCBwQuPF1_QMoryDWixSKx4tPAqXI75ns4sc-yGhMdbEvIZ3AJSvDaqTa47XTC6c8R
+    username: litmus-user
+  endpoint: https://preview.litmuschaos.io
+apiVersion: v1
+current-account: https://preview.litmuschaos.io
+current-user: litmus-user
+kind: Config
+```
+
+* To get an overview of the accounts available within `.litmusconfig`, use the `config get-accounts` command:
 
 ```shell
-🔥 Connecting LitmusChaos agent
-
-📶 Please enter LitmusChaos details --
-👉 Host URL where litmus is installed: http://172.17.0.2:31696/
-🤔 Username [admin]: admin
-🙈 Password:
-✅ Login Successful!
+litmusctl config get-accounts
 ```
 
-Upon successful login, there will be a list of exiting projects displayed on the terminal. Select the desired project by entering the sequence number indicated against it.
+**Output:**
 
+```
+CURRENT  ENDPOINT                         USERNAME  EXPIRESIN
+         https://preview.litmuschaos.io   admin     2021-07-22 01:20:27 +0530 IST
+*        https://preview.litmuschaos.io   raj       2021-07-22 14:33:22 +0530 IST
+```
+
+* To alter the current account use the `use-account` command with the --endpoint and --username flags:
 ```shell
-✨ Projects List:
-1.  abc
-
-🔎 Select Project: 1
+litmusctl config use-account --endpoint="" --username=""
 ```
 
-Next, select the installation mode. In case the selected mode was a Cluster there will be a prerequisites check to verify ClusterRole and ClusterRoleBinding.
-
+* To create a project, apply the following command with the `--name` flag:
 ```shell
-🔌 Installation Modes:
-1. Cluster
-2. Namespace
-
-👉 Select Mode [cluster]: 1
-
-🏃 Running prerequisites check....
-🔑  clusterrole - ✅
-🔑  clusterrolebinding - ✅
-
-🌟 Sufficient permissions. Connecting Agent
+litmusctl create project --name=""
 ```
 
-Next, enter the details of the new agent.
-
-Fields to filled in:
-**Agent Name:** Enter the name of the new agent.
-
-**Agent Description:** Fill in details about the agent.
-
-**Platform Name:** Enter the platform name on which this agent is hosted. For example, AWS, GCP, Rancher etc.
-
-**Enter the namespace:** You can either enter an existing namespace or enter a new namespace. In cases where the namespace does not exist, LimtusPortal creates it for you.
-
-**Enter service account:** Enter a name for your service account.
-
+* To view all the projects with the user, use the `get projects` command.
 ```shell
-🔗 Enter the details of the agent ----
-🤷 Agent Name: my-agent
-📘 Agent Description: This is a new agent.
-📦 Platform List
-1. AWS
-2. GKE
-3. Openshift
-4. Rancher
-5. Others
-🔎 Select Platform [Others]: 5
-📁 Enter the namespace (new or existing) [litmus]: litmus
-🔑 Enter service account [litmus]: litmus
+litmusctl get projects
 ```
 
-Once, all these steps are implemented you will be able to see a summary of all the entered fields.
-After verification of these details, you can proceed with the connection of the agent by entering Y. The process of connection might take up to a few seconds.
+**Output:**
 
+```
+PROJECT ID                                PROJECT NAME       CREATEDAT
+50addd40-8767-448c-a91a-5071543a2d8e      Developer Project  2021-07-21 14:38:51 +0530 IST     
+7a4a259a-1ae5-4204-ae83-89a8838eaec3      DevOps Project     2021-07-21 14:39:14 +0530 IST     
+```
+
+
+* To get an overview of the agents available within a project, issue the following command.
 ```shell
-📌 Summary --------------------------
-
-Agent Name:         my-agent
-Agent Description:  This is a new agent.
-Platform Name:      Others
-Namespace:          litmus
-Service Account:    litmus
-Installation Mode:  cluster
-
--------------------------------------
-
-🤷 Do you want to continue with the above details? [Y/N]: Y
-
-💡 Connecting agent to Litmus Portal.
-🏃 Agents running!!
-🚀 Agent Connection Successful!! 🎉
-👉 Litmus agents can be accessed here: http://172.17.0.2:31696/targets
+litmusctl get agents --project-id=""
 ```
 
-To verify, if the connection process was successful you can view the list of connected agents from the Targets section on your LitmusPortal and ensure that the connected agent is in Active State.
+**Output:**
+
+```
+AGENTID                                AGENTNAME          STATUS 
+55ecc7f2-2754-43aa-8e12-6903e4c6183a   agent-1            ACTIVE 
+13dsf3d1-5324-54af-4g23-5331g5v2364f   agent-2            INACTIVE
+```
+
+
+For more information related to flags, Use `litmusctl --help`.
+
+----
