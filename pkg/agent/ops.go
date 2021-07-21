@@ -130,10 +130,9 @@ AGENT_NAME:
 
 	if strings.ToLower(nodeSelectorDescision) == "y" {
 		utils.White_B.Print("\nEnter the NodeSelector (Format: key1=value1,key2=value2): ")
-		nodeSelector := utils.Scanner()
-		newAgent.NodeSelector = &nodeSelector
+		newAgent.NodeSelector = utils.Scanner()
 
-		if ok := utils.CheckKeyValueFormat(*newAgent.NodeSelector); !ok {
+		if ok := utils.CheckKeyValueFormat(newAgent.NodeSelector); !ok {
 			os.Exit(1)
 		}
 	}
