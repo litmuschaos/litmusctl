@@ -1,5 +1,7 @@
-# Usage: Litmusctl
-> Note: For litmusctl v0.3.0 or latest
+# Usage: Litmusctl v0.3.0
+> Notes:
+> * For litmusctl v0.3.0 or latest
+> * Compatible with Litmus 2.0.0-Beta9 or latest
 
 ### litmusctl Syntax
 `litmusctl` has a syntax to use as follows:

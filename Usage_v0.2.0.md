@@ -1,5 +1,9 @@
+# Usage: Litmusctl v0.2.0
 
-> Note: For litmusctl v0.2.0 or earlier
+> Notes:
+> * For litmusctl v0.3.0 or earlier
+> * Compatible with Litmus 2.0.0-Beta8 or earlier
+
 ### Connecting an agent
 
 To connect Litmus Chaos agent:
