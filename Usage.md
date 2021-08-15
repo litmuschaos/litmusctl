@@ -1,4 +1,4 @@
-# Usage: Litmusctl v0.3.0
+# Usage: Litmusctl v0.3.0 (Non-Interactive mode)
 > Notes:
 > * For litmusctl v0.3.0 or latest
 > * Compatible with Litmus 2.0.0-Beta9 or latest
@@ -19,6 +19,14 @@ Litmusctl is using the `.litmusconfig` config file to manage multiple accounts
 
 Litmusctl supports both interactive and non-interactive(flag based) modes.
 > Only `litmusctl create agent`  command needs --non-interactive flag, other commands don't need this flag to be in non-interactive mode. If mandatory flags aren't passed, then litmusctl takes input in an interactive mode.
+
+### Installation modes
+Litmusctl can install an agent in two different modes.
+* cluster mode: With this mode, the agent can run the chaos in any namespace. It installs appropriate cluster roles and cluster role bindings to achieve this mode. It can be enabled by passing a flag `--installation-mode=cluster`
+
+* namespace mode: With this mode, the agent can run the chaos in its namespace. It installs appropriate roles and role bindings to achieve this mode. It can be enabled by passing a flag `--installation-mode=namespace`
+
+Note: With namespace mode, the user needs to create the namespace to install the agent as a prerequisite.
 
 ### Minimal steps to create an agent
 
