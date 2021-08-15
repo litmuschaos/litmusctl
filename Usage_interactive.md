@@ -26,8 +26,6 @@ Litmusctl supports both interactive and non-interactive(flag based) modes.
 
 > Only `litmusctl create agent` command needs --non-interactive flag, other commands don't need this flag to be in non-interactive mode. If mandatory flags aren't passed, then litmusctl takes input in an interactive mode.
 
-Multiple external [ChaosAgents](../getting-started/chaosagents) can be connected to the [ChaosCenter](../getting-started/chaoscenter) with the help of the command line utility [litmusctl](installation)
-
 ### Steps to create an agent
 
 - To setup an account with litmusctl
