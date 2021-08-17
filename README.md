@@ -67,10 +67,10 @@ To install the latest version of litmusctl follow the below steps:
     <td><a href="https://litmusctl-bucket.s3-eu-west-1.amazonaws.com/litmusctl-windows-386-master.tar.gz">Click here</a></td>
   </tr>
    <tr>
-    <td>litmusctl-windows-arm64</td>
-    <td><a href="https://litmusctl-bucket.s3-eu-west-1.amazonaws.com/litmusctl-windows-arm64-v0.3.0.tar.gz">Click here</a></td>
-    <td><a href="https://litmusctl-bucket.s3-eu-west-1.amazonaws.com/litmusctl-windows-arm64-v0.2.0.tar.gz">Click here</a></td>
-    <td><a href="https://litmusctl-bucket.s3-eu-west-1.amazonaws.com/litmusctl-windows-arm64-master.tar.gz">Click here</a></td>
+    <td>litmusctl-windows-amd64</td>
+    <td><a href="https://litmusctl-bucket.s3-eu-west-1.amazonaws.com/litmusctl-windows-amd64-v0.3.0.tar.gz">Click here</a></td>
+    <td><a href="https://litmusctl-bucket.s3-eu-west-1.amazonaws.com/litmusctl-windows-amd64-v0.2.0.tar.gz">Click here</a></td>
+    <td><a href="https://litmusctl-bucket.s3-eu-west-1.amazonaws.com/litmusctl-windows-amd64-master.tar.gz">Click here</a></td>
   </tr>
   <tr>
     <td>litmusctl-windows-arm</td>
