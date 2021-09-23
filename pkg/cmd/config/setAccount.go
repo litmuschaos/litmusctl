@@ -104,7 +104,7 @@ var setAccountCmd = &cobra.Command{
 			resp, err := apis.Auth(authInput)
 			utils.PrintError(err)
 			// Decoding token
-			token, err := jwt.Parse(resp.AccessToken, nil)
+			token, _ := jwt.Parse(resp.AccessToken, nil)
 			if token == nil {
 				os.Exit(1)
 			}
