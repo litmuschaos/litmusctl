@@ -18,9 +18,10 @@ package apis
 import (
 	"encoding/json"
 	"errors"
-	"github.com/litmuschaos/litmusctl/pkg/utils"
 	"io/ioutil"
 	"net/http"
+
+	"github.com/litmuschaos/litmusctl/pkg/utils"
 
 	"github.com/litmuschaos/litmusctl/pkg/types"
 )
@@ -148,7 +149,7 @@ type Project struct {
 
 // GetProjectDetails fetches details of the input user
 func GetProjectDetails(c types.Credentials) (ProjectDetails, error) {
-	query := `{"query":"query {\n  getUser(username: \"` + c.Username + `\"){\n id name created_at projects{ id name members{ role user_id } }\n}\n}"}`
+	query := `{"query":"query {\n  getUser(username: \"` + c.Username + `\"){\n id created_at projects{ id name members{ role user_id } }\n}\n}"}`
 	resp, err := SendRequest(SendRequestParams{Endpoint: c.Endpoint + utils.GQLAPIPath, Token: c.Token}, []byte(query))
 	if err != nil {
 		return ProjectDetails{}, err

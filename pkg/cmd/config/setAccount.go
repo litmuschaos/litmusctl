@@ -22,6 +22,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/golang-jwt/jwt"
 	"github.com/litmuschaos/litmusctl/pkg/apis"
 	"github.com/litmuschaos/litmusctl/pkg/config"
 	"github.com/litmuschaos/litmusctl/pkg/types"
@@ -102,11 +103,17 @@ var setAccountCmd = &cobra.Command{
 
 			resp, err := apis.Auth(authInput)
 			utils.PrintError(err)
+			// Decoding token
+			token, err := jwt.Parse(resp.AccessToken, nil)
+			if token == nil {
+				os.Exit(1)
+			}
+			claims, _ := token.Claims.(jwt.MapClaims)
 
 			var user = types.User{
 				ExpiresIn: fmt.Sprint(time.Now().Add(time.Second * time.Duration(resp.ExpiresIn)).Unix()),
 				Token:     resp.AccessToken,
-				Username:  authInput.Username,
+				Username:  claims["username"].(string),
 			}
 
 			var users []types.User
@@ -127,7 +134,7 @@ var setAccountCmd = &cobra.Command{
 					APIVersion:     "v1",
 					Kind:           "Config",
 					CurrentAccount: authInput.Endpoint,
-					CurrentUser:    authInput.Username,
+					CurrentUser:    claims["username"].(string),
 					Accounts:       accounts,
 				}
 
@@ -143,13 +150,13 @@ var setAccountCmd = &cobra.Command{
 				var updateLitmusCtlConfig = types.UpdateLitmusCtlConfig{
 					Account:        account,
 					CurrentAccount: authInput.Endpoint,
-					CurrentUser:    authInput.Username,
+					CurrentUser:    claims["username"].(string),
 				}
 
 				err = config.UpdateLitmusCtlConfig(updateLitmusCtlConfig, configFilePath)
 				utils.PrintError(err)
 			}
-			utils.White_B.Printf("\naccount.username/%s configured", authInput.Username)
+			utils.White_B.Printf("\naccount.username/%s configured", claims["username"].(string))
 
 		} else {
 			utils.Red.Println("\nError: some flags are missing. Run 'litmusctl config set-account --help' for usage. ")

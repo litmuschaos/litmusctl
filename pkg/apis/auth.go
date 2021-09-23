@@ -18,9 +18,10 @@ package apis
 import (
 	"encoding/json"
 	"errors"
-	"github.com/litmuschaos/litmusctl/pkg/utils"
 	"io/ioutil"
 	"net/http"
+
+	"github.com/litmuschaos/litmusctl/pkg/utils"
 
 	"github.com/litmuschaos/litmusctl/pkg/types"
 )
