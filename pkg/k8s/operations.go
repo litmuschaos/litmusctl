@@ -17,10 +17,13 @@ package k8s
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"log"
 	"os"
 	"os/exec"
+	"path/filepath"
+	"k8s.io/client-go/util/homedir"
 
 	"github.com/litmuschaos/litmusctl/pkg/utils"
 	authorizationv1 "k8s.io/api/authorization/v1"
@@ -262,6 +265,9 @@ func ValidSA(namespace string, kubeconfig *string) (string, bool) {
 	return sa, false
 }
 
+// Token: Authorization token
+// EndPoint: Endpoint in .litmusconfig
+// YamlPath: Path of yaml file
 type ApplyYamlPrams struct {
 	Token    string
 	Endpoint string
@@ -269,13 +275,12 @@ type ApplyYamlPrams struct {
 }
 
 func ApplyYaml(params ApplyYamlPrams, kubeconfig string) (output string, err error) {
-	path := fmt.Sprintf("%s/%s/%s.yaml", params.Endpoint, params.YamlPath, params.Token)
-
+	//path := fmt.Sprintf("%s/%s/%s.yaml", params.Endpoint, params.YamlPath, params.Token)
 	var args []string
 	if kubeconfig != "" {
-		args = []string{"kubectl", "apply", "-f", path, "--kubeconfig", kubeconfig}
+		args = []string{"kubectl", "apply", "-f", params.YamlPath, "--kubeconfig", kubeconfig}
 	} else {
-		args = []string{"kubectl", "apply", "-f", path}
+		args = []string{"kubectl", "apply", "-f", params.YamlPath}
 	}
 
 	stdout, err := exec.Command(args[0], args[1:]...).CombinedOutput()
@@ -284,4 +289,41 @@ func ApplyYaml(params ApplyYamlPrams, kubeconfig string) (output string, err err
 	}
 
 	return string(stdout), err
+}
+
+func GetConfigMap() (string, error){
+
+	// Generalize this command
+	command := []string{"kubectl", "describe", "configmaps", "agent-config", "-n", "litmus"}
+	stdout, err := exec.Command(command[0], command[1:]...).CombinedOutput()
+	if err != nil {
+		return "", err
+	}
+	//fmt.Println(string(stdout))
+	return string(stdout), nil
+}
+
+func GetConfigMap1(c context.Context) {
+	//var cm *v1.ConfigMap
+
+	var kubeconfig *string
+	if home := homedir.HomeDir(); home != "" {
+		fmt.Println("iniside if kube")
+		kubeconfig = flag.String("configmap", filepath.Join(home, ".kube", "config"),"")
+	} else {
+		fmt.Println("iniside else kube")
+		kubeconfig = flag.String("configmap", "", "absolute path to the kubeconfig file")
+	}
+	flag.Parse()
+
+	clientset, err := ClientSet(kubeconfig)
+	if err != nil {
+		fmt.Println(err)
+	}
+	x , err := clientset.CoreV1().ConfigMaps("litmus").Get(c,"agent-config", metav1.GetOptions{})
+	if err != nil {
+		fmt.Println(err)
+
+	}
+	fmt.Println("AGENT CONFIG FROM CONFIG MAP",x)
 }

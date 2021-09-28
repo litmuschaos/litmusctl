@@ -16,7 +16,12 @@ limitations under the License.
 package k8s
 
 import (
+	"flag"
+	"fmt"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
+	"k8s.io/client-go/discovery"
+	"k8s.io/client-go/dynamic"
+	"k8s.io/client-go/rest"
 	"os"
 	"path/filepath"
 
@@ -25,6 +30,35 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/util/homedir"
 )
+
+//getKubeConfig setup the config for access cluster resource
+func GetKubeConfig() (*rest.Config, error) {
+	// Use in-cluster config if kubeconfig path is not specified
+	KubeConfig := os.Getenv("KUBECONFIG")
+	// Use in-cluster config if kubeconfig path is not specified
+	if KubeConfig == "" {
+		return rest.InClusterConfig()
+	}
+
+	return clientcmd.BuildConfigFromFlags("", KubeConfig)
+}
+
+func GetKubecConfig1()(*rest.Config, error) {
+	var kubeconfig *string
+	if home := homedir.HomeDir(); home != "" {
+		kubeconfig = flag.String("kubeconfig", filepath.Join(home, ".kube", "config"),"")
+	} else {
+		kubeconfig = flag.String("kubeconfig", "", "absolute path to the kubeconfig file")
+	}
+	flag.Parse()
+	cfg, err := clientcmd.BuildConfigFromFlags("", *kubeconfig)
+	if err != nil {
+		fmt.Println("Could not get config")
+		return nil, err
+	}
+
+	return cfg, nil
+}
 
 // Returns a new kubernetes client set
 func ClientSet(kubeconfig *string) (*kubernetes.Clientset, error) {
@@ -52,4 +86,27 @@ func ClientSet(kubeconfig *string) (*kubernetes.Clientset, error) {
 		os.Exit(1)
 	}
 	return clientset, err
+}
+
+//This function returns a dynamic client and discovery client
+func GetDynamicAndDiscoveryClient() (discovery.DiscoveryInterface, dynamic.Interface, error) {
+	// returns a config object which uses the service account kubernetes gives to pods
+	config, err := GetKubecConfig1()
+	if err != nil {
+		fmt.Println("ERROR2", err)
+		return nil, nil, err
+	}
+	// NewDiscoveryClientForConfig creates a new DiscoveryClient for the given config
+	discoveryClient, err := discovery.NewDiscoveryClientForConfig(config)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	// NewForConfig creates a new dynamic client or returns an error.
+	dynamicClient, err := dynamic.NewForConfig(config)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return discoveryClient, dynamicClient, nil
 }

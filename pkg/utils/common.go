@@ -22,15 +22,16 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"math/big"
+	"os"
+	"strings"
+
 	"github.com/fatih/color"
 	"github.com/litmuschaos/litmusctl/pkg/config"
 	"github.com/litmuschaos/litmusctl/pkg/types"
 	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v2"
-	"math/big"
-	"os"
-	"strings"
 )
 
 var (
