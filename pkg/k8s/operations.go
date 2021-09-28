@@ -291,39 +291,24 @@ func ApplyYaml(params ApplyYamlPrams, kubeconfig string) (output string, err err
 	return string(stdout), err
 }
 
-func GetConfigMap() (string, error){
-
-	// Generalize this command
-	command := []string{"kubectl", "describe", "configmaps", "agent-config", "-n", "litmus"}
-	stdout, err := exec.Command(command[0], command[1:]...).CombinedOutput()
-	if err != nil {
-		return "", err
-	}
-	//fmt.Println(string(stdout))
-	return string(stdout), nil
-}
-
-func GetConfigMap1(c context.Context) {
-	//var cm *v1.ConfigMap
-
+func GetConfigMap1(c context.Context) (map[string]string, error) {
 	var kubeconfig *string
+
 	if home := homedir.HomeDir(); home != "" {
-		fmt.Println("iniside if kube")
 		kubeconfig = flag.String("configmap", filepath.Join(home, ".kube", "config"),"")
 	} else {
-		fmt.Println("iniside else kube")
-		kubeconfig = flag.String("configmap", "", "absolute path to the kubeconfig file")
+		kubeconfig = flag.String("configmap", "", "")
 	}
 	flag.Parse()
 
 	clientset, err := ClientSet(kubeconfig)
 	if err != nil {
-		fmt.Println(err)
+		return nil, err
 	}
 	x , err := clientset.CoreV1().ConfigMaps("litmus").Get(c,"agent-config", metav1.GetOptions{})
 	if err != nil {
-		fmt.Println(err)
+		return nil, err
 
 	}
-	fmt.Println("AGENT CONFIG FROM CONFIG MAP",x)
+	return x.Data, nil
 }

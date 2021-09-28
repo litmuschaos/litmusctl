@@ -64,46 +64,25 @@ func GetManifest(c context.Context, cred types.Credentials) (string, error) {
 			return "", err
 		}
 
+		content := response.UnstructuredContent()
+		agentData := content["data"].(map[string]interface{})
 
-		type DEPLOYMENTS1 struct {
-			DEPLOYMENTS  []string
-		}
+		fmt.Println("Agent Data ", agentData)
 
-		type configmap struct {
-			ACCESS_KEY string
-			AGENT_SCOPE string
-			CLUSTER_ID string
-			COMPONENTS DEPLOYMENTS1
-			IS_CLUSTER_CONFIRMED string
-			SERVER_ADDR string
-			START_TIME string
-			VERSION string
-		}
-
-
-		x := response.UnstructuredContent()
-		y := x["data"]
-
-		v, ok := y.(map[string]*configmap)
-		if !ok {
-			// Can't assert, handle error.
-			fmt.Println("NoT okay")
-
-		}
-		for _, s := range v {
-			fmt.Printf("Value: %v\n", s)
-		}
-		fmt.Println("-----------------------------------------------")
-
-		fmt.Println("API VERSION ", y)
-		fmt.Println("-----------------------------------------------")
-		fmt.Println("MAP",response.UnstructuredContent())
+		//fmt.Println("-----------------------------------------------")
+		//fmt.Println("MAP",response.UnstructuredContent())
 
 		//fmt.Println("AGENT CONFIG FROM MANIFEST ",response)
 
 		fmt.Println("-----------------------------------------------")
 
-		//k8s.GetConfigMap1(c)
+		configData,err := k8s.GetConfigMap1(c)
+		if err != nil {
+			fmt.Println("ERROR",err)
+			return "", err
+		}
+		fmt.Println("Config Data ", configData)
+
 		//res, err := k8s.GetConfigMap1()
 		//if err != nil {
 		//	return "", err
