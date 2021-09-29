@@ -17,6 +17,8 @@ package create
 
 import (
 	"context"
+	"fmt"
+
 	"github.com/litmuschaos/litmusctl/pkg/apis"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
 	"github.com/spf13/cobra"
@@ -31,13 +33,31 @@ var UpgradeCmd = &cobra.Command{
 
 		utils.PrintError(err)
 
+		projectID, err := cmd.Flags().GetString("project-id")
+		utils.PrintError(err)
+
+		if projectID == "" {
+			utils.White_B.Print("\nEnter the project ID: ")
+			fmt.Scanln(&projectID)
+		}
+
+		namespace, err := cmd.Flags().GetString("namespace")
+		utils.PrintError(err)
+
+		if namespace == "" {
+			utils.White_B.Print("\nEnter the namespace: ")
+			fmt.Scanln(&namespace)
+		}
+
 		c := context.Background()
 
 		// TAKE PROJECT_ID AND NAMESPACE AS INPUT AND PASS IT THROUGH GetManifests FUNCTION
-		apis.GetManifest(c, credentials)
+		apis.GetManifest(c, credentials, projectID, namespace)
 	},
 }
 
 func init() {
 	CreateCmd.AddCommand(UpgradeCmd)
+	UpgradeCmd.Flags().String("namespace", "", "Enter the namespace")
+	UpgradeCmd.Flags().String("project-id", "", "Enter the projectID")
 }
