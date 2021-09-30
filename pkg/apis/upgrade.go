@@ -38,16 +38,18 @@ func createKeyValuePairs(m map[string]string) string {
 
 func GetManifest(c context.Context, cred types.Credentials, projectID string, namespace string) (string, error) {
 
+	// To get the agent-config from the cluster
 	configData, err := k8s.GetConfigMap1(c, namespace)
 	if err != nil {
 		fmt.Println("ERROR", err)
 		return "", err
 	}
 
+	// Extract clusterID and accessKey from namespace by reading agent config
 	clusterID := configData["CLUSTER_ID"]
 	accessKey := configData["ACCESS_KEY"]
 
-	// EXTRACT clusterID FROM NAMESPACE BY READING AGENT CONFIG
+	// Querying the GQL server to get the upgraded manifest file
 	query := `{"query":"query {\n getManifest(projectID : \"` + projectID + `\",\n clusterID : \"` + clusterID + `\",\n accessKey :\"` + accessKey + `\")}"}`
 	resp, err := SendRequest(SendRequestParams{Endpoint: cred.Endpoint + utils.GQLAPIPath, Token: cred.Token}, []byte(query))
 	if err != nil {
@@ -61,10 +63,13 @@ func GetManifest(c context.Context, cred types.Credentials, projectID string, na
 
 	defer resp.Body.Close()
 
+	// Checks if status code is OK(200) then parses the bodybytes and stores in the manifest of type manifestData
 	if resp.StatusCode == http.StatusOK {
 		var manifest manifestData
 		err = json.Unmarshal(bodyBytes, &manifest)
-
+		if err != nil {
+			return "", err
+		}
 		//var y unstructured.Unstructured
 		//err = json.Unmarshal(manifest, &y)
 		//
@@ -72,12 +77,8 @@ func GetManifest(c context.Context, cred types.Credentials, projectID string, na
 		//
 		//manifest1, err := yaml.Marshal(&manifest.Data.GetManifest)
 
-		if err != nil {
-			return "", err
-		}
-
-		// NAMESPACE IS HARDCODED
-		response, err := k8s.ClusterResource(c, manifest.Data.GetManifest, "litmus")
+		// To extract the agent-config config map from manifest
+		response, agentConfig, err := k8s.ClusterResource(c, manifest.Data.GetManifest, namespace)
 		fmt.Println("response", response)
 		if err != nil {
 			fmt.Println("ERROR", err)
@@ -107,6 +108,7 @@ func GetManifest(c context.Context, cred types.Credentials, projectID string, na
 		//}
 		//fmt.Println("Config RESPONSE ",response)
 
+		// To write the manifest data into a temporary file
 		err = ioutil.WriteFile("temp1.yaml", []byte(manifest.Data.GetManifest), 0644)
 		if err != nil {
 			return "", err
@@ -114,27 +116,27 @@ func GetManifest(c context.Context, cred types.Credentials, projectID string, na
 
 		fmt.Println("Agent Data ", agentData)
 
-		// Decode YAML manifest into unstructured.Unstructured
-		obj := &unstructured.Unstructured{}
+		// // Decode YAML manifest into unstructured.Unstructured
+		// obj := &unstructured.Unstructured{}
 
-		manifestsArray := strings.Split(manifest.Data.GetManifest, "---")
+		// manifestsArray := strings.Split(manifest.Data.GetManifest, "---")
 
-		var agentConfig string
+		// var agentConfig string
 
-		for _, x := range manifestsArray[1:] {
+		// for _, x := range manifestsArray[1:] {
 
-			_, _, err = yaml.NewDecodingSerializer(unstructured.UnstructuredJSONScheme).Decode([]byte(x), nil, obj)
-			if err != nil {
-				return "", err
-			}
-			if obj.GetName() == "agent-config" {
-				agentConfig = x
-				break
-			}
+		// 	_, _, err = yaml.NewDecodingSerializer(unstructured.UnstructuredJSONScheme).Decode([]byte(x), nil, obj)
+		// 	if err != nil {
+		// 		return "", err
+		// 	}
+		// 	if obj.GetName() == "agent-config" {
+		// 		agentConfig = x
+		// 		break
+		// 	}
 
-		}
+		// }
 
-		var configMapString string
+		var configMapString string // To store configMap from the cluster
 
 		metadata := new(bytes.Buffer)
 		fmt.Fprintf(metadata, "\n%s: %s\n%s: %s\n%s: \n  %s: %s\n  %s: %s\n%s:\n", "apiVersion", "v1",

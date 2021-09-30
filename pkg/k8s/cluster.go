@@ -27,25 +27,26 @@ var (
 )
 
 // This function handles cluster operations
-func ClusterResource(c context.Context, manifest string, namespace string) (*unstructured.Unstructured, error) {
+func ClusterResource(c context.Context, manifest string, namespace string) (*unstructured.Unstructured, string, error) {
 
 	obj := &unstructured.Unstructured{}
 
 	manifestsArray := strings.Split(manifest, "---")
-
+	var agentConfig string
 	for _, x := range manifestsArray[1:] {
 
 		_, _, err := decUnstructured.Decode([]byte(x), nil, obj)
 		if err != nil {
-			return nil, err
+			return nil, "", err
 		}
 		if obj.GetName() == "agent-config" {
+			agentConfig = x
 			break
 		}
 	}
 
-	fmt.Println("objjjj", obj.UnstructuredContent())
-	return obj, nil
+	// fmt.Println("objjjj", obj.UnstructuredContent())
+	return obj, agentConfig, nil
 
 }
 
