@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/litmuschaos/litmusctl/pkg/k8s"
@@ -182,7 +183,12 @@ func GetManifest(c context.Context, cred types.Credentials, projectID string, na
 		utils.White_B.Print("\n", yamlOutput)
 
 		fmt.Println("SUCCESSFUL")
-		return "File Written Succesfully", nil
+		fmt.Println("Deleting the manifest file...")
+		e := os.Remove("temp1.yaml")
+		if e != nil {
+			return "", e
+		}
+		return "Manifest applied successfully", nil
 	} else {
 		return "", errors.New("Unmatched status code:" + string(bodyBytes))
 	}
