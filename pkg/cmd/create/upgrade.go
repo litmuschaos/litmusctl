@@ -41,23 +41,23 @@ var UpgradeCmd = &cobra.Command{
 			fmt.Scanln(&projectID)
 		}
 
-		namespace, err := cmd.Flags().GetString("namespace")
+		agentName, err := cmd.Flags().GetString("agentName")
 		utils.PrintError(err)
 
-		if namespace == "" {
-			utils.White_B.Print("\nEnter the namespace: ")
-			fmt.Scanln(&namespace)
+		if agentName == "" {
+			utils.White_B.Print("\nEnter the agentName: ")
+			fmt.Scanln(&agentName)
 		}
 
 		c := context.Background()
 
-		// TAKE PROJECT_ID AND NAMESPACE AS INPUT AND PASS IT THROUGH GetManifests FUNCTION
-		apis.GetManifest(c, credentials, projectID, namespace)
+		// TAKE PROJECT_ID AND agentName AS INPUT AND PASS IT THROUGH GetManifests FUNCTION
+		apis.GetManifest(c, credentials, projectID, agentName)
 	},
 }
 
 func init() {
 	CreateCmd.AddCommand(UpgradeCmd)
-	UpgradeCmd.Flags().String("namespace", "", "Enter the namespace")
+	UpgradeCmd.Flags().String("agentName", "", "Enter the agentName")
 	UpgradeCmd.Flags().String("project-id", "", "Enter the projectID")
 }

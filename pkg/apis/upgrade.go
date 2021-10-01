@@ -9,7 +9,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
-	"strings"
 
 	"github.com/litmuschaos/litmusctl/pkg/k8s"
 	"github.com/litmuschaos/litmusctl/pkg/types"
@@ -21,11 +20,25 @@ import (
 var decUnstructured = yaml.NewDecodingSerializer(unstructured.UnstructuredJSONScheme)
 
 type manifestData struct {
-	Data data `json:"data`
+	Data data `json:"data"`
 }
 
 type data struct {
 	GetManifest string `json:"getManifest"`
+}
+
+type ClusterData struct {
+	Data GetAgentDetails `json:"data"`
+}
+
+type GetAgentDetails struct {
+	GetAgentDetails ClusterDetails `json:"getAgentDetails"`
+}
+
+type ClusterDetails struct {
+	ClusterID      string  `json:"cluster_id"`
+	AccessKey      string  `json:"access_key"`
+	AgentNamespace *string `json:"agent_namespace"`
 }
 
 func createKeyValuePairs(m map[string]string) string {
@@ -36,22 +49,39 @@ func createKeyValuePairs(m map[string]string) string {
 	return b.String()
 }
 
-func GetManifest(c context.Context, cred types.Credentials, projectID string, namespace string) (string, error) {
+func GetManifest(c context.Context, cred types.Credentials, projectID string, agentName string) (string, error) {
 
-	// To get the agent-config from the cluster
-	configData, err := k8s.GetConfigMap1(c, namespace)
+	// fmt.Println(agentName, projectID)
+	// // Extract clusterID and accessKey from namespace by reading agent config
+	// clusterID := configData["CLUSTER_ID"]
+	// accessKey := configData["ACCESS_KEY"]
+
+	query := `{"query":"query {\n getAgentDetails(agentName : \"` + agentName + `\", \n projectID : \"` + projectID + `\"){\n agent_namespace access_key cluster_id \n}}"}`
+	resp, err := SendRequest(SendRequestParams{Endpoint: cred.Endpoint + utils.GQLAPIPath, Token: cred.Token}, []byte(query))
 	if err != nil {
-		fmt.Println("ERROR", err)
 		return "", err
 	}
 
-	// Extract clusterID and accessKey from namespace by reading agent config
-	clusterID := configData["CLUSTER_ID"]
-	accessKey := configData["ACCESS_KEY"]
+	bodyBytes1, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return "", err
+	}
+
+	defer resp.Body.Close()
+	var agent ClusterData
+	if resp.StatusCode == http.StatusOK {
+
+		err = json.Unmarshal(bodyBytes1, &agent)
+		// fmt.Println("agentttt", *agent.Data.GetAgentDetails.AgentNamespace)
+
+		if err != nil {
+			return "", err
+		}
+	}
 
 	// Querying the GQL server to get the upgraded manifest file
-	query := `{"query":"query {\n getManifest(projectID : \"` + projectID + `\",\n clusterID : \"` + clusterID + `\",\n accessKey :\"` + accessKey + `\")}"}`
-	resp, err := SendRequest(SendRequestParams{Endpoint: cred.Endpoint + utils.GQLAPIPath, Token: cred.Token}, []byte(query))
+	query = `{"query":"query {\n getManifest(projectID : \"` + projectID + `\",\n clusterID : \"` + agent.Data.GetAgentDetails.ClusterID + `\",\n accessKey :\"` + agent.Data.GetAgentDetails.AccessKey + `\")}"}`
+	resp, err = SendRequest(SendRequestParams{Endpoint: cred.Endpoint + utils.GQLAPIPath, Token: cred.Token}, []byte(query))
 	if err != nil {
 		return "", err
 	}
@@ -78,22 +108,22 @@ func GetManifest(c context.Context, cred types.Credentials, projectID string, na
 		//manifest1, err := yaml.Marshal(&manifest.Data.GetManifest)
 
 		// To extract the agent-config config map from manifest
-		response, agentConfig, err := k8s.ClusterResource(c, manifest.Data.GetManifest, namespace)
-		fmt.Println("response", response)
-		if err != nil {
-			fmt.Println("ERROR", err)
-			return "", err
-		}
+		// response, agentConfig, err := k8s.ClusterResource(c, manifest.Data.GetManifest, *agent.Data.GetAgentDetails.AgentNamespace)
+		// fmt.Println("response", response)
+		// if err != nil {
+		// 	fmt.Println("ERROR", err)
+		// 	return "", err
+		// }
 
-		content := response.UnstructuredContent()
-		agentData := content["data"].(map[string]interface{})
-		fmt.Println("Agent dataaa", agentData)
+		// content := response.UnstructuredContent()
+		// agentData := content["data"].(map[string]interface{})
+		// fmt.Println("Agent dataaa", agentData)
 		//fmt.Println("-----------------------------------------------")
 		//fmt.Println("MAP",response.UnstructuredContent())
 
 		//fmt.Println("AGENT CONFIG FROM MANIFEST ",response)
 
-		fmt.Println("-----------------------------------------------")
+		// fmt.Println("-----------------------------------------------")
 
 		//res, err := k8s.GetConfigMap1()
 		//if err != nil {
@@ -114,7 +144,7 @@ func GetManifest(c context.Context, cred types.Credentials, projectID string, na
 			return "", err
 		}
 
-		fmt.Println("Agent Data ", agentData)
+		// fmt.Println("Agent Data ", agentData)
 
 		// // Decode YAML manifest into unstructured.Unstructured
 		// obj := &unstructured.Unstructured{}
@@ -136,18 +166,22 @@ func GetManifest(c context.Context, cred types.Credentials, projectID string, na
 
 		// }
 
+		// To get the agent-config from the cluster
+		configData, err := k8s.GetConfigMap1(c, *agent.Data.GetAgentDetails.AgentNamespace)
+		if err != nil {
+			fmt.Println("ERROR", err)
+			return "", err
+		}
 		var configMapString string // To store configMap from the cluster
 
 		metadata := new(bytes.Buffer)
 		fmt.Fprintf(metadata, "\n%s: %s\n%s: %s\n%s: \n  %s: %s\n  %s: %s\n%s:\n", "apiVersion", "v1",
-			"kind", "ConfigMap", "metadata", "name", "agent-config", "namespace", "litmus", "data")
+			"kind", "ConfigMap", "metadata", "name", "agent-config", "namespace", *agent.Data.GetAgentDetails.AgentNamespace, "data")
 
+		fmt.Println(configData)
 		for k, v := range configData {
 			b := new(bytes.Buffer)
-			if k == "VERSION" {
-				fmt.Println("Version", agentData["VERSION"])
-				fmt.Fprintf(b, "  %s: %s\n", k, agentData["VERSION"])
-			} else if k == "COMPONENTS" {
+			if k == "COMPONENTS" {
 				fmt.Fprintf(b, "  %s: |\n    %s", k, v)
 			} else if k == "START_TIME" || k == "IS_CLUSTER_CONFIRMED" {
 				fmt.Fprintf(b, "  %s: \"%s\"\n", k, v)
@@ -155,23 +189,28 @@ func GetManifest(c context.Context, cred types.Credentials, projectID string, na
 				fmt.Fprintf(b, "  %s: %s\n", k, v)
 			}
 			configMapString = configMapString + b.String()
+
 		}
 		configMapString = metadata.String() + configMapString
-		fmt.Println("Config Data ", configMapString)
-
-		fileContent, err := ioutil.ReadFile("temp1.yaml")
+		// fmt.Println("Config Data ", configMapString)
+		err = ioutil.WriteFile("backupAgentConfig.yaml", []byte(configMapString), 0644)
 		if err != nil {
 			return "", err
 		}
 
-		var newContent = string(fileContent)
+		// fileContent, err := ioutil.ReadFile("temp1.yaml")
+		// if err != nil {
+		// 	return "", err
+		// }
 
-		newContent = strings.Replace(newContent, agentConfig, configMapString, -1)
+		// var newContent = string(fileContent)
 
-		err = ioutil.WriteFile("temp1.yaml", []byte(newContent), 0644)
-		if err != nil {
-			return "", err
-		}
+		// newContent = strings.Replace(newContent, agentConfig, configMapString, -1)
+
+		// err = ioutil.WriteFile("temp1.yaml", []byte(newContent), 0644)
+		// if err != nil {
+		// 	return "", err
+		// }
 		yamlOutput, err := k8s.ApplyYaml(k8s.ApplyYamlPrams{
 			Token:    cred.Token,
 			Endpoint: cred.Endpoint,
