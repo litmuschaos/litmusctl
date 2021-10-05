@@ -16,6 +16,7 @@ limitations under the License.
 package create
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/litmuschaos/litmusctl/pkg/agent"
 	"github.com/litmuschaos/litmusctl/pkg/apis"
@@ -122,6 +123,41 @@ var agentCmd = &cobra.Command{
 				if ok := utils.CheckKeyValueFormat(newAgent.NodeSelector); !ok {
 					os.Exit(1)
 				}
+			}
+			toleration, err := cmd.Flags().GetString("tolerations")
+			utils.PrintError(err)
+
+			if toleration != "" {
+				var tolerations []types.Toleration
+				err := json.Unmarshal([]byte(toleration), &tolerations)
+				utils.PrintError(err)
+
+				str := "["
+				for _, tol := range tolerations {
+					str += "{"
+					if tol.TolerationSeconds != "" {
+						str += "tolerationSeconds: \\\"" + tol.TolerationSeconds + "\\\" "
+					}
+					if tol.Effect != "" {
+						str += "effect: \\\"" + tol.Effect + "\\\" "
+					}
+					if tol.Key != "" {
+						str += "key: \\\"" + tol.Key + "\\\" "
+					}
+
+					if tol.Value != "" {
+						str += "value: \\\"" + tol.Value + "\\\" "
+					}
+
+					if tol.Operator != "" {
+						str += "operator : \\\"" + tol.Operator + "\\\" "
+					}
+
+					str += " }"
+				}
+				str += "]"
+
+				newAgent.Tolerations = str
 			}
 
 			newAgent.Namespace, err = cmd.Flags().GetString("namespace")
@@ -234,6 +270,8 @@ func init() {
 
 	agentCmd.Flags().BoolP("non-interactive", "n", false, "Set it to true for non interactive mode | Note: Always set the boolean flag as --non-interactive=Boolean")
 	agentCmd.Flags().StringP("kubeconfig", "k", "", "Set to pass kubeconfig file if it is not in the default location ($HOME/.kube/config)")
+	agentCmd.Flags().String("tolerartions", "", "Set to pass kubeconfig file if it is not in the default location ($HOME/.kube/config)")
+
 	agentCmd.Flags().String("project-id", "", "Set the project-id to install agent for the particular project. To see the projects, apply litmusctl get projects")
 	agentCmd.Flags().String("installation-mode", "cluster", "Set the installation mode for the kind of agent | Supported=cluster/namespace")
 	agentCmd.Flags().String("agent-name", "", "Set the agent name")

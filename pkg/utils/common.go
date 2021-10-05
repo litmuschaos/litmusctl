@@ -30,7 +30,9 @@ import (
 	"gopkg.in/yaml.v2"
 	"math/big"
 	"os"
+	"strconv"
 	"strings"
+	"unicode"
 )
 
 var (
@@ -147,4 +149,48 @@ func CheckKeyValueFormat(str string) bool {
 		}
 	}
 	return true
+}
+
+// process event data into proper format acceptable by graphql
+func MarshalGQLData(gqlData interface{}) (string, error) {
+	data, err := json.Marshal(gqlData)
+	if err != nil {
+		return "", err
+	}
+
+	// process the marshalled data to make it graphql compatible
+	processed := strconv.Quote(string(data))
+	processed = strings.Replace(processed, `\"`, `\\\"`, -1)
+	return processed, nil
+}
+
+func GetKeyValueMapFromQuotedString(quotedString string) map[string]string {
+	lastQuote := rune(0)
+	f := func(c rune) bool {
+		switch {
+		case c == lastQuote:
+			lastQuote = rune(0)
+			return false
+		case lastQuote != rune(0):
+			return false
+		case unicode.In(c, unicode.Quotation_Mark):
+			lastQuote = c
+			return false
+		default:
+			return unicode.IsSpace(c)
+
+		}
+	}
+
+	// splitting string by space but considering quoted section
+	items := strings.FieldsFunc(quotedString, f)
+
+	// create and fill the map
+	m := make(map[string]string)
+	for _, item := range items {
+		x := strings.Split(item, "=")
+		m[x[0]] = x[1][1 : len(x[1])-2]
+	}
+
+	return m
 }

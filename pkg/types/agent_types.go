@@ -23,8 +23,17 @@ type Agent struct {
 	ProjectId      string `json:"project_id"`
 	ClusterType    string `json:"cluster_type"`
 	NodeSelector   string `json:"node_selector"`
+	Tolerations    string
 	Namespace      string
 	ServiceAccount string
 	NsExists       bool
 	SAExists       bool
+}
+
+type Toleration struct {
+	Key               string `json:"key"`
+	Value             string `json:"value"`
+	Operator          string `json:"operator"`
+	Effect            string `json:"effect"`
+	TolerationSeconds string `json:"tolerationSeconds"`
 }
