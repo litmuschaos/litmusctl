@@ -41,7 +41,7 @@ var agentCmd = &cobra.Command{
 			fmt.Scanln(&projectID)
 		}
 
-		cluster_id, err := cmd.Flags().GetString("agent-id")
+		cluster_id, err := cmd.Flags().GetString("cluster-id")
 		utils.PrintError(err)
 
 		if cluster_id == "" {
