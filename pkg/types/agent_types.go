@@ -35,5 +35,5 @@ type Toleration struct {
 	Value             string `json:"value"`
 	Operator          string `json:"operator"`
 	Effect            string `json:"effect"`
-	TolerationSeconds string `json:"tolerationSeconds"`
+	TolerationSeconds int    `json:"tolerationSeconds"`
 }

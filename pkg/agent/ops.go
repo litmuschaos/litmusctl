@@ -171,7 +171,7 @@ AGENT_NAME:
 			}
 
 			if ts != "" {
-				str += "tolerationSeconds: \\\"" + ts + "\\\" "
+				str += "tolerationSeconds: " + ts + " "
 			}
 
 			utils.White_B.Print("\nKey: ")
