@@ -17,6 +17,7 @@ package rootCmd
 
 import (
 	"fmt"
+	"github.com/litmuschaos/litmusctl/pkg/cmd/upgrade"
 	"github.com/litmuschaos/litmusctl/pkg/cmd/version"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
 	"os"
@@ -52,6 +53,7 @@ func init() {
 	rootCmd.AddCommand(create.CreateCmd)
 	rootCmd.AddCommand(get.GetCmd)
 	rootCmd.AddCommand(version.VersionCmd)
+	rootCmd.AddCommand(upgrade.UpgradeCmd)
 
 	// Here you will define your flags and configuration settings.
 	// Cobra supports persistent flags, which, if defined here,

@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package create
+package upgrade
 
 import (
 	"context"
@@ -25,8 +25,8 @@ import (
 )
 
 // createCmd represents the create command
-var UpgradeCmd = &cobra.Command{
-	Use:   "upgrade",
+var agentCmd = &cobra.Command{
+	Use:   "agent",
 	Short: `Upgrades the LitmusChaos agent plane.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		credentials, err := utils.GetCredentials(cmd)
@@ -41,23 +41,20 @@ var UpgradeCmd = &cobra.Command{
 			fmt.Scanln(&projectID)
 		}
 
-		agentName, err := cmd.Flags().GetString("agentName")
+		cluster_id, err := cmd.Flags().GetString("agent-id")
 		utils.PrintError(err)
 
-		if agentName == "" {
-			utils.White_B.Print("\nEnter the agentName: ")
-			fmt.Scanln(&agentName)
+		if cluster_id == "" {
+			utils.White_B.Print("\nEnter the cluster ID: ")
+			fmt.Scanln(&cluster_id)
 		}
 
-		c := context.Background()
-
-		// TAKE PROJECT_ID AND agentName AS INPUT AND PASS IT THROUGH GetManifests FUNCTION
-		apis.GetManifest(c, credentials, projectID, agentName)
+		apis.UpgradeAgent(context.Background(), credentials, projectID, cluster_id)
 	},
 }
 
 func init() {
-	CreateCmd.AddCommand(UpgradeCmd)
-	UpgradeCmd.Flags().String("agentName", "", "Enter the agentName")
-	UpgradeCmd.Flags().String("project-id", "", "Enter the projectID")
+	UpgradeCmd.AddCommand(agentCmd)
+	agentCmd.Flags().String("project-id", "", "Enter the project ID")
+	agentCmd.Flags().String("cluster-id", "", "Enter the cluster ID")
 }

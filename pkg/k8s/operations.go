@@ -292,7 +292,8 @@ func ApplyYaml(params ApplyYamlPrams, kubeconfig string) (output string, err err
 	return string(stdout), err
 }
 
-func GetConfigMap1(c context.Context, namespace string) (map[string]string, error) {
+// GetConfigMap returns config map for a given name and namespace
+func GetConfigMap(c context.Context, name string, namespace string) (map[string]string, error) {
 	var kubeconfig *string
 
 	if home := homedir.HomeDir(); home != "" {
@@ -306,7 +307,7 @@ func GetConfigMap1(c context.Context, namespace string) (map[string]string, erro
 	if err != nil {
 		return nil, err
 	}
-	x, err := clientset.CoreV1().ConfigMaps(namespace).Get(c, "agent-config", metav1.GetOptions{})
+	x, err := clientset.CoreV1().ConfigMaps(namespace).Get(c, name, metav1.GetOptions{})
 	if err != nil {
 		return nil, err
 
