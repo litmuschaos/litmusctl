@@ -17,12 +17,13 @@ package create
 
 import (
 	"fmt"
+	"os"
+
 	"github.com/litmuschaos/litmusctl/pkg/agent"
 	"github.com/litmuschaos/litmusctl/pkg/apis"
 	"github.com/litmuschaos/litmusctl/pkg/k8s"
 	"github.com/litmuschaos/litmusctl/pkg/types"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
-	"os"
 
 	"github.com/spf13/cobra"
 )
@@ -213,7 +214,7 @@ var agentCmd = &cobra.Command{
 			Token:    agent.Data.UserAgentReg.Token,
 			Endpoint: credentials.Endpoint,
 			YamlPath: utils.ChaosYamlPath,
-		}, kubeconfig)
+		}, kubeconfig, false)
 		if err != nil {
 			utils.White_B.Print("\n❌ Failed in applying connection yaml: \n" + yamlOutput)
 			os.Exit(1)

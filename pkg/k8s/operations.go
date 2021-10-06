@@ -275,13 +275,16 @@ type ApplyYamlPrams struct {
 	YamlPath string
 }
 
-func ApplyYaml(params ApplyYamlPrams, kubeconfig string) (output string, err error) {
-	//path := fmt.Sprintf("%s/%s/%s.yaml", params.Endpoint, params.YamlPath, params.Token)
+func ApplyYaml(params ApplyYamlPrams, kubeconfig string, isLocal bool) (output string, err error) {
+	path := params.YamlPath
+	if !isLocal {
+		path = fmt.Sprintf("%s/%s/%s.yaml", params.Endpoint, params.YamlPath, params.Token)
+	}
 	var args []string
 	if kubeconfig != "" {
-		args = []string{"kubectl", "apply", "-f", params.YamlPath, "--kubeconfig", kubeconfig}
+		args = []string{"kubectl", "apply", "-f", path, "--kubeconfig", kubeconfig}
 	} else {
-		args = []string{"kubectl", "apply", "-f", params.YamlPath}
+		args = []string{"kubectl", "apply", "-f", path}
 	}
 
 	stdout, err := exec.Command(args[0], args[1:]...).CombinedOutput()

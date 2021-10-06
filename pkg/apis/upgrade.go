@@ -119,7 +119,7 @@ func UpgradeAgent(c context.Context, cred types.Credentials, projectID string, c
 			Token:    cred.Token,
 			Endpoint: cred.Endpoint,
 			YamlPath: "agent-manifest.yaml",
-		}, "")
+		}, "", true)
 
 		if err != nil {
 			return "", err
