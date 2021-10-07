@@ -48,7 +48,7 @@ func UpgradeAgent(c context.Context, cred types.Credentials, projectID string, c
 		return "", err
 	}
 
-	bodyBytes1, err := ioutil.ReadAll(resp.Body)
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return "", err
 	}
@@ -57,7 +57,7 @@ func UpgradeAgent(c context.Context, cred types.Credentials, projectID string, c
 	var agent ClusterData
 
 	if resp.StatusCode == http.StatusOK {
-		err = json.Unmarshal(bodyBytes1, &agent)
+		err = json.Unmarshal(bodyBytes, &agent)
 		if err != nil {
 			return "", err
 		}
@@ -70,7 +70,7 @@ func UpgradeAgent(c context.Context, cred types.Credentials, projectID string, c
 		return "", err
 	}
 
-	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	bodyBytes, err = ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return "", err
 	}

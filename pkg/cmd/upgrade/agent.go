@@ -30,7 +30,6 @@ var agentCmd = &cobra.Command{
 	Short: `Upgrades the LitmusChaos agent plane.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		credentials, err := utils.GetCredentials(cmd)
-
 		utils.PrintError(err)
 
 		projectID, err := cmd.Flags().GetString("project-id")
