@@ -48,7 +48,8 @@ var agentCmd = &cobra.Command{
 			fmt.Scanln(&cluster_id)
 		}
 
-		apis.UpgradeAgent(context.Background(), credentials, projectID, cluster_id)
+		_, err = apis.UpgradeAgent(context.Background(), credentials, projectID, cluster_id)
+		utils.PrintError(err)
 	},
 }
 
