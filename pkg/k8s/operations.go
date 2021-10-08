@@ -17,10 +17,14 @@ package k8s
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"log"
 	"os"
 	"os/exec"
+	"path/filepath"
+
+	"k8s.io/client-go/util/homedir"
 
 	"github.com/litmuschaos/litmusctl/pkg/utils"
 	authorizationv1 "k8s.io/api/authorization/v1"
@@ -262,15 +266,20 @@ func ValidSA(namespace string, kubeconfig *string) (string, bool) {
 	return sa, false
 }
 
+// Token: Authorization token
+// EndPoint: Endpoint in .litmusconfig
+// YamlPath: Path of yaml file
 type ApplyYamlPrams struct {
 	Token    string
 	Endpoint string
 	YamlPath string
 }
 
-func ApplyYaml(params ApplyYamlPrams, kubeconfig string) (output string, err error) {
-	path := fmt.Sprintf("%s/%s/%s.yaml", params.Endpoint, params.YamlPath, params.Token)
-
+func ApplyYaml(params ApplyYamlPrams, kubeconfig string, isLocal bool) (output string, err error) {
+	path := params.YamlPath
+	if !isLocal {
+		path = fmt.Sprintf("%s/%s/%s.yaml", params.Endpoint, params.YamlPath, params.Token)
+	}
 	var args []string
 	if kubeconfig != "" {
 		args = []string{"kubectl", "apply", "-f", path, "--kubeconfig", kubeconfig}
@@ -284,4 +293,27 @@ func ApplyYaml(params ApplyYamlPrams, kubeconfig string) (output string, err err
 	}
 
 	return string(stdout), err
+}
+
+// GetConfigMap returns config map for a given name and namespace
+func GetConfigMap(c context.Context, name string, namespace string) (map[string]string, error) {
+	var kubeconfig *string
+
+	if home := homedir.HomeDir(); home != "" {
+		kubeconfig = flag.String("configmap", filepath.Join(home, ".kube", "config"), "")
+	} else {
+		kubeconfig = flag.String("configmap", "", "")
+	}
+	flag.Parse()
+
+	clientset, err := ClientSet(kubeconfig)
+	if err != nil {
+		return nil, err
+	}
+	x, err := clientset.CoreV1().ConfigMaps(namespace).Get(c, name, metav1.GetOptions{})
+	if err != nil {
+		return nil, err
+
+	}
+	return x.Data, nil
 }
