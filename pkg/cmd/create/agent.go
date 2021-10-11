@@ -136,7 +136,7 @@ var agentCmd = &cobra.Command{
 				for _, tol := range tolerations {
 					str += "{"
 					if tol.TolerationSeconds > 0 {
-						str += "tolerationSeconds: " + string(tol.TolerationSeconds) + " "
+						str += "tolerationSeconds: " + fmt.Sprint(tol.TolerationSeconds) + " "
 					}
 					if tol.Effect != "" {
 						str += "effect: \\\"" + tol.Effect + "\\\" "
