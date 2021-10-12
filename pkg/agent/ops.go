@@ -18,6 +18,7 @@ package agent
 import (
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 
 	"github.com/litmuschaos/litmusctl/pkg/apis"
@@ -136,6 +137,71 @@ AGENT_NAME:
 			os.Exit(1)
 		}
 	}
+
+	utils.White_B.Print("\nDo you want Tolerations to be added in the agent deployments? (Y/N) (Default: N): ")
+	tolerationDescision := utils.Scanner()
+
+	if strings.ToLower(tolerationDescision) == "y" {
+		utils.White_B.Print("\nHow many tolerations? ")
+		no_of_tolerations := utils.Scanner()
+
+		nts, err := strconv.Atoi(no_of_tolerations)
+		utils.PrintError(err)
+
+		str := "["
+		for tol := 0; tol < nts; tol++ {
+			str += "{"
+
+			utils.White_B.Print("\nToleration count: ", tol+1)
+
+			utils.White_B.Print("\nTolerationSeconds: (Press Enter to ignore)")
+			ts := utils.Scanner()
+
+			utils.White_B.Print("\nOperator: ")
+			operator := utils.Scanner()
+			if operator != "" {
+				str += "operator : \\\"" + operator + "\\\" "
+			}
+
+			utils.White_B.Print("\nEffect: ")
+			effect := utils.Scanner()
+
+			if effect != "" {
+				str += "effect: \\\"" + effect + "\\\" "
+			}
+
+			if ts != "" {
+				str += "tolerationSeconds: " + ts + " "
+			}
+
+			utils.White_B.Print("\nKey: ")
+			key := utils.Scanner()
+			if key != "" {
+				str += "key: \\\"" + key + "\\\" "
+			}
+
+			utils.White_B.Print("\nValue: ")
+			value := utils.Scanner()
+			if key != "" {
+				str += "value: \\\"" + value + "\\\" "
+			}
+
+			str += " }"
+		}
+		str += "]"
+
+		newAgent.Tolerations = str
+	}
+
+	if strings.ToLower(nodeSelectorDescision) == "y" {
+		utils.White_B.Print("\nEnter the NodeSelector (Format: key1=value1,key2=value2): ")
+		newAgent.NodeSelector = utils.Scanner()
+
+		if ok := utils.CheckKeyValueFormat(newAgent.NodeSelector); !ok {
+			os.Exit(1)
+		}
+	}
+
 	// Get platform name as input
 	newAgent.PlatformName = GetPlatformName(kubeconfig)
 	// Set agent type
