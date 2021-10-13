@@ -192,7 +192,7 @@ AGENT_NAME:
 
 		newAgent.Tolerations = str
 	}
-	
+
 	// Get platform name as input
 	newAgent.PlatformName = GetPlatformName(kubeconfig)
 	// Set agent type
