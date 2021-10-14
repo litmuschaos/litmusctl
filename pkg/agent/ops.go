@@ -193,15 +193,6 @@ AGENT_NAME:
 		newAgent.Tolerations = str
 	}
 
-	if strings.ToLower(nodeSelectorDescision) == "y" {
-		utils.White_B.Print("\nEnter the NodeSelector (Format: key1=value1,key2=value2): ")
-		newAgent.NodeSelector = utils.Scanner()
-
-		if ok := utils.CheckKeyValueFormat(newAgent.NodeSelector); !ok {
-			os.Exit(1)
-		}
-	}
-
 	// Get platform name as input
 	newAgent.PlatformName = GetPlatformName(kubeconfig)
 	// Set agent type
