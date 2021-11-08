@@ -51,7 +51,7 @@ var projectsCmd = &cobra.Command{
 		case "":
 			writer := tabwriter.NewWriter(os.Stdout, 8, 8, 8, '\t', tabwriter.AlignRight)
 			utils.White_B.Fprintln(writer, "PROJECT ID\tPROJECT NAME\tCREATEDAT")
-			for _, project := range projects.Data.ListProjects {
+			for _, project := range projects.Data {
 				intTime, err := strconv.ParseInt(project.CreatedAt, 10, 64)
 				utils.PrintError(err)
 

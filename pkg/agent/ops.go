@@ -43,20 +43,20 @@ func PrintExistingAgents(agent apis.AgentData) {
 func GetProjectID(u apis.ProjectDetails) string {
 	var pid int
 	utils.White_B.Println("Project list:")
-	for index := range u.Data.GetUser.Projects {
-		utils.White_B.Printf("%d.  %s\n", index+1, u.Data.GetUser.Projects[index].Name)
+	for index := range u.Data.Projects {
+		utils.White_B.Printf("%d.  %s\n", index+1, u.Data.Projects[index].Name)
 	}
 
 repeat:
-	utils.White_B.Printf("\nSelect a project [Range: 1-%s]: ", fmt.Sprint(len(u.Data.GetUser.Projects)))
+	utils.White_B.Printf("\nSelect a project [Range: 1-%s]: ", fmt.Sprint(len(u.Data.Projects)))
 	fmt.Scanln(&pid)
 
-	for pid < 1 || pid > len(u.Data.GetUser.Projects) {
+	for pid < 1 || pid > len(u.Data.Projects) {
 		utils.Red.Println("❗ Invalid Project. Please select a correct one.")
 		goto repeat
 	}
 
-	return u.Data.GetUser.Projects[pid-1].ID
+	return u.Data.Projects[pid-1].ID
 }
 
 // GetMode gets mode of agent installation as input

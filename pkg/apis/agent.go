@@ -19,9 +19,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/litmuschaos/litmusctl/pkg/utils"
 	"io/ioutil"
 	"net/http"
+
+	"github.com/litmuschaos/litmusctl/pkg/utils"
 
 	types "github.com/litmuschaos/litmusctl/pkg/types"
 )
@@ -48,7 +49,7 @@ type AgentList struct {
 // GetAgentList lists the agent connected to the specified project
 func GetAgentList(c types.Credentials, pid string) (AgentData, error) {
 	query := `{"query":"query{\n  getCluster(project_id: \"` + pid + `\"){\n  cluster_id cluster_name is_active \n  }\n}"}`
-	resp, err := SendRequest(SendRequestParams{Endpoint: c.Endpoint + utils.GQLAPIPath, Token: c.Token}, []byte(query))
+	resp, err := SendRequest(SendRequestParams{Endpoint: c.Endpoint + utils.GQLAPIPath, Token: c.Token}, []byte(query), "POST")
 	if err != nil {
 		utils.Red.Println("Error in getting agent list: ", err)
 	}
@@ -115,7 +116,7 @@ func ConnectAgent(agent types.Agent, cred types.Credentials) (AgentConnectionDat
 		query = `{"query":"mutation {\n  userClusterReg(clusterInput: \n    { \n    cluster_name: \"` + agent.AgentName + `\", \n    description: \"` + agent.Description + `\",\n  node_selector: \"` + agent.NodeSelector + `\",\n  \tplatform_name: \"` + agent.PlatformName + `\",\n    project_id: \"` + agent.ProjectId + `\",\n    cluster_type: \"` + agent.ClusterType + `\",\n  agent_scope: \"` + agent.Mode + `\",\n    agent_namespace: \"` + agent.Namespace + `\",\n    serviceaccount: \"` + agent.ServiceAccount + `\",\n    agent_ns_exists: ` + fmt.Sprintf("%t", agent.NsExists) + `,\n    agent_sa_exists: ` + fmt.Sprintf("%t", agent.SAExists) + `,\n tolerations: ` + agent.Tolerations + ` }){\n    cluster_id\n    cluster_name\n    token\n  }\n}"}`
 	}
 
-	resp, err := SendRequest(SendRequestParams{Endpoint: cred.Endpoint + utils.GQLAPIPath, Token: cred.Token}, []byte(query))
+	resp, err := SendRequest(SendRequestParams{Endpoint: cred.Endpoint + utils.GQLAPIPath, Token: cred.Token}, []byte(query), "POST")
 	if err != nil {
 		return AgentConnectionData{}, errors.New("Error in registering agent: " + err.Error())
 	}

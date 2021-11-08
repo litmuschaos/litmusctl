@@ -21,6 +21,8 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	"github.com/golang-jwt/jwt"
+
 	"github.com/litmuschaos/litmusctl/pkg/utils"
 
 	"github.com/litmuschaos/litmusctl/pkg/types"
@@ -39,10 +41,19 @@ type createProjectResponse struct {
 	} `json:"errors"`
 }
 
-func CreateProjectRequest(projectName string, cred types.Credentials) (createProjectResponse, error) {
-	query := `{"query":"mutation{createProject(projectName: \"` + projectName + `\"){name id}}"}`
+type CreateProjectPayload struct {
+	ProjectName string `json:"project_name"`
+}
 
-	resp, err := SendRequest(SendRequestParams{Endpoint: cred.Endpoint + utils.GQLAPIPath, Token: cred.Token}, []byte(query))
+func CreateProjectRequest(projectName string, cred types.Credentials) (createProjectResponse, error) {
+	payloadBytes, err := json.Marshal(CreateProjectPayload{
+		ProjectName: projectName,
+	})
+
+	if err != nil {
+		return createProjectResponse{}, err
+	}
+	resp, err := SendRequest(SendRequestParams{cred.Endpoint + "/create_project", "Bearer " + cred.Token}, payloadBytes, "POST")
 	if err != nil {
 		return createProjectResponse{}, err
 	}
@@ -73,12 +84,10 @@ func CreateProjectRequest(projectName string, cred types.Credentials) (createPro
 }
 
 type listProjectResponse struct {
-	Data struct {
-		ListProjects []struct {
-			ID        string `json:"id"`
-			Name      string `json:"name"`
-			CreatedAt string `json:"created_at"`
-		} `json:"listProjects"`
+	Data []struct {
+		ID        string `json:"ID"`
+		Name      string `json:"Name"`
+		CreatedAt string `json:"CreatedAt"`
 	} `json:"data"`
 	Errors []struct {
 		Message string   `json:"message"`
@@ -87,8 +96,8 @@ type listProjectResponse struct {
 }
 
 func ListProject(cred types.Credentials) (listProjectResponse, error) {
-	query := `{"query":"query{listProjects{id name created_at}}"}`
-	resp, err := SendRequest(SendRequestParams{Endpoint: cred.Endpoint + utils.GQLAPIPath, Token: cred.Token}, []byte(query))
+
+	resp, err := SendRequest(SendRequestParams{Endpoint: cred.Endpoint + "/list_projects", Token: "Bearer " + cred.Token}, []byte{}, "GET")
 	if err != nil {
 		return listProjectResponse{}, err
 	}
@@ -126,31 +135,31 @@ type ProjectDetails struct {
 }
 
 type Data struct {
-	GetUser GetUser `json:"getUser"`
-}
-
-type GetUser struct {
-	ID       string    `json:"id"`
-	Projects []Project `json:"projects"`
+	ID       string    `json:"ID"`
+	Projects []Project `json:"Projects"`
 }
 
 type Member struct {
-	Role     string `json:"role"`
-	UserID   string `json:"user_id"`
-	UserName string `json:"user_name"`
+	Role     string `json:"Role"`
+	UserID   string `json:"UserID"`
+	UserName string `json:"UserName"`
 }
 
 type Project struct {
-	ID        string   `json:"id"`
-	Name      string   `json:"name"`
-	CreatedAt string   `json:"created_at"`
-	Members   []Member `json:"members"`
+	ID        string   `json:"ID"`
+	Name      string   `json:"Name"`
+	CreatedAt string   `json:"CreatedAt"`
+	Members   []Member `json:"Members"`
 }
 
 // GetProjectDetails fetches details of the input user
 func GetProjectDetails(c types.Credentials) (ProjectDetails, error) {
-	query := `{"query":"query {\n  getUser(username: \"` + c.Username + `\"){\n id created_at projects{ id name members{ role user_id } }\n}\n}"}`
-	resp, err := SendRequest(SendRequestParams{Endpoint: c.Endpoint + utils.GQLAPIPath, Token: c.Token}, []byte(query))
+	token, _ := jwt.Parse(c.Token, nil)
+	if token == nil {
+		return ProjectDetails{}, nil
+	}
+	Username, _ := token.Claims.(jwt.MapClaims)["username"].(string)
+	resp, err := SendRequest(SendRequestParams{Endpoint: c.Endpoint + "/get_user_with_project/" + Username, Token: "Bearer " + c.Token}, []byte{}, "GET")
 	if err != nil {
 		return ProjectDetails{}, err
 	}
@@ -167,7 +176,6 @@ func GetProjectDetails(c types.Credentials) (ProjectDetails, error) {
 		if err != nil {
 			return ProjectDetails{}, err
 		}
-
 		if len(project.Errors) > 0 {
 			return ProjectDetails{}, errors.New(project.Errors[0].Message)
 		}
