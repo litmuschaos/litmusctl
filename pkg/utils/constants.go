@@ -56,9 +56,9 @@ const (
 
 	ChaosAgentPath = "targets"
 
-	//graphql server api path
+	// Graphql server api path
 	GQLAPIPath = "/api/query"
 
-	//auth server api path
+	// Auth server api path
 	AuthAPIPath = "/auth/login"
 )

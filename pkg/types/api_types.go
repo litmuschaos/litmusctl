@@ -15,6 +15,13 @@ limitations under the License.
 */
 package types
 
+type Method string
+
+const (
+	Post Method = "POST"
+	Get  Method = "GET"
+)
+
 type AuthResponse struct {
 	AccessToken string `json:"access_token"`
 	ExpiresIn   int64  `json:"expires_in"`

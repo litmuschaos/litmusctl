@@ -30,10 +30,8 @@ import (
 
 type createProjectResponse struct {
 	Data struct {
-		CreateProject struct {
-			Name string `json:"name"`
-			ID   string `json:"id"`
-		} `json:"createProject"`
+		Name string `json:"name"`
+		ID   string `json:"id"`
 	} `json:"data"`
 	Errors []struct {
 		Message string   `json:"message"`
@@ -41,19 +39,19 @@ type createProjectResponse struct {
 	} `json:"errors"`
 }
 
-type CreateProjectPayload struct {
+type createProjectPayload struct {
 	ProjectName string `json:"project_name"`
 }
 
 func CreateProjectRequest(projectName string, cred types.Credentials) (createProjectResponse, error) {
-	payloadBytes, err := json.Marshal(CreateProjectPayload{
+	payloadBytes, err := json.Marshal(createProjectPayload{
 		ProjectName: projectName,
 	})
 
 	if err != nil {
 		return createProjectResponse{}, err
 	}
-	resp, err := SendRequest(SendRequestParams{cred.Endpoint + "/create_project", "Bearer " + cred.Token}, payloadBytes, "POST")
+	resp, err := SendRequest(SendRequestParams{cred.Endpoint + "/create_project", "Bearer " + cred.Token}, payloadBytes, string(types.Post))
 	if err != nil {
 		return createProjectResponse{}, err
 	}
@@ -76,7 +74,7 @@ func CreateProjectRequest(projectName string, cred types.Credentials) (createPro
 			return createProjectResponse{}, errors.New(project.Errors[0].Message)
 		}
 
-		utils.White_B.Println("project/" + project.Data.CreateProject.Name + " created")
+		utils.White_B.Println("project/" + project.Data.Name + " created")
 		return project, nil
 	} else {
 		return createProjectResponse{}, errors.New("Unmatched status code:" + string(bodyBytes))
@@ -97,7 +95,7 @@ type listProjectResponse struct {
 
 func ListProject(cred types.Credentials) (listProjectResponse, error) {
 
-	resp, err := SendRequest(SendRequestParams{Endpoint: cred.Endpoint + "/list_projects", Token: "Bearer " + cred.Token}, []byte{}, "GET")
+	resp, err := SendRequest(SendRequestParams{Endpoint: cred.Endpoint + "/list_projects", Token: "Bearer " + cred.Token}, []byte{}, string(types.Get))
 	if err != nil {
 		return listProjectResponse{}, err
 	}
@@ -159,7 +157,7 @@ func GetProjectDetails(c types.Credentials) (ProjectDetails, error) {
 		return ProjectDetails{}, nil
 	}
 	Username, _ := token.Claims.(jwt.MapClaims)["username"].(string)
-	resp, err := SendRequest(SendRequestParams{Endpoint: c.Endpoint + "/get_user_with_project/" + Username, Token: "Bearer " + c.Token}, []byte{}, "GET")
+	resp, err := SendRequest(SendRequestParams{Endpoint: c.Endpoint + "/get_user_with_project/" + Username, Token: "Bearer " + c.Token}, []byte{}, string(types.Get))
 	if err != nil {
 		return ProjectDetails{}, err
 	}

@@ -275,5 +275,5 @@ func CreateRandomProject(cred types.Credentials) string {
 	project, err := apis.CreateProjectRequest(projectName, cred)
 	utils.PrintError(err)
 
-	return project.Data.CreateProject.ID
+	return project.Data.ID
 }
