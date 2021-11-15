@@ -42,7 +42,7 @@ func Auth(input types.AuthInput) (types.AuthResponse, error) {
 	}
 
 	// Sending token as empty because auth server doesn't need Authorization token to validate.
-	resp, err := SendRequest(SendRequestParams{input.Endpoint + utils.AuthAPIPath, ""}, payloadBytes, string(types.Post))
+	resp, err := SendRequest(SendRequestParams{input.Endpoint + utils.AuthAPIPath + "/login", ""}, payloadBytes, string(types.Post))
 	if err != nil {
 		return types.AuthResponse{}, err
 	}

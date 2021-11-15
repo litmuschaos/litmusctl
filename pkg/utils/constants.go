@@ -60,5 +60,5 @@ const (
 	GQLAPIPath = "/api/query"
 
 	// Auth server api path
-	AuthAPIPath = "/auth/login"
+	AuthAPIPath = "/auth"
 )
