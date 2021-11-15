@@ -62,12 +62,12 @@ var agentCmd = &cobra.Command{
 			utils.PrintError(err)
 
 			var (
-				userID        = userDetails.Data.GetUser.ID
+				userID        = userDetails.Data.ID
 				projectExists = false
 			)
 
 		outerloop:
-			for _, project := range userDetails.Data.GetUser.Projects {
+			for _, project := range userDetails.Data.Projects {
 				for _, member := range project.Members {
 					if (member.UserID == userID) && (member.Role == "Owner" || member.Role == "Editor") {
 						projectExists = true

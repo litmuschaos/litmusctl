@@ -25,8 +25,8 @@ type SendRequestParams struct {
 	Token    string
 }
 
-func SendRequest(params SendRequestParams, payload []byte) (*http.Response, error) {
-	req, err := http.NewRequest("POST", params.Endpoint, bytes.NewBuffer(payload))
+func SendRequest(params SendRequestParams, payload []byte, method string) (*http.Response, error) {
+	req, err := http.NewRequest(method, params.Endpoint, bytes.NewBuffer(payload))
 	if err != nil {
 		return &http.Response{}, err
 	}

@@ -43,7 +43,7 @@ func UpgradeAgent(c context.Context, cred types.Credentials, projectID string, c
 
 	// Query to fetch agent details from server
 	query := `{"query":"query {\n getAgentDetails(cluster_id : \"` + cluster_id + `\", \n projectID : \"` + projectID + `\"){\n agent_namespace access_key cluster_id \n}}"}`
-	resp, err := SendRequest(SendRequestParams{Endpoint: cred.Endpoint + utils.GQLAPIPath, Token: cred.Token}, []byte(query))
+	resp, err := SendRequest(SendRequestParams{Endpoint: cred.Endpoint + utils.GQLAPIPath, Token: cred.Token}, []byte(query), string(types.Post))
 	if err != nil {
 		return "", err
 	}
@@ -65,7 +65,7 @@ func UpgradeAgent(c context.Context, cred types.Credentials, projectID string, c
 
 	// Query to fetch upgraded manifest from the server
 	query = `{"query":"query {\n getManifest(projectID : \"` + projectID + `\",\n clusterID : \"` + agent.Data.GetAgentDetails.ClusterID + `\",\n accessKey :\"` + agent.Data.GetAgentDetails.AccessKey + `\")}"}`
-	resp, err = SendRequest(SendRequestParams{Endpoint: cred.Endpoint + utils.GQLAPIPath, Token: cred.Token}, []byte(query))
+	resp, err = SendRequest(SendRequestParams{Endpoint: cred.Endpoint + utils.GQLAPIPath, Token: cred.Token}, []byte(query), string(types.Post))
 	if err != nil {
 		return "", err
 	}
