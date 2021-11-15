@@ -51,7 +51,7 @@ func CreateProjectRequest(projectName string, cred types.Credentials) (createPro
 	if err != nil {
 		return createProjectResponse{}, err
 	}
-	resp, err := SendRequest(SendRequestParams{cred.Endpoint + "/create_project", "Bearer " + cred.Token}, payloadBytes, string(types.Post))
+	resp, err := SendRequest(SendRequestParams{cred.Endpoint + utils.AuthAPIPath + "/create_project", "Bearer " + cred.Token}, payloadBytes, string(types.Post))
 	if err != nil {
 		return createProjectResponse{}, err
 	}
@@ -95,7 +95,7 @@ type listProjectResponse struct {
 
 func ListProject(cred types.Credentials) (listProjectResponse, error) {
 
-	resp, err := SendRequest(SendRequestParams{Endpoint: cred.Endpoint + "/list_projects", Token: "Bearer " + cred.Token}, []byte{}, string(types.Get))
+	resp, err := SendRequest(SendRequestParams{Endpoint: cred.Endpoint + utils.AuthAPIPath + "/list_projects", Token: "Bearer " + cred.Token}, []byte{}, string(types.Get))
 	if err != nil {
 		return listProjectResponse{}, err
 	}
@@ -157,7 +157,7 @@ func GetProjectDetails(c types.Credentials) (ProjectDetails, error) {
 		return ProjectDetails{}, nil
 	}
 	Username, _ := token.Claims.(jwt.MapClaims)["username"].(string)
-	resp, err := SendRequest(SendRequestParams{Endpoint: c.Endpoint + "/get_user_with_project/" + Username, Token: "Bearer " + c.Token}, []byte{}, string(types.Get))
+	resp, err := SendRequest(SendRequestParams{Endpoint: c.Endpoint + utils.AuthAPIPath + "/get_user_with_project/" + Username, Token: "Bearer " + c.Token}, []byte{}, string(types.Get))
 	if err != nil {
 		return ProjectDetails{}, err
 	}
