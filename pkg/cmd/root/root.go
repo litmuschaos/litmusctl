@@ -16,11 +16,14 @@ limitations under the License.
 package rootCmd
 
 import (
+	"crypto/tls"
 	"fmt"
+	"net/http"
+	"os"
+
 	"github.com/litmuschaos/litmusctl/pkg/cmd/upgrade"
 	"github.com/litmuschaos/litmusctl/pkg/cmd/version"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
-	"os"
 
 	"github.com/litmuschaos/litmusctl/pkg/cmd/config"
 	"github.com/litmuschaos/litmusctl/pkg/cmd/create"
@@ -32,6 +35,7 @@ import (
 )
 
 var cfgFile string
+var SkipSSLVerify bool
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -60,6 +64,7 @@ func init() {
 	// will be global for your application.
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.litmusctl)")
+	rootCmd.PersistentFlags().BoolVar(&SkipSSLVerify, "skipSSL", false, "skipSSL")
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -75,6 +80,10 @@ func initConfig() {
 		// Search config in home directory with name ".litmusconfig" (without extension).
 		viper.AddConfigPath(home)
 		viper.SetConfigName(utils.DefaultFileName)
+	}
+
+	if SkipSSLVerify {
+		http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 	}
 
 	viper.AutomaticEnv() // read in environment variables that match

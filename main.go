@@ -17,8 +17,9 @@ package main
 
 import (
 	"fmt"
-	"github.com/litmuschaos/litmusctl/pkg/cmd/root"
 	"os"
+
+	rootCmd "github.com/litmuschaos/litmusctl/pkg/cmd/root"
 )
 
 var CLIVersion string
