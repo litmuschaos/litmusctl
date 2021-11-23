@@ -21,6 +21,8 @@ import (
 	"net/http"
 	"os"
 
+	config2 "github.com/litmuschaos/litmusctl/pkg/config"
+
 	"github.com/litmuschaos/litmusctl/pkg/cmd/upgrade"
 	"github.com/litmuschaos/litmusctl/pkg/cmd/version"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
@@ -35,7 +37,6 @@ import (
 )
 
 var cfgFile string
-var SkipSSLVerify bool
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -64,7 +65,7 @@ func init() {
 	// will be global for your application.
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.litmusctl)")
-	rootCmd.PersistentFlags().BoolVar(&SkipSSLVerify, "skipSSL", false, "skipSSL")
+	rootCmd.PersistentFlags().BoolVar(&config2.SkipSSLVerify, "skipSSL", false, "skipSSL")
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -82,7 +83,7 @@ func initConfig() {
 		viper.SetConfigName(utils.DefaultFileName)
 	}
 
-	if SkipSSLVerify {
+	if config2.SkipSSLVerify {
 		http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 	}
 
