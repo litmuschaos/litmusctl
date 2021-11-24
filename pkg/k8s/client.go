@@ -16,9 +16,10 @@ limitations under the License.
 package k8s
 
 import (
-	"github.com/litmuschaos/litmusctl/pkg/utils"
 	"os"
 	"path/filepath"
+
+	"github.com/litmuschaos/litmusctl/pkg/utils"
 
 	"k8s.io/client-go/kubernetes"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"

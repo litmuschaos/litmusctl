@@ -19,7 +19,9 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"log"
+	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -279,12 +281,29 @@ func ApplyYaml(params ApplyYamlPrams, kubeconfig string, isLocal bool) (output s
 	path := params.YamlPath
 	if !isLocal {
 		path = fmt.Sprintf("%s/%s/%s.yaml", params.Endpoint, params.YamlPath, params.Token)
+		req, err := http.NewRequest("GET", path, nil)
+		if err != nil {
+			return "", err
+		}
+		resp, err := http.DefaultClient.Do(req)
+		if err != nil {
+			return "", err
+		}
+		defer resp.Body.Close()
+		resp_body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return "", err
+		}
+		err = ioutil.WriteFile("agent-manifest.yaml", resp_body, 0644)
+		if err != nil {
+			return "", err
+		}
+		path = "agent-manifest.yaml"
 	}
-	var args []string
+
+	args := []string{"kubectl", "apply", "-f", path}
 	if kubeconfig != "" {
-		args = []string{"kubectl", "apply", "-f", path, "--kubeconfig", kubeconfig}
-	} else {
-		args = []string{"kubectl", "apply", "-f", path}
+		args = append(args, []string{"--kubeconfig", kubeconfig}...)
 	}
 
 	stdout, err := exec.Command(args[0], args[1:]...).CombinedOutput()

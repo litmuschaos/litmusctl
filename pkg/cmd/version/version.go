@@ -16,8 +16,9 @@ limitations under the License.
 package version
 
 import (
-	"github.com/litmuschaos/litmusctl/pkg/utils"
 	"os"
+
+	"github.com/litmuschaos/litmusctl/pkg/utils"
 
 	"github.com/spf13/cobra"
 )
