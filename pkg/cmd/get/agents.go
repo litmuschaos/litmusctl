@@ -17,11 +17,12 @@ package get
 
 import (
 	"fmt"
+	"os"
+	"text/tabwriter"
+
 	"github.com/litmuschaos/litmusctl/pkg/apis"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
 	"github.com/spf13/cobra"
-	"os"
-	"text/tabwriter"
 )
 
 // agentsCmd represents the agents command

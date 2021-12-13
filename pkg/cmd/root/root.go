@@ -16,7 +16,9 @@ limitations under the License.
 package rootCmd
 
 import (
+	"crypto/tls"
 	"fmt"
+	"net/http"
 	"os"
 
 	"github.com/litmuschaos/litmusctl/pkg/cmd/upgrade"
@@ -26,6 +28,7 @@ import (
 	"github.com/litmuschaos/litmusctl/pkg/cmd/config"
 	"github.com/litmuschaos/litmusctl/pkg/cmd/create"
 	"github.com/litmuschaos/litmusctl/pkg/cmd/get"
+	config2 "github.com/litmuschaos/litmusctl/pkg/config"
 	"github.com/spf13/cobra"
 
 	"github.com/mitchellh/go-homedir"
@@ -61,6 +64,7 @@ func init() {
 	// will be global for your application.
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.litmusctl)")
+	rootCmd.PersistentFlags().BoolVar(&config2.SkipSSLVerify, "skipSSL", false, "skipSSL")
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -80,6 +84,9 @@ func initConfig() {
 
 	viper.AutomaticEnv() // read in environment variables that match
 
+	if config2.SkipSSLVerify {
+		http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
+	}
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {
 		fmt.Fprintln(os.Stderr, "Using config file:", viper.ConfigFileUsed())

@@ -24,6 +24,8 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+var SkipSSLVerify bool
+
 func CreateNewLitmusCtlConfig(filename string, config types.LitmuCtlConfig) error {
 
 	configByte, err := yaml.Marshal(config)
