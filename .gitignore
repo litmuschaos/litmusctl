@@ -6,6 +6,7 @@
 *.dylib
 main
 litmusctl
+agent-manifest.yaml
 
 # Test binary, built with `go test -c`
 *.test
