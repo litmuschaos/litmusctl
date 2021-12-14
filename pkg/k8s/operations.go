@@ -305,12 +305,6 @@ func ApplyYaml(params ApplyYamlPrams, kubeconfig string, isLocal bool) (output s
 	if kubeconfig != "" {
 		args = append(args, []string{"--kubeconfig", kubeconfig}...)
 	}
-	var args []string
-	if kubeconfig != "" {
-		args = []string{"kubectl", "apply", "-f", path, "--kubeconfig", kubeconfig}
-	} else {
-		args = []string{"kubectl", "apply", "-f", path}
-	}
 
 	stdout, err := exec.Command(args[0], args[1:]...).CombinedOutput()
 	if err != nil {
