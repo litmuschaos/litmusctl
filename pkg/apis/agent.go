@@ -53,20 +53,20 @@ func GetAgentList(c types.Credentials, pid string) (AgentData, error) {
 	query := `{"query":"query{\n  getCluster(project_id: \"` + pid + `\"){\n  cluster_id cluster_name is_active \n  }\n}"}`
 	resp, err := SendRequest(SendRequestParams{Endpoint: c.Endpoint + utils.GQLAPIPath, Token: c.Token}, []byte(query), string(types.Post))
 	if err != nil {
-		utils.Red.Println("Error in getting agent list: ", err)
+		return AgentData{}, err
 	}
 
 	bodyBytes, err := ioutil.ReadAll(resp.Body)
 	defer resp.Body.Close()
 	if err != nil {
-		utils.Red.Println("Error in getting agent list: ", err)
+		return AgentData{}, err
 	}
 
 	if resp.StatusCode == http.StatusOK {
 		var agent AgentData
 		err = json.Unmarshal(bodyBytes, &agent)
 		if err != nil {
-			utils.Red.Println("Error in getting agent list: ", err)
+			return AgentData{}, err
 		}
 
 		if len(agent.Errors) > 0 {
