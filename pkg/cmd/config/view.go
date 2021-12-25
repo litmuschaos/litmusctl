@@ -17,8 +17,9 @@ package config
 
 import (
 	"fmt"
-	"github.com/litmuschaos/litmusctl/pkg/utils"
 	"io/ioutil"
+
+	"github.com/litmuschaos/litmusctl/pkg/utils"
 
 	"os"
 
