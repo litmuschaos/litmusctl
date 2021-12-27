@@ -126,6 +126,15 @@ AGENT_NAME:
 	utils.White_B.Print("\nAgent Description: ")
 	newAgent.Description = utils.Scanner()
 
+	utils.White_B.Print("\nDo you want Agent to skip SSL/TLS check (Y/N) (Default: N): ")
+	skipSSLDescision := utils.Scanner()
+
+	if strings.ToLower(skipSSLDescision) == "y" {
+		newAgent.SkipSSL = true
+	} else {
+		newAgent.SkipSSL = false
+	}
+
 	utils.White_B.Print("\nDo you want NodeSelector to be added in the agent deployments (Y/N) (Default: N): ")
 	nodeSelectorDescision := utils.Scanner()
 
@@ -237,7 +246,7 @@ func ValidateSAPermissions(mode string, kubeconfig *string) {
 
 // Summary display the agent details based on input
 func Summary(agent types.Agent, kubeconfig *string) {
-	utils.White_B.Printf("\n📌 Summary \nAgent Name: %s\nAgent Description: %s\nPlatform Name: %s\n", agent.AgentName, agent.Description, agent.PlatformName)
+	utils.White_B.Printf("\n📌 Summary \nAgent Name: %s\nAgent Description: %s\nAgent SSL/TLS Skip: %t\nPlatform Name: %s\n", agent.AgentName, agent.Description, agent.SkipSSL, agent.PlatformName)
 	if ok, _ := k8s.NsExists(agent.Namespace, kubeconfig); ok {
 		utils.White_B.Println("Namespace: ", agent.Namespace)
 	} else {

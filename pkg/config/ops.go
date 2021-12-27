@@ -24,7 +24,10 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-var SkipSSLVerify bool
+var (
+	SkipSSLVerify bool   = false
+	CACert        string = ""
+)
 
 func CreateNewLitmusCtlConfig(filename string, config types.LitmuCtlConfig) error {
 
