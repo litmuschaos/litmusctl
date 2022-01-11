@@ -16,7 +16,11 @@ limitations under the License.
 package rootCmd
 
 import (
+	"crypto/tls"
+	"crypto/x509"
 	"fmt"
+	"io/ioutil"
+	"net/http"
 	"os"
 
 	"github.com/litmuschaos/litmusctl/pkg/cmd/upgrade"
@@ -26,6 +30,7 @@ import (
 	"github.com/litmuschaos/litmusctl/pkg/cmd/config"
 	"github.com/litmuschaos/litmusctl/pkg/cmd/create"
 	"github.com/litmuschaos/litmusctl/pkg/cmd/get"
+	config2 "github.com/litmuschaos/litmusctl/pkg/config"
 	"github.com/spf13/cobra"
 
 	"github.com/mitchellh/go-homedir"
@@ -61,6 +66,8 @@ func init() {
 	// will be global for your application.
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.litmusctl)")
+	rootCmd.PersistentFlags().BoolVar(&config2.SkipSSLVerify, "skipSSL", false, "skipSSL, litmusctl will skip ssl/tls verification while communicating with portal")
+	rootCmd.PersistentFlags().StringVar(&config2.CACert, "cacert", "", "cacert <path_to_crt_file> , custom ca certificate used for communicating with portal")
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -79,6 +86,16 @@ func initConfig() {
 	}
 
 	viper.AutomaticEnv() // read in environment variables that match
+
+	if config2.SkipSSLVerify {
+		http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
+	} else if config2.CACert != "" {
+		caCert, err := ioutil.ReadFile(config2.CACert)
+		cobra.CheckErr(err)
+		caCertPool := x509.NewCertPool()
+		caCertPool.AppendCertsFromPEM(caCert)
+		http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{RootCAs: caCertPool}
+	}
 
 	// If a config file is found, read it in.
 	if err := viper.ReadInConfig(); err == nil {

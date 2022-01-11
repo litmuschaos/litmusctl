@@ -28,6 +28,7 @@ type Agent struct {
 	ServiceAccount string
 	NsExists       bool
 	SAExists       bool
+	SkipSSL        bool
 }
 
 type Toleration struct {

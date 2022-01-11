@@ -95,6 +95,9 @@ var agentCmd = &cobra.Command{
 			newAgent.AgentName, err = cmd.Flags().GetString("agent-name")
 			utils.PrintError(err)
 
+			newAgent.SkipSSL, err = cmd.Flags().GetBool("skip-agent-ssl")
+			utils.PrintError(err)
+
 			if newAgent.AgentName == "" {
 				utils.Red.Print("Error: --agent-name flag is empty")
 				os.Exit(1)
@@ -283,6 +286,7 @@ func init() {
 	agentCmd.Flags().String("node-selector", "", "Set the node-selector for agent components | Format: \"key1=value1,key2=value2\")")
 	agentCmd.Flags().String("namespace", "litmus", "Set the namespace for the agent installation")
 	agentCmd.Flags().String("service-account", "litmus", "Set the service account to be used by the agent")
+	agentCmd.Flags().Bool("skip-agent-ssl", false, "Set whether agent will skip ssl/tls check (can be used for self-signed certs, if cert is not provided in portal)")
 	agentCmd.Flags().Bool("ns-exists", false, "Set the --ns-exists=false if the namespace mentioned in the --namespace flag is not existed else set it to --ns-exists=true | Note: Always set the boolean flag as --ns-exists=Boolean")
 	agentCmd.Flags().Bool("sa-exists", false, "Set the --sa-exists=false if the service-account mentioned in the --service-account flag is not existed else set it to --sa-exists=true | Note: Always set the boolean flag as --sa-exists=Boolean\"\n")
 }
