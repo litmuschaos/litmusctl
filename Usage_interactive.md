@@ -277,21 +277,31 @@ AGENTID                                AGENTNAME          STATUS
 
 <table>
     <th>Flag</th>
+    <th>Short Flag</th>
+    <th>Type</th>
     <th>Description</th>
     <tr>
         <td>--cacert</td>
-        <td>cacert <path_to_crt_file> , custom ca certificate used for communicating with portal</td>
+        <td></td>
+        <td>String</td>
+        <td>custom ca certificate used by litmusctl for communicating with portal</td>
     </tr>
     <tr>
         <td>--config</td>
-        <td>config <path_to_config_file>, config file (default is $HOME/.litmusctl)</td>
+        <td></td>
+        <td>String</td>
+        <td>config file (default is $HOME/.litmusctl)</td>
     </tr>
     <tr>
         <td>--skipSSL</td>
-        <td>skipSSL, litmusctl will skip ssl/tls verification while communicating with portal</td>
+        <td></td>
+        <td>Boolean</td>
+        <td>litmusctl will skip ssl/tls verification while communicating with portal</td>
     </tr>
     <tr>
-        <td>-h, --help</td>
+        <td>--help</td>
+        <td>-h</td>
+        <td></td>
         <td>help for litmusctl</td>
     </tr>
 </table>

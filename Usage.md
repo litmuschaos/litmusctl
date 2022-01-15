@@ -70,6 +70,12 @@ litmusctl create agent --agent-name="" --project-id="" --non-interactive
         <td>Set the cluster-type to external for external agents | Supported=external/internal (default "external")</td>
     </tr>
     <tr>
+        <td>--skip-agent-ssl</td>
+        <td></td>
+        <td>Boolean</td>
+        <td>Set whether agent will skip ssl/tls check (can be used for self-signed certs, if cert is not provided in portal) (default false)</td>
+    </tr>
+    <tr>
         <td>--cluster-type</td>
         <td></td>
         <td>String</td>
