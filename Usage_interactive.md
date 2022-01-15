@@ -106,6 +106,10 @@ Fields to be filled in <br />
         <td>Fill in details about the agent</td>
     </tr>
     <tr>
+        <td>Skip SSL verification</td>
+        <td>Choose whether agent will skip SSL/TLS verification</td>
+    </tr>
+    <tr>
         <td>Node Selector:</td>
         <td>To deploy the agent on a particular node based on the node selector labels</td>
     </tr>
@@ -129,6 +133,8 @@ Enter the details of the agent
 Agent Name: New-Agent
 
 Agent Description: This is a new agent
+
+Do you want Agent to skip SSL/TLS check (Y/N) (Default: N): n
 
 Do you want NodeSelector to be added in the agent deployments (Y/N) (Default: N): N
 
@@ -154,6 +160,7 @@ Enter service account [Default: litmus]:
 📌 Summary
 Agent Name: New-Agent
 Agent Description: This is a new agent
+Agent SSL/TLS Skip: false
 Platform Name: Others
 Namespace:  litmus
 Service Account:  litmus (new)
@@ -265,5 +272,28 @@ AGENTID                                AGENTNAME          STATUS
 55ecc7f2-2754-43aa-8e12-6903e4c6183a   agent-1            ACTIVE
 13dsf3d1-5324-54af-4g23-5331g5v2364f   agent-2            INACTIVE
 ```
+
+## Flag details
+
+<table>
+    <th>Flag</th>
+    <th>Description</th>
+    <tr>
+        <td>--cacert</td>
+        <td>cacert <path_to_crt_file> , custom ca certificate used for communicating with portal</td>
+    </tr>
+    <tr>
+        <td>--config</td>
+        <td>config <path_to_config_file>, config file (default is $HOME/.litmusctl)</td>
+    </tr>
+    <tr>
+        <td>--skipSSL</td>
+        <td>skipSSL, litmusctl will skip ssl/tls verification while communicating with portal</td>
+    </tr>
+    <tr>
+        <td>-h, --help</td>
+        <td>help for litmusctl</td>
+    </tr>
+</table>
 
 For more information related to flags, Use `litmusctl --help`.
