@@ -66,6 +66,40 @@ var workflowCmd = &cobra.Command{
 			}
 		}
 
+		chaosWorkFlowInput.ClusterID, err = cmd.Flags().GetString("cluster-id")
+		utils.PrintError(err)
+
+		if chaosWorkFlowInput.ClusterID == "" {
+			utils.White_B.Print("\nEnter the Cluster ID: ")
+			fmt.Scanln(&chaosWorkFlowInput.ClusterID)
+
+			if chaosWorkFlowInput.ClusterID == "" {
+				utils.Red.Println("⛔ Cluster ID can't be empty!!")
+				os.Exit(1)
+			}
+		}
+
+		userDetails, err := apis.GetProjectDetails(credentials)
+		utils.PrintError(err)
+		var editAccess = false
+		var project apis.Project
+
+		for _, p := range userDetails.Data.Projects {
+			if p.ID == chaosWorkFlowInput.ProjectID {
+				project = p
+			}
+		}
+
+		for _, member := range project.Members {
+			if (member.UserID == userDetails.Data.ID) && (member.Role == "Owner" || member.Role == "Editor") {
+				editAccess = true
+			}
+		}
+
+		if !editAccess {
+			utils.Red.Println("⛔ User doesn't have edit access to the project!!")
+		}
+
 		workflow := readManifestFile(workflowManifest)
 		workflowStr, _ := json.Marshal(workflow)
 		chaosWorkFlowInput.WorkflowManifest = string(workflowStr)
@@ -88,19 +122,6 @@ var workflowCmd = &cobra.Command{
 
 		chaosWorkFlowInput.Weightages = weightages
 		chaosWorkFlowInput.IsCustomWorkflow = true
-
-		chaosWorkFlowInput.ClusterID, err = cmd.Flags().GetString("cluster-id")
-		utils.PrintError(err)
-
-		if chaosWorkFlowInput.ClusterID == "" {
-			utils.White_B.Print("\nEnter the Cluster ID: ")
-			fmt.Scanln(&chaosWorkFlowInput.ClusterID)
-
-			if chaosWorkFlowInput.ClusterID == "" {
-				utils.Red.Println("⛔ Cluster ID can't be empty!!")
-				os.Exit(1)
-			}
-		}
 
 		apis.CreateWorkflow(chaosWorkFlowInput, credentials)
 	},
