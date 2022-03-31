@@ -58,8 +58,13 @@ var workflowCmd = &cobra.Command{
 		utils.PrintError(err)
 
 		if chaosWorkFlowInput.ProjectID == "" {
-			utils.Red.Print("Error: --project-id is empty.\n")
-			os.Exit(1)
+			utils.White_B.Print("\nEnter the Project ID: ")
+			fmt.Scanln(&chaosWorkFlowInput.ProjectID)
+
+			if chaosWorkFlowInput.ProjectID == "" {
+				utils.Red.Println("⛔ Project ID can't be empty!!")
+				os.Exit(1)
+			}
 		}
 
 		workflow := readManifestFile(workflowManifest)
