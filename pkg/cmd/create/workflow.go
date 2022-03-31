@@ -54,7 +54,6 @@ var workflowCmd = &cobra.Command{
 		utils.PrintError(err)
 
 		chaosWorkFlowInput.ProjectID, err = cmd.Flags().GetString("project-id")
-		fmt.Println(chaosWorkFlowInput.ProjectID)
 		utils.PrintError(err)
 
 		if chaosWorkFlowInput.ProjectID == "" {
@@ -89,7 +88,19 @@ var workflowCmd = &cobra.Command{
 		)
 		chaosWorkFlowInput.Weightages = weightages
 		chaosWorkFlowInput.IsCustomWorkflow = true
-		chaosWorkFlowInput.ClusterID = "1c9c5801-8789-4ac9-bf5f-32649b707a5c"
+
+		chaosWorkFlowInput.ClusterID, err = cmd.Flags().GetString("cluster-id")
+		utils.PrintError(err)
+
+		if chaosWorkFlowInput.ClusterID == "" {
+			utils.White_B.Print("\nEnter the Cluster ID: ")
+			fmt.Scanln(&chaosWorkFlowInput.ClusterID)
+
+			if chaosWorkFlowInput.ClusterID == "" {
+				utils.Red.Println("⛔ Cluster ID can't be empty!!")
+				os.Exit(1)
+			}
+		}
 
 		apis.CreateWorkflow(chaosWorkFlowInput, credentials)
 	},
@@ -107,6 +118,9 @@ func readManifestFile(file string) v1alpha1.Workflow {
 
 func init() {
 	CreateCmd.AddCommand(workflowCmd)
-	workflowCmd.Flags().StringP("file", "f", "", "The manifest file for the workflow")
+
 	workflowCmd.Flags().String("project-id", "", "Set the project-id to create workflow for the particular project. To see the projects, apply litmusctl get projects")
+	workflowCmd.Flags().String("cluster-id", "", "Set the cluster-id to create workflow for the particular cluster. To see the projects, apply litmusctl get agents")
+
+	workflowCmd.Flags().StringP("file", "f", "", "The manifest file for the workflow")
 }
