@@ -74,18 +74,18 @@ var workflowCmd = &cobra.Command{
 		for _, t := range workflow.Spec.Templates {
 			if len(t.Inputs.Artifacts) != 0 {
 				err := yaml.Unmarshal([]byte(t.Inputs.Artifacts[0].Raw.Data), &chaosExperiment)
-				if err == nil {
+				if chaosExperiment.Kind == "ChaosEngine" || err != nil {
 					continue // Tried to parse a ChaosEngine spec
 				}
+				weightages = append(weightages,
+					types.WeightagesInput{
+						ExperimentName: chaosExperiment.ObjectMeta.Name,
+						Weightage:      10, // TODO: fetch from annotation
+					},
+				)
 			}
 		}
 
-		weightages = append(weightages,
-			types.WeightagesInput{
-				ExperimentName: chaosExperiment.ObjectMeta.Name,
-				Weightage:      10, // TODO: fetch from annotation
-			},
-		)
 		chaosWorkFlowInput.Weightages = weightages
 		chaosWorkFlowInput.IsCustomWorkflow = true
 
