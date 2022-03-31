@@ -17,7 +17,9 @@ package create
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
+	"os"
 
 	"github.com/argoproj/argo-workflows/v3/pkg/apis/workflow/v1alpha1"
 	chaosTypes "github.com/litmuschaos/chaos-operator/pkg/apis/litmuschaos/v1alpha1"
@@ -44,15 +46,26 @@ var workflowCmd = &cobra.Command{
 		credentials, err := utils.GetCredentials(cmd)
 		utils.PrintError(err)
 
-		workflowManifest, err := cmd.Flags().GetString("file")
-		utils.PrintError(err)
-
 		var chaosWorkFlowInput types.ChaosWorkFlowInput
 		var chaosExperiment chaosTypes.ChaosExperiment
 		var weightages []types.WeightagesInput
 
+		workflowManifest, err := cmd.Flags().GetString("file")
+		utils.PrintError(err)
+
+		chaosWorkFlowInput.ProjectID, err = cmd.Flags().GetString("project-id")
+		fmt.Println(chaosWorkFlowInput.ProjectID)
+		utils.PrintError(err)
+
+		if chaosWorkFlowInput.ProjectID == "" {
+			utils.Red.Print("Error: --project-id is empty.\n")
+			os.Exit(1)
+		}
+
 		workflow := readManifestFile(workflowManifest)
 		workflowStr, _ := json.Marshal(workflow)
+		chaosWorkFlowInput.WorkflowManifest = string(workflowStr)
+		chaosWorkFlowInput.WorkflowName = workflow.ObjectMeta.Name
 
 		for _, t := range workflow.Spec.Templates {
 			if len(t.Inputs.Artifacts) != 0 {
@@ -69,18 +82,9 @@ var workflowCmd = &cobra.Command{
 				Weightage:      10, // TODO: fetch from annotation
 			},
 		)
-
-		chaosWorkFlowInput = types.ChaosWorkFlowInput{
-			WorkflowID:          "",
-			WorkflowManifest:    string(workflowStr),
-			CronSyntax:          "",
-			WorkflowName:        workflow.ObjectMeta.Name,
-			WorkflowDescription: "Testing struct",
-			Weightages:          weightages,
-			IsCustomWorkflow:    true,
-			ProjectID:           "c370c344-ab5d-4518-9b9c-1379eb1befcd",
-			ClusterID:           "1c9c5801-8789-4ac9-bf5f-32649b707a5c",
-		}
+		chaosWorkFlowInput.Weightages = weightages
+		chaosWorkFlowInput.IsCustomWorkflow = true
+		chaosWorkFlowInput.ClusterID = "1c9c5801-8789-4ac9-bf5f-32649b707a5c"
 
 		apis.CreateWorkflow(chaosWorkFlowInput, credentials)
 	},
@@ -99,4 +103,5 @@ func readManifestFile(file string) v1alpha1.Workflow {
 func init() {
 	CreateCmd.AddCommand(workflowCmd)
 	workflowCmd.Flags().StringP("file", "f", "", "The manifest file for the workflow")
+	workflowCmd.Flags().String("project-id", "", "Set the project-id to create workflow for the particular project. To see the projects, apply litmusctl get projects")
 }
