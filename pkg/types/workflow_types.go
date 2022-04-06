@@ -15,6 +15,7 @@ limitations under the License.
 */
 package types
 
+// ChaosWorkFlowInput describes the payload of the API request for workflow creation.
 type ChaosWorkFlowInput struct {
 	WorkflowID          string            `json:"workflow_id"`
 	WorkflowManifest    string            `json:"workflow_manifest"`

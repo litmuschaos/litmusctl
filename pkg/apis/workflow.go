@@ -24,6 +24,7 @@ import (
 	"github.com/litmuschaos/litmusctl/pkg/utils"
 )
 
+// CreateWorkflow sends GraphQL API request for creating a workflow
 func CreateWorkflow(in types.ChaosWorkFlowInput, cred types.Credentials) {
 
 	var gqlReq types.ChaosWorkFlowGraphQLRequest

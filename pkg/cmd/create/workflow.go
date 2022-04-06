@@ -38,11 +38,13 @@ var workflowCmd = &cobra.Command{
 	Short: `Create a workflow
 	Example:
 	#create a workflow
-	litmusctl create workflow -f workflow.yaml
+	litmusctl create workflow -f workflow.yaml --project-id="d861b650-1549-4574-b2ba-ab754058dd04" --cluster-id="1c9c5801-8789-4ac9-bf5f-32649b707a5c"
 
 	Note: The default location of the config file is $HOME/.litmusconfig, and can be overridden by a --config flag
 	`,
 	Run: func(cmd *cobra.Command, args []string) {
+
+		// Fetch user credentials
 		credentials, err := utils.GetCredentials(cmd)
 		utils.PrintError(err)
 
@@ -56,6 +58,7 @@ var workflowCmd = &cobra.Command{
 		chaosWorkFlowInput.ProjectID, err = cmd.Flags().GetString("project-id")
 		utils.PrintError(err)
 
+		// Handle blank input for project ID
 		if chaosWorkFlowInput.ProjectID == "" {
 			utils.White_B.Print("\nEnter the Project ID: ")
 			fmt.Scanln(&chaosWorkFlowInput.ProjectID)
@@ -69,6 +72,7 @@ var workflowCmd = &cobra.Command{
 		chaosWorkFlowInput.ClusterID, err = cmd.Flags().GetString("cluster-id")
 		utils.PrintError(err)
 
+		// Handle blank input for cluster ID
 		if chaosWorkFlowInput.ClusterID == "" {
 			utils.White_B.Print("\nEnter the Cluster ID: ")
 			fmt.Scanln(&chaosWorkFlowInput.ClusterID)
@@ -79,32 +83,32 @@ var workflowCmd = &cobra.Command{
 			}
 		}
 
+		// Perform authorization
 		userDetails, err := apis.GetProjectDetails(credentials)
 		utils.PrintError(err)
 		var editAccess = false
 		var project apis.Project
-
 		for _, p := range userDetails.Data.Projects {
 			if p.ID == chaosWorkFlowInput.ProjectID {
 				project = p
 			}
 		}
-
 		for _, member := range project.Members {
 			if (member.UserID == userDetails.Data.ID) && (member.Role == "Owner" || member.Role == "Editor") {
 				editAccess = true
 			}
 		}
-
 		if !editAccess {
 			utils.Red.Println("⛔ User doesn't have edit access to the project!!")
 		}
 
+		// Marshal workflow manifest
 		workflow := readManifestFile(workflowManifest)
 		workflowStr, _ := json.Marshal(workflow)
 		chaosWorkFlowInput.WorkflowManifest = string(workflowStr)
 		chaosWorkFlowInput.WorkflowName = workflow.ObjectMeta.Name
 
+		// Assign weights to each chaos experiment
 		for _, t := range workflow.Spec.Templates {
 			if len(t.Inputs.Artifacts) != 0 {
 				err := yaml.Unmarshal([]byte(t.Inputs.Artifacts[0].Raw.Data), &chaosExperiment)
@@ -121,6 +125,8 @@ var workflowCmd = &cobra.Command{
 		}
 
 		chaosWorkFlowInput.Weightages = weightages
+
+		// All workflows created using this command are considered as custom.
 		chaosWorkFlowInput.IsCustomWorkflow = true
 
 		apis.CreateWorkflow(chaosWorkFlowInput, credentials)
