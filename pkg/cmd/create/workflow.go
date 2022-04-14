@@ -100,6 +100,7 @@ var workflowCmd = &cobra.Command{
 		}
 		if !editAccess {
 			utils.Red.Println("⛔ User doesn't have edit access to the project!!")
+			os.Exit(1)
 		}
 
 		// Marshal workflow manifest
