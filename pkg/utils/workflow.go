@@ -16,9 +16,18 @@ limitations under the License.
 package utils
 
 import (
+	"bytes"
+	"fmt"
 	"net/url"
+	"os"
+	"regexp"
+	"strconv"
 
 	"github.com/argoproj/argo-workflows/v3/pkg/apis/workflow/v1alpha1"
+	chaosTypes "github.com/litmuschaos/chaos-operator/pkg/apis/litmuschaos/v1alpha1"
+	"github.com/litmuschaos/litmusctl/pkg/types"
+	yamlutil "k8s.io/apimachinery/pkg/util/yaml"
+	"sigs.k8s.io/yaml"
 )
 
 // ReadWorkflowManifest reads the manifest that is passed as an argument.
@@ -31,4 +40,80 @@ func ReadWorkflowManifest(file string, workflow *v1alpha1.Workflow) error {
 		err = UnmarshalRemoteFile(file, &workflow)
 	}
 	return err
+}
+
+// FetchWeightages parses the experiment spec and assigns weightage to each of the
+// experiments present. It can parse both artifacts and remote experiment specs.
+func FetchWeightages(workflow *v1alpha1.Workflow) []types.WeightagesInput {
+
+	var weightages []types.WeightagesInput
+	var chaosExperiments []chaosTypes.ChaosExperiment
+
+	// Fetch all present experiments and append them to the experiments array
+	for _, t := range workflow.Spec.Templates {
+		var c chaosTypes.ChaosExperiment
+
+		// Only the template named "install-chaos-experiments" contains ChaosExperiment(s)
+		if t.Name == "install-chaos-experiments" {
+
+			if len(t.Inputs.Artifacts) != 0 {
+
+				// These are experiments with the spec passed as an artifact
+				for _, a := range t.Inputs.Artifacts {
+					err := yaml.Unmarshal([]byte(a.Raw.Data), &c)
+					if err != nil {
+						Red.Println("❌ Error parsing chaos experiment.")
+						os.Exit(1)
+					}
+					chaosExperiments = append(chaosExperiments, c)
+				}
+
+			} else { // These are experiments with their spec passed as remote file URLs
+
+				// Extracting the URL from the container arguments
+				re := regexp.MustCompile(`kubectl apply -f\s(?P<first>.+)\s-n.+`)
+				extractURL := fmt.Sprintf("${%s}", re.SubexpNames()[1])
+				fileURL := re.ReplaceAllString(t.Container.Args[0], extractURL)
+
+				body, err := ReadRemoteFile(fileURL)
+				if err != nil {
+					Red.Println("❌ Error reading ChaosExperiment")
+					os.Exit(1)
+				}
+
+				// Using a decoder since there might be multiple YAML documents
+				// inside the same remote file.
+				decoder := yamlutil.NewYAMLToJSONDecoder(bytes.NewReader(body))
+				for {
+					if err := decoder.Decode(&c); err != nil {
+						break
+					}
+					chaosExperiments = append(chaosExperiments, c)
+				}
+			}
+		}
+	}
+
+	// Assign weights to each chaos experiment
+	for _, c := range chaosExperiments {
+
+		// Fetch experiment weightage from annotation
+		w, ok := c.ObjectMeta.Annotations["litmuschaos.io/experiment-weightage"]
+		if !ok {
+			White.Println("Experiment weightage not provided, defaulting to 10.")
+			w = "10"
+		}
+
+		var win types.WeightagesInput
+		var err error
+		win.ExperimentName = c.ObjectMeta.Name
+		win.Weightage, err = strconv.Atoi(w)
+		if err != nil {
+			Red.Println("❌ Invalid experiment weightage provided.")
+			os.Exit(1)
+		}
+		weightages = append(weightages, win)
+	}
+
+	return weightages
 }

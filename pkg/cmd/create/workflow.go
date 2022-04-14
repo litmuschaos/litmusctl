@@ -21,10 +21,8 @@ import (
 	"os"
 
 	"github.com/argoproj/argo-workflows/v3/pkg/apis/workflow/v1alpha1"
-	chaosTypes "github.com/litmuschaos/chaos-operator/pkg/apis/litmuschaos/v1alpha1"
 	"github.com/litmuschaos/litmusctl/pkg/apis"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
-	"sigs.k8s.io/yaml"
 
 	types "github.com/litmuschaos/litmusctl/pkg/types"
 
@@ -48,8 +46,6 @@ var workflowCmd = &cobra.Command{
 		utils.PrintError(err)
 
 		var chaosWorkFlowInput types.ChaosWorkFlowInput
-		var chaosExperiment chaosTypes.ChaosExperiment
-		var weightages []types.WeightagesInput
 
 		workflowManifest, err := cmd.Flags().GetString("file")
 		utils.PrintError(err)
@@ -115,23 +111,8 @@ var workflowCmd = &cobra.Command{
 		chaosWorkFlowInput.WorkflowManifest = string(workflowStr)
 		chaosWorkFlowInput.WorkflowName = workflow.ObjectMeta.Name
 
-		// Assign weights to each chaos experiment
-		for _, t := range workflow.Spec.Templates {
-			if len(t.Inputs.Artifacts) != 0 {
-				err := yaml.Unmarshal([]byte(t.Inputs.Artifacts[0].Raw.Data), &chaosExperiment)
-				if chaosExperiment.Kind == "ChaosEngine" || err != nil {
-					continue // Tried to parse a ChaosEngine spec
-				}
-				weightages = append(weightages,
-					types.WeightagesInput{
-						ExperimentName: chaosExperiment.ObjectMeta.Name,
-						Weightage:      10, // TODO: fetch from annotation
-					},
-				)
-			}
-		}
-
-		chaosWorkFlowInput.Weightages = weightages
+		// Fetch experiment weightages
+		chaosWorkFlowInput.Weightages = utils.FetchWeightages(&workflow)
 
 		// All workflows created using this command are considered as custom.
 		chaosWorkFlowInput.IsCustomWorkflow = true
