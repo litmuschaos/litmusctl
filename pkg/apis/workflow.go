@@ -17,15 +17,36 @@ package apis
 
 import (
 	"encoding/json"
-	"fmt"
+	"errors"
 	"io/ioutil"
+	"net/http"
 
 	types "github.com/litmuschaos/litmusctl/pkg/types"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
 )
 
+type CreateWorkflowData struct {
+	Errors []struct {
+		Message string   `json:"message"`
+		Path    []string `json:"path"`
+	} `json:"errors"`
+	Data WorkflowData `json:"data"`
+}
+
+type WorkflowData struct {
+	CreateChaosWorkflow CreateChaosWorkflow `json:"createChaosWorkFlow"`
+}
+
+type CreateChaosWorkflow struct {
+	WorkflowID          string `json:"workflow_id"`
+	CronSyntax          string `json:"cronSyntax"`
+	WorkflowName        string `json:"workflow_name"`
+	WorkflowDescription string `json:"workflow_description"`
+	IsCustomWorkflow    bool   `json:"isCustomWorkflow"`
+}
+
 // CreateWorkflow sends GraphQL API request for creating a workflow
-func CreateWorkflow(in types.ChaosWorkFlowInput, cred types.Credentials) {
+func CreateWorkflow(in types.ChaosWorkFlowInput, cred types.Credentials) (CreateWorkflowData, error) {
 
 	var gqlReq types.ChaosWorkFlowGraphQLRequest
 
@@ -51,7 +72,27 @@ func CreateWorkflow(in types.ChaosWorkFlowInput, cred types.Credentials) {
 		string(types.Post),
 	)
 
-	bodyBytes, _ := ioutil.ReadAll(resp.Body)
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
 	defer resp.Body.Close()
-	fmt.Println(string(bodyBytes))
+	if err != nil {
+		return CreateWorkflowData{}, errors.New("Error in creating workflow: " + err.Error())
+	}
+
+	if resp.StatusCode == http.StatusOK {
+		var createdWorkflow CreateWorkflowData
+
+		err = json.Unmarshal(bodyBytes, &createdWorkflow)
+		if err != nil {
+			return CreateWorkflowData{}, errors.New("Error in creating workflow: " + err.Error())
+		}
+
+		// Errors present
+		if len(createdWorkflow.Errors) > 0 {
+			return CreateWorkflowData{}, errors.New(createdWorkflow.Errors[0].Message)
+		}
+
+		return createdWorkflow, nil
+	} else {
+		return CreateWorkflowData{}, err
+	}
 }

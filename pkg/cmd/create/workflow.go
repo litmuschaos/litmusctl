@@ -19,6 +19,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/argoproj/argo-workflows/v3/pkg/apis/workflow/v1alpha1"
 	"github.com/litmuschaos/litmusctl/pkg/apis"
@@ -117,7 +118,22 @@ var workflowCmd = &cobra.Command{
 		// All workflows created using this command are considered as custom.
 		chaosWorkFlowInput.IsCustomWorkflow = true
 
-		apis.CreateWorkflow(chaosWorkFlowInput, credentials)
+		// Make API call
+		createdWorkflow, err := apis.CreateWorkflow(chaosWorkFlowInput, credentials)
+		if err != nil {
+			if (createdWorkflow.Data == apis.WorkflowData{}) {
+				if strings.Contains(err.Error(), "multiple write errors") {
+					utils.Red.Println("\n🚫 Workflow/" + workflow.ObjectMeta.Name + " already exists")
+					os.Exit(1)
+				} else {
+					utils.White_B.Print("\n🚫 Workflow creation failed: " + err.Error() + "\n")
+					os.Exit(1)
+				}
+			}
+		}
+
+		// Successful creation
+		utils.White_B.Println("Workflow/" + createdWorkflow.Data.CreateChaosWorkflow.WorkflowName + " successfully created")
 	},
 }
 
