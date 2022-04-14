@@ -15,8 +15,8 @@ limitations under the License.
 */
 package types
 
-// ChaosWorkFlowInput describes the payload of the API request for workflow creation.
-type ChaosWorkFlowInput struct {
+// CreateChaosWorkFlowInput describes the payload of the API request for workflow creation.
+type CreateChaosWorkFlowInput struct {
 	WorkflowID          string            `json:"workflow_id"`
 	WorkflowManifest    string            `json:"workflow_manifest"`
 	CronSyntax          string            `json:"cronSyntax"`
@@ -33,9 +33,14 @@ type WeightagesInput struct {
 	Weightage      int    `json:"weightage"`
 }
 
-type ChaosWorkFlowGraphQLRequest struct {
+type CreateChaosWorkFlowGraphQLRequest struct {
 	Query     string `json:"query"`
 	Variables struct {
-		ChaosWorkFlowInput ChaosWorkFlowInput `json:"ChaosWorkFlowInput"`
+		CreateChaosWorkFlowInput CreateChaosWorkFlowInput `json:"ChaosWorkFlowInput"`
+	} `json:"variables"`
+}
+	Query     string `json:"query"`
+	Variables struct {
+		ChaosWorkFlowInput CreateChaosWorkFlowInput `json:"ChaosWorkFlowInput"`
 	} `json:"variables"`
 }

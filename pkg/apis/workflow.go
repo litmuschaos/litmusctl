@@ -46,9 +46,56 @@ type CreateChaosWorkflow struct {
 }
 
 // CreateWorkflow sends GraphQL API request for creating a workflow
-func CreateWorkflow(in types.ChaosWorkFlowInput, cred types.Credentials) (CreateWorkflowData, error) {
+func CreateWorkflow(in types.CreateChaosWorkFlowInput, cred types.Credentials) (CreateWorkflowData, error) {
 
-	var gqlReq types.ChaosWorkFlowGraphQLRequest
+	var gqlReq types.CreateChaosWorkFlowGraphQLRequest
+
+	gqlReq.Query = `mutation createChaosWorkFlow($ChaosWorkFlowInput: ChaosWorkFlowInput!) {
+                      createChaosWorkFlow(input: $ChaosWorkFlowInput) {
+                        workflow_id
+                        cronSyntax
+                        workflow_name
+                        workflow_description
+                        isCustomWorkflow
+                      }
+                    }`
+	gqlReq.Variables.CreateChaosWorkFlowInput = in
+
+	query, _ := json.Marshal(gqlReq)
+
+	resp, _ := SendRequest(
+		SendRequestParams{
+			Endpoint: cred.Endpoint + utils.GQLAPIPath,
+			Token:    cred.Token,
+		},
+		query,
+		string(types.Post),
+	)
+
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	defer resp.Body.Close()
+	if err != nil {
+		return CreateWorkflowData{}, errors.New("Error in creating workflow: " + err.Error())
+	}
+
+	if resp.StatusCode == http.StatusOK {
+		var createdWorkflow CreateWorkflowData
+
+		err = json.Unmarshal(bodyBytes, &createdWorkflow)
+		if err != nil {
+			return CreateWorkflowData{}, errors.New("Error in creating workflow: " + err.Error())
+		}
+
+		// Errors present
+		if len(createdWorkflow.Errors) > 0 {
+			return CreateWorkflowData{}, errors.New(createdWorkflow.Errors[0].Message)
+		}
+
+		return createdWorkflow, nil
+	} else {
+		return CreateWorkflowData{}, err
+	}
+}
 
 	gqlReq.Query = `mutation createChaosWorkFlow($ChaosWorkFlowInput: ChaosWorkFlowInput!) {
                       createChaosWorkFlow(input: $ChaosWorkFlowInput) {

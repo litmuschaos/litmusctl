@@ -46,7 +46,7 @@ var workflowCmd = &cobra.Command{
 		credentials, err := utils.GetCredentials(cmd)
 		utils.PrintError(err)
 
-		var chaosWorkFlowInput types.ChaosWorkFlowInput
+		var chaosWorkFlowInput types.CreateChaosWorkFlowInput
 
 		workflowManifest, err := cmd.Flags().GetString("file")
 		utils.PrintError(err)
