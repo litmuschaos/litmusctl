@@ -1,0 +1,70 @@
+/*
+Copyright © 2021 The LitmusChaos Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+package utils
+
+import (
+	"encoding/json"
+	"io/ioutil"
+	"net/http"
+
+	"sigs.k8s.io/yaml"
+)
+
+// unmarshalObject unmarshals the given body into the given interface.
+// It converts to JSON first for consistent parsing and also to support
+// both YAML and JSON with the same function.
+func unmarshalObject(body []byte, obj interface{}) error {
+	jsonBody, err := yaml.YAMLToJSON(body)
+	if err != nil {
+		return err
+	}
+
+	err = json.Unmarshal(jsonBody, &obj)
+	if err != nil {
+		return err
+	}
+
+	return err
+}
+
+// UnmarshalLocalFile unmarshals a given local file.
+func UnmarshalLocalFile(file string, obj interface{}) error {
+	body, err := ioutil.ReadFile(file)
+	if err == nil {
+		err = unmarshalObject(body, &obj)
+	}
+	return err
+}
+
+// ReadRemoteFile reads a given remote file.
+func ReadRemoteFile(url string) ([]byte, error) {
+	resp, err := http.Get(url)
+	var body []byte
+	if err == nil {
+		body, err = ioutil.ReadAll(resp.Body)
+		resp.Body.Close()
+	}
+	return body, err
+}
+
+// UnmarshalRemoteFile unmarshals a given remote file into the given interface.
+func UnmarshalRemoteFile(file string, obj interface{}) error {
+	body, err := ReadRemoteFile(file)
+	if err == nil {
+		err = unmarshalObject(body, &obj)
+	}
+	return err
+}

@@ -18,7 +18,6 @@ package create
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 
 	"github.com/argoproj/argo-workflows/v3/pkg/apis/workflow/v1alpha1"
@@ -103,8 +102,15 @@ var workflowCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		// Marshal workflow manifest
-		workflow := readManifestFile(workflowManifest)
+		// Unmarshal workflow manifest
+		var workflow v1alpha1.Workflow
+		err = utils.ReadWorkflowManifest(workflowManifest, &workflow)
+		if err != nil {
+			utils.Red.Println("⛔ Error reading workflow manifest!!")
+			os.Exit(1)
+		}
+
+		// Marshal it back to JSON for API payload
 		workflowStr, _ := json.Marshal(workflow)
 		chaosWorkFlowInput.WorkflowManifest = string(workflowStr)
 		chaosWorkFlowInput.WorkflowName = workflow.ObjectMeta.Name
@@ -132,16 +138,6 @@ var workflowCmd = &cobra.Command{
 
 		apis.CreateWorkflow(chaosWorkFlowInput, credentials)
 	},
-}
-
-// TODO: Move this to utils
-func readManifestFile(file string) v1alpha1.Workflow {
-	var body []byte
-	var workflowManifest v1alpha1.Workflow
-
-	body, _ = ioutil.ReadFile(file)
-	_ = yaml.Unmarshal(body, &workflowManifest)
-	return workflowManifest
 }
 
 func init() {
