@@ -19,7 +19,9 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"time"
 
+	"github.com/gorhill/cronexpr"
 	"github.com/litmuschaos/litmusctl/pkg/apis"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
 
@@ -120,6 +122,13 @@ var workflowCmd = &cobra.Command{
 
 		// Successful creation
 		utils.White_B.Println("\n🚀 ChaosWorkflow/" + createdWorkflow.Data.CreateChaosWorkflow.WorkflowName + " successfully created 🎉")
+		if createdWorkflow.Data.CreateChaosWorkflow.CronSyntax == "" {
+			utils.White_B.Println("\nThe next run of this workflow will be scheduled immediately.")
+		} else {
+			utils.White_B.Println(
+				"\nThe next run of this workflow will be scheduled at " +
+					cronexpr.MustParse(createdWorkflow.Data.CreateChaosWorkflow.CronSyntax).Next(time.Now()).Format("January 2 2006, 03:04:05 PM"))
+		}
 	},
 }
 

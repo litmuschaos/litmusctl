@@ -6,6 +6,7 @@ require (
 	github.com/argoproj/argo-workflows/v3 v3.2.3
 	github.com/fatih/color v1.12.0
 	github.com/golang-jwt/jwt v3.2.1+incompatible
+	github.com/gorhill/cronexpr v0.0.0-20180427100037-88b0669f7d75
 	github.com/litmuschaos/chaos-operator v0.0.0-20211109081056-46bcd99c3daf
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/spf13/cobra v1.2.1
