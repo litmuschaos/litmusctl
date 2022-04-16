@@ -16,12 +16,10 @@ limitations under the License.
 package create
 
 import (
-	"encoding/json"
 	"fmt"
 	"os"
 	"strings"
 
-	"github.com/argoproj/argo-workflows/v3/pkg/apis/workflow/v1alpha1"
 	"github.com/litmuschaos/litmusctl/pkg/apis"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
 
@@ -99,24 +97,12 @@ var workflowCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		// Unmarshal workflow manifest
-		var workflow v1alpha1.Workflow
-		err = utils.ReadWorkflowManifest(workflowManifest, &workflow)
+		// Parse workflow manifest and populate chaosWorkFlowInput
+		err = utils.ParseWorkflowManifest(workflowManifest, &chaosWorkFlowInput)
 		if err != nil {
-			utils.Red.Println("⛔ Error reading workflow manifest!!")
+			utils.Red.Println("⛔ Error reading workflow manifest: " + err.Error())
 			os.Exit(1)
 		}
-
-		// Marshal it back to JSON for API payload
-		workflowStr, _ := json.Marshal(workflow)
-		chaosWorkFlowInput.WorkflowManifest = string(workflowStr)
-		chaosWorkFlowInput.WorkflowName = workflow.ObjectMeta.Name
-
-		// Fetch experiment weightages
-		chaosWorkFlowInput.Weightages = utils.FetchWeightages(&workflow)
-
-		// All workflows created using this command are considered as custom.
-		chaosWorkFlowInput.IsCustomWorkflow = true
 
 		// Make API call
 		createdWorkflow, err := apis.CreateWorkflow(chaosWorkFlowInput, credentials)

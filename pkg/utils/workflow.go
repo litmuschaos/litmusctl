@@ -17,7 +17,10 @@ package utils
 
 import (
 	"bytes"
+	"encoding/json"
+	"errors"
 	"fmt"
+	"io/ioutil"
 	"net/url"
 	"os"
 	"regexp"
@@ -30,27 +33,85 @@ import (
 	"sigs.k8s.io/yaml"
 )
 
-// ReadWorkflowManifest reads the manifest that is passed as an argument.
-// It can be either a local file or a remote file.
-func ReadWorkflowManifest(file string, workflow *v1alpha1.Workflow) error {
-	parsedURL, err := url.ParseRequestURI(file)
-	if err != nil || !(parsedURL.Scheme == "http" || parsedURL.Scheme == "https") {
-		err = UnmarshalLocalFile(file, &workflow)
+// ParseWorkflowManifest reads the manifest that is passed as an argument and
+// populates the payload for the CreateChaosWorkflow API request. The manifest
+// can be either a local file or a remote file.
+func ParseWorkflowManifest(file string, chaosWorkFlowInput *types.CreateChaosWorkFlowInput) error {
+
+	var body []byte
+	var err error
+
+	// Read the manifest file.
+	parsedURL, ok := url.ParseRequestURI(file)
+	if ok != nil || !(parsedURL.Scheme == "http" || parsedURL.Scheme == "https") {
+		body, err = ioutil.ReadFile(file)
 	} else {
-		err = UnmarshalRemoteFile(file, &workflow)
+		body, err = ReadRemoteFile(file)
 	}
-	return err
+	if err != nil {
+		return err
+	}
+
+	// Extract the kind of Argo Workflow from the given manifest
+	re := regexp.MustCompile(`\bkind:\s*(?P<kind>Workflow|CronWorkflow)\b`)
+	extractKind := fmt.Sprintf("${%s}", re.SubexpNames()[1])
+	workflowKind := re.ReplaceAllString(re.FindString(string(body)), extractKind)
+
+	if workflowKind == "Workflow" {
+
+		var workflow v1alpha1.Workflow
+		err = UnmarshalObject(body, &workflow)
+		if err != nil {
+			return err
+		}
+
+		// Marshal the workflow back to JSON for API payload.
+		workflowStr, ok := json.Marshal(workflow)
+		if ok != nil {
+			return ok
+		}
+		chaosWorkFlowInput.WorkflowManifest = string(workflowStr)
+		chaosWorkFlowInput.WorkflowName = workflow.ObjectMeta.Name
+		chaosWorkFlowInput.IsCustomWorkflow = true
+
+		// Fetch the weightages for experiments present in the spec.
+		chaosWorkFlowInput.Weightages = FetchWeightages(workflow.Spec.Templates)
+	} else if workflowKind == "CronWorkflow" {
+
+		var cronWorkflow v1alpha1.CronWorkflow
+		err = UnmarshalObject(body, &cronWorkflow)
+		if err != nil {
+			return err
+		}
+
+		// Marshal the workflow back to JSON for API payload.
+		workflowStr, _ := json.Marshal(cronWorkflow)
+		chaosWorkFlowInput.WorkflowManifest = string(workflowStr)
+		chaosWorkFlowInput.WorkflowName = cronWorkflow.ObjectMeta.Name
+		chaosWorkFlowInput.IsCustomWorkflow = true
+
+		// Set the schedule for the workflow
+		chaosWorkFlowInput.CronSyntax = cronWorkflow.Spec.Schedule
+
+		// Fetch the weightages for experiments present in the spec.
+		chaosWorkFlowInput.Weightages = FetchWeightages(cronWorkflow.Spec.WorkflowSpec.Templates)
+	} else {
+		return errors.New("Invalid resource kind found in manifest.")
+	}
+
+	return nil
 }
 
-// FetchWeightages parses the experiment spec and assigns weightage to each of the
-// experiments present. It can parse both artifacts and remote experiment specs.
-func FetchWeightages(workflow *v1alpha1.Workflow) []types.WeightagesInput {
+// FetchWeightages takes in the templates present in the workflow spec and
+// assigns weightage to each of the experiments present in them. It can parse
+// both artifacts and remote experiment specs.
+func FetchWeightages(templates []v1alpha1.Template) []types.WeightagesInput {
 
 	var weightages []types.WeightagesInput
 	var chaosExperiments []chaosTypes.ChaosExperiment
 
 	// Fetch all present experiments and append them to the experiments array
-	for _, t := range workflow.Spec.Templates {
+	for _, t := range templates {
 		var c chaosTypes.ChaosExperiment
 
 		// Only the template named "install-chaos-experiments" contains ChaosExperiment(s)

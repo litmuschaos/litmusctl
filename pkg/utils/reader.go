@@ -23,10 +23,10 @@ import (
 	"sigs.k8s.io/yaml"
 )
 
-// unmarshalObject unmarshals the given body into the given interface.
+// UnmarshalObject unmarshals the given body into the given interface.
 // It converts to JSON first for consistent parsing and also to support
 // both YAML and JSON with the same function.
-func unmarshalObject(body []byte, obj interface{}) error {
+func UnmarshalObject(body []byte, obj interface{}) error {
 	jsonBody, err := yaml.YAMLToJSON(body)
 	if err != nil {
 		return err
@@ -40,15 +40,6 @@ func unmarshalObject(body []byte, obj interface{}) error {
 	return err
 }
 
-// UnmarshalLocalFile unmarshals a given local file.
-func UnmarshalLocalFile(file string, obj interface{}) error {
-	body, err := ioutil.ReadFile(file)
-	if err == nil {
-		err = unmarshalObject(body, &obj)
-	}
-	return err
-}
-
 // ReadRemoteFile reads a given remote file.
 func ReadRemoteFile(url string) ([]byte, error) {
 	resp, err := http.Get(url)
@@ -58,13 +49,4 @@ func ReadRemoteFile(url string) ([]byte, error) {
 		resp.Body.Close()
 	}
 	return body, err
-}
-
-// UnmarshalRemoteFile unmarshals a given remote file into the given interface.
-func UnmarshalRemoteFile(file string, obj interface{}) error {
-	body, err := ReadRemoteFile(file)
-	if err == nil {
-		err = unmarshalObject(body, &obj)
-	}
-	return err
 }
