@@ -100,7 +100,7 @@ var workflowCmd = &cobra.Command{
 		// Parse workflow manifest and populate chaosWorkFlowInput
 		err = utils.ParseWorkflowManifest(workflowManifest, &chaosWorkFlowInput)
 		if err != nil {
-			utils.Red.Println("⛔ Error reading workflow manifest: " + err.Error())
+			utils.Red.Println("❌ Error reading workflow manifest: " + err.Error())
 			os.Exit(1)
 		}
 
@@ -109,17 +109,17 @@ var workflowCmd = &cobra.Command{
 		if err != nil {
 			if (createdWorkflow.Data == apis.WorkflowData{}) {
 				if strings.Contains(err.Error(), "multiple write errors") {
-					utils.Red.Println("\n🚫 Workflow/" + workflow.ObjectMeta.Name + " already exists")
+					utils.Red.Println("\n❌ ChaosWorkflow/" + chaosWorkFlowInput.WorkflowName + " already exists")
 					os.Exit(1)
 				} else {
-					utils.White_B.Print("\n🚫 Workflow creation failed: " + err.Error() + "\n")
+					utils.White_B.Print("\n❌ ChaosWorkflow/" + chaosWorkFlowInput.WorkflowName + " failed to be created: " + err.Error())
 					os.Exit(1)
 				}
 			}
 		}
 
 		// Successful creation
-		utils.White_B.Println("Workflow/" + createdWorkflow.Data.CreateChaosWorkflow.WorkflowName + " successfully created")
+		utils.White_B.Println("\n🚀 ChaosWorkflow/" + createdWorkflow.Data.CreateChaosWorkflow.WorkflowName + " successfully created 🎉")
 	},
 }
 

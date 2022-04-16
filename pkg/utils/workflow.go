@@ -96,7 +96,7 @@ func ParseWorkflowManifest(file string, chaosWorkFlowInput *types.CreateChaosWor
 		// Fetch the weightages for experiments present in the spec.
 		chaosWorkFlowInput.Weightages = FetchWeightages(cronWorkflow.Spec.WorkflowSpec.Templates)
 	} else {
-		return errors.New("Invalid resource kind found in manifest.")
+		return errors.New("❌ Invalid resource kind found in manifest.")
 	}
 
 	return nil
@@ -161,7 +161,7 @@ func FetchWeightages(templates []v1alpha1.Template) []types.WeightagesInput {
 		// Fetch experiment weightage from annotation
 		w, ok := c.ObjectMeta.Annotations["litmuschaos.io/experiment-weightage"]
 		if !ok {
-			White.Println("Experiment weightage not provided, defaulting to 10.")
+			White.Println("Weightage for ChaosExperiment/" + c.ObjectMeta.Name + " not provided, defaulting to 10.")
 			w = "10"
 		}
 
@@ -170,7 +170,7 @@ func FetchWeightages(templates []v1alpha1.Template) []types.WeightagesInput {
 		win.ExperimentName = c.ObjectMeta.Name
 		win.Weightage, err = strconv.Atoi(w)
 		if err != nil {
-			Red.Println("❌ Invalid experiment weightage provided.")
+			Red.Println("❌ Invalid weightage for ChaosExperiment/" + c.ObjectMeta.Name + ".")
 			os.Exit(1)
 		}
 		weightages = append(weightages, win)
