@@ -96,7 +96,7 @@ func ParseWorkflowManifest(file string, chaosWorkFlowInput *types.CreateChaosWor
 		// Fetch the weightages for experiments present in the spec.
 		chaosWorkFlowInput.Weightages = FetchWeightages(cronWorkflow.Spec.WorkflowSpec.Templates)
 	} else {
-		return errors.New("❌ Invalid resource kind found in manifest.")
+		return errors.New("Invalid resource kind found in manifest.")
 	}
 
 	return nil

@@ -102,7 +102,7 @@ var workflowCmd = &cobra.Command{
 		// Parse workflow manifest and populate chaosWorkFlowInput
 		err = utils.ParseWorkflowManifest(workflowManifest, &chaosWorkFlowInput)
 		if err != nil {
-			utils.Red.Println("❌ Error reading workflow manifest: " + err.Error())
+			utils.Red.Println("❌ Error parsing workflow manifest: " + err.Error())
 			os.Exit(1)
 		}
 
