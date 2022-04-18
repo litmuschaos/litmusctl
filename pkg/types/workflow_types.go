@@ -39,8 +39,3 @@ type CreateChaosWorkFlowGraphQLRequest struct {
 		CreateChaosWorkFlowInput CreateChaosWorkFlowInput `json:"ChaosWorkFlowInput"`
 	} `json:"variables"`
 }
-	Query     string `json:"query"`
-	Variables struct {
-		ChaosWorkFlowInput CreateChaosWorkFlowInput `json:"ChaosWorkFlowInput"`
-	} `json:"variables"`
-}
