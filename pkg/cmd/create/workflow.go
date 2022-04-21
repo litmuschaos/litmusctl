@@ -109,7 +109,7 @@ var workflowCmd = &cobra.Command{
 		// Make API call
 		createdWorkflow, err := apis.CreateWorkflow(chaosWorkFlowInput, credentials)
 		if err != nil {
-			if (createdWorkflow.Data == apis.WorkflowData{}) {
+			if (createdWorkflow.Data == apis.CreatedWorkflow{}) {
 				if strings.Contains(err.Error(), "multiple write errors") {
 					utils.Red.Println("\n❌ ChaosWorkflow/" + chaosWorkFlowInput.WorkflowName + " already exists")
 					os.Exit(1)
