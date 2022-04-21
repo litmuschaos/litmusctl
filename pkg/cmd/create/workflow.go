@@ -25,7 +25,7 @@ import (
 	"github.com/litmuschaos/litmusctl/pkg/apis"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
 
-	types "github.com/litmuschaos/litmusctl/pkg/types"
+	"github.com/litmuschaos/litmus/litmus-portal/graphql-server/graph/model"
 
 	"github.com/spf13/cobra"
 )
@@ -46,7 +46,7 @@ var workflowCmd = &cobra.Command{
 		credentials, err := utils.GetCredentials(cmd)
 		utils.PrintError(err)
 
-		var chaosWorkFlowInput types.CreateChaosWorkFlowInput
+		var chaosWorkFlowInput model.ChaosWorkFlowInput
 
 		workflowManifest, err := cmd.Flags().GetString("file")
 		utils.PrintError(err)

@@ -21,6 +21,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	"github.com/litmuschaos/litmus/litmus-portal/graphql-server/graph/model"
 	types "github.com/litmuschaos/litmusctl/pkg/types"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
 )
@@ -34,21 +35,20 @@ type WorkflowCreationData struct {
 }
 
 type CreatedWorkflow struct {
-	CreateChaosWorkflow CreatedWorkflowDetails `json:"createChaosWorkFlow"`
+	CreateChaosWorkflow model.ChaosWorkFlowResponse `json:"createChaosWorkFlow"`
 }
 
-type CreatedWorkflowDetails struct {
-	WorkflowID          string `json:"workflow_id"`
-	CronSyntax          string `json:"cronSyntax"`
-	WorkflowName        string `json:"workflow_name"`
-	WorkflowDescription string `json:"workflow_description"`
-	IsCustomWorkflow    bool   `json:"isCustomWorkflow"`
+type CreateChaosWorkFlowGraphQLRequest struct {
+	Query     string `json:"query"`
+	Variables struct {
+		CreateChaosWorkFlowInput model.ChaosWorkFlowInput `json:"ChaosWorkFlowInput"`
+	} `json:"variables"`
 }
 
 // CreateWorkflow sends GraphQL API request for creating a workflow
-func CreateWorkflow(in types.CreateChaosWorkFlowInput, cred types.Credentials) (WorkflowCreationData, error) {
+func CreateWorkflow(in model.ChaosWorkFlowInput, cred types.Credentials) (WorkflowCreationData, error) {
 
-	var gqlReq types.CreateChaosWorkFlowGraphQLRequest
+	var gqlReq CreateChaosWorkFlowGraphQLRequest
 
 	gqlReq.Query = `mutation createChaosWorkFlow($ChaosWorkFlowInput: ChaosWorkFlowInput!) {
                       createChaosWorkFlow(input: $ChaosWorkFlowInput) {

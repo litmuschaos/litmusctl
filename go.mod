@@ -3,18 +3,19 @@ module github.com/litmuschaos/litmusctl
 go 1.16
 
 require (
-	github.com/argoproj/argo-workflows/v3 v3.2.3
+	github.com/argoproj/argo-workflows/v3 v3.2.9
 	github.com/fatih/color v1.12.0
-	github.com/golang-jwt/jwt v3.2.1+incompatible
+	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/gorhill/cronexpr v0.0.0-20180427100037-88b0669f7d75
 	github.com/litmuschaos/chaos-operator v0.0.0-20211109081056-46bcd99c3daf
+	github.com/litmuschaos/litmus/litmus-portal/graphql-server v0.0.0-20220415210522-227a4a15f079
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/spf13/cobra v1.2.1
 	github.com/spf13/viper v1.8.1
 	golang.org/x/term v0.0.0-20210220032956-6a3ed077a48d
 	gopkg.in/yaml.v2 v2.4.0
 	k8s.io/api v0.22.1
-	k8s.io/apimachinery v0.22.1
+	k8s.io/apimachinery v0.22.2
 	k8s.io/client-go v12.0.0+incompatible
 	sigs.k8s.io/yaml v1.2.0
 )

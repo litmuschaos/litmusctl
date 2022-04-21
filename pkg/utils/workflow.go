@@ -22,13 +22,12 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/url"
-	"os"
 	"regexp"
 	"strconv"
 
 	"github.com/argoproj/argo-workflows/v3/pkg/apis/workflow/v1alpha1"
 	chaosTypes "github.com/litmuschaos/chaos-operator/pkg/apis/litmuschaos/v1alpha1"
-	"github.com/litmuschaos/litmusctl/pkg/types"
+	"github.com/litmuschaos/litmus/litmus-portal/graphql-server/graph/model"
 	yamlutil "k8s.io/apimachinery/pkg/util/yaml"
 	"sigs.k8s.io/yaml"
 )
@@ -36,7 +35,7 @@ import (
 // ParseWorkflowManifest reads the manifest that is passed as an argument and
 // populates the payload for the CreateChaosWorkflow API request. The manifest
 // can be either a local file or a remote file.
-func ParseWorkflowManifest(file string, chaosWorkFlowInput *types.CreateChaosWorkFlowInput) error {
+func ParseWorkflowManifest(file string, chaosWorkFlowInput *model.ChaosWorkFlowInput) error {
 
 	var body []byte
 	var err error
@@ -75,7 +74,10 @@ func ParseWorkflowManifest(file string, chaosWorkFlowInput *types.CreateChaosWor
 		chaosWorkFlowInput.IsCustomWorkflow = true
 
 		// Fetch the weightages for experiments present in the spec.
-		chaosWorkFlowInput.Weightages = FetchWeightages(workflow.Spec.Templates)
+		err = FetchWeightages(chaosWorkFlowInput, workflow.Spec.Templates)
+		if err != nil {
+			return err
+		}
 	} else if workflowKind == "CronWorkflow" {
 
 		var cronWorkflow v1alpha1.CronWorkflow
@@ -94,7 +96,10 @@ func ParseWorkflowManifest(file string, chaosWorkFlowInput *types.CreateChaosWor
 		chaosWorkFlowInput.CronSyntax = cronWorkflow.Spec.Schedule
 
 		// Fetch the weightages for experiments present in the spec.
-		chaosWorkFlowInput.Weightages = FetchWeightages(cronWorkflow.Spec.WorkflowSpec.Templates)
+		err = FetchWeightages(chaosWorkFlowInput, cronWorkflow.Spec.WorkflowSpec.Templates)
+		if err != nil {
+			return err
+		}
 	} else {
 		return errors.New("Invalid resource kind found in manifest.")
 	}
@@ -105,9 +110,8 @@ func ParseWorkflowManifest(file string, chaosWorkFlowInput *types.CreateChaosWor
 // FetchWeightages takes in the templates present in the workflow spec and
 // assigns weightage to each of the experiments present in them. It can parse
 // both artifacts and remote experiment specs.
-func FetchWeightages(templates []v1alpha1.Template) []types.WeightagesInput {
+func FetchWeightages(chaosWorkFlowInput *model.ChaosWorkFlowInput, templates []v1alpha1.Template) error {
 
-	var weightages []types.WeightagesInput
 	var chaosExperiments []chaosTypes.ChaosExperiment
 
 	// Fetch all present experiments and append them to the experiments array
@@ -123,8 +127,7 @@ func FetchWeightages(templates []v1alpha1.Template) []types.WeightagesInput {
 				for _, a := range t.Inputs.Artifacts {
 					err := yaml.Unmarshal([]byte(a.Raw.Data), &c)
 					if err != nil {
-						Red.Println("❌ Error parsing chaos experiment.")
-						os.Exit(1)
+						return errors.New("Error parsing ChaosExperiment: " + err.Error())
 					}
 					chaosExperiments = append(chaosExperiments, c)
 				}
@@ -138,8 +141,7 @@ func FetchWeightages(templates []v1alpha1.Template) []types.WeightagesInput {
 
 				body, err := ReadRemoteFile(fileURL)
 				if err != nil {
-					Red.Println("❌ Error reading ChaosExperiment")
-					os.Exit(1)
+					return errors.New("Error reading ChaosExperiment: " + err.Error())
 				}
 
 				// Using a decoder since there might be multiple YAML documents
@@ -165,16 +167,15 @@ func FetchWeightages(templates []v1alpha1.Template) []types.WeightagesInput {
 			w = "10"
 		}
 
-		var win types.WeightagesInput
+		var win model.WeightagesInput
 		var err error
 		win.ExperimentName = c.ObjectMeta.Name
 		win.Weightage, err = strconv.Atoi(w)
 		if err != nil {
-			Red.Println("❌ Invalid weightage for ChaosExperiment/" + c.ObjectMeta.Name + ".")
-			os.Exit(1)
+			return errors.New("Invalid weightage for ChaosExperiment/" + c.ObjectMeta.Name + ".")
 		}
-		weightages = append(weightages, win)
+		chaosWorkFlowInput.Weightages = append(chaosWorkFlowInput.Weightages, &win)
 	}
 
-	return weightages
+	return nil
 }
