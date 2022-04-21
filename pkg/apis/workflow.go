@@ -63,7 +63,7 @@ func CreateWorkflow(in types.CreateChaosWorkFlowInput, cred types.Credentials) (
 
 	query, _ := json.Marshal(gqlReq)
 
-	resp, _ := SendRequest(
+	resp, err := SendRequest(
 		SendRequestParams{
 			Endpoint: cred.Endpoint + utils.GQLAPIPath,
 			Token:    cred.Token,
@@ -71,6 +71,9 @@ func CreateWorkflow(in types.CreateChaosWorkFlowInput, cred types.Credentials) (
 		query,
 		string(types.Post),
 	)
+	if err != nil {
+		return WorkflowCreationData{}, err
+	}
 
 	bodyBytes, err := ioutil.ReadAll(resp.Body)
 	defer resp.Body.Close()
