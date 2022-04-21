@@ -33,9 +33,9 @@ import (
 // workflowCmd represents the project command
 var workflowCmd = &cobra.Command{
 	Use: "workflow",
-	Short: `Create a workflow
+	Short: `Create a Chaos Workflow
 	Example:
-	#create a workflow
+	#create a chaos workflow
 	litmusctl create workflow -f workflow.yaml --project-id="d861b650-1549-4574-b2ba-ab754058dd04" --cluster-id="1c9c5801-8789-4ac9-bf5f-32649b707a5c"
 
 	Note: The default location of the config file is $HOME/.litmusconfig, and can be overridden by a --config flag
@@ -109,7 +109,7 @@ var workflowCmd = &cobra.Command{
 		// Make API call
 		createdWorkflow, err := apis.CreateWorkflow(chaosWorkFlowInput, credentials)
 		if err != nil {
-			if (createdWorkflow.Data == apis.CreatedWorkflow{}) {
+			if (createdWorkflow.Data == apis.CreatedChaosWorkflow{}) {
 				if strings.Contains(err.Error(), "multiple write errors") {
 					utils.Red.Println("\n❌ ChaosWorkflow/" + chaosWorkFlowInput.WorkflowName + " already exists")
 					os.Exit(1)

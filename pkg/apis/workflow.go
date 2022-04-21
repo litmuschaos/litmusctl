@@ -26,15 +26,15 @@ import (
 	"github.com/litmuschaos/litmusctl/pkg/utils"
 )
 
-type WorkflowCreationData struct {
+type ChaosWorkflowCreationData struct {
 	Errors []struct {
 		Message string   `json:"message"`
 		Path    []string `json:"path"`
 	} `json:"errors"`
-	Data CreatedWorkflow `json:"data"`
+	Data CreatedChaosWorkflow `json:"data"`
 }
 
-type CreatedWorkflow struct {
+type CreatedChaosWorkflow struct {
 	CreateChaosWorkflow model.ChaosWorkFlowResponse `json:"createChaosWorkFlow"`
 }
 
@@ -46,7 +46,7 @@ type CreateChaosWorkFlowGraphQLRequest struct {
 }
 
 // CreateWorkflow sends GraphQL API request for creating a workflow
-func CreateWorkflow(in model.ChaosWorkFlowInput, cred types.Credentials) (WorkflowCreationData, error) {
+func CreateWorkflow(in model.ChaosWorkFlowInput, cred types.Credentials) (ChaosWorkflowCreationData, error) {
 
 	var gqlReq CreateChaosWorkFlowGraphQLRequest
 
@@ -72,30 +72,30 @@ func CreateWorkflow(in model.ChaosWorkFlowInput, cred types.Credentials) (Workfl
 		string(types.Post),
 	)
 	if err != nil {
-		return WorkflowCreationData{}, err
+		return ChaosWorkflowCreationData{}, err
 	}
 
 	bodyBytes, err := ioutil.ReadAll(resp.Body)
 	defer resp.Body.Close()
 	if err != nil {
-		return WorkflowCreationData{}, errors.New("Error in creating workflow: " + err.Error())
+		return ChaosWorkflowCreationData{}, errors.New("Error in creating workflow: " + err.Error())
 	}
 
 	if resp.StatusCode == http.StatusOK {
-		var createdWorkflow WorkflowCreationData
+		var createdWorkflow ChaosWorkflowCreationData
 
 		err = json.Unmarshal(bodyBytes, &createdWorkflow)
 		if err != nil {
-			return WorkflowCreationData{}, errors.New("Error in creating workflow: " + err.Error())
+			return ChaosWorkflowCreationData{}, errors.New("Error in creating workflow: " + err.Error())
 		}
 
 		// Errors present
 		if len(createdWorkflow.Errors) > 0 {
-			return WorkflowCreationData{}, errors.New(createdWorkflow.Errors[0].Message)
+			return ChaosWorkflowCreationData{}, errors.New(createdWorkflow.Errors[0].Message)
 		}
 
 		return createdWorkflow, nil
 	} else {
-		return WorkflowCreationData{}, err
+		return ChaosWorkflowCreationData{}, err
 	}
 }
