@@ -36,7 +36,7 @@ var workflowCmd = &cobra.Command{
 	Short: `Create a Chaos Workflow
 	Example:
 	#create a chaos workflow
-	litmusctl create workflow -f workflow.yaml --project-id="d861b650-1549-4574-b2ba-ab754058dd04" --cluster-id="1c9c5801-8789-4ac9-bf5f-32649b707a5c"
+	litmusctl create workflow -f workflow.yaml --project-id="d861b650-1549-4574-b2ba-ab754058dd04" --agent-id="1c9c5801-8789-4ac9-bf5f-32649b707a5c"
 
 	Note: The default location of the config file is $HOME/.litmusconfig, and can be overridden by a --config flag
 	`,
@@ -65,16 +65,16 @@ var workflowCmd = &cobra.Command{
 			}
 		}
 
-		chaosWorkFlowInput.ClusterID, err = cmd.Flags().GetString("cluster-id")
+		chaosWorkFlowInput.ClusterID, err = cmd.Flags().GetString("agent-id")
 		utils.PrintError(err)
 
-		// Handle blank input for cluster ID
+		// Handle blank input for agent ID
 		if chaosWorkFlowInput.ClusterID == "" {
-			utils.White_B.Print("\nEnter the Cluster ID: ")
+			utils.White_B.Print("\nEnter the Agent ID: ")
 			fmt.Scanln(&chaosWorkFlowInput.ClusterID)
 
 			if chaosWorkFlowInput.ClusterID == "" {
-				utils.Red.Println("⛔ Cluster ID can't be empty!!")
+				utils.Red.Println("⛔ Agent ID can't be empty!!")
 				os.Exit(1)
 			}
 		}
@@ -136,7 +136,7 @@ func init() {
 	CreateCmd.AddCommand(workflowCmd)
 
 	workflowCmd.Flags().String("project-id", "", "Set the project-id to create workflow for the particular project. To see the projects, apply litmusctl get projects")
-	workflowCmd.Flags().String("cluster-id", "", "Set the cluster-id to create workflow for the particular cluster. To see the projects, apply litmusctl get agents")
+	workflowCmd.Flags().String("agent-id", "", "Set the agent-id to create workflow for the particular agent. To see the agents, apply litmusctl get agents")
 
 	workflowCmd.Flags().StringP("file", "f", "", "The manifest file for the workflow")
 }
