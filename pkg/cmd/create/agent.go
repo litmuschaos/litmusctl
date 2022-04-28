@@ -188,7 +188,7 @@ var agentCmd = &cobra.Command{
 
 			// Check if user has sufficient permissions based on mode
 			utils.White_B.Print("\n🏃 Running prerequisites check....")
-			agent.ValidateSAPermissions(newAgent.Mode, &kubeconfig)
+			agent.ValidateSAPermissions(newAgent.Mode, newAgent.Namespace, &kubeconfig)
 
 			agents, err := apis.GetAgentList(credentials, newAgent.ProjectId)
 			utils.PrintError(err)
@@ -218,11 +218,12 @@ var agentCmd = &cobra.Command{
 
 			modeType := agent.GetModeType()
 
-			// Check if user has sufficient permissions based on mode
-			utils.White_B.Print("\n🏃 Running prerequisites check....")
-			agent.ValidateSAPermissions(modeType, &kubeconfig)
 			newAgent, err = agent.GetAgentDetails(modeType, newAgent.ProjectId, credentials, &kubeconfig)
 			utils.PrintError(err)
+
+			// Check if user has sufficient permissions based on mode
+			utils.White_B.Print("\n🏃 Running prerequisites check....")
+			agent.ValidateSAPermissions(modeType, newAgent.Namespace, &kubeconfig)
 
 			newAgent.ServiceAccount, newAgent.SAExists = k8s.ValidSA(newAgent.Namespace, &kubeconfig)
 			newAgent.Mode = modeType

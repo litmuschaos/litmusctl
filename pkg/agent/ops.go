@@ -214,21 +214,24 @@ AGENT_NAME:
 	return newAgent, nil
 }
 
-func ValidateSAPermissions(mode string, kubeconfig *string) {
+func ValidateSAPermissions(mode string, namespace string, kubeconfig *string) {
 	var (
 		pems      [2]bool
 		err       error
 		resources [2]string
+		ns        string
 	)
 
 	if mode == "cluster" {
-		resources = [2]string{"clusterrole", "clusterrolebinding"}
+		resources = [2]string{"clusterroles", "clusterrolebindings"}
 	} else {
-		resources = [2]string{"role", "rolebinding"}
+		resources = [2]string{"roles", "rolebindings"}
+		// In namespace mode, we must use the namespace provided in input if any, so that permissions are checked in this namespace. Not needed in cluster mode
+		ns = namespace
 	}
 
 	for i, resource := range resources {
-		pems[i], err = k8s.CheckSAPermissions(k8s.CheckSAPermissionsParams{Verb: "create", Resource: resource, Print: true}, kubeconfig)
+		pems[i], err = k8s.CheckSAPermissions(k8s.CheckSAPermissionsParams{Verb: "create", Resource: resource, Print: true, Namespace: ns}, kubeconfig)
 		if err != nil {
 			utils.Red.Println(err)
 		}
