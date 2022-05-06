@@ -40,7 +40,7 @@ type createProjectResponse struct {
 }
 
 type createProjectPayload struct {
-	ProjectName string `json:"project_name"`
+	ProjectName string `json:"projectName"`
 }
 
 func CreateProjectRequest(projectName string, cred types.Credentials) (createProjectResponse, error) {

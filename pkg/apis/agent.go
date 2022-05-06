@@ -36,10 +36,10 @@ type AgentData struct {
 }
 
 type AgentDetails struct {
-	AgentName    string `json:"cluster_name"`
-	IsActive     bool   `json:"is_active"`
-	IsRegistered bool   `json:"is_registered"`
-	ClusterID    string `json:"cluster_id"`
+	AgentName    string `json:"clusterName"`
+	IsActive     bool   `json:"isActive"`
+	IsRegistered bool   `json:"isRegistered"`
+	ClusterID    string `json:"clusterID"`
 }
 
 type AgentList struct {
@@ -48,7 +48,7 @@ type AgentList struct {
 
 // GetAgentList lists the agent connected to the specified project
 func GetAgentList(c types.Credentials, pid string) (AgentData, error) {
-	query := `{"query":"query{\n  getCluster(project_id: \"` + pid + `\"){\n  cluster_id cluster_name is_active \n  }\n}"}`
+	query := `{"query":"query{\n  getCluster(projectID: \"` + pid + `\"){\n  clusterID clusterName isActive \n  }\n}"}`
 	resp, err := SendRequest(SendRequestParams{Endpoint: c.Endpoint + utils.GQLAPIPath, Token: c.Token}, []byte(query), string(types.Post))
 	if err != nil {
 		return AgentData{}, err
@@ -91,29 +91,29 @@ type Errors struct {
 }
 
 type AgentConnect struct {
-	UserAgentReg UserAgentReg `json:"userClusterReg"`
+	UserAgentReg UserAgentReg `json:"registerCluster"`
 }
 
 type UserAgentReg struct {
-	ClusterID   string `json:"cluster_id"`
-	ClusterName string `json:"cluster_name"`
+	ClusterID   string `json:"clusterID"`
+	ClusterName string `json:"clusterName"`
 	Token       string `json:"token"`
 }
 
 // ConnectAgent connects the agent with the given details
 func ConnectAgent(agent types.Agent, cred types.Credentials) (AgentConnectionData, error) {
-	query := `{"query":"mutation {\n  userClusterReg(clusterInput: \n    { \n    cluster_name: \"` + agent.AgentName + `\", \n    description: \"` + agent.Description + `\",\n  \tplatform_name: \"` + agent.PlatformName + `\",\n    project_id: \"` + agent.ProjectId + `\",\n    cluster_type: \"` + agent.ClusterType + `\",\n  agent_scope: \"` + agent.Mode + `\",\n    agent_namespace: \"` + agent.Namespace + `\",\n    serviceaccount: \"` + agent.ServiceAccount + `\",\n    skip_ssl: ` + fmt.Sprintf("%t", agent.SkipSSL) + `,\n    agent_ns_exists: ` + fmt.Sprintf("%t", agent.NsExists) + `,\n    agent_sa_exists: ` + fmt.Sprintf("%t", agent.SAExists) + `,\n  }){\n    cluster_id\n    cluster_name\n    token\n  }\n}"}`
+	query := `{"query":"mutation {\n  registerCluster(clusterInput: \n    { \n    clusterName: \"` + agent.AgentName + `\", \n    description: \"` + agent.Description + `\",\n  \tplatformName: \"` + agent.PlatformName + `\",\n    projectID: \"` + agent.ProjectId + `\",\n    clusterType: \"` + agent.ClusterType + `\",\n  agentScope: \"` + agent.Mode + `\",\n    agentNamespace: \"` + agent.Namespace + `\",\n    serviceAccount: \"` + agent.ServiceAccount + `\",\n    skipSsl: ` + fmt.Sprintf("%t", agent.SkipSSL) + `,\n    agentNsExists: ` + fmt.Sprintf("%t", agent.NsExists) + `,\n    agentSaExists: ` + fmt.Sprintf("%t", agent.SAExists) + `,\n  }){\n    clusterID\n    clusterName\n    token\n  }\n}"}`
 
 	if agent.NodeSelector != "" {
-		query = `{"query":"mutation {\n  userClusterReg(clusterInput: \n    { \n    cluster_name: \"` + agent.AgentName + `\", \n    description: \"` + agent.Description + `\",\n  node_selector: \"` + agent.NodeSelector + `\",\n  \tplatform_name: \"` + agent.PlatformName + `\",\n    project_id: \"` + agent.ProjectId + `\",\n    cluster_type: \"` + agent.ClusterType + `\",\n  agent_scope: \"` + agent.Mode + `\",\n    agent_namespace: \"` + agent.Namespace + `\",\n    skip_ssl: ` + fmt.Sprintf("%t", agent.SkipSSL) + `,\n    serviceaccount: \"` + agent.ServiceAccount + `\",\n    agent_ns_exists: ` + fmt.Sprintf("%t", agent.NsExists) + `,\n    agent_sa_exists: ` + fmt.Sprintf("%t", agent.SAExists) + `,\n  }){\n    cluster_id\n    cluster_name\n    token\n  }\n}"}`
+		query = `{"query":"mutation {\n  registerCluster(clusterInput: \n    { \n    clusterName: \"` + agent.AgentName + `\", \n    description: \"` + agent.Description + `\",\n  nodeSelector: \"` + agent.NodeSelector + `\",\n  \tplatformName: \"` + agent.PlatformName + `\",\n    projectID: \"` + agent.ProjectId + `\",\n    clusterType: \"` + agent.ClusterType + `\",\n  agentScope: \"` + agent.Mode + `\",\n    agentNamespace: \"` + agent.Namespace + `\",\n    skipSsl: ` + fmt.Sprintf("%t", agent.SkipSSL) + `,\n    serviceAccount: \"` + agent.ServiceAccount + `\",\n    agentNsExists: ` + fmt.Sprintf("%t", agent.NsExists) + `,\n    agentSaExists: ` + fmt.Sprintf("%t", agent.SAExists) + `,\n  }){\n    clusterID\n    clusterName\n    token\n  }\n}"}`
 	}
 
 	if agent.Tolerations != "" {
-		query = `{"query":"mutation {\n  userClusterReg(clusterInput: \n    { \n    cluster_name: \"` + agent.AgentName + `\", \n    description: \"` + agent.Description + `\",\n  \tplatform_name: \"` + agent.PlatformName + `\",\n    project_id: \"` + agent.ProjectId + `\",\n    cluster_type: \"` + agent.ClusterType + `\",\n  agent_scope: \"` + agent.Mode + `\",\n    agent_namespace: \"` + agent.Namespace + `\",\n    serviceaccount: \"` + agent.ServiceAccount + `\",\n    skip_ssl: ` + fmt.Sprintf("%t", agent.SkipSSL) + `,\n    agent_ns_exists: ` + fmt.Sprintf("%t", agent.NsExists) + `,\n    agent_sa_exists: ` + fmt.Sprintf("%t", agent.SAExists) + `,\n tolerations: ` + agent.Tolerations + ` }){\n    cluster_id\n    cluster_name\n    token\n  }\n}"}`
+		query = `{"query":"mutation {\n  registerCluster(clusterInput: \n    { \n    clusterName: \"` + agent.AgentName + `\", \n    description: \"` + agent.Description + `\",\n  \tplatformName: \"` + agent.PlatformName + `\",\n    projectID: \"` + agent.ProjectId + `\",\n    clusterType: \"` + agent.ClusterType + `\",\n  agentScope: \"` + agent.Mode + `\",\n    agentNamespace: \"` + agent.Namespace + `\",\n    serviceAccount: \"` + agent.ServiceAccount + `\",\n    skipSsl: ` + fmt.Sprintf("%t", agent.SkipSSL) + `,\n    agentNsExists: ` + fmt.Sprintf("%t", agent.NsExists) + `,\n    agentSaExists: ` + fmt.Sprintf("%t", agent.SAExists) + `,\n tolerations: ` + agent.Tolerations + ` }){\n    clusterID\n    clusterName\n    token\n  }\n}"}`
 	}
 
 	if agent.NodeSelector != "" && agent.Tolerations != "" {
-		query = `{"query":"mutation {\n  userClusterReg(clusterInput: \n    { \n    cluster_name: \"` + agent.AgentName + `\", \n    description: \"` + agent.Description + `\",\n  node_selector: \"` + agent.NodeSelector + `\",\n  \tplatform_name: \"` + agent.PlatformName + `\",\n    project_id: \"` + agent.ProjectId + `\",\n    cluster_type: \"` + agent.ClusterType + `\",\n  agent_scope: \"` + agent.Mode + `\",\n    agent_namespace: \"` + agent.Namespace + `\",\n    skip_ssl: ` + fmt.Sprintf("%t", agent.SkipSSL) + `,\n    serviceaccount: \"` + agent.ServiceAccount + `\",\n    agent_ns_exists: ` + fmt.Sprintf("%t", agent.NsExists) + `,\n    agent_sa_exists: ` + fmt.Sprintf("%t", agent.SAExists) + `,\n tolerations: ` + agent.Tolerations + ` }){\n    cluster_id\n    cluster_name\n    token\n  }\n}"}`
+		query = `{"query":"mutation {\n  registerCluster(clusterInput: \n    { \n    clusterName: \"` + agent.AgentName + `\", \n    description: \"` + agent.Description + `\",\n  nodeSelector: \"` + agent.NodeSelector + `\",\n  \tplatformName: \"` + agent.PlatformName + `\",\n    projectID: \"` + agent.ProjectId + `\",\n    clusterType: \"` + agent.ClusterType + `\",\n  agentScope: \"` + agent.Mode + `\",\n    agentNamespace: \"` + agent.Namespace + `\",\n    skipSsl: ` + fmt.Sprintf("%t", agent.SkipSSL) + `,\n    serviceAccount: \"` + agent.ServiceAccount + `\",\n    agentNsExists: ` + fmt.Sprintf("%t", agent.NsExists) + `,\n    agentSaExists: ` + fmt.Sprintf("%t", agent.SAExists) + `,\n tolerations: ` + agent.Tolerations + ` }){\n    clusterID\n    clusterName\n    token\n  }\n}"}`
 	}
 
 	resp, err := SendRequest(SendRequestParams{Endpoint: cred.Endpoint + utils.GQLAPIPath, Token: cred.Token}, []byte(query), string(types.Post))
