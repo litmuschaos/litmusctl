@@ -239,7 +239,6 @@ var agentCmd = &cobra.Command{
 			utils.Red.Println("\n❌ Agent connection failed: " + err.Error() + "\n")
 			os.Exit(1)
 		}
-
 		path := fmt.Sprintf("%s/%s/%s.yaml", credentials.Endpoint, utils.ChaosYamlPath, agent.Data.UserAgentReg.Token)
 		utils.White_B.Print("Applying YAML:\n", path)
 
@@ -266,7 +265,7 @@ var agentCmd = &cobra.Command{
 		k8s.WatchPod(k8s.WatchPodParams{Namespace: newAgent.Namespace, Label: utils.ChaosAgentLabel}, &kubeconfig)
 
 		utils.White_B.Println("\n🚀 Agent Connection Successful!! 🎉")
-		utils.White_B.Println("👉 Litmus agents can be accessed here: " + fmt.Sprintf("%s%s", credentials.Endpoint, utils.ChaosAgentPath))
+		utils.White_B.Println("👉 Litmus agents can be accessed here: " + fmt.Sprintf("%s/%s", credentials.Endpoint, utils.ChaosAgentPath))
 	},
 }
 

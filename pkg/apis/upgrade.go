@@ -42,7 +42,7 @@ type ClusterDetails struct {
 func UpgradeAgent(c context.Context, cred types.Credentials, projectID string, clusterID string) (string, error) {
 
 	// Query to fetch agent details from server
-	query := `{"query":"query {\n getAgentDetails(clusterID : \"` + clusterID + `\", \n projectID : \"` + projectID + `\"){\n agent_namespace access_key clusterID \n}}"}`
+	query := `{"query":"query {\n getAgentDetails(clusterID : \"` + clusterID + `\", \n projectID : \"` + projectID + `\"){\n agentNamespace accessKey clusterID \n}}"}`
 	resp, err := SendRequest(SendRequestParams{Endpoint: cred.Endpoint + utils.GQLAPIPath, Token: cred.Token}, []byte(query), string(types.Post))
 	if err != nil {
 		return "", err
