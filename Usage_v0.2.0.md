@@ -1,8 +1,9 @@
 # Usage: Litmusctl v0.2.0
 
 > Notes:
-> * For litmusctl v0.3.0 or earlier
-> * Compatible with Litmus 2.0.0-Beta8 or earlier
+>
+> - For litmusctl v0.3.0 or earlier
+> - Compatible with Litmus 2.0.0-Beta8 or earlier
 
 ### Connecting an agent
 
@@ -12,7 +13,7 @@ To connect Litmus Chaos agent:
 litmusctl agent connect
 ```
 
-Next, you need to enter ChaosCenter details to login into your Chaos Center account. Fields to be filled in:
+Next, you need to enter ChaosCenter details to login into your ChaosCenter account. Fields to be filled in:
 
 **ChaosCenter UI URL:** Enter the URL used to access the ChaosCenter UI.
 Example, http://172.17.0.2:31696/
