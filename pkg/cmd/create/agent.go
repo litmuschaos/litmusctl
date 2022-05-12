@@ -239,7 +239,6 @@ var agentCmd = &cobra.Command{
 			utils.Red.Println("\n❌ Agent connection failed: " + err.Error() + "\n")
 			os.Exit(1)
 		}
-
 		path := fmt.Sprintf("%s/%s/%s.yaml", credentials.Endpoint, utils.ChaosYamlPath, agent.Data.UserAgentReg.Token)
 		utils.White_B.Print("Applying YAML:\n", path)
 

@@ -192,7 +192,7 @@ func WatchPod(params WatchPodParams, kubeconfig *string) {
 		if !ok {
 			log.Fatal("unexpected type")
 		}
-		utils.White_B.Println("💡 Connecting agent to Litmus Portal.")
+		utils.White_B.Println("💡 Connecting agent to ChaosCenter.")
 		if p.Status.Phase == "Running" {
 			utils.White_B.Println("🏃 Agents are running!!")
 			watch.Stop()

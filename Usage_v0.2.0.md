@@ -1,8 +1,9 @@
 # Usage: Litmusctl v0.2.0
 
 > Notes:
-> * For litmusctl v0.3.0 or earlier
-> * Compatible with Litmus 2.0.0-Beta8 or earlier
+>
+> - For litmusctl v0.3.0 or earlier
+> - Compatible with Litmus 2.0.0-Beta8 or earlier
 
 ### Connecting an agent
 
@@ -12,13 +13,13 @@ To connect Litmus Chaos agent:
 litmusctl agent connect
 ```
 
-Next, you need to enter LitmusPortal details to login into your LitmusPortal account. Fields to be filled in:
+Next, you need to enter ChaosCenter details to login into your ChaosCenter account. Fields to be filled in:
 
-**LimtusPortal UI URL:** Enter the URL used to access the Litmus Portal UI.
+**ChaosCenter UI URL:** Enter the URL used to access the ChaosCenter UI.
 Example, http://172.17.0.2:31696/
 
-**Username:** Enter your LitmusPortal username.
-**Password:** Enter your LitmusPortal password.
+**Username:** Enter your ChaosCenter username.
+**Password:** Enter your ChaosCenter password.
 
 ```shell
 🔥 Connecting LitmusChaos agent
@@ -64,7 +65,7 @@ Fields to filled in:
 
 **Platform Name:** Enter the platform name on which this agent is hosted. For example, AWS, GCP, Rancher etc.
 
-**Enter the namespace:** You can either enter an existing namespace or enter a new namespace. In cases where the namespace does not exist, LimtusPortal creates it for you.
+**Enter the namespace:** You can either enter an existing namespace or enter a new namespace. In cases where the namespace does not exist, ChaosCenter creates it for you.
 
 **Enter service account:** Enter a name for your service account.
 
@@ -100,10 +101,10 @@ Installation Mode:  cluster
 
 🤷 Do you want to continue with the above details? [Y/N]: Y
 
-💡 Connecting agent to Litmus Portal.
+💡 Connecting agent to ChaosCenter.
 🏃 Agents running!!
 🚀 Agent Connection Successful!! 🎉
 👉 Litmus agents can be accessed here: http://172.17.0.2:31696/targets
 ```
 
-To verify, if the connection process was successful you can view the list of connected agents from the Targets section on your LitmusPortal and ensure that the connected agent is in Active State.
+To verify, if the connection process was successful you can view the list of connected agents from the Targets section on your ChaosCenter and ensure that the connected agent is in Active State.

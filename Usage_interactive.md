@@ -172,7 +172,7 @@ Installation Mode: cluster
 Applying YAML:
 https://preview.litmuschaos.io/api/file/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbHVzdGVyX2lkIjoiMDUyZmFlN2UtZGM0MS00YmU4LWJiYTgtMmM4ZTYyNDFkN2I0In0.i31QQDG92X5nD6P_-7TfeAAarZqLvUTFfnAghJYXPiM.yaml
 
-💡 Connecting agent to Litmus Portal.
+💡 Connecting agent to ChaosCenter.
 🏃 Agents are running!!
 
 🚀 Agent Connection Successful!! 🎉
