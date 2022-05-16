@@ -48,8 +48,13 @@ var agentCmd = &cobra.Command{
 			fmt.Scanln(&cluster_id)
 		}
 
-		_, err = apis.UpgradeAgent(context.Background(), credentials, projectID, cluster_id)
-		utils.PrintError(err)
+		output, err := apis.UpgradeAgent(context.Background(), credentials, projectID, cluster_id)
+		if err != nil {
+			utils.Red.Print(output)
+			utils.PrintError(err)
+		} else {
+			utils.White.Print(output)
+		}
 	},
 }
 
