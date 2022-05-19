@@ -8,11 +8,12 @@ require (
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/gorhill/cronexpr v0.0.0-20180427100037-88b0669f7d75
 	github.com/litmuschaos/chaos-operator v0.0.0-20211109081056-46bcd99c3daf
-	github.com/litmuschaos/litmus/litmus-portal/graphql-server v0.0.0-20220415210522-227a4a15f079
+	github.com/litmuschaos/litmus/litmus-portal/graphql-server v0.0.0-20220516165207-ffe995975cc2
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/spf13/cobra v1.2.1
 	github.com/spf13/viper v1.8.1
 	golang.org/x/term v0.0.0-20210220032956-6a3ed077a48d
+	golang.org/x/text v0.3.7 // indirect
 	gopkg.in/yaml.v2 v2.4.0
 	k8s.io/api v0.22.1
 	k8s.io/apimachinery v0.22.2
