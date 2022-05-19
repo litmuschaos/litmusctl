@@ -41,25 +41,25 @@ type CreatedChaosWorkflow struct {
 type CreateChaosWorkFlowGraphQLRequest struct {
 	Query     string `json:"query"`
 	Variables struct {
-		CreateChaosWorkFlowInput model.ChaosWorkFlowInput `json:"ChaosWorkFlowInput"`
+		CreateChaosWorkFlowRequest model.ChaosWorkFlowRequest `json:"request"`
 	} `json:"variables"`
 }
 
 // CreateWorkflow sends GraphQL API request for creating a workflow
-func CreateWorkflow(in model.ChaosWorkFlowInput, cred types.Credentials) (ChaosWorkflowCreationData, error) {
+func CreateWorkflow(in model.ChaosWorkFlowRequest, cred types.Credentials) (ChaosWorkflowCreationData, error) {
 
 	var gqlReq CreateChaosWorkFlowGraphQLRequest
 
-	gqlReq.Query = `mutation createChaosWorkFlow($ChaosWorkFlowInput: ChaosWorkFlowInput!) {
-                      createChaosWorkFlow(input: $ChaosWorkFlowInput) {
-                        workflow_id
+	gqlReq.Query = `mutation createChaosWorkFlow($request: ChaosWorkFlowRequest!) {
+                      createChaosWorkFlow(request: $request) {
+                        workflowID
                         cronSyntax
-                        workflow_name
-                        workflow_description
+                        workflowName
+                        workflowDescription
                         isCustomWorkflow
                       }
                     }`
-	gqlReq.Variables.CreateChaosWorkFlowInput = in
+	gqlReq.Variables.CreateChaosWorkFlowRequest = in
 
 	query, _ := json.Marshal(gqlReq)
 

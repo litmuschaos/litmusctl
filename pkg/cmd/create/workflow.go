@@ -46,34 +46,34 @@ var workflowCmd = &cobra.Command{
 		credentials, err := utils.GetCredentials(cmd)
 		utils.PrintError(err)
 
-		var chaosWorkFlowInput model.ChaosWorkFlowInput
+		var chaosWorkFlowRequest model.ChaosWorkFlowRequest
 
 		workflowManifest, err := cmd.Flags().GetString("file")
 		utils.PrintError(err)
 
-		chaosWorkFlowInput.ProjectID, err = cmd.Flags().GetString("project-id")
+		chaosWorkFlowRequest.ProjectID, err = cmd.Flags().GetString("project-id")
 		utils.PrintError(err)
 
 		// Handle blank input for project ID
-		if chaosWorkFlowInput.ProjectID == "" {
+		if chaosWorkFlowRequest.ProjectID == "" {
 			utils.White_B.Print("\nEnter the Project ID: ")
-			fmt.Scanln(&chaosWorkFlowInput.ProjectID)
+			fmt.Scanln(&chaosWorkFlowRequest.ProjectID)
 
-			if chaosWorkFlowInput.ProjectID == "" {
+			if chaosWorkFlowRequest.ProjectID == "" {
 				utils.Red.Println("⛔ Project ID can't be empty!!")
 				os.Exit(1)
 			}
 		}
 
-		chaosWorkFlowInput.ClusterID, err = cmd.Flags().GetString("agent-id")
+		chaosWorkFlowRequest.ClusterID, err = cmd.Flags().GetString("agent-id")
 		utils.PrintError(err)
 
 		// Handle blank input for agent ID
-		if chaosWorkFlowInput.ClusterID == "" {
+		if chaosWorkFlowRequest.ClusterID == "" {
 			utils.White_B.Print("\nEnter the Agent ID: ")
-			fmt.Scanln(&chaosWorkFlowInput.ClusterID)
+			fmt.Scanln(&chaosWorkFlowRequest.ClusterID)
 
-			if chaosWorkFlowInput.ClusterID == "" {
+			if chaosWorkFlowRequest.ClusterID == "" {
 				utils.Red.Println("⛔ Agent ID can't be empty!!")
 				os.Exit(1)
 			}
@@ -85,7 +85,7 @@ var workflowCmd = &cobra.Command{
 		var editAccess = false
 		var project apis.Project
 		for _, p := range userDetails.Data.Projects {
-			if p.ID == chaosWorkFlowInput.ProjectID {
+			if p.ID == chaosWorkFlowRequest.ProjectID {
 				project = p
 			}
 		}
@@ -100,21 +100,21 @@ var workflowCmd = &cobra.Command{
 		}
 
 		// Parse workflow manifest and populate chaosWorkFlowInput
-		err = utils.ParseWorkflowManifest(workflowManifest, &chaosWorkFlowInput)
+		err = utils.ParseWorkflowManifest(workflowManifest, &chaosWorkFlowRequest)
 		if err != nil {
 			utils.Red.Println("❌ Error parsing workflow manifest: " + err.Error())
 			os.Exit(1)
 		}
 
 		// Make API call
-		createdWorkflow, err := apis.CreateWorkflow(chaosWorkFlowInput, credentials)
+		createdWorkflow, err := apis.CreateWorkflow(chaosWorkFlowRequest, credentials)
 		if err != nil {
 			if (createdWorkflow.Data == apis.CreatedChaosWorkflow{}) {
 				if strings.Contains(err.Error(), "multiple write errors") {
-					utils.Red.Println("\n❌ ChaosWorkflow/" + chaosWorkFlowInput.WorkflowName + " already exists")
+					utils.Red.Println("\n❌ ChaosWorkflow/" + chaosWorkFlowRequest.WorkflowName + " already exists")
 					os.Exit(1)
 				} else {
-					utils.White_B.Print("\n❌ ChaosWorkflow/" + chaosWorkFlowInput.WorkflowName + " failed to be created: " + err.Error())
+					utils.White_B.Print("\n❌ ChaosWorkflow/" + chaosWorkFlowRequest.WorkflowName + " failed to be created: " + err.Error())
 					os.Exit(1)
 				}
 			}
@@ -127,7 +127,7 @@ var workflowCmd = &cobra.Command{
 		} else {
 			utils.White_B.Println(
 				"\nThe next run of this workflow will be scheduled at " +
-					cronexpr.MustParse(createdWorkflow.Data.CreateChaosWorkflow.CronSyntax).Next(time.Now()).Format("January 2 2006, 03:04:05 PM"))
+					cronexpr.MustParse(createdWorkflow.Data.CreateChaosWorkflow.CronSyntax).Next(time.Now()).Format("January 2nd 2006, 03:04:05 pm"))
 		}
 	},
 }

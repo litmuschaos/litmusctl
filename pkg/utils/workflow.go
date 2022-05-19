@@ -35,7 +35,7 @@ import (
 // ParseWorkflowManifest reads the manifest that is passed as an argument and
 // populates the payload for the CreateChaosWorkflow API request. The manifest
 // can be either a local file or a remote file.
-func ParseWorkflowManifest(file string, chaosWorkFlowInput *model.ChaosWorkFlowInput) error {
+func ParseWorkflowManifest(file string, chaosWorkFlowInput *model.ChaosWorkFlowRequest) error {
 
 	var body []byte
 	var err error
@@ -110,7 +110,7 @@ func ParseWorkflowManifest(file string, chaosWorkFlowInput *model.ChaosWorkFlowI
 // FetchWeightages takes in the templates present in the workflow spec and
 // assigns weightage to each of the experiments present in them. It can parse
 // both artifacts and remote experiment specs.
-func FetchWeightages(chaosWorkFlowInput *model.ChaosWorkFlowInput, templates []v1alpha1.Template) error {
+func FetchWeightages(chaosWorkFlowInput *model.ChaosWorkFlowRequest, templates []v1alpha1.Template) error {
 
 	var chaosExperiments []chaosTypes.ChaosExperiment
 
