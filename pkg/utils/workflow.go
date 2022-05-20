@@ -16,7 +16,6 @@ limitations under the License.
 package utils
 
 import (
-	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -26,16 +25,13 @@ import (
 	"strconv"
 
 	"github.com/argoproj/argo-workflows/v3/pkg/apis/workflow/v1alpha1"
-	chaosTypes "github.com/litmuschaos/chaos-operator/pkg/apis/litmuschaos/v1alpha1"
 	"github.com/litmuschaos/litmus/litmus-portal/graphql-server/graph/model"
-	yamlutil "k8s.io/apimachinery/pkg/util/yaml"
-	"sigs.k8s.io/yaml"
 )
 
 // ParseWorkflowManifest reads the manifest that is passed as an argument and
 // populates the payload for the CreateChaosWorkflow API request. The manifest
 // can be either a local file or a remote file.
-func ParseWorkflowManifest(file string, chaosWorkFlowInput *model.ChaosWorkFlowRequest) error {
+func ParseWorkflowManifest(file string, chaosWorkFlowRequest *model.ChaosWorkFlowRequest) error {
 
 	var body []byte
 	var err error
@@ -69,12 +65,12 @@ func ParseWorkflowManifest(file string, chaosWorkFlowInput *model.ChaosWorkFlowR
 		if ok != nil {
 			return ok
 		}
-		chaosWorkFlowInput.WorkflowManifest = string(workflowStr)
-		chaosWorkFlowInput.WorkflowName = workflow.ObjectMeta.Name
-		chaosWorkFlowInput.IsCustomWorkflow = true
+		chaosWorkFlowRequest.WorkflowManifest = string(workflowStr)
+		chaosWorkFlowRequest.WorkflowName = workflow.ObjectMeta.Name
+		chaosWorkFlowRequest.IsCustomWorkflow = true
 
 		// Fetch the weightages for experiments present in the spec.
-		err = FetchWeightages(chaosWorkFlowInput, workflow.Spec.Templates)
+		err = FetchWeightages(chaosWorkFlowRequest, workflow.Spec.Templates)
 		if err != nil {
 			return err
 		}
@@ -88,15 +84,15 @@ func ParseWorkflowManifest(file string, chaosWorkFlowInput *model.ChaosWorkFlowR
 
 		// Marshal the workflow back to JSON for API payload.
 		workflowStr, _ := json.Marshal(cronWorkflow)
-		chaosWorkFlowInput.WorkflowManifest = string(workflowStr)
-		chaosWorkFlowInput.WorkflowName = cronWorkflow.ObjectMeta.Name
-		chaosWorkFlowInput.IsCustomWorkflow = true
+		chaosWorkFlowRequest.WorkflowManifest = string(workflowStr)
+		chaosWorkFlowRequest.WorkflowName = cronWorkflow.ObjectMeta.Name
+		chaosWorkFlowRequest.IsCustomWorkflow = true
 
 		// Set the schedule for the workflow
-		chaosWorkFlowInput.CronSyntax = cronWorkflow.Spec.Schedule
+		chaosWorkFlowRequest.CronSyntax = cronWorkflow.Spec.Schedule
 
 		// Fetch the weightages for experiments present in the spec.
-		err = FetchWeightages(chaosWorkFlowInput, cronWorkflow.Spec.WorkflowSpec.Templates)
+		err = FetchWeightages(chaosWorkFlowRequest, cronWorkflow.Spec.WorkflowSpec.Templates)
 		if err != nil {
 			return err
 		}
@@ -107,75 +103,50 @@ func ParseWorkflowManifest(file string, chaosWorkFlowInput *model.ChaosWorkFlowR
 	return nil
 }
 
+// Helper fucntion to check the presence of a stirng in a slice
+func sliceContains(s []string, e string) bool {
+	for _, a := range s {
+		if a == e {
+			return true
+		}
+	}
+	return false
+}
+
 // FetchWeightages takes in the templates present in the workflow spec and
 // assigns weightage to each of the experiments present in them. It can parse
 // both artifacts and remote experiment specs.
-func FetchWeightages(chaosWorkFlowInput *model.ChaosWorkFlowRequest, templates []v1alpha1.Template) error {
+func FetchWeightages(chaosWorkFlowRequest *model.ChaosWorkFlowRequest, templates []v1alpha1.Template) error {
 
-	var chaosExperiments []chaosTypes.ChaosExperiment
+	var chaosEngines []string
 
 	// Fetch all present experiments and append them to the experiments array
 	for _, t := range templates {
-		var c chaosTypes.ChaosExperiment
-
 		// Only the template named "install-chaos-experiments" contains ChaosExperiment(s)
 		if t.Name == "install-chaos-experiments" {
-
-			if len(t.Inputs.Artifacts) != 0 {
-
-				// These are experiments with the spec passed as an artifact
-				for _, a := range t.Inputs.Artifacts {
-					err := yaml.Unmarshal([]byte(a.Raw.Data), &c)
-					if err != nil {
-						return errors.New("Error parsing ChaosExperiment: " + err.Error())
-					}
-					chaosExperiments = append(chaosExperiments, c)
-				}
-
-			} else { // These are experiments with their spec passed as remote file URLs
-
-				// Extracting the URL from the container arguments
-				re := regexp.MustCompile(`kubectl apply -f\s(?P<first>.+)\s-n.+`)
-				extractURL := fmt.Sprintf("${%s}", re.SubexpNames()[1])
-				fileURL := re.ReplaceAllString(t.Container.Args[0], extractURL)
-
-				body, err := ReadRemoteFile(fileURL)
-				if err != nil {
-					return errors.New("Error reading ChaosExperiment: " + err.Error())
-				}
-
-				// Using a decoder since there might be multiple YAML documents
-				// inside the same remote file.
-				decoder := yamlutil.NewYAMLToJSONDecoder(bytes.NewReader(body))
-				for {
-					if err := decoder.Decode(&c); err != nil {
-						break
-					}
-					chaosExperiments = append(chaosExperiments, c)
-				}
+			for _, a := range t.Inputs.Artifacts {
+				chaosEngines = append(chaosEngines, a.Name)
 			}
 		}
-	}
 
-	// Assign weights to each chaos experiment
-	for _, c := range chaosExperiments {
+		// Template that contains ChaosEngine manifest
+		if sliceContains(chaosEngines, t.Name) {
+			var weightageInput model.WeightagesInput
+			var err error
 
-		// Fetch experiment weightage from annotation
-		w, ok := c.ObjectMeta.Annotations["litmuschaos.io/experiment-weightage"]
-		if !ok {
-			White.Println("Weightage for ChaosExperiment/" + c.ObjectMeta.Name + " not provided, defaulting to 10.")
-			w = "10"
+			weightageInput.ExperimentName = t.Inputs.Artifacts[0].Name
+			w, ok := t.Metadata.Labels["weight"]
+			if !ok {
+				White.Println("Weightage for ChaosExperiment/" + weightageInput.ExperimentName + " not provided, defaulting to 10.")
+				w = "10"
+			}
+			weightageInput.Weightage, err = strconv.Atoi(w)
+			if err != nil {
+				return errors.New("Invalid weightage for ChaosExperiment/" + weightageInput.ExperimentName + ".")
+			}
+
+			chaosWorkFlowRequest.Weightages = append(chaosWorkFlowRequest.Weightages, &weightageInput)
 		}
-
-		var win model.WeightagesInput
-		var err error
-		win.ExperimentName = c.ObjectMeta.Name
-		win.Weightage, err = strconv.Atoi(w)
-		if err != nil {
-			return errors.New("Invalid weightage for ChaosExperiment/" + c.ObjectMeta.Name + ".")
-		}
-		chaosWorkFlowInput.Weightages = append(chaosWorkFlowInput.Weightages, &win)
 	}
-
 	return nil
 }
