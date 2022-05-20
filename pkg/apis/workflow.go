@@ -46,7 +46,7 @@ type CreateChaosWorkFlowGraphQLRequest struct {
 }
 
 // CreateWorkflow sends GraphQL API request for creating a workflow
-func CreateWorkflow(in model.ChaosWorkFlowRequest, cred types.Credentials) (ChaosWorkflowCreationData, error) {
+func CreateWorkflow(requestData model.ChaosWorkFlowRequest, cred types.Credentials) (ChaosWorkflowCreationData, error) {
 
 	var gqlReq CreateChaosWorkFlowGraphQLRequest
 
@@ -59,7 +59,7 @@ func CreateWorkflow(in model.ChaosWorkFlowRequest, cred types.Credentials) (Chao
                         isCustomWorkflow
                       }
                     }`
-	gqlReq.Variables.CreateChaosWorkFlowRequest = in
+	gqlReq.Variables.CreateChaosWorkFlowRequest = requestData
 
 	query, _ := json.Marshal(gqlReq)
 
