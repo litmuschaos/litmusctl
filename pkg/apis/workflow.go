@@ -61,7 +61,10 @@ func CreateWorkflow(requestData model.ChaosWorkFlowRequest, cred types.Credentia
                     }`
 	gqlReq.Variables.CreateChaosWorkFlowRequest = requestData
 
-	query, _ := json.Marshal(gqlReq)
+	query, err := json.Marshal(gqlReq)
+	if err != nil {
+		return ChaosWorkflowCreationData{}, err
+	}
 
 	resp, err := SendRequest(
 		SendRequestParams{
