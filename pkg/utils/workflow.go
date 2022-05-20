@@ -25,7 +25,9 @@ import (
 	"strconv"
 
 	"github.com/argoproj/argo-workflows/v3/pkg/apis/workflow/v1alpha1"
+	chaosTypes "github.com/litmuschaos/chaos-operator/pkg/apis/litmuschaos/v1alpha1"
 	"github.com/litmuschaos/litmus/litmus-portal/graphql-server/graph/model"
+	"sigs.k8s.io/yaml"
 )
 
 // ParseWorkflowManifest reads the manifest that is passed as an argument and
@@ -134,7 +136,12 @@ func FetchWeightages(chaosWorkFlowRequest *model.ChaosWorkFlowRequest, templates
 			var weightageInput model.WeightagesInput
 			var err error
 
-			weightageInput.ExperimentName = t.Inputs.Artifacts[0].Name
+			var chaosEngine chaosTypes.ChaosEngine
+			err = yaml.Unmarshal([]byte(t.Inputs.Artifacts[0].Raw.Data), &chaosEngine)
+			if err != nil {
+				return errors.New("Error parsing ChaosEngine: " + err.Error())
+			}
+			weightageInput.ExperimentName = chaosEngine.ObjectMeta.GenerateName
 			w, ok := t.Metadata.Labels["weight"]
 			if !ok {
 				White.Println("Weightage for ChaosExperiment/" + weightageInput.ExperimentName + " not provided, defaulting to 10.")
