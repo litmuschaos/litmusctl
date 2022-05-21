@@ -142,3 +142,78 @@ func ConnectAgent(agent types.Agent, cred types.Credentials) (AgentConnectionDat
 		return AgentConnectionData{}, err
 	}
 }
+
+type DeleteAgentData struct {
+	Errors []struct {
+		Message string   `json:"message"`
+		Path    []string `json:"path"`
+	} `json:"errors"`
+	Data DeleteAgentDetails `json:"data"`
+}
+
+type DeleteAgentDetails struct {
+	Message string `json:"deleteClusters"`
+}
+
+type DeleteAgentGraphQLRequest struct {
+	Query     string `json:"query"`
+	Variables struct {
+		ProjectID  string    `json:"projectID"`
+		ClusterIDs []*string `json:"clusterIDs"`
+	} `json:"variables"`
+}
+
+// DeleteAgent sends GraphQL API request for deleting ChaosAgent(s).
+func DeleteAgent(projectID string, clusterIDs []*string, cred types.Credentials) (DeleteAgentData, error) {
+
+	var gqlReq DeleteAgentGraphQLRequest
+	var err error
+
+	gqlReq.Query = `mutation deleteClusters($projectID: String!, $clusterIDs: [String]!) {
+                      deleteClusters(
+                        projectID: $projectID
+                        clusterIDs: $clusterIDs
+                      )
+                    }`
+	gqlReq.Variables.ProjectID = projectID
+	gqlReq.Variables.ClusterIDs = clusterIDs
+
+	query, err := json.Marshal(gqlReq)
+	if err != nil {
+		return DeleteAgentData{}, err
+	}
+
+	resp, err := SendRequest(
+		SendRequestParams{
+			Endpoint: cred.Endpoint + utils.GQLAPIPath,
+			Token:    cred.Token,
+		},
+		query,
+		string(types.Post),
+	)
+	if err != nil {
+		return DeleteAgentData{}, err
+	}
+
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	defer resp.Body.Close()
+	if err != nil {
+		return DeleteAgentData{}, err
+	}
+
+	if resp.StatusCode == http.StatusOK {
+		var deleteAgentData DeleteAgentData
+		err = json.Unmarshal(bodyBytes, &deleteAgentData)
+		if err != nil {
+			return DeleteAgentData{}, err
+		}
+
+		if len(deleteAgentData.Errors) > 0 {
+			return DeleteAgentData{}, errors.New(deleteAgentData.Errors[0].Message)
+		}
+
+		return deleteAgentData, nil
+	} else {
+		return DeleteAgentData{}, err
+	}
+}
