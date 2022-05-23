@@ -13,19 +13,19 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package delete
+package disconnect
 
 import (
 	"github.com/spf13/cobra"
 )
 
-// deleteCmd represents the delete command
-var DeleteCmd = &cobra.Command{
-	Use: "delete",
-	Short: `Delete resources for LitmusChaos agent plane.
+// disconnectCmd represents the disconnect command
+var DisconnectCmd = &cobra.Command{
+	Use: "disconnect",
+	Short: `Disconnect resources for LitmusChaos agent plane.
 		Examples:
-		#delete an agent
-		litmusctl delete agent c520650e-7cb6-474c-b0f0-4df07b2b025b --project-id=c520650e-7cb6-474c-b0f0-4df07b2b025b
+		#disconnect an agent
+		litmusctl disconnect agent c520650e-7cb6-474c-b0f0-4df07b2b025b --project-id=c520650e-7cb6-474c-b0f0-4df07b2b025b
 
 		Note: The default location of the config file is $HOME/.litmusconfig, and can be overridden by a --config flag
 	`,

@@ -143,19 +143,19 @@ func ConnectAgent(agent types.Agent, cred types.Credentials) (AgentConnectionDat
 	}
 }
 
-type DeleteAgentData struct {
+type DisconnectAgentData struct {
 	Errors []struct {
 		Message string   `json:"message"`
 		Path    []string `json:"path"`
 	} `json:"errors"`
-	Data DeleteAgentDetails `json:"data"`
+	Data DisconnectAgentDetails `json:"data"`
 }
 
-type DeleteAgentDetails struct {
+type DisconnectAgentDetails struct {
 	Message string `json:"deleteClusters"`
 }
 
-type DeleteAgentGraphQLRequest struct {
+type DisconnectAgentGraphQLRequest struct {
 	Query     string `json:"query"`
 	Variables struct {
 		ProjectID  string    `json:"projectID"`
@@ -163,10 +163,10 @@ type DeleteAgentGraphQLRequest struct {
 	} `json:"variables"`
 }
 
-// DeleteAgent sends GraphQL API request for deleting ChaosAgent(s).
-func DeleteAgent(projectID string, clusterIDs []*string, cred types.Credentials) (DeleteAgentData, error) {
+// DisconnectAgent sends GraphQL API request for disconnecting ChaosAgent(s).
+func DisconnectAgent(projectID string, clusterIDs []*string, cred types.Credentials) (DisconnectAgentData, error) {
 
-	var gqlReq DeleteAgentGraphQLRequest
+	var gqlReq DisconnectAgentGraphQLRequest
 	var err error
 
 	gqlReq.Query = `mutation deleteClusters($projectID: String!, $clusterIDs: [String]!) {
@@ -180,7 +180,7 @@ func DeleteAgent(projectID string, clusterIDs []*string, cred types.Credentials)
 
 	query, err := json.Marshal(gqlReq)
 	if err != nil {
-		return DeleteAgentData{}, err
+		return DisconnectAgentData{}, err
 	}
 
 	resp, err := SendRequest(
@@ -192,28 +192,28 @@ func DeleteAgent(projectID string, clusterIDs []*string, cred types.Credentials)
 		string(types.Post),
 	)
 	if err != nil {
-		return DeleteAgentData{}, err
+		return DisconnectAgentData{}, err
 	}
 
 	bodyBytes, err := ioutil.ReadAll(resp.Body)
 	defer resp.Body.Close()
 	if err != nil {
-		return DeleteAgentData{}, err
+		return DisconnectAgentData{}, err
 	}
 
 	if resp.StatusCode == http.StatusOK {
-		var deleteAgentData DeleteAgentData
-		err = json.Unmarshal(bodyBytes, &deleteAgentData)
+		var disconnectAgentData DisconnectAgentData
+		err = json.Unmarshal(bodyBytes, &disconnectAgentData)
 		if err != nil {
-			return DeleteAgentData{}, err
+			return DisconnectAgentData{}, err
 		}
 
-		if len(deleteAgentData.Errors) > 0 {
-			return DeleteAgentData{}, errors.New(deleteAgentData.Errors[0].Message)
+		if len(disconnectAgentData.Errors) > 0 {
+			return DisconnectAgentData{}, errors.New(disconnectAgentData.Errors[0].Message)
 		}
 
-		return deleteAgentData, nil
+		return disconnectAgentData, nil
 	} else {
-		return DeleteAgentData{}, err
+		return DisconnectAgentData{}, err
 	}
 }

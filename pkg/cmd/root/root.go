@@ -23,13 +23,13 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/litmuschaos/litmusctl/pkg/cmd/disconnect"
 	"github.com/litmuschaos/litmusctl/pkg/cmd/upgrade"
 	"github.com/litmuschaos/litmusctl/pkg/cmd/version"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
 
 	"github.com/litmuschaos/litmusctl/pkg/cmd/config"
 	"github.com/litmuschaos/litmusctl/pkg/cmd/create"
-	"github.com/litmuschaos/litmusctl/pkg/cmd/delete"
 	"github.com/litmuschaos/litmusctl/pkg/cmd/get"
 	config2 "github.com/litmuschaos/litmusctl/pkg/config"
 	"github.com/spf13/cobra"
@@ -59,7 +59,7 @@ func init() {
 	rootCmd.AddCommand(config.ConfigCmd)
 	rootCmd.AddCommand(create.CreateCmd)
 	rootCmd.AddCommand(get.GetCmd)
-	rootCmd.AddCommand(delete.DeleteCmd)
+	rootCmd.AddCommand(disconnect.DisconnectCmd)
 	rootCmd.AddCommand(version.VersionCmd)
 	rootCmd.AddCommand(upgrade.UpgradeCmd)
 

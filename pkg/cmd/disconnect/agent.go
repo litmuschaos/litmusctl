@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package delete
+package disconnect
 
 import (
 	"fmt"
@@ -29,10 +29,10 @@ import (
 // agentCmd represents the agent command
 var agentCmd = &cobra.Command{
 	Use: "agent",
-	Short: `Delete a ChaosAgent
+	Short: `Disconnect a ChaosAgent
 	Example:
-	#delete an agent
-		litmusctl delete agent c520650e-7cb6-474c-b0f0-4df07b2b025b --project-id=c520650e-7cb6-474c-b0f0-4df07b2b025b
+	#disconnect an agent
+	litmusctl disconnect agent c520650e-7cb6-474c-b0f0-4df07b2b025b --project-id=c520650e-7cb6-474c-b0f0-4df07b2b025b
 
 	Note: The default location of the config file is $HOME/.litmusconfig, and can be overridden by a --config flag
 	`,
@@ -93,22 +93,22 @@ var agentCmd = &cobra.Command{
 		// Make API call
 		var agentIDs []*string
 		agentIDs = append(agentIDs, &agentID)
-		deletedAgent, err := apis.DeleteAgent(projectID, agentIDs, credentials)
+		disconnectedAgent, err := apis.DisconnectAgent(projectID, agentIDs, credentials)
 		if err != nil {
-			utils.Red.Println("\n❌ Error in deleting ChaosAgent: ", err.Error())
+			utils.Red.Println("\n❌ Error in disconnecting ChaosAgent: ", err.Error())
 			os.Exit(1)
 		}
 
-		if strings.Contains(deletedAgent.Data.Message, "Successfully deleted clusters") {
-			utils.White_B.Println("\n🚀 ChaosAgent successfully deleted.")
+		if strings.Contains(disconnectedAgent.Data.Message, "Successfully deleted clusters") {
+			utils.White_B.Println("\n🚀 ChaosAgent successfully disconnected.")
 		} else {
-			utils.White_B.Println("\n❌ Failed to delete ChaosAgent. Please check if the ID is correct or not.")
+			utils.White_B.Println("\n❌ Failed to disconnect ChaosAgent. Please check if the ID is correct or not.")
 		}
 	},
 }
 
 func init() {
-	DeleteCmd.AddCommand(agentCmd)
+	DisconnectCmd.AddCommand(agentCmd)
 
 	agentCmd.Flags().String("project-id", "", "Set the project-id to create workflow for the particular project. To see the projects, apply litmusctl get projects")
 }
