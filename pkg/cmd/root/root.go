@@ -29,8 +29,8 @@ import (
 
 	"github.com/litmuschaos/litmusctl/pkg/cmd/config"
 	"github.com/litmuschaos/litmusctl/pkg/cmd/create"
-	"github.com/litmuschaos/litmusctl/pkg/cmd/get"
 	"github.com/litmuschaos/litmusctl/pkg/cmd/delete"
+	"github.com/litmuschaos/litmusctl/pkg/cmd/get"
 	config2 "github.com/litmuschaos/litmusctl/pkg/config"
 	"github.com/spf13/cobra"
 
