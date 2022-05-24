@@ -48,7 +48,7 @@ type AgentList struct {
 
 // GetAgentList lists the agent connected to the specified project
 func GetAgentList(c types.Credentials, pid string) (AgentData, error) {
-	query := `{"query":"query{\n  listClusters(projectID: \"` + pid + `\"){\n  clusterID clusterName isActive \n  }\n}"}`
+	query := `{"query":"query{\n  listClusters(projectID: \"` + pid + `\"){\n  clusterID clusterName isActive isRegistered\n  }\n}"}`
 	resp, err := SendRequest(SendRequestParams{Endpoint: c.Endpoint + utils.GQLAPIPath, Token: c.Token}, []byte(query), string(types.Post))
 	if err != nil {
 		return AgentData{}, err
