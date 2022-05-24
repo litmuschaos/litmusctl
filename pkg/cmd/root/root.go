@@ -23,6 +23,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/litmuschaos/litmusctl/pkg/cmd/connect"
 	"github.com/litmuschaos/litmusctl/pkg/cmd/disconnect"
 	"github.com/litmuschaos/litmusctl/pkg/cmd/upgrade"
 	"github.com/litmuschaos/litmusctl/pkg/cmd/version"
@@ -59,6 +60,7 @@ func init() {
 	rootCmd.AddCommand(config.ConfigCmd)
 	rootCmd.AddCommand(create.CreateCmd)
 	rootCmd.AddCommand(get.GetCmd)
+	rootCmd.AddCommand(connect.ConnectCmd)
 	rootCmd.AddCommand(disconnect.DisconnectCmd)
 	rootCmd.AddCommand(version.VersionCmd)
 	rootCmd.AddCommand(upgrade.UpgradeCmd)

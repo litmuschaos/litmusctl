@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package create
+package connect
 
 import (
 	"encoding/json"
@@ -32,14 +32,14 @@ import (
 // agentCmd represents the agent command
 var agentCmd = &cobra.Command{
 	Use: "agent",
-	Short: `Create an external agent.
+	Short: `Connect an external agent.
 	Example(s):
-	#create an agent
-	litmusctl create agent --agent-name="new-agent" --non-interactive
+	#connect an agent
+	litmusctl connect agent --agent-name="new-agent" --non-interactive
 
-	#create an agent within a project
-	litmusctl create agent --agent-name="new-agent" --project-id="d861b650-1549-4574-b2ba-ab754058dd04" --non-interactive
-	
+	#connect an agent within a project
+	litmusctl connect agent --agent-name="new-agent" --project-id="d861b650-1549-4574-b2ba-ab754058dd04" --non-interactive
+
 	Note: The default location of the config file is $HOME/.litmusconfig, and can be overridden by a --config flag
 `,
 	Run: func(cmd *cobra.Command, args []string) {
@@ -270,7 +270,7 @@ var agentCmd = &cobra.Command{
 }
 
 func init() {
-	CreateCmd.AddCommand(agentCmd)
+	ConnectCmd.AddCommand(agentCmd)
 
 	agentCmd.Flags().BoolP("non-interactive", "n", false, "Set it to true for non interactive mode | Note: Always set the boolean flag as --non-interactive=Boolean")
 	agentCmd.Flags().StringP("kubeconfig", "k", "", "Set to pass kubeconfig file if it is not in the default location ($HOME/.kube/config)")
