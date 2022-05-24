@@ -63,7 +63,7 @@ var agentsCmd = &cobra.Command{
 		case "":
 
 			writer := tabwriter.NewWriter(os.Stdout, 4, 8, 1, '\t', 0)
-			utils.White_B.Fprintln(writer, "AGENTID\tAGENTNAME\tSTATUS\t")
+			utils.White_B.Fprintln(writer, "AGENT ID\tAGENT NAME\tSTATUS\t")
 
 			for _, agent := range agents.Data.GetAgent {
 				var status string
