@@ -3,7 +3,7 @@ module github.com/litmuschaos/litmusctl
 go 1.16
 
 require (
-	github.com/argoproj/argo-workflows/v3 v3.2.9
+	github.com/argoproj/argo-workflows/v3 v3.2.11
 	github.com/fatih/color v1.12.0
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/gorhill/cronexpr v0.0.0-20180427100037-88b0669f7d75
