@@ -13,22 +13,19 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package create
+package disconnect
 
 import (
 	"github.com/spf13/cobra"
 )
 
-// createCmd represents the create command
-var CreateCmd = &cobra.Command{
-	Use: "create",
-	Short: `Create resources for LitmusChaos agent plane.
+// disconnectCmd represents the disconnect command
+var DisconnectCmd = &cobra.Command{
+	Use: "disconnect",
+	Short: `Disconnect resources for LitmusChaos agent plane.
 		Examples:
-		#create a project
-		litmusctl create project --name new-proj
-
-		#create a chaos workflow from a file
-		litmusctl create workflow -f workflow.yaml --project-id="d861b650-1549-4574-b2ba-ab754058dd04" --agent-id="d861b650-1549-4574-b2ba-ab754058dd04"
+		#disconnect an agent
+		litmusctl disconnect agent c520650e-7cb6-474c-b0f0-4df07b2b025b --project-id=c520650e-7cb6-474c-b0f0-4df07b2b025b
 
 		Note: The default location of the config file is $HOME/.litmusconfig, and can be overridden by a --config flag
 	`,

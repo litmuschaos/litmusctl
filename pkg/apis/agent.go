@@ -48,7 +48,7 @@ type AgentList struct {
 
 // GetAgentList lists the agent connected to the specified project
 func GetAgentList(c types.Credentials, pid string) (AgentData, error) {
-	query := `{"query":"query{\n  listClusters(projectID: \"` + pid + `\"){\n  clusterID clusterName isActive \n  }\n}"}`
+	query := `{"query":"query{\n  listClusters(projectID: \"` + pid + `\"){\n  clusterID clusterName isActive isRegistered\n  }\n}"}`
 	resp, err := SendRequest(SendRequestParams{Endpoint: c.Endpoint + utils.GQLAPIPath, Token: c.Token}, []byte(query), string(types.Post))
 	if err != nil {
 		return AgentData{}, err
@@ -140,5 +140,80 @@ func ConnectAgent(agent types.Agent, cred types.Credentials) (AgentConnectionDat
 		return connectAgent, nil
 	} else {
 		return AgentConnectionData{}, err
+	}
+}
+
+type DisconnectAgentData struct {
+	Errors []struct {
+		Message string   `json:"message"`
+		Path    []string `json:"path"`
+	} `json:"errors"`
+	Data DisconnectAgentDetails `json:"data"`
+}
+
+type DisconnectAgentDetails struct {
+	Message string `json:"deleteClusters"`
+}
+
+type DisconnectAgentGraphQLRequest struct {
+	Query     string `json:"query"`
+	Variables struct {
+		ProjectID  string    `json:"projectID"`
+		ClusterIDs []*string `json:"clusterIDs"`
+	} `json:"variables"`
+}
+
+// DisconnectAgent sends GraphQL API request for disconnecting ChaosAgent(s).
+func DisconnectAgent(projectID string, clusterIDs []*string, cred types.Credentials) (DisconnectAgentData, error) {
+
+	var gqlReq DisconnectAgentGraphQLRequest
+	var err error
+
+	gqlReq.Query = `mutation deleteClusters($projectID: String!, $clusterIDs: [String]!) {
+                      deleteClusters(
+                        projectID: $projectID
+                        clusterIDs: $clusterIDs
+                      )
+                    }`
+	gqlReq.Variables.ProjectID = projectID
+	gqlReq.Variables.ClusterIDs = clusterIDs
+
+	query, err := json.Marshal(gqlReq)
+	if err != nil {
+		return DisconnectAgentData{}, err
+	}
+
+	resp, err := SendRequest(
+		SendRequestParams{
+			Endpoint: cred.Endpoint + utils.GQLAPIPath,
+			Token:    cred.Token,
+		},
+		query,
+		string(types.Post),
+	)
+	if err != nil {
+		return DisconnectAgentData{}, err
+	}
+
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	defer resp.Body.Close()
+	if err != nil {
+		return DisconnectAgentData{}, err
+	}
+
+	if resp.StatusCode == http.StatusOK {
+		var disconnectAgentData DisconnectAgentData
+		err = json.Unmarshal(bodyBytes, &disconnectAgentData)
+		if err != nil {
+			return DisconnectAgentData{}, err
+		}
+
+		if len(disconnectAgentData.Errors) > 0 {
+			return DisconnectAgentData{}, errors.New(disconnectAgentData.Errors[0].Message)
+		}
+
+		return disconnectAgentData, nil
+	} else {
+		return DisconnectAgentData{}, err
 	}
 }

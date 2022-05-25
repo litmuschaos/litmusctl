@@ -13,22 +13,22 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package create
+package connect
 
 import (
 	"github.com/spf13/cobra"
 )
 
-// createCmd represents the create command
-var CreateCmd = &cobra.Command{
-	Use: "create",
-	Short: `Create resources for LitmusChaos agent plane.
+// connectCmd represents the connect command
+var ConnectCmd = &cobra.Command{
+	Use: "connect",
+	Short: `Connect resources for LitmusChaos agent plane.
 		Examples:
-		#create a project
-		litmusctl create project --name new-proj
+		#connect an agent
+		litmusctl connect agent --agent-name="new-agent" --non-interactive
 
-		#create a chaos workflow from a file
-		litmusctl create workflow -f workflow.yaml --project-id="d861b650-1549-4574-b2ba-ab754058dd04" --agent-id="d861b650-1549-4574-b2ba-ab754058dd04"
+		#connect an agent within a project
+		litmusctl connect agent --agent-name="new-agent" --project-id="d861b650-1549-4574-b2ba-ab754058dd04" --non-interactive
 
 		Note: The default location of the config file is $HOME/.litmusconfig, and can be overridden by a --config flag
 	`,
