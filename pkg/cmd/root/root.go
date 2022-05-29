@@ -24,9 +24,9 @@ import (
 	"os"
 
 	"github.com/litmuschaos/litmusctl/pkg/cmd/connect"
-	"github.com/litmuschaos/litmusctl/pkg/cmd/disconnect"
 	"github.com/litmuschaos/litmusctl/pkg/cmd/delete"
 	"github.com/litmuschaos/litmusctl/pkg/cmd/describe"
+	"github.com/litmuschaos/litmusctl/pkg/cmd/disconnect"
 	"github.com/litmuschaos/litmusctl/pkg/cmd/upgrade"
 	"github.com/litmuschaos/litmusctl/pkg/cmd/version"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
