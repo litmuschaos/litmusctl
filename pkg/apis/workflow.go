@@ -102,3 +102,95 @@ func CreateWorkflow(requestData model.ChaosWorkFlowRequest, cred types.Credentia
 		return ChaosWorkflowCreationData{}, err
 	}
 }
+
+type WorkflowListData struct {
+	Errors []struct {
+		Message string   `json:"message"`
+		Path    []string `json:"path"`
+	} `json:"errors"`
+	Data WorkflowList `json:"data"`
+}
+
+type WorkflowList struct {
+	ListWorkflowDetails model.ListWorkflowsResponse `json:"listWorkflows"`
+}
+
+type GetChaosWorkFlowsGraphQLRequest struct {
+	Query     string `json:"query"`
+	Variables struct {
+		GetChaosWorkFlowsRequest model.ListWorkflowsRequest `json:"request"`
+	} `json:"variables"`
+}
+
+// GetWorkflowList sends GraphQL API request for fetching a list of workflows.
+func GetWorkflowList(in model.ListWorkflowsRequest, cred types.Credentials) (WorkflowListData, error) {
+
+	var gqlReq GetChaosWorkFlowsGraphQLRequest
+	var err error
+
+	gqlReq.Query = `query listWorkflows($request: ListWorkflowsRequest!) {
+                      listWorkflows(request: $request) {
+                        totalNoOfWorkflows
+                        workflows {
+                          workflowID
+                          workflowManifest
+                          cronSyntax
+                          clusterName
+                          workflowName
+                          workflowDescription
+                          weightages {
+                            experimentName
+                            weightage
+                          }
+                          isCustomWorkflow
+                          updatedAt
+                          createdAt
+                          projectID
+                          clusterID
+                          clusterType
+                          isRemoved
+                          lastUpdatedBy
+                        }
+                      }
+                    }`
+	gqlReq.Variables.GetChaosWorkFlowsRequest = in
+
+	query, err := json.Marshal(gqlReq)
+	if err != nil {
+		return WorkflowListData{}, err
+	}
+
+	resp, err := SendRequest(
+		SendRequestParams{
+			Endpoint: cred.Endpoint + utils.GQLAPIPath,
+			Token:    cred.Token,
+		},
+		query,
+		string(types.Post),
+	)
+	if err != nil {
+		return WorkflowListData{}, err
+	}
+
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	defer resp.Body.Close()
+	if err != nil {
+		return WorkflowListData{}, err
+	}
+
+	if resp.StatusCode == http.StatusOK {
+		var workflowList WorkflowListData
+		err = json.Unmarshal(bodyBytes, &workflowList)
+		if err != nil {
+			return WorkflowListData{}, err
+		}
+
+		if len(workflowList.Errors) > 0 {
+			return WorkflowListData{}, errors.New(workflowList.Errors[0].Message)
+		}
+
+		return workflowList, nil
+	} else {
+		return WorkflowListData{}, err
+	}
+}
