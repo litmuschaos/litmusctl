@@ -185,6 +185,23 @@ To verify, if the connection process was successful you can view the list of con
 
 ---
 
+### Steps to create a Chaos Workflow
+
+* To setup an account with litmusctl
+```shell
+litmusctl config set-account --endpoint="" --username="" --password=""
+```
+
+* To create a Chaos Workflow by passing a manifest file
+> Note:
+> * To get `project-id`, apply `litmusctl get projects`
+> * To get `agent-id`, apply `litmusctl get agents --project-id=""`
+```shell
+litmusctl create workflow -f custom-chaos-workflow.yml --project-id="" --agent-id=""
+```
+
+---
+
 ### Additional commands
 
 - To view the current configuration of `.litmusconfig`, type:
@@ -272,6 +289,74 @@ AGENTID                                AGENTNAME          STATUS
 55ecc7f2-2754-43aa-8e12-6903e4c6183a   agent-1            ACTIVE
 13dsf3d1-5324-54af-4g23-5331g5v2364f   agent-2            INACTIVE
 ```
+
+
+* To list the created workflows within a project, issue the following command.
+```shell
+litmusctl get workflows --project-id=""
+```
+
+**Output:**
+
+```
+WORKFLOW ID                          WORKFLOW NAME                    WORKFLOW TYPE     NEXT SCHEDULE AGENT ID                             AGENT NAME LAST UPDATED BY
+9433b48c-4ab7-4544-8dab-4a7237619e09 custom-chaos-workflow-1627980541 Non Cron Workflow None          f9799723-29f1-454c-b830-ae8ba7ee4c30 Self-Agent admin
+
+Showing 1 of 1 workflows
+```
+
+
+* To list all the chaos workflow runs within a project, issue the following command.
+```shell
+litmusctl get workflowruns --project-id=""
+```
+
+**Output:**
+
+```
+WORKFLOW RUN ID                      STATUS  RESILIENCY SCORE WORKFLOW ID                          WORKFLOW NAME                    TARGET AGENT LAST RUN                 EXECUTED BY
+8ceb712c-1ed4-40e6-adc4-01f78d281506 Running 0.00             9433b48c-4ab7-4544-8dab-4a7237619e09 custom-chaos-workflow-1627980541 Self-Agent   June 1 2022, 10:28:02 pm admin
+
+Showing 1 of 1 workflow runs
+```
+
+
+* To describe a particular chaos workflow, issue the following command.
+```shell
+litmusctl describe workflow 9433b48c-4ab7-4544-8dab-4a7237619e09 --project-id=""
+```
+
+**Output:**
+
+```
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+    creationTimestamp: null
+    labels:
+        cluster_id: f9799723-29f1-454c-b830-ae8ba7ee4c30
+        subject: custom-chaos-workflow_litmus
+        workflow_id: 9433b48c-4ab7-4544-8dab-4a7237619e09
+        workflows.argoproj.io/controller-instanceid: f9799723-29f1-454c-b830-ae8ba7ee4c30
+    name: custom-chaos-workflow-1627980541
+    namespace: litmus
+spec:
+...
+```
+
+
+* To delete a particular chaos workflow, issue the following command.
+```shell
+litmusctl delete workflow df91c6b2-ad33-45ae-9a2f-00cb87978657 --project-id=""
+```
+
+**Output:**
+
+```
+🚀 ChaosWorkflow successfully deleted.
+```
+
+---
 
 ## Flag details
 
