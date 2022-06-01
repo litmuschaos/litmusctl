@@ -291,6 +291,18 @@ AGENTID                                AGENTNAME          STATUS
 ```
 
 
+* To disconnect an agent, issue the following command..
+```shell
+litmusctl disconnect agent f9799723-29f1-454c-b830-ae8ba7ee4c30 --project-id=""
+```
+
+**Output:**
+
+```
+🚀 ChaosAgent successfully disconnected.
+```
+
+
 * To list the created workflows within a project, issue the following command.
 ```shell
 litmusctl get workflows --project-id=""
