@@ -24,7 +24,7 @@ Litmusctl is using the `.litmusconfig` config file to manage multiple accounts
 
 Litmusctl supports both interactive and non-interactive(flag based) modes.
 
-> Only `litmusctl create agent` command needs --non-interactive flag, other commands don't need this flag to be in non-interactive mode. If mandatory flags aren't passed, then litmusctl takes input in an interactive mode.
+> Only `litmusctl connect agent` command needs --non-interactive flag, other commands don't need this flag to be in non-interactive mode. If mandatory flags aren't passed, then litmusctl takes input in an interactive mode.
 
 ### Steps to create an agent
 
@@ -54,7 +54,7 @@ account.username/admin configured
 - To create an agent in a cluster mode
 
 ```shell
-litmusctl create agent
+litmusctl connect agent
 ```
 
 There will be a list of existing projects displayed on the terminal. Select the desired project by entering the sequence number indicated against it.
