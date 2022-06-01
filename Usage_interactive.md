@@ -285,9 +285,9 @@ Enter the Project ID: 50addd40-8767-448c-a91a-5071543a2d8e
 **Output:**
 
 ```
-AGENTID                                AGENTNAME          STATUS
-55ecc7f2-2754-43aa-8e12-6903e4c6183a   agent-1            ACTIVE
-13dsf3d1-5324-54af-4g23-5331g5v2364f   agent-2            INACTIVE
+AGENTID                                AGENTNAME          STATUS     REGISTRATION
+55ecc7f2-2754-43aa-8e12-6903e4c6183a   agent-1            ACTIVE     REGISTERED
+13dsf3d1-5324-54af-4g23-5331g5v2364f   agent-2            INACTIVE   NOT REGISTERED
 ```
 
 
