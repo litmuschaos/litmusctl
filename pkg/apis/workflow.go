@@ -283,6 +283,6 @@ func GetWorkflowRunsList(in model.ListWorkflowRunsRequest, cred types.Credential
 
 		return workflowRunsList, nil
 	} else {
-		return WorkflowRunsListData{}, err
+		return WorkflowRunsListData{}, errors.New("Error while fetching the chaos workflow runs")
 	}
 }
