@@ -362,6 +362,6 @@ func DeleteChaosWorkflow(projectID string, workflowID *string, cred types.Creden
 
 		return deletedWorkflow, nil
 	} else {
-		return DeleteChaosWorkflowData{}, err
+		return DeleteChaosWorkflowData{}, errors.New("Error while deleting the chaos workflow")
 	}
 }
