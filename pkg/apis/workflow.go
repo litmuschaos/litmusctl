@@ -191,6 +191,6 @@ func GetWorkflowList(in model.ListWorkflowsRequest, cred types.Credentials) (Wor
 
 		return workflowList, nil
 	} else {
-		return WorkflowListData{}, err
+		return WorkflowListData{}, errors.New("Error while fetching the chaos workflows")
 	}
 }
