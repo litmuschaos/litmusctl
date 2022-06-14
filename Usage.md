@@ -240,7 +240,7 @@ AGENTID                                AGENTNAME          STATUS     REGISTRATIO
 
 * To disconnect an agent, issue the following command..
 ```shell
-litmusctl disconnect agent f9799723-29f1-454c-b830-ae8ba7ee4c30 --project-id=""
+litmusctl disconnect agent <agent-id> --project-id=""
 ```
 
 **Output:**
@@ -282,7 +282,7 @@ Showing 1 of 1 workflow runs
 
 * To describe a particular chaos workflow, issue the following command.
 ```shell
-litmusctl describe workflow 9433b48c-4ab7-4544-8dab-4a7237619e09 --project-id=""
+litmusctl describe workflow <workflow-id> --project-id=""
 ```
 
 **Output:**
@@ -306,7 +306,7 @@ spec:
 
 * To delete a particular chaos workflow, issue the following command.
 ```shell
-litmusctl delete workflow df91c6b2-ad33-45ae-9a2f-00cb87978657 --project-id=""
+litmusctl delete workflow <workflow-id> --project-id=""
 ```
 
 **Output:**
