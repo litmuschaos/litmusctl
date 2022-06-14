@@ -194,3 +194,95 @@ func GetWorkflowList(in model.ListWorkflowsRequest, cred types.Credentials) (Wor
 		return WorkflowListData{}, errors.New("Error while fetching the chaos workflows")
 	}
 }
+
+type WorkflowRunsListData struct {
+	Errors []struct {
+		Message string   `json:"message"`
+		Path    []string `json:"path"`
+	} `json:"errors"`
+	Data WorkflowRunsList `json:"data"`
+}
+
+type WorkflowRunsList struct {
+	ListWorkflowRunsDetails model.ListWorkflowRunsResponse `json:"listWorkflowRuns"`
+}
+
+type GetChaosWorkFlowRunsGraphQLRequest struct {
+	Query     string `json:"query"`
+	Variables struct {
+		GetChaosWorkFlowRunsRequest model.ListWorkflowRunsRequest `json:"request"`
+	} `json:"variables"`
+}
+
+// GetWorkflowRunsList sends GraphQL API request for fetching a list of workflow runs.
+func GetWorkflowRunsList(in model.ListWorkflowRunsRequest, cred types.Credentials) (WorkflowRunsListData, error) {
+
+	var gqlReq GetChaosWorkFlowRunsGraphQLRequest
+	var err error
+
+	gqlReq.Query = `query listWorkflowRuns($request: ListWorkflowRunsRequest!) {
+                      listWorkflowRuns(request: $request) {
+                        totalNoOfWorkflowRuns
+                        workflowRuns {
+                          workflowRunID
+                          workflowID
+                          clusterName
+                          workflowName
+                          projectID
+                          clusterID
+                          clusterType
+                          isRemoved
+                          lastUpdated
+                          phase
+                          resiliencyScore
+                          experimentsPassed
+                          experimentsFailed
+                          experimentsAwaited
+                          experimentsStopped
+                          experimentsNa
+                          totalExperiments
+                          executedBy
+                        }
+                      }
+                    }`
+	gqlReq.Variables.GetChaosWorkFlowRunsRequest = in
+
+	query, err := json.Marshal(gqlReq)
+	if err != nil {
+		return WorkflowRunsListData{}, err
+	}
+
+	resp, err := SendRequest(
+		SendRequestParams{
+			Endpoint: cred.Endpoint + utils.GQLAPIPath,
+			Token:    cred.Token,
+		},
+		query,
+		string(types.Post),
+	)
+	if err != nil {
+		return WorkflowRunsListData{}, err
+	}
+
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	defer resp.Body.Close()
+	if err != nil {
+		return WorkflowRunsListData{}, err
+	}
+
+	if resp.StatusCode == http.StatusOK {
+		var workflowRunsList WorkflowRunsListData
+		err = json.Unmarshal(bodyBytes, &workflowRunsList)
+		if err != nil {
+			return WorkflowRunsListData{}, err
+		}
+
+		if len(workflowRunsList.Errors) > 0 {
+			return WorkflowRunsListData{}, errors.New(workflowRunsList.Errors[0].Message)
+		}
+
+		return workflowRunsList, nil
+	} else {
+		return WorkflowRunsListData{}, errors.New("Error while fetching the chaos workflow runs")
+	}
+}

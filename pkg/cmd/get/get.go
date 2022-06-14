@@ -32,6 +32,9 @@ var GetCmd = &cobra.Command{
 		#get list of chaos workflows
 		litmusctl get workflows --project-id=""
 
+		#get list of chaos workflow runs
+		litmusctl get workflowruns --project-id=""
+
 		Note: The default location of the config file is $HOME/.litmusconfig, and can be overridden by a --config flag
 	`,
 }
