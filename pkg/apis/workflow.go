@@ -286,3 +286,82 @@ func GetWorkflowRunsList(in model.ListWorkflowRunsRequest, cred types.Credential
 		return WorkflowRunsListData{}, errors.New("Error while fetching the chaos workflow runs")
 	}
 }
+
+type DeleteChaosWorkflowData struct {
+	Errors []struct {
+		Message string   `json:"message"`
+		Path    []string `json:"path"`
+	} `json:"errors"`
+	Data DeleteChaosWorkflowDetails `json:"data"`
+}
+
+type DeleteChaosWorkflowDetails struct {
+	IsDeleted bool `json:"deleteChaosWorkflow"`
+}
+
+type DeleteChaosWorkflowGraphQLRequest struct {
+	Query     string `json:"query"`
+	Variables struct {
+		ProjectID     string  `json:"projectID"`
+		WorkflowID    *string `json:"workflowID"`
+		WorkflowRunID *string `json:"workflowRunID"`
+	} `json:"variables"`
+}
+
+// DeleteChaosWorkflow sends GraphQL API request for deleting a given Chaos Workflow.
+func DeleteChaosWorkflow(projectID string, workflowID *string, cred types.Credentials) (DeleteChaosWorkflowData, error) {
+
+	var gqlReq DeleteChaosWorkflowGraphQLRequest
+	var err error
+
+	gqlReq.Query = `mutation deleteChaosWorkflow($projectID: String!, $workflowID: String, $workflowRunID: String) {
+                      deleteChaosWorkflow(
+                        projectID: $projectID
+                        workflowID: $workflowID
+                        workflowRunID: $workflowRunID
+                      )
+                    }`
+	gqlReq.Variables.ProjectID = projectID
+	gqlReq.Variables.WorkflowID = workflowID
+	var workflow_run_id string = ""
+	gqlReq.Variables.WorkflowRunID = &workflow_run_id
+
+	query, err := json.Marshal(gqlReq)
+	if err != nil {
+		return DeleteChaosWorkflowData{}, err
+	}
+
+	resp, err := SendRequest(
+		SendRequestParams{
+			Endpoint: cred.Endpoint + utils.GQLAPIPath,
+			Token:    cred.Token,
+		},
+		query,
+		string(types.Post),
+	)
+	if err != nil {
+		return DeleteChaosWorkflowData{}, err
+	}
+
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	defer resp.Body.Close()
+	if err != nil {
+		return DeleteChaosWorkflowData{}, err
+	}
+
+	if resp.StatusCode == http.StatusOK {
+		var deletedWorkflow DeleteChaosWorkflowData
+		err = json.Unmarshal(bodyBytes, &deletedWorkflow)
+		if err != nil {
+			return DeleteChaosWorkflowData{}, err
+		}
+
+		if len(deletedWorkflow.Errors) > 0 {
+			return DeleteChaosWorkflowData{}, errors.New(deletedWorkflow.Errors[0].Message)
+		}
+
+		return deletedWorkflow, nil
+	} else {
+		return DeleteChaosWorkflowData{}, errors.New("Error while deleting the chaos workflow")
+	}
+}
