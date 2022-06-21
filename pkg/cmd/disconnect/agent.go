@@ -36,7 +36,6 @@ var agentCmd = &cobra.Command{
 
 	Note: The default location of the config file is $HOME/.litmusconfig, and can be overridden by a --config flag
 	`,
-	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 
 		// Fetch user credentials
@@ -57,17 +56,18 @@ var agentCmd = &cobra.Command{
 			}
 		}
 
-		agentID := args[0]
+		var agentID string
+		if len(args) == 0 {
+			utils.White_B.Print("\nEnter the Agent ID: ")
+			fmt.Scanln(&agentID)
+		} else {
+			agentID = args[0]
+		}
 
 		// Handle blank input for agent ID
 		if agentID == "" {
-			utils.White_B.Print("\nEnter the Agent ID: ")
-			fmt.Scanln(&agentID)
-
-			if agentID == "" {
-				utils.Red.Println("⛔ Agent ID can't be empty!!")
-				os.Exit(1)
-			}
+			utils.Red.Println("⛔ Agent ID can't be empty!!")
+			os.Exit(1)
 		}
 
 		// Perform authorization
