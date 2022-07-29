@@ -214,7 +214,7 @@ AGENT_NAME:
 	return newAgent, nil
 }
 
-func ValidateSAPermissions(mode string, kubeconfig *string) {
+func ValidateSAPermissions(namespace string, mode string, kubeconfig *string) {
 	var (
 		pems      [2]bool
 		err       error
@@ -228,7 +228,7 @@ func ValidateSAPermissions(mode string, kubeconfig *string) {
 	}
 
 	for i, resource := range resources {
-		pems[i], err = k8s.CheckSAPermissions(k8s.CheckSAPermissionsParams{Verb: "create", Resource: resource, Print: true}, kubeconfig)
+		pems[i], err = k8s.CheckSAPermissions(k8s.CheckSAPermissionsParams{Verb: "create", Resource: resource, Print: true, Namespace: namespace}, kubeconfig)
 		if err != nil {
 			utils.Red.Println(err)
 		}
