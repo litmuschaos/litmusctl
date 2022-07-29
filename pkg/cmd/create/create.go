@@ -27,12 +27,9 @@ var CreateCmd = &cobra.Command{
 		#create a project
 		litmusctl create project --name new-proj
 
-		#create an agent
-		litmusctl create agent --agent-name="new-agent" --non-interactive
+		#create a chaos workflow from a file
+		litmusctl create workflow -f workflow.yaml --project-id="d861b650-1549-4574-b2ba-ab754058dd04" --agent-id="d861b650-1549-4574-b2ba-ab754058dd04"
 
-		#create an agent within a project
-		litmusctl create agent --agent-name="new-agent" --project-id="d861b650-1549-4574-b2ba-ab754058dd04" --non-interactive
-		
 		Note: The default location of the config file is $HOME/.litmusconfig, and can be overridden by a --config flag
 	`,
 }

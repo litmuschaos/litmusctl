@@ -16,13 +16,13 @@ limitations under the License.
 package types
 
 type Agent struct {
-	AgentName      string `json:"cluster_name"`
+	AgentName      string `json:"clusterName"`
 	Mode           string
 	Description    string `json:"description,omitempty"`
-	PlatformName   string `json:"platform_name"`
-	ProjectId      string `json:"project_id"`
-	ClusterType    string `json:"cluster_type"`
-	NodeSelector   string `json:"node_selector"`
+	PlatformName   string `json:"platformName"`
+	ProjectId      string `json:"projectID"`
+	ClusterType    string `json:"clusterType"`
+	NodeSelector   string `json:"nodeSelector"`
 	Tolerations    string
 	Namespace      string
 	ServiceAccount string

@@ -34,15 +34,15 @@ type GetAgentDetails struct {
 }
 
 type ClusterDetails struct {
-	ClusterID      string  `json:"cluster_id"`
-	AccessKey      string  `json:"access_key"`
-	AgentNamespace *string `json:"agent_namespace"`
+	ClusterID      string  `json:"clusterID"`
+	AccessKey      string  `json:"accessKey"`
+	AgentNamespace *string `json:"agentNamespace"`
 }
 
-func UpgradeAgent(c context.Context, cred types.Credentials, projectID string, cluster_id string) (string, error) {
+func UpgradeAgent(c context.Context, cred types.Credentials, projectID string, clusterID string) (string, error) {
 
 	// Query to fetch agent details from server
-	query := `{"query":"query {\n getAgentDetails(cluster_id : \"` + cluster_id + `\", \n projectID : \"` + projectID + `\"){\n agent_namespace access_key cluster_id \n}}"}`
+	query := `{"query":"query {\n getAgentDetails(clusterID : \"` + clusterID + `\", \n projectID : \"` + projectID + `\"){\n agentNamespace accessKey clusterID \n}}"}`
 	resp, err := SendRequest(SendRequestParams{Endpoint: cred.Endpoint + utils.GQLAPIPath, Token: cred.Token}, []byte(query), string(types.Post))
 	if err != nil {
 		return "", err
@@ -122,13 +122,13 @@ func UpgradeAgent(c context.Context, cred types.Credentials, projectID string, c
 		}, "", true)
 
 		if err != nil {
-			return "", err
+			return yamlOutput, err
 		}
 		utils.White.Print("\n", yamlOutput)
 
 		err = os.Remove("agent-manifest.yaml")
 		if err != nil {
-			return "", err
+			return "Error removing agent manifest: ", err
 		}
 
 		// Creating a backup for current agent-config in the SUBSCRIBER
@@ -138,13 +138,13 @@ func UpgradeAgent(c context.Context, cred types.Credentials, projectID string, c
 		configMapString = metadata.String() + configMapString
 		err = ioutil.WriteFile(home+"/backupAgentConfig.yaml", []byte(configMapString), 0644)
 		if err != nil {
-			return "", err
+			return "Error creating backup for agent config: ", err
 		}
 
 		utils.White_B.Print("\n ** A backup of agent-config configmap has been saved in your system's home directory as backupAgentConfig.yaml **\n")
 
 		return "Manifest applied successfully", nil
 	} else {
-		return "", errors.New("Unmatched status code:" + string(bodyBytes))
+		return "GQL error: ", errors.New("Unmatched status code:" + string(bodyBytes))
 	}
 }
