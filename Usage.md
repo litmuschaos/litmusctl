@@ -16,7 +16,7 @@ Litmusctl supports both interactive and non-interactive(flag based) modes.
 > Only `litmusctl connect chaos-delegate`  command needs --non-interactive flag, other commands don't need this flag to be in non-interactive mode. If mandatory flags aren't passed, then litmusctl takes input in an interactive mode.
 
 ### Installation modes
-Litmusctl can install an Chaos Delegate in two different modes.
+Litmusctl can install a Chaos Delegate in two different modes.
 * cluster mode: With this mode, the Chaos Delegate can run the chaos in any namespace. It installs appropriate cluster roles and cluster role bindings to achieve this mode. It can be enabled by passing a flag `--installation-mode=cluster`
 
 * namespace mode: With this mode, the Chaos Delegate can run the chaos in its namespace. It installs appropriate roles and role bindings to achieve this mode. It can be enabled by passing a flag `--installation-mode=namespace`
@@ -34,7 +34,7 @@ litmusctl config set-account --endpoint="" --username="" --password=""
 > Note: To get `project-id`. Apply `litmusctl get projects`
 
 ```shell
-litmusctl connect chaos-delegate --chaos-delegate-name="" --project-id="" --non-interactive
+litmusctl connect chaos-delegate --name="" --project-id="" --non-interactive
 ```
 
 ### Flags for `connect chaos-delegate` command
@@ -225,7 +225,7 @@ CHAOS DELEGATE ID                            CHAOS DELEGATE NAME          STATUS
 ```
 
 
-* To disconnect an Chaos Delegate, issue the following command..
+* To disconnect a Chaos Delegate, issue the following command..
 ```shell
 litmusctl disconnect chaos-delegate <chaos-delegate-id> --project-id=""
 ```
@@ -237,7 +237,7 @@ litmusctl disconnect chaos-delegate <chaos-delegate-id> --project-id=""
 ```
 
 
-* To list the created scenarios within a project, issue the following command.
+* To list the created Chaos Scenarios within a project, issue the following command.
 ```shell
 litmusctl get chaos-scenarios --project-id=""
 ```
@@ -291,15 +291,15 @@ spec:
 ```
 
 
-* To delete a particular chaos sceanrio, issue the following command.
+* To delete a particular Chaos Scenario, issue the following command.
 ```shell
-litmusctl delete delete chaos-scenario <chaos-scenario-id> --project-id=""
+litmusctl delete chaos-scenario <chaos-scenario-id> --project-id=""
 ```
 
 **Output:**
 
 ```
-🚀 ChaosScenario successfully deleted.
+🚀 Chaos Scenario successfully deleted.
 ```
 
 

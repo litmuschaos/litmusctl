@@ -121,7 +121,7 @@ var workflowCmd = &cobra.Command{
 		}
 
 		// Successful creation
-		utils.White_B.Println("\n🚀 ChaosScenario/" + createdWorkflow.Data.CreateChaosWorkflow.WorkflowName + " successfully created 🎉")
+		utils.White_B.Println("\n🚀 Chaos Scenario/" + createdWorkflow.Data.CreateChaosWorkflow.WorkflowName + " successfully created 🎉")
 		if createdWorkflow.Data.CreateChaosWorkflow.CronSyntax == "" {
 			utils.White_B.Println("\nThe next run of this Chaos Scenario will be scheduled immediately.")
 		} else {

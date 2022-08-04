@@ -68,7 +68,7 @@ Select a project [Range: 1-1]: 1
 
 Next, select the installation mode based on your requirement by entering the sequence number indicated against it.
 
-Litmusctl can install an Chaos Delegate in two different modes.
+Litmusctl can install a Chaos Delegate in two different modes.
 
 - cluster mode: With this mode, the Chaos Delegate can run the chaos in any namespace. It installs appropriate cluster roles and cluster role bindings to achieve this mode.
 
@@ -173,7 +173,7 @@ Applying YAML:
 https://preview.litmuschaos.io/api/file/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbHVzdGVyX2lkIjoiMDUyZmFlN2UtZGM0MS00YmU4LWJiYTgtMmM4ZTYyNDFkN2I0In0.i31QQDG92X5nD6P_-7TfeAAarZqLvUTFfnAghJYXPiM.yaml
 
 💡 Connecting Chaos Delegate to ChaosCenter.
-🏃 Chaos Delegates are running!!
+🏃 Chaos Delegate is running!!
 
 🚀 Chaos Delegate Connection Successful!! 🎉
 👉 Litmus Chaos Delegates can be accessed here: https://preview.litmuschaos.io/targets
@@ -303,7 +303,7 @@ litmusctl disconnect chaos-delegate <chaos-delegate-id> --project-id=""
 ```
 
 
-* To list the created scenarios within a project, issue the following command.
+* To list the created Chaos Scenarios within a project, issue the following command.
 ```shell
 litmusctl get chaos-scenarios --project-id=""
 ```
@@ -357,15 +357,15 @@ spec:
 ```
 
 
-* To delete a particular chaos sceanrio, issue the following command.
+* To delete a particular Chaos Scenario, issue the following command.
 ```shell
-litmusctl delete delete chaos-scenario <chaos-scenario-id> --project-id=""
+litmusctl delete chaos-scenario <chaos-scenario-id> --project-id=""
 ```
 
 **Output:**
 
 ```
-🚀 ChaosScenario successfully deleted.
+🚀 Chaos Scenario successfully deleted.
 ```
 
 ---

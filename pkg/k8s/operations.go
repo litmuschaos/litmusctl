@@ -153,7 +153,7 @@ start:
 	}
 	if ok {
 		if podExists(podExistsParams{namespace, label}, kubeconfig) {
-			utils.Red.Println("\n🚫 There is an Chaos Delegate already present in this namespace. Please enter a different namespace")
+			utils.Red.Println("\n🚫 There is a Chaos Delegate already present in this namespace. Please enter a different namespace")
 			goto start
 		} else {
 			nsExists = true
@@ -194,7 +194,7 @@ func WatchPod(params WatchPodParams, kubeconfig *string) {
 		}
 		utils.White_B.Println("💡 Connecting Chaos Delegate to ChaosCenter.")
 		if p.Status.Phase == "Running" {
-			utils.White_B.Println("🏃 Chaos Delegates are running!!")
+			utils.White_B.Println("🏃 Chaos Delegate is running!!")
 			watch.Stop()
 			break
 		}

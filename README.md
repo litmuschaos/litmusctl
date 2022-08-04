@@ -21,6 +21,40 @@ The litmusctl CLI requires the following things:
 - kubectl- litmusctl is using kubectl under the hood to apply the manifest. To install kubectl, follow:  [kubectl](https://kubernetes.io/docs/tasks/tools/#kubectl)
 
 
+## Compatibility matrix
+
+To check compatibility of chaosctl with Chaos Center
+
+<table>
+  <th>litmusctl version</th>
+  <th>Chaos Center supported versions</th>
+
+  <tr>
+    <td>0.6.0</td>
+    <td>2.2.0, 2.3.0</td>
+  </tr>
+  <tr>
+    <td>0.7.0</td>
+    <td>2.4.0, 2.5.0, 2.6.0, 2.7.0, 2.8.0</td>
+  </tr>
+  <tr>
+    <td>0.8.0</td>
+    <td>2.4.0, 2.5.0, 2.6.0, 2.7.0, 2.8.0</td>
+  </tr>
+  <tr>
+    <td>0.9.0</td>
+    <td>2.4.0, 2.5.0, 2.6.0, 2.7.0, 2.8.0</td>
+  </tr>
+  <tr>
+    <td>0.10.0</td>
+    <td>2.9.0, 2.10.0, 2.11.0</td>
+  </tr>
+  <tr>
+    <td>0.11.0</td>
+    <td>2.9.0, 2.10.0, 2.11.0</td>
+  </tr>
+</table>
+
 ## Installation
 
 To install the latest version of litmusctl follow the below steps:
