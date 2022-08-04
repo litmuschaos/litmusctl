@@ -153,7 +153,7 @@ start:
 	}
 	if ok {
 		if podExists(podExistsParams{namespace, label}, kubeconfig) {
-			utils.Red.Println("\n🚫 There is an agent already present in this namespace. Please enter a different namespace")
+			utils.Red.Println("\n🚫 There is an Chaos Delegate already present in this namespace. Please enter a different namespace")
 			goto start
 		} else {
 			nsExists = true
@@ -192,9 +192,9 @@ func WatchPod(params WatchPodParams, kubeconfig *string) {
 		if !ok {
 			log.Fatal("unexpected type")
 		}
-		utils.White_B.Println("💡 Connecting agent to ChaosCenter.")
+		utils.White_B.Println("💡 Connecting Chaos Delegate to ChaosCenter.")
 		if p.Status.Phase == "Running" {
-			utils.White_B.Println("🏃 Agents are running!!")
+			utils.White_B.Println("🏃 Chaos Delegates are running!!")
 			watch.Stop()
 			break
 		}
@@ -294,11 +294,11 @@ func ApplyYaml(params ApplyYamlPrams, kubeconfig string, isLocal bool) (output s
 		if err != nil {
 			return "", err
 		}
-		err = ioutil.WriteFile("agent-manifest.yaml", resp_body, 0644)
+		err = ioutil.WriteFile("chaos-delegate-manifest.yaml", resp_body, 0644)
 		if err != nil {
 			return "", err
 		}
-		path = "agent-manifest.yaml"
+		path = "chaos-delegate-manifest.yaml"
 	}
 
 	args := []string{"kubectl", "apply", "-f", path}

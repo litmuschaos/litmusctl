@@ -24,8 +24,8 @@ var DeleteCmd = &cobra.Command{
 	Use: "delete",
 	Short: `Delete resources for LitmusChaos agent plane.
 		Examples:
-		#delete a chaos workflow
-		litmusctl delete workflow c520650e-7cb6-474c-b0f0-4df07b2b025b --project-id=c520650e-7cb6-474c-b0f0-4df07b2b025b
+		#delete a Chaos Scenario
+		litmusctl delete chaos-scenario c520650e-7cb6-474c-b0f0-4df07b2b025b --project-id=c520650e-7cb6-474c-b0f0-4df07b2b025b
 
 		Note: The default location of the config file is $HOME/.litmusconfig, and can be overridden by a --config flag
 	`,

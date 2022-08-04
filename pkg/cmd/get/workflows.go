@@ -28,11 +28,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// workflowsCmd represents the workflows command
+// workflowsCmd represents the Chaos Scenarios command
 var workflowsCmd = &cobra.Command{
-	Use:   "workflows",
-	Short: "Display list of workflows within the project",
-	Long:  `Display list of workflows within the project`,
+	Use:   "chaos-scenarios",
+	Short: "Display list of Chaos Scenarios within the project",
+	Long:  `Display list of Chaos Scenarios within the project`,
 	Run: func(cmd *cobra.Command, args []string) {
 		credentials, err := utils.GetCredentials(cmd)
 		utils.PrintError(err)
@@ -59,7 +59,7 @@ var workflowsCmd = &cobra.Command{
 		}
 
 		listWorkflowsRequest.Filter = &model.WorkflowFilterInput{}
-		agentName, err := cmd.Flags().GetString("agent")
+		agentName, err := cmd.Flags().GetString("chaos-delegate")
 		utils.PrintError(err)
 		listWorkflowsRequest.Filter.ClusterName = &agentName
 
@@ -79,24 +79,24 @@ var workflowsCmd = &cobra.Command{
 		case "":
 
 			writer := tabwriter.NewWriter(os.Stdout, 4, 8, 1, '\t', 0)
-			utils.White_B.Fprintln(writer, "WORKFLOW ID\tWORKFLOW NAME\tWORKFLOW TYPE\tNEXT SCHEDULE\tAGENT ID\tAGENT NAME\tLAST UPDATED BY")
+			utils.White_B.Fprintln(writer, "CHAOS SCENARIO ID\tCHAOS SCENARIO NAME\tCHAOS SCENARIO TYPE\tNEXT SCHEDULE\tCHAOS DELEGATE ID\tCHAOS DELEGATE NAME\tLAST UPDATED BY")
 
 			for _, workflow := range workflows.Data.ListWorkflowDetails.Workflows {
 				if workflow.CronSyntax != "" {
 					utils.White.Fprintln(
 						writer,
-						workflow.WorkflowID+"\t"+workflow.WorkflowName+"\tCron Workflow\t"+cronexpr.MustParse(workflow.CronSyntax).Next(time.Now()).Format("January 2 2006, 03:04:05 pm")+"\t"+workflow.ClusterID+"\t"+workflow.ClusterName+"\t"+*workflow.LastUpdatedBy)
+						workflow.WorkflowID+"\t"+workflow.WorkflowName+"\tCron Chaos Scenario\t"+cronexpr.MustParse(workflow.CronSyntax).Next(time.Now()).Format("January 2 2006, 03:04:05 pm")+"\t"+workflow.ClusterID+"\t"+workflow.ClusterName+"\t"+*workflow.LastUpdatedBy)
 				} else {
 					utils.White.Fprintln(
 						writer,
-						workflow.WorkflowID+"\t"+workflow.WorkflowName+"\tNon Cron Workflow\tNone\t"+workflow.ClusterID+"\t"+workflow.ClusterName+"\t"+*workflow.LastUpdatedBy)
+						workflow.WorkflowID+"\t"+workflow.WorkflowName+"\tNon Cron Chaos Scenario\tNone\t"+workflow.ClusterID+"\t"+workflow.ClusterName+"\t"+*workflow.LastUpdatedBy)
 				}
 			}
 
 			if listAllWorkflows || (workflows.Data.ListWorkflowDetails.TotalNoOfWorkflows <= listWorkflowsRequest.Pagination.Limit) {
-				utils.White_B.Fprintln(writer, fmt.Sprintf("\nShowing %d of %d workflows", workflows.Data.ListWorkflowDetails.TotalNoOfWorkflows, workflows.Data.ListWorkflowDetails.TotalNoOfWorkflows))
+				utils.White_B.Fprintln(writer, fmt.Sprintf("\nShowing %d of %d Chaos Scenarios", workflows.Data.ListWorkflowDetails.TotalNoOfWorkflows, workflows.Data.ListWorkflowDetails.TotalNoOfWorkflows))
 			} else {
-				utils.White_B.Fprintln(writer, fmt.Sprintf("\nShowing %d of %d workflows", listWorkflowsRequest.Pagination.Limit, workflows.Data.ListWorkflowDetails.TotalNoOfWorkflows))
+				utils.White_B.Fprintln(writer, fmt.Sprintf("\nShowing %d of %d Chaos Scenarios", listWorkflowsRequest.Pagination.Limit, workflows.Data.ListWorkflowDetails.TotalNoOfWorkflows))
 			}
 			writer.Flush()
 		}
@@ -106,10 +106,10 @@ var workflowsCmd = &cobra.Command{
 func init() {
 	GetCmd.AddCommand(workflowsCmd)
 
-	workflowsCmd.Flags().String("project-id", "", "Set the project-id to list workflows from the particular project. To see the projects, apply litmusctl get projects")
-	workflowsCmd.Flags().Int("count", 30, "Set the count of workflows to display. Default value is 30")
-	workflowsCmd.Flags().Bool("all", false, "Set to true to display all workflows")
-	workflowsCmd.Flags().StringP("agent", "A", "", "Set the agent name to display all workflows targeted towards that particular agent.")
+	workflowsCmd.Flags().String("project-id", "", "Set the project-id to list Chaos Scenarios from the particular project. To see the projects, apply litmusctl get projects")
+	workflowsCmd.Flags().Int("count", 30, "Set the count of Chaos Scenarios to display. Default value is 30")
+	workflowsCmd.Flags().Bool("all", false, "Set to true to display all Chaos Scenarios")
+	workflowsCmd.Flags().StringP("chaos-delegate", "A", "", "Set the Chaos Delegate name to display all Chaos Scenarios targeted towards that particular Chaos Delegate.")
 
 	workflowsCmd.Flags().StringP("output", "o", "", "Output format. One of:\njson|yaml")
 }

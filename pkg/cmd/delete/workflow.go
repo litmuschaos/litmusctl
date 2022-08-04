@@ -25,13 +25,13 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// workflowCmd represents the workflow command
+// workflowCmd represents the Chaos Scenario command
 var workflowCmd = &cobra.Command{
-	Use: "workflow",
-	Short: `Delete a Chaos Workflow
+	Use: "chaos-scenario",
+	Short: `Delete a Chaos Scenario
 	Example:
-	#delete a chaos workflow
-	litmusctl delete workflow c520650e-7cb6-474c-b0f0-4df07b2b025b --project-id=c520650e-7cb6-474c-b0f0-4df07b2b025b
+	#delete a Chaos Scenario
+	litmusctl delete chaos-scenario c520650e-7cb6-474c-b0f0-4df07b2b025b --project-id=c520650e-7cb6-474c-b0f0-4df07b2b025b
 
 	Note: The default location of the config file is $HOME/.litmusconfig, and can be overridden by a --config flag
 	`,
@@ -58,13 +58,13 @@ var workflowCmd = &cobra.Command{
 
 		workflowID := args[0]
 
-		// Handle blank input for workflow ID
+		// Handle blank input for Chaos Scenario ID
 		if workflowID == "" {
-			utils.White_B.Print("\nEnter the Workflow ID: ")
+			utils.White_B.Print("\nEnter the Chaos Scenario ID: ")
 			fmt.Scanln(&workflowID)
 
 			if workflowID == "" {
-				utils.Red.Println("⛔ Workflow ID can't be empty!!")
+				utils.Red.Println("⛔ Chaos Scenario ID can't be empty!!")
 				os.Exit(1)
 			}
 		}
@@ -92,14 +92,14 @@ var workflowCmd = &cobra.Command{
 		// Make API call
 		deletedWorkflow, err := apis.DeleteChaosWorkflow(projectID, &workflowID, credentials)
 		if err != nil {
-			utils.Red.Println("\n❌ Error in deleting ChaosWorkflow: ", err.Error())
+			utils.Red.Println("\n❌ Error in deleting Chaos Scenario: ", err.Error())
 			os.Exit(1)
 		}
 
 		if deletedWorkflow.Data.IsDeleted {
-			utils.White_B.Println("\n🚀 ChaosWorkflow successfully deleted.")
+			utils.White_B.Println("\n🚀 Chaos Scenario successfully deleted.")
 		} else {
-			utils.White_B.Println("\n❌ Failed to delete ChaosWorkflow. Please check if the ID is correct or not.")
+			utils.White_B.Println("\n❌ Failed to delete Chaos Scenario. Please check if the ID is correct or not.")
 		}
 	},
 }
@@ -107,5 +107,5 @@ var workflowCmd = &cobra.Command{
 func init() {
 	DeleteCmd.AddCommand(workflowCmd)
 
-	workflowCmd.Flags().String("project-id", "", "Set the project-id to create workflow for the particular project. To see the projects, apply litmusctl get projects")
+	workflowCmd.Flags().String("project-id", "", "Set the project-id to create Chaos Scenario for the particular project. To see the projects, apply litmusctl get projects")
 }

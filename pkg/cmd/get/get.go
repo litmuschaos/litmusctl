@@ -26,14 +26,14 @@ var GetCmd = &cobra.Command{
 		#get list of projects accessed by the user
 		litmusctl get projects
 
-		#get list of agents within the project
-		litmusctl get agents --project-id=""
+		#get list of Chaos Delegates within the project
+		litmusctl get chaos-delegates --project-id=""
 
-		#get list of chaos workflows
-		litmusctl get workflows --project-id=""
+		#get list of chaos Chaos Scenarios
+		litmusctl get chaos-sceanrios --project-id=""
 
-		#get list of chaos workflow runs
-		litmusctl get workflowruns --project-id=""
+		#get list of Chaos Scenario runs
+		litmusctl get chaos-scenario-runs --project-id=""
 
 		Note: The default location of the config file is $HOME/.litmusconfig, and can be overridden by a --config flag
 	`,

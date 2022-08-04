@@ -81,7 +81,7 @@ func CreateWorkflow(requestData model.ChaosWorkFlowRequest, cred types.Credentia
 	bodyBytes, err := ioutil.ReadAll(resp.Body)
 	defer resp.Body.Close()
 	if err != nil {
-		return ChaosWorkflowCreationData{}, errors.New("Error in creating workflow: " + err.Error())
+		return ChaosWorkflowCreationData{}, errors.New("Error in creating Chaos Scenario: " + err.Error())
 	}
 
 	if resp.StatusCode == http.StatusOK {
@@ -89,7 +89,7 @@ func CreateWorkflow(requestData model.ChaosWorkFlowRequest, cred types.Credentia
 
 		err = json.Unmarshal(bodyBytes, &createdWorkflow)
 		if err != nil {
-			return ChaosWorkflowCreationData{}, errors.New("Error in creating workflow: " + err.Error())
+			return ChaosWorkflowCreationData{}, errors.New("Error in creating Chaos Scenario: " + err.Error())
 		}
 
 		// Errors present
@@ -191,7 +191,7 @@ func GetWorkflowList(in model.ListWorkflowsRequest, cred types.Credentials) (Wor
 
 		return workflowList, nil
 	} else {
-		return WorkflowListData{}, errors.New("Error while fetching the chaos workflows")
+		return WorkflowListData{}, errors.New("Error while fetching the Chaos Scenarios")
 	}
 }
 
@@ -283,7 +283,7 @@ func GetWorkflowRunsList(in model.ListWorkflowRunsRequest, cred types.Credential
 
 		return workflowRunsList, nil
 	} else {
-		return WorkflowRunsListData{}, errors.New("Error while fetching the chaos workflow runs")
+		return WorkflowRunsListData{}, errors.New("Error while fetching the Chaos Scenario runs")
 	}
 }
 
@@ -362,6 +362,6 @@ func DeleteChaosWorkflow(projectID string, workflowID *string, cred types.Creden
 
 		return deletedWorkflow, nil
 	} else {
-		return DeleteChaosWorkflowData{}, errors.New("Error while deleting the chaos workflow")
+		return DeleteChaosWorkflowData{}, errors.New("Error while deleting the Chaos Scenario")
 	}
 }

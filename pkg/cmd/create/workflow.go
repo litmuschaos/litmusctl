@@ -32,11 +32,11 @@ import (
 
 // workflowCmd represents the project command
 var workflowCmd = &cobra.Command{
-	Use: "workflow",
-	Short: `Create a Chaos Workflow
+	Use: "chaos-scenario",
+	Short: `Create a Chaos Scenario
 	Example:
-	#create a chaos workflow
-	litmusctl create workflow -f workflow.yaml --project-id="d861b650-1549-4574-b2ba-ab754058dd04" --agent-id="1c9c5801-8789-4ac9-bf5f-32649b707a5c"
+	#create a Chaos Scenario
+	litmusctl create chaos-scenario -f chaos-scenario.yaml --project-id="d861b650-1549-4574-b2ba-ab754058dd04" --chaos-delegate-id="1c9c5801-8789-4ac9-bf5f-32649b707a5c"
 
 	Note: The default location of the config file is $HOME/.litmusconfig, and can be overridden by a --config flag
 	`,
@@ -65,16 +65,16 @@ var workflowCmd = &cobra.Command{
 			}
 		}
 
-		chaosWorkFlowRequest.ClusterID, err = cmd.Flags().GetString("agent-id")
+		chaosWorkFlowRequest.ClusterID, err = cmd.Flags().GetString("chaos-delegate-id")
 		utils.PrintError(err)
 
-		// Handle blank input for agent ID
+		// Handle blank input for Chaos Delegate ID
 		if chaosWorkFlowRequest.ClusterID == "" {
-			utils.White_B.Print("\nEnter the Agent ID: ")
+			utils.White_B.Print("\nEnter the Chaos Delegate ID: ")
 			fmt.Scanln(&chaosWorkFlowRequest.ClusterID)
 
 			if chaosWorkFlowRequest.ClusterID == "" {
-				utils.Red.Println("⛔ Agent ID can't be empty!!")
+				utils.Red.Println("⛔ Chaos Delegate ID can't be empty!!")
 				os.Exit(1)
 			}
 		}
@@ -102,7 +102,7 @@ var workflowCmd = &cobra.Command{
 		// Parse workflow manifest and populate chaosWorkFlowInput
 		err = utils.ParseWorkflowManifest(workflowManifest, &chaosWorkFlowRequest)
 		if err != nil {
-			utils.Red.Println("❌ Error parsing workflow manifest: " + err.Error())
+			utils.Red.Println("❌ Error parsing Chaos Scenario manifest: " + err.Error())
 			os.Exit(1)
 		}
 
@@ -111,22 +111,22 @@ var workflowCmd = &cobra.Command{
 		if err != nil {
 			if (createdWorkflow.Data == apis.CreatedChaosWorkflow{}) {
 				if strings.Contains(err.Error(), "multiple write errors") {
-					utils.Red.Println("\n❌ ChaosWorkflow/" + chaosWorkFlowRequest.WorkflowName + " already exists")
+					utils.Red.Println("\n❌ Chaos Scenario/" + chaosWorkFlowRequest.WorkflowName + " already exists")
 					os.Exit(1)
 				} else {
-					utils.White_B.Print("\n❌ ChaosWorkflow/" + chaosWorkFlowRequest.WorkflowName + " failed to be created: " + err.Error())
+					utils.White_B.Print("\n❌ Chaos Scenario/" + chaosWorkFlowRequest.WorkflowName + " failed to be created: " + err.Error())
 					os.Exit(1)
 				}
 			}
 		}
 
 		// Successful creation
-		utils.White_B.Println("\n🚀 ChaosWorkflow/" + createdWorkflow.Data.CreateChaosWorkflow.WorkflowName + " successfully created 🎉")
+		utils.White_B.Println("\n🚀 ChaosScenario/" + createdWorkflow.Data.CreateChaosWorkflow.WorkflowName + " successfully created 🎉")
 		if createdWorkflow.Data.CreateChaosWorkflow.CronSyntax == "" {
-			utils.White_B.Println("\nThe next run of this workflow will be scheduled immediately.")
+			utils.White_B.Println("\nThe next run of this Chaos Scenario will be scheduled immediately.")
 		} else {
 			utils.White_B.Println(
-				"\nThe next run of this workflow will be scheduled at " +
+				"\nThe next run of this Chaos Scenario will be scheduled at " +
 					cronexpr.MustParse(createdWorkflow.Data.CreateChaosWorkflow.CronSyntax).Next(time.Now()).Format("January 2nd 2006, 03:04:05 pm"))
 		}
 	},
@@ -135,8 +135,7 @@ var workflowCmd = &cobra.Command{
 func init() {
 	CreateCmd.AddCommand(workflowCmd)
 
-	workflowCmd.Flags().String("project-id", "", "Set the project-id to create workflow for the particular project. To see the projects, apply litmusctl get projects")
-	workflowCmd.Flags().String("agent-id", "", "Set the agent-id to create workflow for the particular agent. To see the agents, apply litmusctl get agents")
-
-	workflowCmd.Flags().StringP("file", "f", "", "The manifest file for the workflow")
+	workflowCmd.Flags().String("project-id", "", "Set the project-id to create Chaos Scenario for the particular project. To see the projects, apply litmusctl get projects")
+	workflowCmd.Flags().String("chaos-delegate-id", "", "Set the chaos-delegate-id to create Chaos Scenario for the particular Chaos Delegate. To see the Chaos Delegates, apply litmusctl get chaos-delegates")
+	workflowCmd.Flags().StringP("file", "f", "", "The manifest file for the Chaos Scenario")
 }

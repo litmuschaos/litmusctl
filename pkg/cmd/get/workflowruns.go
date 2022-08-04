@@ -28,11 +28,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// workflowRunsCmd represents the workflow runs command
+// workflowRunsCmd represents the Chaos Scenario runs command
 var workflowRunsCmd = &cobra.Command{
-	Use:   "workflowruns",
-	Short: "Display list of workflow runs within the project",
-	Long:  `Display list of workflow runs within the project`,
+	Use:   "chaos-scenario-runs",
+	Short: "Display list of Chaos Scenario runs within the project",
+	Long:  `Display list of Chaos Scenario runs within the project`,
 	Run: func(cmd *cobra.Command, args []string) {
 		credentials, err := utils.GetCredentials(cmd)
 		utils.PrintError(err)
@@ -74,7 +74,7 @@ var workflowRunsCmd = &cobra.Command{
 		case "":
 
 			writer := tabwriter.NewWriter(os.Stdout, 4, 8, 1, '\t', 0)
-			utils.White_B.Fprintln(writer, "WORKFLOW RUN ID\tSTATUS\tRESILIENCY SCORE\tWORKFLOW ID\tWORKFLOW NAME\tTARGET AGENT\tLAST RUN\tEXECUTED BY")
+			utils.White_B.Fprintln(writer, "CHAOS SCENARIO RUN ID\tSTATUS\tRESILIENCY SCORE\tCHAOS SCENARIO ID\tCHAOS SCENARIO NAME\tTARGET CHAOS DELEGATE\tLAST RUN\tEXECUTED BY")
 
 			for _, workflowRun := range workflowRuns.Data.ListWorkflowRunsDetails.WorkflowRuns {
 
@@ -92,9 +92,9 @@ var workflowRunsCmd = &cobra.Command{
 			}
 
 			if listAllWorkflowRuns || (workflowRuns.Data.ListWorkflowRunsDetails.TotalNoOfWorkflowRuns <= listWorkflowRunsRequest.Pagination.Limit) {
-				utils.White_B.Fprintln(writer, fmt.Sprintf("\nShowing %d of %d workflow runs", workflowRuns.Data.ListWorkflowRunsDetails.TotalNoOfWorkflowRuns, workflowRuns.Data.ListWorkflowRunsDetails.TotalNoOfWorkflowRuns))
+				utils.White_B.Fprintln(writer, fmt.Sprintf("\nShowing %d of %d Chaos Scenario runs", workflowRuns.Data.ListWorkflowRunsDetails.TotalNoOfWorkflowRuns, workflowRuns.Data.ListWorkflowRunsDetails.TotalNoOfWorkflowRuns))
 			} else {
-				utils.White_B.Fprintln(writer, fmt.Sprintf("\nShowing %d of %d workflow runs", listWorkflowRunsRequest.Pagination.Limit, workflowRuns.Data.ListWorkflowRunsDetails.TotalNoOfWorkflowRuns))
+				utils.White_B.Fprintln(writer, fmt.Sprintf("\nShowing %d of %d Chaos Scenario runs", listWorkflowRunsRequest.Pagination.Limit, workflowRuns.Data.ListWorkflowRunsDetails.TotalNoOfWorkflowRuns))
 			}
 
 			writer.Flush()
@@ -105,9 +105,9 @@ var workflowRunsCmd = &cobra.Command{
 func init() {
 	GetCmd.AddCommand(workflowRunsCmd)
 
-	workflowRunsCmd.Flags().String("project-id", "", "Set the project-id to list workflows from the particular project. To see the projects, apply litmusctl get projects")
-	workflowRunsCmd.Flags().Int("count", 30, "Set the count of workflow runs to display. Default value is 30")
-	workflowRunsCmd.Flags().BoolP("all", "A", false, "Set to true to display all workflow runs")
+	workflowRunsCmd.Flags().String("project-id", "", "Set the project-id to list Chaos Scenarios from the particular project. To see the projects, apply litmusctl get projects")
+	workflowRunsCmd.Flags().Int("count", 30, "Set the count of Chaos Scenario runs to display. Default value is 30")
+	workflowRunsCmd.Flags().BoolP("all", "A", false, "Set to true to display all Chaos Scenario runs")
 
 	workflowRunsCmd.Flags().StringP("output", "o", "", "Output format. One of:\njson|yaml")
 }

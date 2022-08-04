@@ -86,7 +86,7 @@ func UpgradeAgent(c context.Context, cred types.Credentials, projectID string, c
 		}
 
 		// To write the manifest data into a temporary file
-		err = ioutil.WriteFile("agent-manifest.yaml", []byte(manifest.Data.GetManifest), 0644)
+		err = ioutil.WriteFile("chaos-delegate-manifest.yaml", []byte(manifest.Data.GetManifest), 0644)
 		if err != nil {
 			return "", err
 		}
@@ -118,7 +118,7 @@ func UpgradeAgent(c context.Context, cred types.Credentials, projectID string, c
 		yamlOutput, err := k8s.ApplyYaml(k8s.ApplyYamlPrams{
 			Token:    cred.Token,
 			Endpoint: cred.Endpoint,
-			YamlPath: "agent-manifest.yaml",
+			YamlPath: "chaos-delegate-manifest.yaml",
 		}, "", true)
 
 		if err != nil {
@@ -126,9 +126,9 @@ func UpgradeAgent(c context.Context, cred types.Credentials, projectID string, c
 		}
 		utils.White.Print("\n", yamlOutput)
 
-		err = os.Remove("agent-manifest.yaml")
+		err = os.Remove("chaos-delegate-manifest.yaml")
 		if err != nil {
-			return "Error removing agent manifest: ", err
+			return "Error removing Chaos Delegate manifest: ", err
 		}
 
 		// Creating a backup for current agent-config in the SUBSCRIBER

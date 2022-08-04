@@ -4,7 +4,7 @@
 [![GitHub stars](https://img.shields.io/github/stars/litmuschaos/litmusctl?style=social)](https://github.com/litmuschaos/litmusctl/stargazers)
 [![GitHub Release](https://img.shields.io/github/release/litmuschaos/litmusctl.svg?style=flat)]()
 
-The Litmuschaos command-line tool, litmusctl, allows you to manage litmuschaos's agent plane. You can use litmusctl to create agents, project, and manage multiple litmuschaos accounts. 
+The Litmuschaos command-line tool, litmusctl, allows you to manage litmuschaos's agent plane. You can use litmusctl to connect Chaos Delegates, create project, schedule Chaos Scenarios, disconnect Chaos Delegates and manage multiple litmuschaos accounts. 
 
 ## Usage
 For more information including a complete list of litmusctl operations, see the litmusctl reference documentation.
@@ -17,7 +17,7 @@ For more information including a complete list of litmusctl operations, see the 
 
 The litmusctl CLI requires the following things:
 
-- kubeconfig - litmusctl needs the kubeconfig of the k8s cluster where we need to connect litmus agents. The CLI currently uses the default path of kubeconfig i.e. `~/.kube/config`.
+- kubeconfig - litmusctl needs the kubeconfig of the k8s cluster where we need to connect litmus Chaos Delegates. The CLI currently uses the default path of kubeconfig i.e. `~/.kube/config`.
 - kubectl- litmusctl is using kubectl under the hood to apply the manifest. To install kubectl, follow:  [kubectl](https://kubernetes.io/docs/tasks/tools/#kubectl)
 
 
