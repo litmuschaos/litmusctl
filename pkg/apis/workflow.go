@@ -34,23 +34,6 @@ type ChaosWorkflowCreationData struct {
 	Data CreatedChaosWorkflow `json:"data"`
 }
 
-type ServerVersionResponse struct {
-	Data   ServerVersionData `json:"data"`
-	Errors []struct {
-		Message string   `json:"message"`
-		Path    []string `json:"path"`
-	} `json:"errors"`
-}
-
-type ServerVersionData struct {
-	GetServerVersion GetServerVersionData `json:"getServerVersion"`
-}
-
-type GetServerVersionData struct {
-	Key   string `json:"key"`
-	Value string `json:"value"`
-}
-
 type CreatedChaosWorkflow struct {
 	CreateChaosWorkflow model.ChaosWorkFlowResponse `json:"createChaosWorkFlow"`
 }
@@ -120,14 +103,299 @@ func CreateWorkflow(requestData model.ChaosWorkFlowRequest, cred types.Credentia
 	}
 }
 
+type WorkflowListData struct {
+	Errors []struct {
+		Message string   `json:"message"`
+		Path    []string `json:"path"`
+	} `json:"errors"`
+	Data WorkflowList `json:"data"`
+}
+
+type WorkflowList struct {
+	ListWorkflowDetails model.ListWorkflowsResponse `json:"listWorkflows"`
+}
+
+type GetChaosWorkFlowsGraphQLRequest struct {
+	Query     string `json:"query"`
+	Variables struct {
+		GetChaosWorkFlowsRequest model.ListWorkflowsRequest `json:"request"`
+	} `json:"variables"`
+}
+
+// GetWorkflowList sends GraphQL API request for fetching a list of workflows.
+func GetWorkflowList(in model.ListWorkflowsRequest, cred types.Credentials) (WorkflowListData, error) {
+
+	var gqlReq GetChaosWorkFlowsGraphQLRequest
+	var err error
+
+	gqlReq.Query = `query listWorkflows($request: ListWorkflowsRequest!) {
+                      listWorkflows(request: $request) {
+                        totalNoOfWorkflows
+                        workflows {
+                          workflowID
+                          workflowManifest
+                          cronSyntax
+                          clusterName
+                          workflowName
+                          workflowDescription
+                          weightages {
+                            experimentName
+                            weightage
+                          }
+                          isCustomWorkflow
+                          updatedAt
+                          createdAt
+                          projectID
+                          clusterID
+                          clusterType
+                          isRemoved
+                          lastUpdatedBy
+                        }
+                      }
+                    }`
+	gqlReq.Variables.GetChaosWorkFlowsRequest = in
+
+	query, err := json.Marshal(gqlReq)
+	if err != nil {
+		return WorkflowListData{}, err
+	}
+
+	resp, err := SendRequest(
+		SendRequestParams{
+			Endpoint: cred.Endpoint + utils.GQLAPIPath,
+			Token:    cred.Token,
+		},
+		query,
+		string(types.Post),
+	)
+	if err != nil {
+		return WorkflowListData{}, err
+	}
+
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	defer resp.Body.Close()
+	if err != nil {
+		return WorkflowListData{}, err
+	}
+
+	if resp.StatusCode == http.StatusOK {
+		var workflowList WorkflowListData
+		err = json.Unmarshal(bodyBytes, &workflowList)
+		if err != nil {
+			return WorkflowListData{}, err
+		}
+
+		if len(workflowList.Errors) > 0 {
+			return WorkflowListData{}, errors.New(workflowList.Errors[0].Message)
+		}
+
+		return workflowList, nil
+	} else {
+		return WorkflowListData{}, errors.New("Error while fetching the chaos workflows")
+	}
+}
+
+type WorkflowRunsListData struct {
+	Errors []struct {
+		Message string   `json:"message"`
+		Path    []string `json:"path"`
+	} `json:"errors"`
+	Data WorkflowRunsList `json:"data"`
+}
+
+type WorkflowRunsList struct {
+	ListWorkflowRunsDetails model.ListWorkflowRunsResponse `json:"listWorkflowRuns"`
+}
+
+type GetChaosWorkFlowRunsGraphQLRequest struct {
+	Query     string `json:"query"`
+	Variables struct {
+		GetChaosWorkFlowRunsRequest model.ListWorkflowRunsRequest `json:"request"`
+	} `json:"variables"`
+}
+
+// GetWorkflowRunsList sends GraphQL API request for fetching a list of workflow runs.
+func GetWorkflowRunsList(in model.ListWorkflowRunsRequest, cred types.Credentials) (WorkflowRunsListData, error) {
+
+	var gqlReq GetChaosWorkFlowRunsGraphQLRequest
+	var err error
+
+	gqlReq.Query = `query listWorkflowRuns($request: ListWorkflowRunsRequest!) {
+                      listWorkflowRuns(request: $request) {
+                        totalNoOfWorkflowRuns
+                        workflowRuns {
+                          workflowRunID
+                          workflowID
+                          clusterName
+                          workflowName
+                          projectID
+                          clusterID
+                          clusterType
+                          isRemoved
+                          lastUpdated
+                          phase
+                          resiliencyScore
+                          experimentsPassed
+                          experimentsFailed
+                          experimentsAwaited
+                          experimentsStopped
+                          experimentsNa
+                          totalExperiments
+                          executedBy
+                        }
+                      }
+                    }`
+	gqlReq.Variables.GetChaosWorkFlowRunsRequest = in
+
+	query, err := json.Marshal(gqlReq)
+	if err != nil {
+		return WorkflowRunsListData{}, err
+	}
+
+	resp, err := SendRequest(
+		SendRequestParams{
+			Endpoint: cred.Endpoint + utils.GQLAPIPath,
+			Token:    cred.Token,
+		},
+		query,
+		string(types.Post),
+	)
+	if err != nil {
+		return WorkflowRunsListData{}, err
+	}
+
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	defer resp.Body.Close()
+	if err != nil {
+		return WorkflowRunsListData{}, err
+	}
+
+	if resp.StatusCode == http.StatusOK {
+		var workflowRunsList WorkflowRunsListData
+		err = json.Unmarshal(bodyBytes, &workflowRunsList)
+		if err != nil {
+			return WorkflowRunsListData{}, err
+		}
+
+		if len(workflowRunsList.Errors) > 0 {
+			return WorkflowRunsListData{}, errors.New(workflowRunsList.Errors[0].Message)
+		}
+
+		return workflowRunsList, nil
+	} else {
+		return WorkflowRunsListData{}, errors.New("Error while fetching the chaos workflow runs")
+	}
+}
+
+type DeleteChaosWorkflowData struct {
+	Errors []struct {
+		Message string   `json:"message"`
+		Path    []string `json:"path"`
+	} `json:"errors"`
+	Data DeleteChaosWorkflowDetails `json:"data"`
+}
+
+type DeleteChaosWorkflowDetails struct {
+	IsDeleted bool `json:"deleteChaosWorkflow"`
+}
+
+type DeleteChaosWorkflowGraphQLRequest struct {
+	Query     string `json:"query"`
+	Variables struct {
+		ProjectID     string  `json:"projectID"`
+		WorkflowID    *string `json:"workflowID"`
+		WorkflowRunID *string `json:"workflowRunID"`
+	} `json:"variables"`
+}
+
+// DeleteChaosWorkflow sends GraphQL API request for deleting a given Chaos Workflow.
+func DeleteChaosWorkflow(projectID string, workflowID *string, cred types.Credentials) (DeleteChaosWorkflowData, error) {
+
+	var gqlReq DeleteChaosWorkflowGraphQLRequest
+	var err error
+
+	gqlReq.Query = `mutation deleteChaosWorkflow($projectID: String!, $workflowID: String, $workflowRunID: String) {
+                      deleteChaosWorkflow(
+                        projectID: $projectID
+                        workflowID: $workflowID
+                        workflowRunID: $workflowRunID
+                      )
+                    }`
+	gqlReq.Variables.ProjectID = projectID
+	gqlReq.Variables.WorkflowID = workflowID
+	var workflow_run_id string = ""
+	gqlReq.Variables.WorkflowRunID = &workflow_run_id
+
+	query, err := json.Marshal(gqlReq)
+	if err != nil {
+		return DeleteChaosWorkflowData{}, err
+	}
+
+	resp, err := SendRequest(
+		SendRequestParams{
+			Endpoint: cred.Endpoint + utils.GQLAPIPath,
+			Token:    cred.Token,
+		},
+		query,
+		string(types.Post),
+	)
+	if err != nil {
+		return DeleteChaosWorkflowData{}, err
+	}
+
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	defer resp.Body.Close()
+	if err != nil {
+		return DeleteChaosWorkflowData{}, err
+	}
+
+	if resp.StatusCode == http.StatusOK {
+		var deletedWorkflow DeleteChaosWorkflowData
+		err = json.Unmarshal(bodyBytes, &deletedWorkflow)
+		if err != nil {
+			return DeleteChaosWorkflowData{}, err
+		}
+
+		if len(deletedWorkflow.Errors) > 0 {
+			return DeleteChaosWorkflowData{}, errors.New(deletedWorkflow.Errors[0].Message)
+		}
+
+		return deletedWorkflow, nil
+	} else {
+		return DeleteChaosWorkflowData{}, errors.New("Error while deleting the chaos workflow")
+	}
+}
+
+type ServerVersionResponse struct {
+	Data   ServerVersionData `json:"data"`
+	Errors []struct {
+		Message string   `json:"message"`
+		Path    []string `json:"path"`
+	} `json:"errors"`
+}
+
+type ServerVersionData struct {
+	GetServerVersion GetServerVersionData `json:"getServerVersion"`
+}
+
+type GetServerVersionData struct {
+	Key   string `json:"key"`
+	Value string `json:"value"`
+}
+
 // GetServerVersion lists the agent connected to the specified project
 func GetServerVersion() (ServerVersionResponse, error) {
-	query := `{"query":"query{\n  getServerVersion{\n  key value\n  }\n}"}`
-	resp, err := SendRequest(SendRequestParams{Endpoint: "http://localhost:8080/query"}, []byte(query), string(types.Post))
+	query := `{“query”:“query{\n  getServerVersion{\n  key value\n  }\n}“}`
+	resp, err := SendRequest(
+		SendRequestParams{
+			Endpoint: "http://localhost:8080/query",
+		},
+		[]byte(query),
+		string(types.Post),
+	)
 	if err != nil {
 		return ServerVersionResponse{}, err
 	}
-
 	bodyBytes, err := ioutil.ReadAll(resp.Body)
 	defer resp.Body.Close()
 	if err != nil {
@@ -139,11 +407,9 @@ func GetServerVersion() (ServerVersionResponse, error) {
 		if err != nil {
 			return ServerVersionResponse{}, err
 		}
-
 		if len(version.Errors) > 0 {
 			return ServerVersionResponse{}, errors.New(version.Errors[0].Message)
 		}
-
 		return version, nil
 	} else {
 		return ServerVersionResponse{}, err

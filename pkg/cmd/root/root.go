@@ -24,6 +24,8 @@ import (
 	"os"
 
 	"github.com/litmuschaos/litmusctl/pkg/cmd/connect"
+	"github.com/litmuschaos/litmusctl/pkg/cmd/delete"
+	"github.com/litmuschaos/litmusctl/pkg/cmd/describe"
 	"github.com/litmuschaos/litmusctl/pkg/cmd/disconnect"
 	"github.com/litmuschaos/litmusctl/pkg/cmd/upgrade"
 	"github.com/litmuschaos/litmusctl/pkg/cmd/version"
@@ -62,6 +64,8 @@ func init() {
 	rootCmd.AddCommand(get.GetCmd)
 	rootCmd.AddCommand(connect.ConnectCmd)
 	rootCmd.AddCommand(disconnect.DisconnectCmd)
+	rootCmd.AddCommand(delete.DeleteCmd)
+	rootCmd.AddCommand(describe.DescribeCmd)
 	rootCmd.AddCommand(version.VersionCmd)
 	rootCmd.AddCommand(upgrade.UpgradeCmd)
 
