@@ -29,6 +29,14 @@ var VersionCmd = &cobra.Command{
 	Short: "Displays the version of litmusctl",
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
+		compatibilityArr := utils.CompatibilityMatrix[os.Getenv("CLIVersion")]
 		utils.White_B.Println("Litmusctl version: ", os.Getenv("CLIVersion"))
+		utils.White_B.Println("Compatible ChaosCenter versions: ")
+		utils.White_B.Print("[ ")
+		for _, v := range compatibilityArr {
+			utils.White_B.Print("'" + v + "' ")
+		}
+		utils.White_B.Print("]")
+		utils.White_B.Println("")
 	},
 }

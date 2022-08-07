@@ -34,6 +34,23 @@ type ChaosWorkflowCreationData struct {
 	Data CreatedChaosWorkflow `json:"data"`
 }
 
+type ServerVersionResponse struct {
+	Data   ServerVersionData `json:"data"`
+	Errors []struct {
+		Message string   `json:"message"`
+		Path    []string `json:"path"`
+	} `json:"errors"`
+}
+
+type ServerVersionData struct {
+	GetServerVersion GetServerVersionData `json:"getServerVersion"`
+}
+
+type GetServerVersionData struct {
+	Key   string `json:"key"`
+	Value string `json:"value"`
+}
+
 type CreatedChaosWorkflow struct {
 	CreateChaosWorkflow model.ChaosWorkFlowResponse `json:"createChaosWorkFlow"`
 }
@@ -100,5 +117,35 @@ func CreateWorkflow(requestData model.ChaosWorkFlowRequest, cred types.Credentia
 		return createdWorkflow, nil
 	} else {
 		return ChaosWorkflowCreationData{}, err
+	}
+}
+
+// GetServerVersion lists the agent connected to the specified project
+func GetServerVersion() (ServerVersionResponse, error) {
+	query := `{"query":"query{\n  getServerVersion{\n  key value\n  }\n}"}`
+	resp, err := SendRequest(SendRequestParams{Endpoint: "http://localhost:8080/query"}, []byte(query), string(types.Post))
+	if err != nil {
+		return ServerVersionResponse{}, err
+	}
+
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	defer resp.Body.Close()
+	if err != nil {
+		return ServerVersionResponse{}, err
+	}
+	if resp.StatusCode == http.StatusOK {
+		var version ServerVersionResponse
+		err = json.Unmarshal(bodyBytes, &version)
+		if err != nil {
+			return ServerVersionResponse{}, err
+		}
+
+		if len(version.Errors) > 0 {
+			return ServerVersionResponse{}, errors.New(version.Errors[0].Message)
+		}
+
+		return version, nil
+	} else {
+		return ServerVersionResponse{}, err
 	}
 }

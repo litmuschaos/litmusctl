@@ -158,6 +158,32 @@ var setAccountCmd = &cobra.Command{
 			}
 			utils.White_B.Printf("\naccount.username/%s configured", claims["username"].(string))
 
+			serverResp, err := apis.GetServerVersion()
+			var isCompatible bool
+			if err != nil {
+				utils.Red.Println("\nError: ", err)
+			} else {
+				compatibilityArr := utils.CompatibilityMatrix[os.Getenv("CLIVersion")]
+				for _, v := range compatibilityArr {
+					if v == serverResp.Data.GetServerVersion.Value {
+						isCompatible = true
+					}
+				}
+
+				if isCompatible == false {
+					utils.Red.Println("\n🚫 ChaosCenter version: " + serverResp.Data.GetServerVersion.Value + " is not compatible with the installed LitmusCTL version: " + os.Getenv("CLIVersion"))
+					utils.White_B.Println("Compatible ChaosCenter versions are: ")
+					utils.White_B.Print("[ ")
+					for _, v := range compatibilityArr {
+						utils.White_B.Print("'" + v + "' ")
+					}
+					utils.White_B.Print("]")
+					utils.White_B.Println("")
+				} else {
+					utils.White_B.Println("\n✅  Installed versions of ChaosCenter and LitmusCTL are compatible! ")
+				}
+			}
+
 		} else {
 			utils.Red.Println("\nError: some flags are missing. Run 'litmusctl config set-account --help' for usage. ")
 		}
