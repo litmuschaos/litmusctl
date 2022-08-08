@@ -36,7 +36,6 @@ var VersionCmd = &cobra.Command{
 		for _, v := range compatibilityArr {
 			utils.White_B.Print("'" + v + "' ")
 		}
-		utils.White_B.Print("]")
-		utils.White_B.Println("")
+		utils.White_B.Print("]\n")
 	},
 }
