@@ -170,7 +170,7 @@ var setAccountCmd = &cobra.Command{
 					}
 				}
 
-				if isCompatible == false {
+				if !isCompatible {
 					utils.Red.Println("\n🚫 ChaosCenter version: " + serverResp.Data.GetServerVersion.Value + " is not compatible with the installed LitmusCTL version: " + os.Getenv("CLIVersion"))
 					utils.White_B.Println("Compatible ChaosCenter versions are: ")
 					utils.White_B.Print("[ ")
