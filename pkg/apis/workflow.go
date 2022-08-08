@@ -383,12 +383,12 @@ type GetServerVersionData struct {
 	Value string `json:"value"`
 }
 
-// GetServerVersion lists the agent connected to the specified project
-func GetServerVersion() (ServerVersionResponse, error) {
+// GetServerVersion fetches the GQL server version
+func GetServerVersion(endpoint string) (ServerVersionResponse, error) {
 	query := `{“query”:“query{\n  getServerVersion{\n  key value\n  }\n}“}`
 	resp, err := SendRequest(
 		SendRequestParams{
-			Endpoint: "http://localhost:8080/query",
+			Endpoint: endpoint + utils.GQLAPIPath,
 		},
 		[]byte(query),
 		string(types.Post),

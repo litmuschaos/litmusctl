@@ -158,7 +158,7 @@ var setAccountCmd = &cobra.Command{
 			}
 			utils.White_B.Printf("\naccount.username/%s configured", claims["username"].(string))
 
-			serverResp, err := apis.GetServerVersion()
+			serverResp, err := apis.GetServerVersion(authInput.Endpoint)
 			var isCompatible bool
 			if err != nil {
 				utils.Red.Println("\nError: ", err)
