@@ -24,8 +24,8 @@ var DescribeCmd = &cobra.Command{
 	Use: "describe",
 	Short: `Describe resources for LitmusChaos agent plane.
 		Examples:
-		#describe a ChaosWorkflow
-		litmusctl describe workflow d861b650-1549-4574-b2ba-ab754058dd04 --project-id="d861b650-1549-4574-b2ba-ab754058dd04"
+		#describe a Chaos Scenario
+		litmusctl describe chaos-scenario d861b650-1549-4574-b2ba-ab754058dd04 --project-id="d861b650-1549-4574-b2ba-ab754058dd04"
 
 		Note: The default location of the config file is $HOME/.litmusconfig, and can be overridden by a --config flag
 	`,

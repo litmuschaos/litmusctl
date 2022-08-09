@@ -29,16 +29,16 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// agentCmd represents the agent command
+// agentCmd represents the Chaos Delegate command
 var agentCmd = &cobra.Command{
-	Use: "agent",
-	Short: `Connect an external agent.
+	Use: "chaos-delegate",
+	Short: `Connect an external Chaos Delegate.
 	Example(s):
-	#connect an agent
-	litmusctl connect agent --agent-name="new-agent" --non-interactive
+	#connect a Chaos Delegate
+	litmusctl connect chaos-delegate --name="new-chaos-delegate" --non-interactive
 
-	#connect an agent within a project
-	litmusctl connect agent --agent-name="new-agent" --project-id="d861b650-1549-4574-b2ba-ab754058dd04" --non-interactive
+	#connect a Chaos Delegate within a project
+	litmusctl connect chaos-delegate --name="new-chaos-delegate" --project-id="d861b650-1549-4574-b2ba-ab754058dd04" --non-interactive
 
 	Note: The default location of the config file is $HOME/.litmusconfig, and can be overridden by a --config flag
 `,
@@ -92,18 +92,18 @@ var agentCmd = &cobra.Command{
 				os.Exit(1)
 			}
 
-			newAgent.AgentName, err = cmd.Flags().GetString("agent-name")
+			newAgent.AgentName, err = cmd.Flags().GetString("name")
 			utils.PrintError(err)
 
-			newAgent.SkipSSL, err = cmd.Flags().GetBool("skip-agent-ssl")
+			newAgent.SkipSSL, err = cmd.Flags().GetBool("skip-ssl")
 			utils.PrintError(err)
 
 			if newAgent.AgentName == "" {
-				utils.Red.Print("Error: --agent-name flag is empty")
+				utils.Red.Print("Error: --name flag is empty")
 				os.Exit(1)
 			}
 
-			newAgent.Description, err = cmd.Flags().GetString("agent-description")
+			newAgent.Description, err = cmd.Flags().GetString("description")
 			utils.PrintError(err)
 
 			newAgent.PlatformName, err = cmd.Flags().GetString("platform-name")
@@ -114,10 +114,10 @@ var agentCmd = &cobra.Command{
 				os.Exit(1)
 			}
 
-			newAgent.ClusterType, err = cmd.Flags().GetString("cluster-type")
+			newAgent.ClusterType, err = cmd.Flags().GetString("chaos-delegate-type")
 			utils.PrintError(err)
 			if newAgent.ClusterType == "" {
-				utils.Red.Print("Error: --cluster-type flag is empty")
+				utils.Red.Print("Error: --chaos-delegate-type flag is empty")
 				os.Exit(1)
 			}
 
@@ -236,7 +236,7 @@ var agentCmd = &cobra.Command{
 
 		agent, err := apis.ConnectAgent(newAgent, credentials)
 		if err != nil {
-			utils.Red.Println("\n❌ Agent connection failed: " + err.Error() + "\n")
+			utils.Red.Println("\n❌ Chaos Delegate connection failed: " + err.Error() + "\n")
 			os.Exit(1)
 		}
 
@@ -250,7 +250,7 @@ var agentCmd = &cobra.Command{
 
 		// Print error message in case Data field is null in response
 		if (agent.Data == apis.AgentConnect{}) {
-			utils.White_B.Print("\n🚫 Agent connection failed: " + agent.Errors[0].Message + "\n")
+			utils.White_B.Print("\n🚫 Chaos Delegate connection failed: " + agent.Errors[0].Message + "\n")
 			os.Exit(1)
 		}
 
@@ -271,8 +271,8 @@ var agentCmd = &cobra.Command{
 		// Watch subscriber pod status
 		k8s.WatchPod(k8s.WatchPodParams{Namespace: newAgent.Namespace, Label: utils.ChaosAgentLabel}, &kubeconfig)
 
-		utils.White_B.Println("\n🚀 Agent Connection Successful!! 🎉")
-		utils.White_B.Println("👉 Litmus agents can be accessed here: " + fmt.Sprintf("%s/%s", credentials.Endpoint, utils.ChaosAgentPath))
+		utils.White_B.Println("\n🚀 Chaos Delegate connection successful!! 🎉")
+		utils.White_B.Println("👉 Litmus Chaos Delegates can be accessed here: " + fmt.Sprintf("%s/%s", credentials.Endpoint, utils.ChaosAgentPath))
 	},
 }
 
@@ -283,16 +283,16 @@ func init() {
 	agentCmd.Flags().StringP("kubeconfig", "k", "", "Set to pass kubeconfig file if it is not in the default location ($HOME/.kube/config)")
 	agentCmd.Flags().String("tolerations", "", "Set to pass kubeconfig file if it is not in the default location ($HOME/.kube/config)")
 
-	agentCmd.Flags().String("project-id", "", "Set the project-id to install agent for the particular project. To see the projects, apply litmusctl get projects")
-	agentCmd.Flags().String("installation-mode", "cluster", "Set the installation mode for the kind of agent | Supported=cluster/namespace")
-	agentCmd.Flags().String("agent-name", "", "Set the agent name")
-	agentCmd.Flags().String("agent-description", "---", "Set the agent description")
+	agentCmd.Flags().String("project-id", "", "Set the project-id to install Chaos Delegate for the particular project. To see the projects, apply litmusctl get projects")
+	agentCmd.Flags().String("installation-mode", "cluster", "Set the installation mode for the kind of Chaos Delegate | Supported=cluster/namespace")
+	agentCmd.Flags().String("name", "", "Set the Chaos Delegate name")
+	agentCmd.Flags().String("description", "---", "Set the Chaos Delegate description")
 	agentCmd.Flags().String("platform-name", "Others", "Set the platform name. Supported- AWS/GKE/Openshift/Rancher/Others")
-	agentCmd.Flags().String("cluster-type", "external", "Set the cluster-type to external for external agents | Supported=external/internal")
-	agentCmd.Flags().String("node-selector", "", "Set the node-selector for agent components | Format: \"key1=value1,key2=value2\")")
-	agentCmd.Flags().String("namespace", "litmus", "Set the namespace for the agent installation")
-	agentCmd.Flags().String("service-account", "litmus", "Set the service account to be used by the agent")
-	agentCmd.Flags().Bool("skip-agent-ssl", false, "Set whether agent will skip ssl/tls check (can be used for self-signed certs, if cert is not provided in portal)")
+	agentCmd.Flags().String("chaos-delegate-type", "external", "Set the chaos-delegate-type to external for external Chaos Delegates | Supported=external/internal")
+	agentCmd.Flags().String("node-selector", "", "Set the node-selector for Chaos Delegate components | Format: \"key1=value1,key2=value2\")")
+	agentCmd.Flags().String("namespace", "litmus", "Set the namespace for the Chaos Delegate installation")
+	agentCmd.Flags().String("service-account", "litmus", "Set the service account to be used by the Chaos Delegate")
+	agentCmd.Flags().Bool("skip-ssl", false, "Set whether Chaos Delegate will skip ssl/tls check (can be used for self-signed certs, if cert is not provided in portal)")
 	agentCmd.Flags().Bool("ns-exists", false, "Set the --ns-exists=false if the namespace mentioned in the --namespace flag is not existed else set it to --ns-exists=true | Note: Always set the boolean flag as --ns-exists=Boolean")
 	agentCmd.Flags().Bool("sa-exists", false, "Set the --sa-exists=false if the service-account mentioned in the --service-account flag is not existed else set it to --sa-exists=true | Note: Always set the boolean flag as --sa-exists=Boolean\"\n")
 }
