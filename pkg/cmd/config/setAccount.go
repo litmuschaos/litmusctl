@@ -167,6 +167,7 @@ var setAccountCmd = &cobra.Command{
 				for _, v := range compatibilityArr {
 					if v == serverResp.Data.GetServerVersion.Value {
 						isCompatible = true
+						break
 					}
 				}
 
