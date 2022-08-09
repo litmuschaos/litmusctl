@@ -365,3 +365,53 @@ func DeleteChaosWorkflow(projectID string, workflowID *string, cred types.Creden
 		return DeleteChaosWorkflowData{}, errors.New("Error while deleting the Chaos Scenario")
 	}
 }
+
+type ServerVersionResponse struct {
+	Data   ServerVersionData `json:"data"`
+	Errors []struct {
+		Message string   `json:"message"`
+		Path    []string `json:"path"`
+	} `json:"errors"`
+}
+
+type ServerVersionData struct {
+	GetServerVersion GetServerVersionData `json:"getServerVersion"`
+}
+
+type GetServerVersionData struct {
+	Key   string `json:"key"`
+	Value string `json:"value"`
+}
+
+// GetServerVersion fetches the GQL server version
+func GetServerVersion(endpoint string) (ServerVersionResponse, error) {
+	query := `{“query”:“query{\n  getServerVersion{\n  key value\n  }\n}“}`
+	resp, err := SendRequest(
+		SendRequestParams{
+			Endpoint: endpoint + utils.GQLAPIPath,
+		},
+		[]byte(query),
+		string(types.Post),
+	)
+	if err != nil {
+		return ServerVersionResponse{}, err
+	}
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	defer resp.Body.Close()
+	if err != nil {
+		return ServerVersionResponse{}, err
+	}
+	if resp.StatusCode == http.StatusOK {
+		var version ServerVersionResponse
+		err = json.Unmarshal(bodyBytes, &version)
+		if err != nil {
+			return ServerVersionResponse{}, err
+		}
+		if len(version.Errors) > 0 {
+			return ServerVersionResponse{}, errors.New(version.Errors[0].Message)
+		}
+		return version, nil
+	} else {
+		return ServerVersionResponse{}, err
+	}
+}
