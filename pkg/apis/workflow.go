@@ -385,7 +385,7 @@ type GetServerVersionData struct {
 
 // GetServerVersion fetches the GQL server version
 func GetServerVersion(endpoint string) (ServerVersionResponse, error) {
-	query := `{“query”:“query{\n  getServerVersion{\n  key value\n  }\n}“}`
+	query := `{"query":"query{\n getServerVersion{\n key value\n }\n}"}`
 	resp, err := SendRequest(
 		SendRequestParams{
 			Endpoint: endpoint + utils.GQLAPIPath,
@@ -412,6 +412,6 @@ func GetServerVersion(endpoint string) (ServerVersionResponse, error) {
 		}
 		return version, nil
 	} else {
-		return ServerVersionResponse{}, err
+		return ServerVersionResponse{}, errors.New(resp.Status)
 	}
 }
