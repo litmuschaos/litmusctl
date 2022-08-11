@@ -39,7 +39,7 @@ type ClusterDetails struct {
 	AgentNamespace *string `json:"agentNamespace"`
 }
 
-func UpgradeAgent(c context.Context, cred types.Credentials, projectID string, clusterID string) (string, error) {
+func UpgradeAgent(c context.Context, cred types.Credentials, projectID string, clusterID string, kubeconfig string) (string, error) {
 
 	// Query to fetch agent details from server
 	query := `{"query":"query {\n getAgentDetails(clusterID : \"` + clusterID + `\", \n projectID : \"` + projectID + `\"){\n agentNamespace accessKey clusterID \n}}"}`
@@ -119,7 +119,7 @@ func UpgradeAgent(c context.Context, cred types.Credentials, projectID string, c
 			Token:    cred.Token,
 			Endpoint: cred.Endpoint,
 			YamlPath: "chaos-delegate-manifest.yaml",
-		}, "", true)
+		}, kubeconfig, true)
 
 		if err != nil {
 			return yamlOutput, err

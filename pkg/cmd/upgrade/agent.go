@@ -48,7 +48,11 @@ var agentCmd = &cobra.Command{
 			fmt.Scanln(&cluster_id)
 		}
 
-		output, err := apis.UpgradeAgent(context.Background(), credentials, projectID, cluster_id)
+		kubeconfig := ""
+		kubeconfig, err = cmd.Flags().GetString("kubeconfig")
+		utils.PrintError(err)
+
+		output, err := apis.UpgradeAgent(context.Background(), credentials, projectID, cluster_id, kubeconfig)
 		if err != nil {
 			utils.Red.Print(output)
 			utils.PrintError(err)
