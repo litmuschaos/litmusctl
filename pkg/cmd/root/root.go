@@ -43,6 +43,8 @@ import (
 
 var cfgFile string
 
+//var kubeconfig string
+
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "litmusctl",
@@ -74,6 +76,7 @@ func init() {
 	// will be global for your application.
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.litmusctl)")
+	//rootCmd.PersistentFlags().StringVar(&kubeconfig, "kubeconfig", "", "kubeconfig file (default is $HOME/.kube/config")
 	rootCmd.PersistentFlags().BoolVar(&config2.SkipSSLVerify, "skipSSL", false, "skipSSL, litmusctl will skip ssl/tls verification while communicating with portal")
 	rootCmd.PersistentFlags().StringVar(&config2.CACert, "cacert", "", "cacert <path_to_crt_file> , custom ca certificate used for communicating with portal")
 }

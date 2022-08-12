@@ -48,7 +48,10 @@ var agentCmd = &cobra.Command{
 			fmt.Scanln(&cluster_id)
 		}
 
-		output, err := apis.UpgradeAgent(context.Background(), credentials, projectID, cluster_id)
+		kubeconfig, err := cmd.Flags().GetString("kubeconfig")
+		utils.PrintError(err)
+
+		output, err := apis.UpgradeAgent(context.Background(), credentials, projectID, cluster_id, kubeconfig)
 		if err != nil {
 			utils.Red.Print(output)
 			utils.PrintError(err)
@@ -61,5 +64,6 @@ var agentCmd = &cobra.Command{
 func init() {
 	UpgradeCmd.AddCommand(agentCmd)
 	agentCmd.Flags().String("project-id", "", "Enter the project ID")
+	agentCmd.Flags().String("kubeconfig", "", "Enter the kubeconfig path(default: $HOME/.kube/config))")
 	agentCmd.Flags().String("chaos-delegate-id", "", "Enter the Chaos Delegate ID")
 }
