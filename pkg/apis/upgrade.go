@@ -18,7 +18,11 @@ import (
 )
 
 type manifestData struct {
-	Data data `json:"data"`
+	Data   data `json:"data"`
+	Errors []struct {
+		Message string   `json:"message"`
+		Path    []string `json:"path"`
+	} `json:"errors"`
 }
 
 type data struct {
@@ -26,7 +30,11 @@ type data struct {
 }
 
 type ClusterData struct {
-	Data GetAgentDetails `json:"data"`
+	Data   GetAgentDetails `json:"data"`
+	Errors []struct {
+		Message string   `json:"message"`
+		Path    []string `json:"path"`
+	} `json:"errors"`
 }
 
 type GetAgentDetails struct {
@@ -61,6 +69,11 @@ func UpgradeAgent(c context.Context, cred types.Credentials, projectID string, c
 		if err != nil {
 			return "", err
 		}
+		if len(agent.Errors) > 0 {
+			return "", errors.New(agent.Errors[0].Message)
+		}
+	} else {
+		return "", errors.New(resp.Status)
 	}
 
 	// Query to fetch upgraded manifest from the server
@@ -83,6 +96,10 @@ func UpgradeAgent(c context.Context, cred types.Credentials, projectID string, c
 		err = json.Unmarshal(bodyBytes, &manifest)
 		if err != nil {
 			return "", err
+		}
+
+		if len(manifest.Errors) > 0 {
+			return "", errors.New(manifest.Errors[0].Message)
 		}
 
 		// To write the manifest data into a temporary file
