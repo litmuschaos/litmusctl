@@ -1,16 +1,11 @@
-# Usage: Litmusctl v0.3.0 (Non-Interactive mode)
-> Notes:
-> * For litmusctl v0.3.0 or latest
-> * Compatible with Litmus 2.0.0-Beta9 or latest
-
 ### litmusctl Syntax
 `litmusctl` has a syntax to use as follows:
 
 ```shell
 litmusctl [command] [TYPE] [flags]
 ```
-* Command: refers to what you do want to perform (create, get and config)
-* Type: refers to the feature type you are performing a command against (agent, project etc.)
+* Command: refers to what you do want to perform (connect, create, get and config)
+* Type: refers to the feature type you are performing a command against (chaos-delegate, project etc.)
 * Flags: It takes some additional information for resource operations. For example, `--installation-mode` allows you to specify an installation mode.
 
 Litmusctl is using the `.litmusconfig` config file to manage multiple accounts
@@ -18,39 +13,31 @@ Litmusctl is using the `.litmusconfig` config file to manage multiple accounts
 2. Otherwise, the ${HOME}/.litmusconfig file is used, and no merging takes place.
 
 Litmusctl supports both interactive and non-interactive(flag based) modes.
-> Only `litmusctl connect agent`  command needs --non-interactive flag, other commands don't need this flag to be in non-interactive mode. If mandatory flags aren't passed, then litmusctl takes input in an interactive mode.
+> Only `litmusctl connect chaos-delegate`  command needs --non-interactive flag, other commands don't need this flag to be in non-interactive mode. If mandatory flags aren't passed, then litmusctl takes input in an interactive mode.
 
 ### Installation modes
-Litmusctl can install an agent in two different modes.
-* cluster mode: With this mode, the agent can run the chaos in any namespace. It installs appropriate cluster roles and cluster role bindings to achieve this mode. It can be enabled by passing a flag `--installation-mode=cluster`
+Litmusctl can install a Chaos Delegate in two different modes.
+* cluster mode: With this mode, the Chaos Delegate can run the chaos in any namespace. It installs appropriate cluster roles and cluster role bindings to achieve this mode. It can be enabled by passing a flag `--installation-mode=cluster`
 
-* namespace mode: With this mode, the agent can run the chaos in its namespace. It installs appropriate roles and role bindings to achieve this mode. It can be enabled by passing a flag `--installation-mode=namespace`
+* namespace mode: With this mode, the Chaos Delegate can run the chaos in its namespace. It installs appropriate roles and role bindings to achieve this mode. It can be enabled by passing a flag `--installation-mode=namespace`
 
-Note: With namespace mode, the user needs to create the namespace to install the agent as a prerequisite.
+Note: With namespace mode, the user needs to create the namespace to install the Chaos Delegate as a prerequisite.
 
-### Minimal steps to create an agent
+### Minimal steps to connect a Chaos Delegate
 
 * To setup an account with litmusctl
 ```shell
 litmusctl config set-account --endpoint="" --username="" --password=""
 ```
 
-* To create an agent without a project
->Note: If the user doesn't have any project, it will create a random project and add the agent in that random project.
-```shell
-litmusctl connect agent --agent-name="" --non-interactive
-```
-
-### Or,
-
-* To create an agent with an existing project
+* To create an Chaos Delegate with an existing project
 > Note: To get `project-id`. Apply `litmusctl get projects`
 
 ```shell
-litmusctl connect agent --agent-name="" --project-id="" --non-interactive
+litmusctl connect chaos-delegate --name="" --project-id="" --non-interactive
 ```
 
-### Flags for `connect agent` command
+### Flags for `connect chaos-delegate` command
 <table>
 <tr>
     <th>Flag</th>
@@ -58,34 +45,34 @@ litmusctl connect agent --agent-name="" --project-id="" --non-interactive
     <th>Type</th>
     <th>Description</th>
     <tr>
-        <td>--agent-description</td>
+        <td>--description</td>
         <td></td>
         <td>String</td>
-        <td>Set the agent description (default "---")</td>
+        <td>Set the Chaos Delegate description (default "---")</td>
     </tr>
     <tr>
-        <td>--agent-name</td>
+        <td>--name</td>
         <td></td>
         <td>String</td>
-        <td>Set the cluster-type to external for external agents | Supported=external/internal (default "external")</td>
+        <td>Set the name of Chaos Delegate which should be unique</td>
     </tr>
     <tr>
-        <td>--skip-agent-ssl</td>
+        <td>--skip-ssl</td>
         <td></td>
         <td>Boolean</td>
-        <td>Set whether agent will skip ssl/tls check (can be used for self-signed certs, if cert is not provided in portal) (default false)</td>
+        <td>Set whether Chaos Delegate will skip ssl/tls check (can be used for self-signed certs, if cert is not provided in portal) (default false)</td>
     </tr>
     <tr>
-        <td>--cluster-type</td>
+        <td>--chaos-delegate-type</td>
         <td></td>
         <td>String</td>
-        <td>Set the cluster-type to external for external agents | Supported=external/internal (default "external")</td>
+        <td>Set the chaos-delegate-type to external for external Chaos Delegates | Supported=external/internal (default "external")</td>
     </tr>
     <tr>
         <td>--installation-mode</td>
         <td></td>
         <td>String</td>
-        <td>Set the installation mode for the kind of agent | Supported=cluster/namespace (default "cluster")</td>
+        <td>Set the installation mode for the kind of Chaos Delegate | Supported=cluster/namespace (default "cluster")</td>
     </tr>
     <tr>
         <td>--kubeconfig</td>
@@ -97,13 +84,13 @@ litmusctl connect agent --agent-name="" --project-id="" --non-interactive
         <td>--namespace</td>
         <td></td>
         <td>String</td>
-        <td>Set the namespace for the agent installation (default "litmus")</td>
+        <td>Set the namespace for the Chaos Delegate installation (default "litmus")</td>
     </tr>
     <tr>
         <td>--node-selector</td>
         <td></td>
         <td>String</td>
-        <td>Set the node-selector for agent components | Format: key1=value1,key2=value2)
+        <td>Set the node-selector for Chaos Delegate components | Format: key1=value1,key2=value2)
     </tr>
     <tr>
         <td>--non-interactive</td>
@@ -133,7 +120,7 @@ litmusctl connect agent --agent-name="" --project-id="" --non-interactive
         <td>--service-account</td>
         <td></td>
         <td>String</td>
-        <td>Set the service account to be used by the agent (default "litmus")</td>
+        <td>Set the service account to be used by the Chaos Delegate (default "litmus")</td>
     </tr>
     <tr>
         <td>--config</td>
@@ -145,19 +132,19 @@ litmusctl connect agent --agent-name="" --project-id="" --non-interactive
 
 ---
 
-### Steps to create a Chaos Workflow
+### Steps to create a chaos scenaro
 
 * To setup an account with litmusctl
 ```shell
 litmusctl config set-account --endpoint="" --username="" --password=""
 ```
 
-* To create a Chaos Workflow by passing a manifest file
+* To create a Chaos Scenario by passing a manifest file
 > Note:
 > * To get `project-id`, apply `litmusctl get projects`
-> * To get `agent-id`, apply `litmusctl get agents --project-id=""`
+> * To get `chaos-delegate-id`, apply `litmusctl get chaos-delegates --project-id=""`
 ```shell
-litmusctl create workflow -f custom-chaos-workflow.yml --project-id="" --agent-id=""
+litmusctl create chaos-scenario -f custom-chaos-scenario.yml --project-id="" --chaos-delegate-id=""
 ```
 
 ---
@@ -224,65 +211,65 @@ PROJECT ID                                PROJECT NAME       CREATEDAT
 ```
 
 
-* To get an overview of the agents available within a project, issue the following command.
+* To get an overview of the Chaos Delegates available within a project, issue the following command.
 ```shell
-litmusctl get agents --project-id=""
+litmusctl get chaos-delegates --project-id=""
 ```
 
 **Output:**
 
 ```
-AGENTID                                AGENTNAME          STATUS     REGISTRATION
-55ecc7f2-2754-43aa-8e12-6903e4c6183a   agent-1            ACTIVE     REGISTERED
-13dsf3d1-5324-54af-4g23-5331g5v2364f   agent-2            INACTIVE   NOT REGISTERED
+CHAOS DELEGATE ID                            CHAOS DELEGATE NAME          STATUS     REGISTRATION
+55ecc7f2-2754-43aa-8e12-6903e4c6183a   chaos-delegate-1            ACTIVE     REGISTERED
+13dsf3d1-5324-54af-4g23-5331g5v2364f   chaos-delegate-2            INACTIVE   NOT REGISTERED
 ```
 
 
-* To disconnect an agent, issue the following command..
+* To disconnect a Chaos Delegate, issue the following command..
 ```shell
-litmusctl disconnect agent <agent-id> --project-id=""
+litmusctl disconnect chaos-delegate <chaos-delegate-id> --project-id=""
 ```
 
 **Output:**
 
 ```
-🚀 ChaosAgent successfully disconnected.
+🚀 Chaos Delegate successfully disconnected.
 ```
 
 
-* To list the created workflows within a project, issue the following command.
+* To list the created Chaos Scenarios within a project, issue the following command.
 ```shell
-litmusctl get workflows --project-id=""
+litmusctl get chaos-scenarios --project-id=""
 ```
 
 **Output:**
 
 ```
-WORKFLOW ID                          WORKFLOW NAME                    WORKFLOW TYPE     NEXT SCHEDULE AGENT ID                             AGENT NAME LAST UPDATED BY
-9433b48c-4ab7-4544-8dab-4a7237619e09 custom-chaos-workflow-1627980541 Non Cron Workflow None          f9799723-29f1-454c-b830-ae8ba7ee4c30 Self-Agent admin
+CHAOS SCENARIO ID                         CHAOS SCENARIO NAME                   CHAOS SCENARIO TYPE     NEXT SCHEDULE CHAOS DELEGATE ID                             CHAOS DELEGATE NAME LAST UPDATED BY
+9433b48c-4ab7-4544-8dab-4a7237619e09 custom-chaos-scenario-1627980541 Non Cron Chaos Scenario None          f9799723-29f1-454c-b830-ae8ba7ee4c30 Self-Chaos-delegate admin
 
-Showing 1 of 1 workflows
+Showing 1 of 1 Chaos Scenarios
 ```
 
 
-* To list all the chaos workflow runs within a project, issue the following command.
+* To list all the Chaos Scenario runs within a project, issue the following command.
 ```shell
-litmusctl get workflowruns --project-id=""
+litmusctl get chaos-scenario-runs  --project-id=""
 ```
 
 **Output:**
 
 ```
-WORKFLOW RUN ID                      STATUS  RESILIENCY SCORE WORKFLOW ID                          WORKFLOW NAME                    TARGET AGENT LAST RUN                 EXECUTED BY
-8ceb712c-1ed4-40e6-adc4-01f78d281506 Running 0.00             9433b48c-4ab7-4544-8dab-4a7237619e09 custom-chaos-workflow-1627980541 Self-Agent   June 1 2022, 10:28:02 pm admin
+CHAOS SCENARIO RUN ID                      STATUS  RESILIENCY SCORE CHAOS SCENARIO ID                          CHAOS SCENARIO NAME                    TARGET CHAOS DELEGATE LAST RUN                 EXECUTED BY
+8ceb712c-1ed4-40e6-adc4-01f78d281506 Running 0.00             9433b48c-4ab7-4544-8dab-4a7237619e09 custom-chaos-scenario-1627980541 Self-Chaos-Delegate   June 1 2022, 10:28:02 pm admin
 
-Showing 1 of 1 workflow runs
+Showing 1 of 1 Chaos Scenario runs
 ```
 
 
-* To describe a particular chaos workflow, issue the following command.
+* To describe a particular Chaos Scenario, issue the following command.
 ```shell
-litmusctl describe workflow <workflow-id> --project-id=""
+litmusctl describe chaos-scenario <chaos-scenario-id> --project-id=""
 ```
 
 **Output:**
@@ -294,26 +281,27 @@ metadata:
     creationTimestamp: null
     labels:
         cluster_id: f9799723-29f1-454c-b830-ae8ba7ee4c30
-        subject: custom-chaos-workflow_litmus
+        subject: custom-chaos-scenario_litmus
         workflow_id: 9433b48c-4ab7-4544-8dab-4a7237619e09
         workflows.argoproj.io/controller-instanceid: f9799723-29f1-454c-b830-ae8ba7ee4c30
-    name: custom-chaos-workflow-1627980541
+    name: custom-chaos-scenario-1627980541
     namespace: litmus
 spec:
 ...
 ```
 
 
-* To delete a particular chaos workflow, issue the following command.
+* To delete a particular Chaos Scenario, issue the following command.
 ```shell
-litmusctl delete workflow <workflow-id> --project-id=""
+litmusctl delete chaos-scenario <chaos-scenario-id> --project-id=""
 ```
 
 **Output:**
 
 ```
-🚀 ChaosWorkflow successfully deleted.
+🚀 Chaos Scenario successfully deleted.
 ```
+
 
 
 For more information related to flags, Use `litmusctl --help`.

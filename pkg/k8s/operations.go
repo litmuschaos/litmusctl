@@ -69,9 +69,10 @@ func NsExists(namespace string, kubeconfig *string) (bool, error) {
 }
 
 type CheckSAPermissionsParams struct {
-	Verb     string
-	Resource string
-	Print    bool
+	Verb      string
+	Resource  string
+	Print     bool
+	Namespace string
 }
 
 func CheckSAPermissions(params CheckSAPermissionsParams, kubeconfig *string) (bool, error) {
@@ -79,6 +80,7 @@ func CheckSAPermissions(params CheckSAPermissionsParams, kubeconfig *string) (bo
 	var o CanIOptions
 	o.Verb = params.Verb
 	o.Resource.Resource = params.Resource
+	o.Namespace = params.Namespace
 	client, err := ClientSet(kubeconfig)
 	if err != nil {
 		return false, err
@@ -153,14 +155,14 @@ start:
 	}
 	if ok {
 		if podExists(podExistsParams{namespace, label}, kubeconfig) {
-			utils.Red.Println("\n🚫 There is an agent already present in this namespace. Please enter a different namespace")
+			utils.Red.Println("\n🚫 There is a Chaos Delegate already present in this namespace. Please enter a different namespace")
 			goto start
 		} else {
 			nsExists = true
 			utils.White_B.Println("👍 Continuing with", namespace, "namespace")
 		}
 	} else {
-		if val, _ := CheckSAPermissions(CheckSAPermissionsParams{"create", "namespace", false}, kubeconfig); !val {
+		if val, _ := CheckSAPermissions(CheckSAPermissionsParams{"create", "namespace", false, namespace}, kubeconfig); !val {
 			utils.Red.Println("🚫 You don't have permissions to create a namespace.\n Please enter an existing namespace.")
 			goto start
 		}
@@ -192,9 +194,9 @@ func WatchPod(params WatchPodParams, kubeconfig *string) {
 		if !ok {
 			log.Fatal("unexpected type")
 		}
-		utils.White_B.Println("💡 Connecting agent to ChaosCenter.")
+		utils.White_B.Println("💡 Connecting Chaos Delegate to ChaosCenter.")
 		if p.Status.Phase == "Running" {
-			utils.White_B.Println("🏃 Agents are running!!")
+			utils.White_B.Println("🏃 Chaos Delegate is running!!")
 			watch.Stop()
 			break
 		}
@@ -294,11 +296,11 @@ func ApplyYaml(params ApplyYamlPrams, kubeconfig string, isLocal bool) (output s
 		if err != nil {
 			return "", err
 		}
-		err = ioutil.WriteFile("agent-manifest.yaml", resp_body, 0644)
+		err = ioutil.WriteFile("chaos-delegate-manifest.yaml", resp_body, 0644)
 		if err != nil {
 			return "", err
 		}
-		path = "agent-manifest.yaml"
+		path = "chaos-delegate-manifest.yaml"
 	}
 
 	args := []string{"kubectl", "apply", "-f", path}

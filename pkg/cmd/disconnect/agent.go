@@ -28,11 +28,11 @@ import (
 
 // agentCmd represents the agent command
 var agentCmd = &cobra.Command{
-	Use: "agent",
-	Short: `Disconnect a ChaosAgent
+	Use: "chaos-delegate",
+	Short: `Disconnect a Chaos Delegate
 	Example:
-	#disconnect an agent
-	litmusctl disconnect agent c520650e-7cb6-474c-b0f0-4df07b2b025b --project-id=c520650e-7cb6-474c-b0f0-4df07b2b025b
+	#disconnect a Chaos Delegate
+	litmusctl disconnect chaos-delegate c520650e-7cb6-474c-b0f0-4df07b2b025b --project-id=c520650e-7cb6-474c-b0f0-4df07b2b025b
 
 	Note: The default location of the config file is $HOME/.litmusconfig, and can be overridden by a --config flag
 	`,
@@ -63,10 +63,9 @@ var agentCmd = &cobra.Command{
 		} else {
 			agentID = args[0]
 		}
-
 		// Handle blank input for agent ID
 		if agentID == "" {
-			utils.Red.Println("⛔ Agent ID can't be empty!!")
+			utils.Red.Println("⛔ Chaos Delegate ID can't be empty!!")
 			os.Exit(1)
 		}
 
@@ -95,14 +94,14 @@ var agentCmd = &cobra.Command{
 		agentIDs = append(agentIDs, &agentID)
 		disconnectedAgent, err := apis.DisconnectAgent(projectID, agentIDs, credentials)
 		if err != nil {
-			utils.Red.Println("\n❌ Error in disconnecting ChaosAgent: ", err.Error())
+			utils.Red.Println("\n❌ Error in disconnecting Chaos Delegate: ", err.Error())
 			os.Exit(1)
 		}
 
 		if strings.Contains(disconnectedAgent.Data.Message, "Successfully deleted clusters") {
-			utils.White_B.Println("\n🚀 ChaosAgent successfully disconnected.")
+			utils.White_B.Println("\n🚀 Chaos Delegate successfully disconnected.")
 		} else {
-			utils.White_B.Println("\n❌ Failed to disconnect ChaosAgent. Please check if the ID is correct or not.")
+			utils.White_B.Println("\n❌ Failed to disconnect Chaos Delegate. Please check if the ID is correct or not.")
 		}
 	},
 }
@@ -110,5 +109,5 @@ var agentCmd = &cobra.Command{
 func init() {
 	DisconnectCmd.AddCommand(agentCmd)
 
-	agentCmd.Flags().String("project-id", "", "Set the project-id to create workflow for the particular project. To see the projects, apply litmusctl get projects")
+	agentCmd.Flags().String("project-id", "", "Set the project-id to disconnect Chaos Delegate for the particular project. To see the projects, apply litmusctl get projects")
 }

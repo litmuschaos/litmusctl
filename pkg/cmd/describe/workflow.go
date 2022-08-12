@@ -26,11 +26,11 @@ import (
 	"sigs.k8s.io/yaml"
 )
 
-// workflowCmd represents the workflow command
+// workflowCmd represents the Chaos Scenario command
 var workflowCmd = &cobra.Command{
-	Use:   "workflow",
-	Short: "Describe a ChaosWorkflow within the project",
-	Long:  `Describe a ChaosWorkflow within the project`,
+	Use:   "chaos-scenario",
+	Short: "Describe a Chaos Scenario within the project",
+	Long:  `Describe a Chaos Scenario within the project`,
 	Run: func(cmd *cobra.Command, args []string) {
 		credentials, err := utils.GetCredentials(cmd)
 		utils.PrintError(err)
@@ -52,15 +52,15 @@ var workflowCmd = &cobra.Command{
 
 		var workflowID string
 		if len(args) == 0 {
-			utils.White_B.Print("\nEnter the Workflow ID: ")
+			utils.White_B.Print("\nEnter the Chaos Scenario ID: ")
 			fmt.Scanln(&workflowID)
 		} else {
 			workflowID = args[0]
 		}
 
-		// Handle blank input for workflow ID
+		// Handle blank input for Chaos Scenario ID
 		if workflowID == "" {
-			utils.Red.Println("⛔ Workflow ID can't be empty!!")
+			utils.Red.Println("⛔ Chaos Scenario ID can't be empty!!")
 			os.Exit(1)
 		}
 
@@ -71,7 +71,7 @@ var workflowCmd = &cobra.Command{
 
 		yamlManifest, err := yaml.JSONToYAML([]byte(workflow.Data.ListWorkflowDetails.Workflows[0].WorkflowManifest))
 		if err != nil {
-			utils.Red.Println("❌ Error parsing workflow manifest: " + err.Error())
+			utils.Red.Println("❌ Error parsing Chaos Scenario manifest: " + err.Error())
 			os.Exit(1)
 		}
 		utils.PrintInYamlFormat(string(yamlManifest))
@@ -81,5 +81,5 @@ var workflowCmd = &cobra.Command{
 func init() {
 	DescribeCmd.AddCommand(workflowCmd)
 
-	workflowCmd.Flags().String("project-id", "", "Set the project-id to list workflows from the particular project. To see the projects, apply litmusctl get projects")
+	workflowCmd.Flags().String("project-id", "", "Set the project-id to list Chaos Scenarios from the particular project. To see the projects, apply litmusctl get projects")
 }

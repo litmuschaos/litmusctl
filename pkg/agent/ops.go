@@ -28,9 +28,9 @@ import (
 )
 
 func PrintExistingAgents(agent apis.AgentData) {
-	utils.Red.Println("\nAgent with the given name already exists.")
-	// Print agent list if existing agent name is entered twice
-	utils.White_B.Println("\nConnected agents list:")
+	utils.Red.Println("\nChaos Delegate with the given name already exists.")
+	// Print Chaos Delegate list if existing Chaos Delegate name is entered twice
+	utils.White_B.Println("\nConnected Chaos Delegates list:")
 
 	for i := range agent.Data.GetAgent {
 		utils.White_B.Println("-", agent.Data.GetAgent[i].AgentName)
@@ -39,7 +39,7 @@ func PrintExistingAgents(agent apis.AgentData) {
 	utils.White_B.Println("\n❗ Please enter a different name.")
 }
 
-// GetProject display list of projects and returns the project id based on input
+// GetProjectID display list of projects and returns the project id based on input
 func GetProjectID(u apis.ProjectDetails) string {
 	var pid int
 	utils.White_B.Println("Project list:")
@@ -59,7 +59,7 @@ repeat:
 	return u.Data.Projects[pid-1].ID
 }
 
-// GetMode gets mode of agent installation as input
+// GetModeType gets mode of Chaos Delegate installation as input
 func GetModeType() string {
 repeat:
 	var (
@@ -88,22 +88,22 @@ repeat:
 	return utils.DefaultMode
 }
 
-// GetAgentDetails take details of agent as input
+// GetAgentDetails take details of Chaos Delegate as input
 func GetAgentDetails(mode string, pid string, c types.Credentials, kubeconfig *string) (types.Agent, error) {
 	var newAgent types.Agent
 	// Get agent name as input
-	utils.White_B.Println("\nEnter the details of the agent")
-	// Label for goto statement in case of invalid agent name
+	utils.White_B.Println("\nEnter the details of the Chaos Delegate")
+	// Label for goto statement in case of invalid Chaos Delegate name
 
 AGENT_NAME:
-	utils.White_B.Print("\nAgent Name: ")
+	utils.White_B.Print("\nChaos Delegate Name: ")
 	newAgent.AgentName = utils.Scanner()
 	if newAgent.AgentName == "" {
-		utils.Red.Println("⛔ Agent name cannot be empty. Please enter a valid name.")
+		utils.Red.Println("⛔ Chaos Delegate name cannot be empty. Please enter a valid name.")
 		goto AGENT_NAME
 	}
 
-	// Check if agent with the given name already exists
+	// Check if Chaos Delegate with the given name already exists
 	agent, err := apis.GetAgentList(c, pid)
 	if err != nil {
 		return types.Agent{}, err
@@ -123,10 +123,10 @@ AGENT_NAME:
 	}
 
 	// Get agent description as input
-	utils.White_B.Print("\nAgent Description: ")
+	utils.White_B.Print("\nChaos Delegate Description: ")
 	newAgent.Description = utils.Scanner()
 
-	utils.White_B.Print("\nDo you want Agent to skip SSL/TLS check (Y/N) (Default: N): ")
+	utils.White_B.Print("\nDo you want Chaos Delegate to skip SSL/TLS check (Y/N) (Default: N): ")
 	skipSSLDescision := utils.Scanner()
 
 	if strings.ToLower(skipSSLDescision) == "y" {
@@ -135,7 +135,7 @@ AGENT_NAME:
 		newAgent.SkipSSL = false
 	}
 
-	utils.White_B.Print("\nDo you want NodeSelector to be added in the agent deployments (Y/N) (Default: N): ")
+	utils.White_B.Print("\nDo you want NodeSelector to be added in the Chaos Delegate deployments (Y/N) (Default: N): ")
 	nodeSelectorDescision := utils.Scanner()
 
 	if strings.ToLower(nodeSelectorDescision) == "y" {
@@ -147,7 +147,7 @@ AGENT_NAME:
 		}
 	}
 
-	utils.White_B.Print("\nDo you want Tolerations to be added in the agent deployments? (Y/N) (Default: N): ")
+	utils.White_B.Print("\nDo you want Tolerations to be added in the Chaos Delegate deployments? (Y/N) (Default: N): ")
 	tolerationDescision := utils.Scanner()
 
 	if strings.ToLower(tolerationDescision) == "y" {
@@ -214,7 +214,7 @@ AGENT_NAME:
 	return newAgent, nil
 }
 
-func ValidateSAPermissions(mode string, kubeconfig *string) {
+func ValidateSAPermissions(namespace string, mode string, kubeconfig *string) {
 	var (
 		pems      [2]bool
 		err       error
@@ -228,7 +228,7 @@ func ValidateSAPermissions(mode string, kubeconfig *string) {
 	}
 
 	for i, resource := range resources {
-		pems[i], err = k8s.CheckSAPermissions(k8s.CheckSAPermissionsParams{Verb: "create", Resource: resource, Print: true}, kubeconfig)
+		pems[i], err = k8s.CheckSAPermissions(k8s.CheckSAPermissionsParams{Verb: "create", Resource: resource, Print: true, Namespace: namespace}, kubeconfig)
 		if err != nil {
 			utils.Red.Println(err)
 		}
@@ -241,12 +241,12 @@ func ValidateSAPermissions(mode string, kubeconfig *string) {
 		}
 	}
 
-	utils.White_B.Println("\n🌟 Sufficient permissions. Installing the Agent...")
+	utils.White_B.Println("\n🌟 Sufficient permissions. Installing the Chaos Delegate...")
 }
 
 // Summary display the agent details based on input
 func Summary(agent types.Agent, kubeconfig *string) {
-	utils.White_B.Printf("\n📌 Summary \nAgent Name: %s\nAgent Description: %s\nAgent SSL/TLS Skip: %t\nPlatform Name: %s\n", agent.AgentName, agent.Description, agent.SkipSSL, agent.PlatformName)
+	utils.White_B.Printf("\n📌 Summary \nChaos Delegate Name: %s\nChaos Delegate Description: %s\nChaos Delegate SSL/TLS Skip: %t\nPlatform Name: %s\n", agent.AgentName, agent.Description, agent.SkipSSL, agent.PlatformName)
 	if ok, _ := k8s.NsExists(agent.Namespace, kubeconfig); ok {
 		utils.White_B.Println("Namespace: ", agent.Namespace)
 	} else {
@@ -268,9 +268,9 @@ func ConfirmInstallation() {
 	fmt.Scanln(&descision)
 
 	if strings.ToLower(descision) == "yes" || strings.ToLower(descision) == "y" {
-		utils.White_B.Println("👍 Continuing agent connection!!")
+		utils.White_B.Println("👍 Continuing Chaos Delegate connection!!")
 	} else {
-		utils.Red.Println("✋ Exiting agent connection!!")
+		utils.Red.Println("✋ Exiting Chaos Delegate connection!!")
 		os.Exit(1)
 	}
 }

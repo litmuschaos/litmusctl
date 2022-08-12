@@ -46,7 +46,7 @@ type AgentList struct {
 	GetAgent []AgentDetails `json:"listClusters"`
 }
 
-// GetAgentList lists the agent connected to the specified project
+// GetAgentList lists the Chaos Delegate connected to the specified project
 func GetAgentList(c types.Credentials, pid string) (AgentData, error) {
 	query := `{"query":"query{\n  listClusters(projectID: \"` + pid + `\"){\n  clusterID clusterName isActive isRegistered\n  }\n}"}`
 	resp, err := SendRequest(SendRequestParams{Endpoint: c.Endpoint + utils.GQLAPIPath, Token: c.Token}, []byte(query), string(types.Post))
@@ -118,20 +118,20 @@ func ConnectAgent(agent types.Agent, cred types.Credentials) (AgentConnectionDat
 
 	resp, err := SendRequest(SendRequestParams{Endpoint: cred.Endpoint + utils.GQLAPIPath, Token: cred.Token}, []byte(query), string(types.Post))
 	if err != nil {
-		return AgentConnectionData{}, errors.New("Error in registering agent: " + err.Error())
+		return AgentConnectionData{}, errors.New("Error in registering Chaos Delegate: " + err.Error())
 	}
 
 	bodyBytes, err := ioutil.ReadAll(resp.Body)
 	defer resp.Body.Close()
 	if err != nil {
-		return AgentConnectionData{}, errors.New("Error in registering agent: " + err.Error())
+		return AgentConnectionData{}, errors.New("Error in registering Chaos Delegate: " + err.Error())
 	}
 
 	if resp.StatusCode == http.StatusOK {
 		var connectAgent AgentConnectionData
 		err = json.Unmarshal(bodyBytes, &connectAgent)
 		if err != nil {
-			return AgentConnectionData{}, errors.New("Error in registering agent: " + err.Error())
+			return AgentConnectionData{}, errors.New("Error in registering Chaos Delegate: " + err.Error())
 		}
 
 		if len(connectAgent.Errors) > 0 {
@@ -163,7 +163,7 @@ type DisconnectAgentGraphQLRequest struct {
 	} `json:"variables"`
 }
 
-// DisconnectAgent sends GraphQL API request for disconnecting ChaosAgent(s).
+// DisconnectAgent sends GraphQL API request for disconnecting Chaos Delegate(s).
 func DisconnectAgent(projectID string, clusterIDs []*string, cred types.Credentials) (DisconnectAgentData, error) {
 
 	var gqlReq DisconnectAgentGraphQLRequest

@@ -81,7 +81,7 @@ func CreateWorkflow(requestData model.ChaosWorkFlowRequest, cred types.Credentia
 	bodyBytes, err := ioutil.ReadAll(resp.Body)
 	defer resp.Body.Close()
 	if err != nil {
-		return ChaosWorkflowCreationData{}, errors.New("Error in creating workflow: " + err.Error())
+		return ChaosWorkflowCreationData{}, errors.New("Error in creating Chaos Scenario: " + err.Error())
 	}
 
 	if resp.StatusCode == http.StatusOK {
@@ -89,7 +89,7 @@ func CreateWorkflow(requestData model.ChaosWorkFlowRequest, cred types.Credentia
 
 		err = json.Unmarshal(bodyBytes, &createdWorkflow)
 		if err != nil {
-			return ChaosWorkflowCreationData{}, errors.New("Error in creating workflow: " + err.Error())
+			return ChaosWorkflowCreationData{}, errors.New("Error in creating Chaos Scenario: " + err.Error())
 		}
 
 		// Errors present
@@ -191,7 +191,7 @@ func GetWorkflowList(in model.ListWorkflowsRequest, cred types.Credentials) (Wor
 
 		return workflowList, nil
 	} else {
-		return WorkflowListData{}, errors.New("Error while fetching the chaos workflows")
+		return WorkflowListData{}, errors.New("Error while fetching the Chaos Scenarios")
 	}
 }
 
@@ -283,7 +283,7 @@ func GetWorkflowRunsList(in model.ListWorkflowRunsRequest, cred types.Credential
 
 		return workflowRunsList, nil
 	} else {
-		return WorkflowRunsListData{}, errors.New("Error while fetching the chaos workflow runs")
+		return WorkflowRunsListData{}, errors.New("Error while fetching the Chaos Scenario runs")
 	}
 }
 
@@ -362,6 +362,56 @@ func DeleteChaosWorkflow(projectID string, workflowID *string, cred types.Creden
 
 		return deletedWorkflow, nil
 	} else {
-		return DeleteChaosWorkflowData{}, errors.New("Error while deleting the chaos workflow")
+		return DeleteChaosWorkflowData{}, errors.New("Error while deleting the Chaos Scenario")
+	}
+}
+
+type ServerVersionResponse struct {
+	Data   ServerVersionData `json:"data"`
+	Errors []struct {
+		Message string   `json:"message"`
+		Path    []string `json:"path"`
+	} `json:"errors"`
+}
+
+type ServerVersionData struct {
+	GetServerVersion GetServerVersionData `json:"getServerVersion"`
+}
+
+type GetServerVersionData struct {
+	Key   string `json:"key"`
+	Value string `json:"value"`
+}
+
+// GetServerVersion fetches the GQL server version
+func GetServerVersion(endpoint string) (ServerVersionResponse, error) {
+	query := `{"query":"query{\n getServerVersion{\n key value\n }\n}"}`
+	resp, err := SendRequest(
+		SendRequestParams{
+			Endpoint: endpoint + utils.GQLAPIPath,
+		},
+		[]byte(query),
+		string(types.Post),
+	)
+	if err != nil {
+		return ServerVersionResponse{}, err
+	}
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	defer resp.Body.Close()
+	if err != nil {
+		return ServerVersionResponse{}, err
+	}
+	if resp.StatusCode == http.StatusOK {
+		var version ServerVersionResponse
+		err = json.Unmarshal(bodyBytes, &version)
+		if err != nil {
+			return ServerVersionResponse{}, err
+		}
+		if len(version.Errors) > 0 {
+			return ServerVersionResponse{}, errors.New(version.Errors[0].Message)
+		}
+		return version, nil
+	} else {
+		return ServerVersionResponse{}, errors.New(resp.Status)
 	}
 }

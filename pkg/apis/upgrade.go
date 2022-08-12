@@ -18,7 +18,11 @@ import (
 )
 
 type manifestData struct {
-	Data data `json:"data"`
+	Data   data `json:"data"`
+	Errors []struct {
+		Message string   `json:"message"`
+		Path    []string `json:"path"`
+	} `json:"errors"`
 }
 
 type data struct {
@@ -26,7 +30,11 @@ type data struct {
 }
 
 type ClusterData struct {
-	Data GetAgentDetails `json:"data"`
+	Data   GetAgentDetails `json:"data"`
+	Errors []struct {
+		Message string   `json:"message"`
+		Path    []string `json:"path"`
+	} `json:"errors"`
 }
 
 type GetAgentDetails struct {
@@ -61,6 +69,11 @@ func UpgradeAgent(c context.Context, cred types.Credentials, projectID string, c
 		if err != nil {
 			return "", err
 		}
+		if len(agent.Errors) > 0 {
+			return "", errors.New(agent.Errors[0].Message)
+		}
+	} else {
+		return "", errors.New(resp.Status)
 	}
 
 	// Query to fetch upgraded manifest from the server
@@ -85,8 +98,12 @@ func UpgradeAgent(c context.Context, cred types.Credentials, projectID string, c
 			return "", err
 		}
 
+		if len(manifest.Errors) > 0 {
+			return "", errors.New(manifest.Errors[0].Message)
+		}
+
 		// To write the manifest data into a temporary file
-		err = ioutil.WriteFile("agent-manifest.yaml", []byte(manifest.Data.GetManifest), 0644)
+		err = ioutil.WriteFile("chaos-delegate-manifest.yaml", []byte(manifest.Data.GetManifest), 0644)
 		if err != nil {
 			return "", err
 		}
@@ -118,7 +135,7 @@ func UpgradeAgent(c context.Context, cred types.Credentials, projectID string, c
 		yamlOutput, err := k8s.ApplyYaml(k8s.ApplyYamlPrams{
 			Token:    cred.Token,
 			Endpoint: cred.Endpoint,
-			YamlPath: "agent-manifest.yaml",
+			YamlPath: "chaos-delegate-manifest.yaml",
 		}, "", true)
 
 		if err != nil {
@@ -126,9 +143,9 @@ func UpgradeAgent(c context.Context, cred types.Credentials, projectID string, c
 		}
 		utils.White.Print("\n", yamlOutput)
 
-		err = os.Remove("agent-manifest.yaml")
+		err = os.Remove("chaos-delegate-manifest.yaml")
 		if err != nil {
-			return "Error removing agent manifest: ", err
+			return "Error removing Chaos Delegate manifest: ", err
 		}
 
 		// Creating a backup for current agent-config in the SUBSCRIBER

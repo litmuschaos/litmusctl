@@ -24,8 +24,8 @@ var DisconnectCmd = &cobra.Command{
 	Use: "disconnect",
 	Short: `Disconnect resources for LitmusChaos agent plane.
 		Examples:
-		#disconnect an agent
-		litmusctl disconnect agent c520650e-7cb6-474c-b0f0-4df07b2b025b --project-id=c520650e-7cb6-474c-b0f0-4df07b2b025b
+		#disconnect a Chaos Delegate
+		litmusctl disconnect chaos-delegate c520650e-7cb6-474c-b0f0-4df07b2b025b --project-id=c520650e-7cb6-474c-b0f0-4df07b2b025b
 
 		Note: The default location of the config file is $HOME/.litmusconfig, and can be overridden by a --config flag
 	`,

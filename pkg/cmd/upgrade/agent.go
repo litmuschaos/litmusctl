@@ -26,7 +26,7 @@ import (
 
 // createCmd represents the create command
 var agentCmd = &cobra.Command{
-	Use:   "agent",
+	Use:   "chaos-delegate",
 	Short: `Upgrades the LitmusChaos agent plane.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		credentials, err := utils.GetCredentials(cmd)
@@ -40,11 +40,11 @@ var agentCmd = &cobra.Command{
 			fmt.Scanln(&projectID)
 		}
 
-		cluster_id, err := cmd.Flags().GetString("cluster-id")
+		cluster_id, err := cmd.Flags().GetString("chaos-delegate-id")
 		utils.PrintError(err)
 
 		if cluster_id == "" {
-			utils.White_B.Print("\nEnter the cluster ID: ")
+			utils.White_B.Print("\nEnter the Chaos Delegate ID: ")
 			fmt.Scanln(&cluster_id)
 		}
 
@@ -61,5 +61,5 @@ var agentCmd = &cobra.Command{
 func init() {
 	UpgradeCmd.AddCommand(agentCmd)
 	agentCmd.Flags().String("project-id", "", "Enter the project ID")
-	agentCmd.Flags().String("cluster-id", "", "Enter the cluster ID")
+	agentCmd.Flags().String("chaos-delegate-id", "", "Enter the Chaos Delegate ID")
 }

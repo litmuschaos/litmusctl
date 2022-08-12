@@ -24,11 +24,11 @@ var ConnectCmd = &cobra.Command{
 	Use: "connect",
 	Short: `Connect resources for LitmusChaos agent plane.
 		Examples:
-		#connect an agent
-		litmusctl connect agent --agent-name="new-agent" --non-interactive
+		#connect a Chaos Delegate
+		litmusctl connect chaos-delegate --name="new-chaos-delegate" --non-interactive
 
-		#connect an agent within a project
-		litmusctl connect agent --agent-name="new-agent" --project-id="d861b650-1549-4574-b2ba-ab754058dd04" --non-interactive
+		#connect a chaos-delegate within a project
+		litmusctl connect chaos-delegate --name="new-chaos-delegate" --project-id="d861b650-1549-4574-b2ba-ab754058dd04" --non-interactive
 
 		Note: The default location of the config file is $HOME/.litmusconfig, and can be overridden by a --config flag
 	`,
