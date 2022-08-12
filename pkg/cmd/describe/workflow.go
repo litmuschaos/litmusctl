@@ -50,16 +50,18 @@ var workflowCmd = &cobra.Command{
 			}
 		}
 
-		workflowID := args[0]
-		// Handle blank input for Chaos Scenario ID
-		if workflowID == "" {
+		var workflowID string
+		if len(args) == 0 {
 			utils.White_B.Print("\nEnter the Chaos Scenario ID: ")
 			fmt.Scanln(&workflowID)
+		} else {
+			workflowID = args[0]
+		}
 
-			if workflowID == "" {
-				utils.Red.Println("⛔ Chaos Scenario ID can't be empty!!")
-				os.Exit(1)
-			}
+		// Handle blank input for Chaos Scenario ID
+		if workflowID == "" {
+			utils.Red.Println("⛔ Chaos Scenario ID can't be empty!!")
+			os.Exit(1)
 		}
 
 		describeWorkflowRequest.WorkflowIDs = append(describeWorkflowRequest.WorkflowIDs, &workflowID)
