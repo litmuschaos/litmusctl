@@ -42,7 +42,8 @@ import (
 )
 
 var cfgFile string
-var kubeconfig string
+
+//var kubeconfig string
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
