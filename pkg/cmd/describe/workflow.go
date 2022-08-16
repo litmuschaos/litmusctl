@@ -69,6 +69,11 @@ var workflowCmd = &cobra.Command{
 		workflow, err := apis.GetWorkflowList(describeWorkflowRequest, credentials)
 		utils.PrintError(err)
 
+		if len(workflow.Data.ListWorkflowDetails.Workflows) == 0 {
+			utils.Red.Println("⛔ No chaos scenarios found with ID: ", workflowID)
+			os.Exit(1)
+		}
+
 		yamlManifest, err := yaml.JSONToYAML([]byte(workflow.Data.ListWorkflowDetails.Workflows[0].WorkflowManifest))
 		if err != nil {
 			utils.Red.Println("❌ Error parsing Chaos Scenario manifest: " + err.Error())
