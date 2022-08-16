@@ -1,9 +1,8 @@
-# Usage: Litmusctl v0.3.0 (Interactive mode)
+# Usage: Litmusctl v0.12.0 (Interactive mode)
 
 > Notes:
 >
-> - For litmusctl v0.3.0 or latest
-> - Compatible with Litmus 2.0.0 or latest
+> - For litmusctl v0.12.0 or latest
 
 ### litmusctl Syntax
 
