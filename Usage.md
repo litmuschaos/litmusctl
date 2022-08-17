@@ -39,11 +39,11 @@ litmusctl connect chaos-delegate --name="" --project-id="" --non-interactive
 
 ### Flags for `connect chaos-delegate` command
 <table>
-<tr>
-    <th>Flag</th>
-    <th>Short Flag</th>
-    <th>Type</th>
-    <th>Description</th>
+    <tr>
+        <th>Flag</th>
+        <th>Short Flag</th>
+        <th>Type</th>
+        <th>Description</th>
     <tr>
         <td>--description</td>
         <td></td>
@@ -90,7 +90,7 @@ litmusctl connect chaos-delegate --name="" --project-id="" --non-interactive
         <td>--node-selector</td>
         <td></td>
         <td>String</td>
-        <td>Set the node-selector for Chaos Delegate components | Format: key1=value1,key2=value2)
+        <td>Set the node-selector for Chaos Delegate components | Format: key1=value1,key2=value2)</td>
     </tr>
     <tr>
         <td>--non-interactive</td>
