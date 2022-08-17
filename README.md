@@ -69,6 +69,7 @@ To install the latest version of litmusctl follow the below steps:
   <th>v0.11.0</th>
   <th>v0.10.0</th>
   <th>v0.9.0</th>
+  <th>v0.8.0</th>
   <th>v0.7.0</th>
   <th>v0.6.0</th>
   <th>master(Unreleased)</th>
