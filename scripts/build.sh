@@ -35,9 +35,14 @@ do
         exit 1
     fi
 
+    bin_name='litmusctl'
+    if [ "$GOOS" == 'windows' ]; then
+      bin_name='litmusctl.exe'
+    fi
+
     cd platforms-$tag
-    mv $output_name litmusctl
-    tar -czvf $output_name-$tag.tar.gz litmusctl
-    rm -rf litmusctl
+    mv $output_name $bin_name
+    tar -czvf $output_name-$tag.tar.gz $bin_name
+    rm -rf $bin_name
     cd ..
 done
