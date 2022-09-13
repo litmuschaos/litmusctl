@@ -261,7 +261,7 @@ var agentCmd = &cobra.Command{
 			YamlPath: utils.ChaosYamlPath,
 		}, kubeconfig, false)
 		if err != nil {
-			utils.White_B.Print("\n❌ Failed in applying connection yaml: \n" + yamlOutput)
+			utils.Red.Print("\n❌ Failed in applying connection yaml: \n" + err.Error() + "\n")
 			utils.White_B.Print("\n Error:  \n" + err.Error())
 			os.Exit(1)
 		}
