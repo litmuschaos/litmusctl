@@ -139,7 +139,7 @@ func UpgradeAgent(c context.Context, cred types.Credentials, projectID string, c
 		}, kubeconfig, true)
 
 		if err != nil {
-			return yamlOutput, err
+			return "", err
 		}
 		utils.White.Print("\n", yamlOutput)
 

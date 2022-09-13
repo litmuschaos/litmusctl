@@ -18,6 +18,7 @@ package upgrade
 import (
 	"context"
 	"fmt"
+	"os"
 
 	"github.com/litmuschaos/litmusctl/pkg/apis"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
@@ -53,11 +54,10 @@ var agentCmd = &cobra.Command{
 
 		output, err := apis.UpgradeAgent(context.Background(), credentials, projectID, cluster_id, kubeconfig)
 		if err != nil {
-			utils.Red.Print(output)
-			utils.PrintError(err)
-		} else {
-			utils.White.Print(output)
+			utils.Red.Print("\n❌ Failed upgrading Chaos Delegate: \n" + err.Error() + "\n")
+			os.Exit(1)
 		}
+		utils.White_B.Print("\n", output)
 	},
 }
 
