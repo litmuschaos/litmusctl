@@ -3,24 +3,24 @@ module github.com/litmuschaos/litmusctl
 go 1.16
 
 require (
-	github.com/argoproj/argo-workflows/v3 v3.2.9
-	github.com/fatih/color v1.12.0
+	github.com/argoproj/argo-workflows/v3 v3.3.1
+	github.com/fatih/color v1.13.0
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/gorhill/cronexpr v0.0.0-20180427100037-88b0669f7d75
-	github.com/litmuschaos/chaos-operator v0.0.0-20211109081056-46bcd99c3daf
-	github.com/litmuschaos/litmus/litmus-portal/graphql-server v0.0.0-20220516165207-ffe995975cc2
+	github.com/litmuschaos/chaos-operator v0.0.0-20220714135640-725f0931d305
+	github.com/litmuschaos/litmus/litmus-portal/graphql-server v0.0.0-20220902124200-7f1e279043f1
 	github.com/mitchellh/go-homedir v1.1.0
-	github.com/spf13/cobra v1.2.1
-	github.com/spf13/viper v1.8.1
-	golang.org/x/term v0.0.0-20210220032956-6a3ed077a48d
-	golang.org/x/text v0.3.7 // indirect
+	github.com/spf13/cobra v1.3.0
+	github.com/spf13/viper v1.10.1
+	golang.org/x/term v0.0.0-20210927222741-03fcf44c2211
 	gopkg.in/yaml.v2 v2.4.0
-	k8s.io/api v0.22.1
-	k8s.io/apimachinery v0.22.2
+	k8s.io/api v0.23.3
+	k8s.io/apimachinery v0.23.3
 	k8s.io/client-go v12.0.0+incompatible
-	sigs.k8s.io/yaml v1.2.0
+	sigs.k8s.io/yaml v1.3.0
 )
 
+// Pinned to kubernetes-1.21.2
 replace (
 	k8s.io/api => k8s.io/api v0.21.2
 	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.21.2
@@ -36,7 +36,6 @@ replace (
 	k8s.io/csi-translation-lib => k8s.io/csi-translation-lib v0.21.2
 	k8s.io/kube-aggregator => k8s.io/kube-aggregator v0.21.2
 	k8s.io/kube-controller-manager => k8s.io/kube-controller-manager v0.21.2
-	k8s.io/kube-openapi => k8s.io/kube-openapi v0.0.0-20210305001622-591a79e4bda7
 	k8s.io/kube-proxy => k8s.io/kube-proxy v0.21.2
 	k8s.io/kube-scheduler => k8s.io/kube-scheduler v0.21.2
 	k8s.io/kubectl => k8s.io/kubectl v0.21.2

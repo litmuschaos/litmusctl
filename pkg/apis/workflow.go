@@ -79,6 +79,7 @@ func CreateWorkflow(requestData model.ChaosWorkFlowRequest, cred types.Credentia
 	}
 
 	bodyBytes, err := ioutil.ReadAll(resp.Body)
+
 	defer resp.Body.Close()
 	if err != nil {
 		return ChaosWorkflowCreationData{}, errors.New("Error in creating Chaos Scenario: " + err.Error())
@@ -88,6 +89,7 @@ func CreateWorkflow(requestData model.ChaosWorkFlowRequest, cred types.Credentia
 		var createdWorkflow ChaosWorkflowCreationData
 
 		err = json.Unmarshal(bodyBytes, &createdWorkflow)
+
 		if err != nil {
 			return ChaosWorkflowCreationData{}, errors.New("Error in creating Chaos Scenario: " + err.Error())
 		}
@@ -99,7 +101,7 @@ func CreateWorkflow(requestData model.ChaosWorkFlowRequest, cred types.Credentia
 
 		return createdWorkflow, nil
 	} else {
-		return ChaosWorkflowCreationData{}, err
+		return ChaosWorkflowCreationData{}, errors.New("graphql schema error")
 	}
 }
 
