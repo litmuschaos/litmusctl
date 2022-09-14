@@ -25,7 +25,7 @@ import (
 	"strconv"
 
 	"github.com/argoproj/argo-workflows/v3/pkg/apis/workflow/v1alpha1"
-	chaosTypes "github.com/litmuschaos/chaos-operator/pkg/apis/litmuschaos/v1alpha1"
+	chaosTypes "github.com/litmuschaos/chaos-operator/api/litmuschaos/v1alpha1"
 	"github.com/litmuschaos/litmus/litmus-portal/graphql-server/graph/model"
 	"sigs.k8s.io/yaml"
 )
@@ -143,6 +143,7 @@ func FetchWeightages(chaosWorkFlowRequest *model.ChaosWorkFlowRequest, templates
 			}
 			weightageInput.ExperimentName = chaosEngine.ObjectMeta.GenerateName
 			w, ok := t.Metadata.Labels["weight"]
+
 			if !ok {
 				White.Println("Weightage for ChaosExperiment/" + weightageInput.ExperimentName + " not provided, defaulting to 10.")
 				w = "10"
