@@ -1069,14 +1069,13 @@ github.com/liggitt/tabwriter v0.0.0-20181228230101-89fcab3d43de/go.mod h1:zAbeS9
 github.com/lithammer/dedent v1.1.0/go.mod h1:jrXYCQtgg0nJiN+StA2KgR7w6CiQNv9Fd/Z9BP0jIOc=
 github.com/litmuschaos/chaos-operator v0.0.0-20210610071657-a58dbd939e73/go.mod h1:QMjfAVIfwcpj/P1jikyz5+C5vWICiUXsFZMR7Ihnzro=
 github.com/litmuschaos/chaos-operator v0.0.0-20220714075136-66fee1fb7ef7/go.mod h1:m8jQuijmZ9PxCbrvWy0QXL0ji558hUCuD9Q5JAKB12Q=
-github.com/litmuschaos/chaos-operator v0.0.0-20220714135640-725f0931d305/go.mod h1:m8jQuijmZ9PxCbrvWy0QXL0ji558hUCuD9Q5JAKB12Q=
 github.com/litmuschaos/chaos-operator v0.0.0-20220804112636-e3332c4460cf h1:GJlaHnPBTsxiGkYmm9X0IgZQl3mX3lfODZGgidhrgP0=
 github.com/litmuschaos/chaos-operator v0.0.0-20220804112636-e3332c4460cf/go.mod h1:TxsfFIIjM3/atf2fLm3AYVtoUucBQK46EJvLwRITnE4=
 github.com/litmuschaos/chaos-scheduler v0.0.0-20220714173615-d7513d616a71/go.mod h1:Edc10opZte1DHcKt0mxyqt64XKPVFAtQ8cghBltZTjs=
 github.com/litmuschaos/elves v0.0.0-20201107015738-552d74669e3c/go.mod h1:DsbHGNUq/78NZozWVVI9Q6eBei4I+JjlkkD5aibJ3MQ=
 github.com/litmuschaos/litmus-go v0.0.0-20210705063441-babf0c4aa57d/go.mod h1:MNO+1u4jBPjLtFO56bckIv87EhwTkppJxDf8+6PbLRY=
-github.com/litmuschaos/litmus/litmus-portal/graphql-server v0.0.0-20220902124200-7f1e279043f1 h1:DmpZk6iI63OAG8NC6GXx8Fsk0cV4jiBwe0b063/RN7I=
-github.com/litmuschaos/litmus/litmus-portal/graphql-server v0.0.0-20220902124200-7f1e279043f1/go.mod h1:sILZAt3Iu3enbCRJehayrCeBwRDiPZc/Fnuuu6rb2U8=
+github.com/litmuschaos/litmus/litmus-portal/graphql-server v0.0.0-20220915052455-d9e64ba5db98 h1:zCRk2jf+eViJL5m2h5dEGtNp/U/zJxMRao28nM/SZSA=
+github.com/litmuschaos/litmus/litmus-portal/graphql-server v0.0.0-20220915052455-d9e64ba5db98/go.mod h1:Ucz3JiEY2USwbLjj/hdSt1tLqmeSiMS0HuHswMCof14=
 github.com/logrusorgru/aurora v0.0.0-20181002194514-a7b3b318ed4e/go.mod h1:7rIyQOR62GCctdiQpZ/zOJlFyk6y+94wXzv6RNZgaR4=
 github.com/logrusorgru/aurora v0.0.0-20200102142835-e9ef32dff381/go.mod h1:7rIyQOR62GCctdiQpZ/zOJlFyk6y+94wXzv6RNZgaR4=
 github.com/lpabon/godbc v0.1.1/go.mod h1:Jo9QV0cf3U6jZABgiJ2skINAXb9j8m51r07g4KI92ZA=

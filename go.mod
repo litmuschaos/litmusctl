@@ -8,7 +8,7 @@ require (
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/gorhill/cronexpr v0.0.0-20180427100037-88b0669f7d75
 	github.com/litmuschaos/chaos-operator v0.0.0-20220804112636-e3332c4460cf
-	github.com/litmuschaos/litmus/litmus-portal/graphql-server v0.0.0-20220902124200-7f1e279043f1
+	github.com/litmuschaos/litmus/litmus-portal/graphql-server v0.0.0-20220915052455-d9e64ba5db98
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/spf13/cobra v1.3.0
 	github.com/spf13/viper v1.10.1
