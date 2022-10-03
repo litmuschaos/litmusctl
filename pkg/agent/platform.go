@@ -87,7 +87,7 @@ func IsAWSPlatform(kubeconfig *string) (bool, error) {
 		return false, err
 	}
 	nodeList, err := clientset.CoreV1().Nodes().List(context.TODO(), v1.ListOptions{})
-	if err != nil {
+	if err != nil || len(nodeList.Items) == 0 {
 		return false, err
 	}
 	if strings.HasPrefix(nodeList.Items[0].Spec.ProviderID, utils.AWSIdentifier) {
@@ -115,7 +115,7 @@ func IsGKEPlatform(kubeconfig *string) (bool, error) {
 		return false, err
 	}
 	nodeList, err := clientset.CoreV1().Nodes().List(context.TODO(), v1.ListOptions{})
-	if err != nil {
+	if err != nil || len(nodeList.Items) == 0 {
 		return false, err
 	}
 	if strings.HasPrefix(nodeList.Items[0].Spec.ProviderID, utils.GKEIdentifier) {
