@@ -7,8 +7,8 @@ require (
 	github.com/fatih/color v1.13.0
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/gorhill/cronexpr v0.0.0-20180427100037-88b0669f7d75
-	github.com/litmuschaos/chaos-operator v0.0.0-20220804112636-e3332c4460cf
-	github.com/litmuschaos/litmus/litmus-portal/graphql-server v0.0.0-20220915052455-d9e64ba5db98
+	github.com/litmuschaos/chaos-operator v0.0.0-20221010164339-e91b0109a875
+	github.com/litmuschaos/litmus/litmus-portal/graphql-server v0.0.0-20221019142834-cbc3e089e654
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/spf13/cobra v1.3.0
 	github.com/spf13/viper v1.10.1
