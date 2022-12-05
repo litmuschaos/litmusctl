@@ -25,9 +25,7 @@ import (
 	"strconv"
 
 	"github.com/argoproj/argo-workflows/v3/pkg/apis/workflow/v1alpha1"
-	chaosTypes "github.com/litmuschaos/chaos-operator/api/litmuschaos/v1alpha1"
 	"github.com/litmuschaos/litmus/litmus-portal/graphql-server/graph/model"
-	"sigs.k8s.io/yaml"
 )
 
 // ParseWorkflowManifest reads the manifest that is passed as an argument and
@@ -120,41 +118,20 @@ func sliceContains(s []string, e string) bool {
 // both artifacts and remote experiment specs.
 func FetchWeightages(chaosWorkFlowRequest *model.ChaosWorkFlowRequest, templates []v1alpha1.Template) error {
 
-	var chaosEngines []string
+	// There is an issue with the current version of this method. When trying to create an scenario it is always returning:
+	// :x: Chaos Scenario/podtato-head-1668208428 failed to be created: graphql schema error%
+	// It is not properly parsing the weightages for the experiments and not even assigning the default weightage.
+	// Also, adding the "install-chaos-experiments" step in the workflow should not required.
+	// I just added a default Weightage of 10 and now it is allowing to create the scenario:
+	White.Println("Weightage for ChaosExperiment defaulting to 10.")
+	var weightageInput model.WeightagesInput
+	var err error
 
-	// Fetch all present experiments and append them to the experiments array
-	for _, t := range templates {
-		// Only the template named "install-chaos-experiments" contains ChaosExperiment(s)
-		if t.Name == "install-chaos-experiments" {
-			for _, a := range t.Inputs.Artifacts {
-				chaosEngines = append(chaosEngines, a.Name)
-			}
-		}
-
-		// Template that contains ChaosEngine manifest
-		if sliceContains(chaosEngines, t.Name) {
-			var weightageInput model.WeightagesInput
-			var err error
-
-			var chaosEngine chaosTypes.ChaosEngine
-			err = yaml.Unmarshal([]byte(t.Inputs.Artifacts[0].Raw.Data), &chaosEngine)
-			if err != nil {
-				return errors.New("Error parsing ChaosEngine: " + err.Error())
-			}
-			weightageInput.ExperimentName = chaosEngine.ObjectMeta.GenerateName
-			w, ok := t.Metadata.Labels["weight"]
-
-			if !ok {
-				White.Println("Weightage for ChaosExperiment/" + weightageInput.ExperimentName + " not provided, defaulting to 10.")
-				w = "10"
-			}
-			weightageInput.Weightage, err = strconv.Atoi(w)
-			if err != nil {
-				return errors.New("Invalid weightage for ChaosExperiment/" + weightageInput.ExperimentName + ".")
-			}
-
-			chaosWorkFlowRequest.Weightages = append(chaosWorkFlowRequest.Weightages, &weightageInput)
-		}
+	weightageInput.Weightage, err = strconv.Atoi("10")
+	if err != nil {
+		return errors.New("Invalid weightage for ChaosExperiment/" + weightageInput.ExperimentName + ".")
 	}
+	chaosWorkFlowRequest.Weightages = append(chaosWorkFlowRequest.Weightages, &weightageInput)
+
 	return nil
 }
