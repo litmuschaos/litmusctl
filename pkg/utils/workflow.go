@@ -26,9 +26,7 @@ import (
 	"strings"
 
 	"github.com/argoproj/argo-workflows/v3/pkg/apis/workflow/v1alpha1"
-	chaosTypes "github.com/litmuschaos/chaos-operator/api/litmuschaos/v1alpha1"
 	"github.com/litmuschaos/litmus/litmus-portal/graphql-server/graph/model"
-	"sigs.k8s.io/yaml"
 )
 
 // ParseWorkflowManifest reads the manifest that is passed as an argument and
