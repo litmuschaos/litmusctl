@@ -25,7 +25,9 @@ import (
 	"strconv"
 
 	"github.com/argoproj/argo-workflows/v3/pkg/apis/workflow/v1alpha1"
+	chaosTypes "github.com/litmuschaos/chaos-operator/api/litmuschaos/v1alpha1"
 	"github.com/litmuschaos/litmus/litmus-portal/graphql-server/graph/model"
+	"sigs.k8s.io/yaml"
 )
 
 // ParseWorkflowManifest reads the manifest that is passed as an argument and
@@ -121,17 +123,53 @@ func FetchWeightages(chaosWorkFlowRequest *model.ChaosWorkFlowRequest, templates
 	// There is an issue with the current version of this method. When trying to create an scenario it is always returning:
 	// :x: Chaos Scenario/podtato-head-1668208428 failed to be created: graphql schema error%
 	// It is not properly parsing the weightages for the experiments and not even assigning the default weightage.
-	// Also, adding the "install-chaos-experiments" step in the workflow should not required.
+	// Also, adding the "install-chaos-experiments" step in the workflow should not be required.
 	// I just added a default Weightage of 10 and now it is allowing to create the scenario:
-	White.Println("Weightage for ChaosExperiment defaulting to 10.")
-	var weightageInput model.WeightagesInput
-	var err error
+	// White.Println("Weightage for ChaosExperiment defaulting to 10.")
+	// var weightageInput model.WeightagesInput
+	// var err error
 
-	weightageInput.Weightage, err = strconv.Atoi("10")
-	if err != nil {
-		return errors.New("Invalid weightage for ChaosExperiment/" + weightageInput.ExperimentName + ".")
+	for _, t := range templates {
+		var err error
+
+		var chaosEngine chaosTypes.ChaosEngine
+		if t.Inputs.Artifacts != nil && len(t.Inputs.Artifacts) > 0 {
+			White.Println(t.Inputs.Artifacts[0].Raw.Data)
+
+			err = yaml.Unmarshal([]byte(t.Inputs.Artifacts[0].Raw.Data), &chaosEngine)
+			if err == nil && chaosEngine.Kind == "ChaosEngine" {
+				var weightageInput model.WeightagesInput
+				weightageInput.ExperimentName = chaosEngine.ObjectMeta.GenerateName
+				w, ok := t.Metadata.Labels["weight"]
+
+				if !ok {
+					White.Println("Weightage for ChaosExperiment/" + weightageInput.ExperimentName + " not provided, defaulting to 10.")
+					w = "10"
+				}
+				weightageInput.Weightage, err = strconv.Atoi(w)
+				if err != nil {
+					return errors.New("Invalid weightage for ChaosExperiment/" + weightageInput.ExperimentName + ".")
+				}
+
+				chaosWorkFlowRequest.Weightages = append(chaosWorkFlowRequest.Weightages, &weightageInput)
+			} else {
+				White.Println("Template not of chaosengine type." + t.Name)
+				if err != nil {
+					White.Println(err.Error())
+
+				}
+				// return errors.New("Error parsing ChaosEngine: " + err.Error())
+			}
+		}
 	}
-	chaosWorkFlowRequest.Weightages = append(chaosWorkFlowRequest.Weightages, &weightageInput)
+
+	if len(chaosWorkFlowRequest.Weightages) == 0 {
+		White.Println("No experiments found for the workflow, defaulting to weightage 0.")
+		var weightageInput model.WeightagesInput
+		weightageInput.ExperimentName = ""
+		weightageInput.Weightage = 0
+		chaosWorkFlowRequest.Weightages = append(chaosWorkFlowRequest.Weightages, &weightageInput)
+	}
 
 	return nil
 }
