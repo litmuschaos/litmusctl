@@ -124,17 +124,12 @@ func FetchWeightages(chaosWorkFlowRequest *model.ChaosWorkFlowRequest, templates
 	// :x: Chaos Scenario/podtato-head-1668208428 failed to be created: graphql schema error%
 	// It is not properly parsing the weightages for the experiments and not even assigning the default weightage.
 	// Also, adding the "install-chaos-experiments" step in the workflow should not be required.
-	// I just added a default Weightage of 10 and now it is allowing to create the scenario:
-	// White.Println("Weightage for ChaosExperiment defaulting to 10.")
-	// var weightageInput model.WeightagesInput
-	// var err error
 
 	for _, t := range templates {
 		var err error
 
 		var chaosEngine chaosTypes.ChaosEngine
 		if t.Inputs.Artifacts != nil && len(t.Inputs.Artifacts) > 0 {
-			White.Println(t.Inputs.Artifacts[0].Raw.Data)
 
 			err = yaml.Unmarshal([]byte(t.Inputs.Artifacts[0].Raw.Data), &chaosEngine)
 			if err == nil && chaosEngine.Kind == "ChaosEngine" {
@@ -152,19 +147,12 @@ func FetchWeightages(chaosWorkFlowRequest *model.ChaosWorkFlowRequest, templates
 				}
 
 				chaosWorkFlowRequest.Weightages = append(chaosWorkFlowRequest.Weightages, &weightageInput)
-			} else {
-				White.Println("Template not of chaosengine type." + t.Name)
-				if err != nil {
-					White.Println(err.Error())
-
-				}
-				// return errors.New("Error parsing ChaosEngine: " + err.Error())
 			}
 		}
 	}
 
 	if len(chaosWorkFlowRequest.Weightages) == 0 {
-		White.Println("No experiments found for the workflow, defaulting to weightage 0.")
+		White.Println("No experiments found in the scenario, defaulting to weightage 0.")
 		var weightageInput model.WeightagesInput
 		weightageInput.ExperimentName = ""
 		weightageInput.Weightage = 0
