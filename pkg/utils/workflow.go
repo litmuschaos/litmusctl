@@ -23,6 +23,7 @@ import (
 	"net/url"
 	"regexp"
 	"strconv"
+	"strings"
 
 	"github.com/argoproj/argo-workflows/v3/pkg/apis/workflow/v1alpha1"
 	chaosTypes "github.com/litmuschaos/chaos-operator/api/litmuschaos/v1alpha1"
@@ -120,44 +121,68 @@ func sliceContains(s []string, e string) bool {
 // both artifacts and remote experiment specs.
 func FetchWeightages(chaosWorkFlowRequest *model.ChaosWorkFlowRequest, templates []v1alpha1.Template) error {
 
-	// There is an issue with the current version of this method. When trying to create an scenario it is always returning:
-	// :x: Chaos Scenario/podtato-head-1668208428 failed to be created: graphql schema error%
-	// It is not properly parsing the weightages for the experiments and not even assigning the default weightage.
-	// Also, adding the "install-chaos-experiments" step in the workflow should not be required.
-
 	for _, t := range templates {
+
 		var err error
 
-		var chaosEngine chaosTypes.ChaosEngine
 		if t.Inputs.Artifacts != nil && len(t.Inputs.Artifacts) > 0 {
+			if t.Inputs.Artifacts[0].Raw == nil {
+				continue
+			}
 
-			err = yaml.Unmarshal([]byte(t.Inputs.Artifacts[0].Raw.Data), &chaosEngine)
-			if err == nil && chaosEngine.Kind == "ChaosEngine" {
-				var weightageInput model.WeightagesInput
-				weightageInput.ExperimentName = chaosEngine.ObjectMeta.GenerateName
-				w, ok := t.Metadata.Labels["weight"]
+			var data = t.Inputs.Artifacts[0].Raw.Data
+			if len(data) > 0 {
+				// This replacement is required because chaos engine yaml have a syntax template. example:{{ workflow.parameters.adminModeNamespace }}
+				// And it is not able the unmarshal the yamlstring to chaos engine struct
+				data = strings.ReplaceAll(data, "{{", "")
+				data = strings.ReplaceAll(data, "}}", "")
 
-				if !ok {
-					White.Println("Weightage for ChaosExperiment/" + weightageInput.ExperimentName + " not provided, defaulting to 10.")
-					w = "10"
-				}
-				weightageInput.Weightage, err = strconv.Atoi(w)
+				var chaosEngine chaosTypes.ChaosEngine
+
+				err = yaml.Unmarshal([]byte(data), &chaosEngine)
+
 				if err != nil {
-					return errors.New("Invalid weightage for ChaosExperiment/" + weightageInput.ExperimentName + ".")
+					return errors.New("failed to unmarshal chaosengine")
 				}
 
-				chaosWorkFlowRequest.Weightages = append(chaosWorkFlowRequest.Weightages, &weightageInput)
+				if strings.ToLower(chaosEngine.Kind) == "chaosengine" {
+					var weightageInput model.WeightagesInput
+
+					weightageInput.ExperimentName = chaosEngine.ObjectMeta.GenerateName
+
+					if len(weightageInput.ExperimentName) == 0 {
+						return errors.New("empty chaos experiment name")
+					}
+
+					if len(chaosEngine.Spec.Experiments) == 0 {
+						return errors.New("no experiments specified in chaosengine - " + weightageInput.ExperimentName)
+					}
+
+					w, ok := t.Metadata.Labels["weight"]
+
+					if !ok {
+						White.Println("Weightage for ChaosExperiment/" + weightageInput.ExperimentName + " not provided, defaulting to 10.")
+						w = "10"
+					}
+					weightageInput.Weightage, err = strconv.Atoi(w)
+
+					if err != nil {
+						return errors.New("Invalid weightage for ChaosExperiment/" + weightageInput.ExperimentName + ".")
+					}
+
+					chaosWorkFlowRequest.Weightages = append(chaosWorkFlowRequest.Weightages, &weightageInput)
+				}
 			}
 		}
 	}
 
+	// If no experiments are present in the workflow, adds a 0 to the Weightages array so it doesn't fail (same behaviour as the UI)
 	if len(chaosWorkFlowRequest.Weightages) == 0 {
-		White.Println("No experiments found in the scenario, defaulting to weightage 0.")
+		White.Println("No experiments found in the workflow, defaulting experiments weightage to 0.")
 		var weightageInput model.WeightagesInput
 		weightageInput.ExperimentName = ""
 		weightageInput.Weightage = 0
 		chaosWorkFlowRequest.Weightages = append(chaosWorkFlowRequest.Weightages, &weightageInput)
 	}
-
 	return nil
 }
