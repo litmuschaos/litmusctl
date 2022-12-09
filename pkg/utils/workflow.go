@@ -178,7 +178,7 @@ func FetchWeightages(chaosWorkFlowRequest *model.ChaosWorkFlowRequest, templates
 
 	// If no experiments are present in the workflow, adds a 0 to the Weightages array so it doesn't fail (same behaviour as the UI)
 	if len(chaosWorkFlowRequest.Weightages) == 0 {
-		White.Println("No experiments found in the workflow, defaulting experiments weightage to 0.")
+		White.Println("No experiments found in the chaos scenario, defaulting experiments weightage to 0.")
 		var weightageInput model.WeightagesInput
 		weightageInput.ExperimentName = ""
 		weightageInput.Weightage = 0
