@@ -6,17 +6,17 @@ if [[ -z "$package" ]]; then
   exit 1
 fi
 
-tag=$2
+tag=0.15.0
 
 platforms=(
  "darwin/amd64"
- "linux/386"
- "linux/amd64"
- "linux/arm"
- "linux/arm64"
- "windows/386"
- "windows/amd64"
- "windows/arm"
+#  "linux/386"
+#  "linux/amd64"
+#  "linux/arm"
+#  "linux/arm64"
+#  "windows/386"
+#  "windows/amd64"
+#  "windows/arm"
 )
 
 rm -rf platforms-$tag/*
