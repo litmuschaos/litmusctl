@@ -16,7 +16,6 @@ limitations under the License.
 package utils
 
 import (
-	// "crypto/rand"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -70,6 +69,7 @@ func ParseWorkflowManifest(file string, chaosWorkFlowRequest *model.ChaosWorkFlo
 			chaosWorkFlowRequest.WorkflowName = workflow.ObjectMeta.Name
 		} else if len(workflow.ObjectMeta.GenerateName) > 0 {
 			workflow.ObjectMeta.Name = workflow.ObjectMeta.GenerateName + generateRandomString()
+			workflow.ObjectMeta.GenerateName = "TOBEDELETED"
 			chaosWorkFlowRequest.WorkflowName = workflow.ObjectMeta.Name
 		} else {
 			return errors.New("No name or generateName provided for the Chaos scenario.")
@@ -80,7 +80,8 @@ func ParseWorkflowManifest(file string, chaosWorkFlowRequest *model.ChaosWorkFlo
 		if ok != nil {
 			return ok
 		}
-		chaosWorkFlowRequest.WorkflowManifest = string(workflowStr)
+
+		chaosWorkFlowRequest.WorkflowManifest = strings.Replace(string(workflowStr), "\"generateName\":\"TOBEDELETED\",", "", 1)
 		chaosWorkFlowRequest.IsCustomWorkflow = true
 
 		// Fetch the weightages for experiments present in the spec.
@@ -102,6 +103,7 @@ func ParseWorkflowManifest(file string, chaosWorkFlowRequest *model.ChaosWorkFlo
 			chaosWorkFlowRequest.WorkflowName = cronWorkflow.ObjectMeta.Name
 		} else if len(cronWorkflow.ObjectMeta.GenerateName) > 0 {
 			cronWorkflow.ObjectMeta.Name = cronWorkflow.ObjectMeta.GenerateName + generateRandomString()
+			cronWorkflow.ObjectMeta.GenerateName = "TOBEDELETED"
 			chaosWorkFlowRequest.WorkflowName = cronWorkflow.ObjectMeta.Name
 		} else {
 			return errors.New("No name or generateName provided for the Chaos scenario.")
@@ -112,7 +114,8 @@ func ParseWorkflowManifest(file string, chaosWorkFlowRequest *model.ChaosWorkFlo
 		if ok != nil {
 			return ok
 		}
-		chaosWorkFlowRequest.WorkflowManifest = string(workflowStr)
+
+		chaosWorkFlowRequest.WorkflowManifest = strings.Replace(string(workflowStr), "\"generateName\":\"TOBEDELETED\",", "", 1)
 		chaosWorkFlowRequest.IsCustomWorkflow = true
 
 		// Set the schedule for the workflow
@@ -143,7 +146,7 @@ func sliceContains(s []string, e string) bool {
 // Helper function to generate a random 8 char string - used for workflow name postfix
 func generateRandomString() string {
 	rand.Seed(time.Now().UnixNano())
-	var letters = []rune("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
+	var letters = []rune("abcdefghijklmnopqrstuvxyz0123456789")
 	b := make([]rune, 5)
 	for i := range b {
 		b[i] = letters[rand.Intn(len(letters))]
