@@ -20,10 +20,12 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"math/rand"
 	"net/url"
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/argoproj/argo-workflows/v3/pkg/apis/workflow/v1alpha1"
 	chaosTypes "github.com/litmuschaos/chaos-operator/api/litmuschaos/v1alpha1"
@@ -63,13 +65,23 @@ func ParseWorkflowManifest(file string, chaosWorkFlowRequest *model.ChaosWorkFlo
 			return err
 		}
 
+		if len(workflow.ObjectMeta.Name) > 0 {
+			chaosWorkFlowRequest.WorkflowName = workflow.ObjectMeta.Name
+		} else if len(workflow.ObjectMeta.GenerateName) > 0 {
+			workflow.ObjectMeta.Name = workflow.ObjectMeta.GenerateName + generateRandomString()
+			workflow.ObjectMeta.GenerateName = "TOBEDELETED"
+			chaosWorkFlowRequest.WorkflowName = workflow.ObjectMeta.Name
+		} else {
+			return errors.New("No name or generateName provided for the Chaos scenario.")
+		}
+
 		// Marshal the workflow back to JSON for API payload.
 		workflowStr, ok := json.Marshal(workflow)
 		if ok != nil {
 			return ok
 		}
-		chaosWorkFlowRequest.WorkflowManifest = string(workflowStr)
-		chaosWorkFlowRequest.WorkflowName = workflow.ObjectMeta.Name
+
+		chaosWorkFlowRequest.WorkflowManifest = strings.Replace(string(workflowStr), "\"generateName\":\"TOBEDELETED\",", "", 1)
 		chaosWorkFlowRequest.IsCustomWorkflow = true
 
 		// Fetch the weightages for experiments present in the spec.
@@ -85,10 +97,25 @@ func ParseWorkflowManifest(file string, chaosWorkFlowRequest *model.ChaosWorkFlo
 			return err
 		}
 
-		// Marshal the workflow back to JSON for API payload.
-		workflowStr, _ := json.Marshal(cronWorkflow)
-		chaosWorkFlowRequest.WorkflowManifest = string(workflowStr)
 		chaosWorkFlowRequest.WorkflowName = cronWorkflow.ObjectMeta.Name
+
+		if len(cronWorkflow.ObjectMeta.Name) > 0 {
+			chaosWorkFlowRequest.WorkflowName = cronWorkflow.ObjectMeta.Name
+		} else if len(cronWorkflow.ObjectMeta.GenerateName) > 0 {
+			cronWorkflow.ObjectMeta.Name = cronWorkflow.ObjectMeta.GenerateName + generateRandomString()
+			cronWorkflow.ObjectMeta.GenerateName = "TOBEDELETED"
+			chaosWorkFlowRequest.WorkflowName = cronWorkflow.ObjectMeta.Name
+		} else {
+			return errors.New("No name or generateName provided for the Chaos scenario.")
+		}
+
+		// Marshal the workflow back to JSON for API payload.
+		workflowStr, ok := json.Marshal(cronWorkflow)
+		if ok != nil {
+			return ok
+		}
+
+		chaosWorkFlowRequest.WorkflowManifest = strings.Replace(string(workflowStr), "\"generateName\":\"TOBEDELETED\",", "", 1)
 		chaosWorkFlowRequest.IsCustomWorkflow = true
 
 		// Set the schedule for the workflow
@@ -106,7 +133,7 @@ func ParseWorkflowManifest(file string, chaosWorkFlowRequest *model.ChaosWorkFlo
 	return nil
 }
 
-// Helper fucntion to check the presence of a stirng in a slice
+// Helper function to check the presence of a string in a slice
 func sliceContains(s []string, e string) bool {
 	for _, a := range s {
 		if a == e {
@@ -114,6 +141,17 @@ func sliceContains(s []string, e string) bool {
 		}
 	}
 	return false
+}
+
+// Helper function to generate a random 8 char string - used for workflow name postfix
+func generateRandomString() string {
+	rand.Seed(time.Now().UnixNano())
+	var letters = []rune("abcdefghijklmnopqrstuvxyz0123456789")
+	b := make([]rune, 5)
+	for i := range b {
+		b[i] = letters[rand.Intn(len(letters))]
+	}
+	return string(b)
 }
 
 // FetchWeightages takes in the templates present in the workflow spec and
@@ -176,7 +214,7 @@ func FetchWeightages(chaosWorkFlowRequest *model.ChaosWorkFlowRequest, templates
 		}
 	}
 
-	// If no experiments are present in the workflow, adds a 0 to the Weightages array so it doesn't fail (same behaviour as the UI)
+	// If no experiments are present in the workflow, adds a 0 to the Weightages array so it doesn't fail (same behavior as the UI)
 	if len(chaosWorkFlowRequest.Weightages) == 0 {
 		White.Println("No experiments found in the chaos scenario, defaulting experiments weightage to 0.")
 		var weightageInput model.WeightagesInput
