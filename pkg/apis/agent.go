@@ -3,7 +3,7 @@ Copyright © 2021 The LitmusChaos Authors
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
+You may obtain a1 copy of the License at
 
 	http://www.apache.org/licenses/LICENSE-2.0
 
@@ -47,7 +47,7 @@ type ListInfraGraphQLRequest struct {
 	} `json:"variables"`
 }
 
-// GetInfraList lists the Chaos Delegate connected to the specified project
+// GetInfraList lists the Chaos Infrastructure connected to the specified project
 func GetInfraList(c types.Credentials, pid string, request models.ListInfraRequest) (InfraData, error) {
 	var gplReq ListInfraGraphQLRequest
 	gplReq.Query = `query listInfras($pid: projectID!, $request: ListInfraRequest!){
@@ -67,7 +67,7 @@ func GetInfraList(c types.Credentials, pid string, request models.ListInfraReque
 	if err != nil {
 		return InfraData{}, err
 	}
-	resp, err := SendRequest(SendRequestParams{Endpoint: c.Endpoint + utils.GQLAPIPath, Token: c.Token}, []byte(query), string(types.Post))
+	resp, err := SendRequest(SendRequestParams{Endpoint: c.Endpoint + utils.GQLAPIPath, Token: c.Token}, query, string(types.Post))
 	if err != nil {
 		return InfraData{}, err
 	}
@@ -113,12 +113,12 @@ type InfraConnect struct {
 }
 
 type InfraAgentReg struct {
-	InfraID   string `json:"InfraID"`
+	InfraID   string `json:"infraID"`
 	InfraName string `json:"name"`
 	Token     string `json:"token"`
 }
 
-// ConnectInfra connects the agent with the given details
+// ConnectInfra connects the  Infra with the given details
 func ConnectInfra(infra types.Infra, cred types.Credentials) (InfraConnectionData, error) {
 	query := `{"query":"mutation {\n  registerInfra(projectID: \"` + infra.ProjectId + `\", request: \n    { \n    name: \"` + infra.InfraName + `\", \n    description: \"` + infra.Description + `\",\n  \tplatformName: \"` + infra.PlatformName + `\",\n    infrastructureType: \"` + infra.InfraType + `\",\n  infraScope: \"` + infra.Mode + `\",\n    infraNamespace: \"` + infra.Namespace + `\",\n    serviceAccount: \"` + infra.ServiceAccount + `\",\n    skipSsl: ` + fmt.Sprintf("%t", infra.SkipSSL) + `,\n    infraNsExists: ` + fmt.Sprintf("%t", infra.NsExists) + `,\n    agentSaExists: ` + fmt.Sprintf("%t", infra.SAExists) + `,\n  }){\n    infraID\n    name\n    token\n  }\n}"}`
 
@@ -161,44 +161,44 @@ func ConnectInfra(infra types.Infra, cred types.Credentials) (InfraConnectionDat
 	}
 }
 
-type DisconnectAgentData struct {
+type DisconnectInfraData struct {
 	Errors []struct {
 		Message string   `json:"message"`
 		Path    []string `json:"path"`
 	} `json:"errors"`
-	Data DisconnectAgentDetails `json:"data"`
+	Data DisconnectInfraDetails `json:"data"`
 }
 
-type DisconnectAgentDetails struct {
-	Message string `json:"deleteClusters"`
+type DisconnectInfraDetails struct {
+	Message string `json:"deleteInfra"`
 }
 
-type DisconnectAgentGraphQLRequest struct {
+type DisconnectInfraGraphQLRequest struct {
 	Query     string `json:"query"`
 	Variables struct {
-		ProjectID  string    `json:"projectID"`
-		ClusterIDs []*string `json:"clusterIDs"`
+		ProjectID string    `json:"projectID"`
+		InfraID   []*string `json:"infraID"`
 	} `json:"variables"`
 }
 
-// DisconnectAgent sends GraphQL API request for disconnecting Chaos Delegate(s).
-func DisconnectAgent(projectID string, clusterIDs []*string, cred types.Credentials) (DisconnectAgentData, error) {
+// DisconnectInfra sends GraphQL API request for disconnecting Chaos Delegate(s).
+func DisconnectInfra(projectID string, infraID []*string, cred types.Credentials) (DisconnectInfraData, error) {
 
-	var gqlReq DisconnectAgentGraphQLRequest
+	var gqlReq DisconnectInfraGraphQLRequest
 	var err error
 
-	gqlReq.Query = `mutation deleteClusters($projectID: String!, $clusterIDs: [String]!) {
+	gqlReq.Query = `mutation deleteInfra($projectID: String!, $infraID: [String]!) {
                       deleteClusters(
                         projectID: $projectID
-                        clusterIDs: $clusterIDs
+                        infraID: $infraID
                       )
                     }`
 	gqlReq.Variables.ProjectID = projectID
-	gqlReq.Variables.ClusterIDs = clusterIDs
+	gqlReq.Variables.InfraID = infraID
 
 	query, err := json.Marshal(gqlReq)
 	if err != nil {
-		return DisconnectAgentData{}, err
+		return DisconnectInfraData{}, err
 	}
 
 	resp, err := SendRequest(
@@ -210,28 +210,28 @@ func DisconnectAgent(projectID string, clusterIDs []*string, cred types.Credenti
 		string(types.Post),
 	)
 	if err != nil {
-		return DisconnectAgentData{}, err
+		return DisconnectInfraData{}, err
 	}
 
 	bodyBytes, err := ioutil.ReadAll(resp.Body)
 	defer resp.Body.Close()
 	if err != nil {
-		return DisconnectAgentData{}, err
+		return DisconnectInfraData{}, err
 	}
 
 	if resp.StatusCode == http.StatusOK {
-		var disconnectAgentData DisconnectAgentData
-		err = json.Unmarshal(bodyBytes, &disconnectAgentData)
+		var disconnectInfraData DisconnectInfraData
+		err = json.Unmarshal(bodyBytes, &disconnectInfraData)
 		if err != nil {
-			return DisconnectAgentData{}, err
+			return DisconnectInfraData{}, err
 		}
 
-		if len(disconnectAgentData.Errors) > 0 {
-			return DisconnectAgentData{}, errors.New(disconnectAgentData.Errors[0].Message)
+		if len(disconnectInfraData.Errors) > 0 {
+			return DisconnectInfraData{}, errors.New(disconnectInfraData.Errors[0].Message)
 		}
 
-		return disconnectAgentData, nil
+		return disconnectInfraData, nil
 	} else {
-		return DisconnectAgentData{}, err
+		return DisconnectInfraData{}, err
 	}
 }
