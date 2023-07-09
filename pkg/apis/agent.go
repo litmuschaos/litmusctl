@@ -95,12 +95,12 @@ func GetInfraList(c types.Credentials, pid string, request models.ListInfraReque
 	}
 }
 
-type AgentConnectionData struct {
+type InfraConnectionData struct {
 	Errors []struct {
 		Message string   `json:"message"`
 		Path    []string `json:"path"`
 	} `json:"errors"`
-	Data AgentConnect `json:"data"`
+	Data InfraConnect `json:"data"`
 }
 
 type Errors struct {
@@ -108,56 +108,56 @@ type Errors struct {
 	Path    []string `json:"path"`
 }
 
-type AgentConnect struct {
-	UserAgentReg UserAgentReg `json:"registerCluster"`
+type InfraConnect struct {
+	UserInfraReg InfraAgentReg `json:"registerInfra"`
 }
 
-type UserAgentReg struct {
-	ClusterID   string `json:"clusterID"`
-	ClusterName string `json:"clusterName"`
-	Token       string `json:"token"`
+type InfraAgentReg struct {
+	InfraID   string `json:"InfraID"`
+	InfraName string `json:"name"`
+	Token     string `json:"token"`
 }
 
-// ConnectAgent connects the agent with the given details
-func ConnectAgent(agent types.Agent, cred types.Credentials) (AgentConnectionData, error) {
-	query := `{"query":"mutation {\n  registerCluster(request: \n    { \n    clusterName: \"` + agent.AgentName + `\", \n    description: \"` + agent.Description + `\",\n  \tplatformName: \"` + agent.PlatformName + `\",\n    projectID: \"` + agent.ProjectId + `\",\n    clusterType: \"` + agent.ClusterType + `\",\n  agentScope: \"` + agent.Mode + `\",\n    agentNamespace: \"` + agent.Namespace + `\",\n    serviceAccount: \"` + agent.ServiceAccount + `\",\n    skipSsl: ` + fmt.Sprintf("%t", agent.SkipSSL) + `,\n    agentNsExists: ` + fmt.Sprintf("%t", agent.NsExists) + `,\n    agentSaExists: ` + fmt.Sprintf("%t", agent.SAExists) + `,\n  }){\n    clusterID\n    clusterName\n    token\n  }\n}"}`
+// ConnectInfra connects the agent with the given details
+func ConnectInfra(infra types.Infra, cred types.Credentials) (InfraConnectionData, error) {
+	query := `{"query":"mutation {\n  registerInfra(projectID: \"` + infra.ProjectId + `\", request: \n    { \n    name: \"` + infra.InfraName + `\", \n    description: \"` + infra.Description + `\",\n  \tplatformName: \"` + infra.PlatformName + `\",\n    infrastructureType: \"` + infra.InfraType + `\",\n  infraScope: \"` + infra.Mode + `\",\n    infraNamespace: \"` + infra.Namespace + `\",\n    serviceAccount: \"` + infra.ServiceAccount + `\",\n    skipSsl: ` + fmt.Sprintf("%t", infra.SkipSSL) + `,\n    infraNsExists: ` + fmt.Sprintf("%t", infra.NsExists) + `,\n    agentSaExists: ` + fmt.Sprintf("%t", infra.SAExists) + `,\n  }){\n    infraID\n    name\n    token\n  }\n}"}`
 
-	if agent.NodeSelector != "" {
-		query = `{"query":"mutation {\n  registerCluster(request: \n    { \n    clusterName: \"` + agent.AgentName + `\", \n    description: \"` + agent.Description + `\",\n  nodeSelector: \"` + agent.NodeSelector + `\",\n  \tplatformName: \"` + agent.PlatformName + `\",\n    projectID: \"` + agent.ProjectId + `\",\n    clusterType: \"` + agent.ClusterType + `\",\n  agentScope: \"` + agent.Mode + `\",\n    agentNamespace: \"` + agent.Namespace + `\",\n    skipSsl: ` + fmt.Sprintf("%t", agent.SkipSSL) + `,\n    serviceAccount: \"` + agent.ServiceAccount + `\",\n    agentNsExists: ` + fmt.Sprintf("%t", agent.NsExists) + `,\n    agentSaExists: ` + fmt.Sprintf("%t", agent.SAExists) + `,\n  }){\n    clusterID\n    clusterName\n    token\n  }\n}"}`
+	if infra.NodeSelector != "" {
+		query = `{"query":"mutation {\n  registerInfra(projectID: \"` + infra.ProjectId + `\", request: \n    { \n    name: \"` + infra.InfraName + `\", \n    description: \"` + infra.Description + `\",\n  nodeSelector: \"` + infra.NodeSelector + `\",\n  \tplatformName: \"` + infra.PlatformName + `\",\n   infrastructureType: \"` + infra.InfraType + `\",\n  infraScope: \"` + infra.Mode + `\",\n   infraNamespace: \"` + infra.Namespace + `\",\n    skipSsl: ` + fmt.Sprintf("%t", infra.SkipSSL) + `,\n    serviceAccount: \"` + infra.ServiceAccount + `\",\n    infraNsExists: ` + fmt.Sprintf("%t", infra.NsExists) + `,\n    infraSaExists: ` + fmt.Sprintf("%t", infra.SAExists) + `,\n  }){\n    infraID\n    name\n    token\n  }\n}"}`
 	}
 
-	if agent.Tolerations != "" {
-		query = `{"query":"mutation {\n  registerCluster(request: \n    { \n    clusterName: \"` + agent.AgentName + `\", \n    description: \"` + agent.Description + `\",\n  \tplatformName: \"` + agent.PlatformName + `\",\n    projectID: \"` + agent.ProjectId + `\",\n    clusterType: \"` + agent.ClusterType + `\",\n  agentScope: \"` + agent.Mode + `\",\n    agentNamespace: \"` + agent.Namespace + `\",\n    serviceAccount: \"` + agent.ServiceAccount + `\",\n    skipSsl: ` + fmt.Sprintf("%t", agent.SkipSSL) + `,\n    agentNsExists: ` + fmt.Sprintf("%t", agent.NsExists) + `,\n    agentSaExists: ` + fmt.Sprintf("%t", agent.SAExists) + `,\n tolerations: ` + agent.Tolerations + ` }){\n    clusterID\n    clusterName\n    token\n  }\n}"}`
+	if infra.Tolerations != "" {
+		query = `{"query":"mutation {\n  registerInfra(projectID: \"` + infra.ProjectId + `\",request: \n    { \n    infraName: \"` + infra.InfraName + `\", \n    description: \"` + infra.Description + `\",\n  \tplatformName: \"` + infra.PlatformName + `\",\n    infraType: \"` + infra.InfraType + `\",\n  infraScope: \"` + infra.Mode + `\",\n    infraNamespace: \"` + infra.Namespace + `\",\n    serviceAccount: \"` + infra.ServiceAccount + `\",\n    skipSsl: ` + fmt.Sprintf("%t", infra.SkipSSL) + `,\n    infraExists: ` + fmt.Sprintf("%t", infra.NsExists) + `,\n    infraSaExists: ` + fmt.Sprintf("%t", infra.SAExists) + `,\n tolerations: ` + infra.Tolerations + ` }){\n    infraID\n    name\n    token\n  }\n}"}`
 	}
 
-	if agent.NodeSelector != "" && agent.Tolerations != "" {
-		query = `{"query":"mutation {\n  registerCluster(request: \n    { \n    clusterName: \"` + agent.AgentName + `\", \n    description: \"` + agent.Description + `\",\n  nodeSelector: \"` + agent.NodeSelector + `\",\n  \tplatformName: \"` + agent.PlatformName + `\",\n    projectID: \"` + agent.ProjectId + `\",\n    clusterType: \"` + agent.ClusterType + `\",\n  agentScope: \"` + agent.Mode + `\",\n    agentNamespace: \"` + agent.Namespace + `\",\n    skipSsl: ` + fmt.Sprintf("%t", agent.SkipSSL) + `,\n    serviceAccount: \"` + agent.ServiceAccount + `\",\n    agentNsExists: ` + fmt.Sprintf("%t", agent.NsExists) + `,\n    agentSaExists: ` + fmt.Sprintf("%t", agent.SAExists) + `,\n tolerations: ` + agent.Tolerations + ` }){\n    clusterID\n    clusterName\n    token\n  }\n}"}`
+	if infra.NodeSelector != "" && infra.Tolerations != "" {
+		query = `{"query":"mutation {\n  registerInfra(projectID: \"` + infra.ProjectId + `\", request: \n    { \n    infraName: \"` + infra.InfraName + `\", \n    description: \"` + infra.Description + `\",\n  nodeSelector: \"` + infra.NodeSelector + `\",\n  \tplatformName: \"` + infra.PlatformName + `\",\n    infraType: \"` + infra.InfraType + `\",\n  infraScope: \"` + infra.Mode + `\",\n    infraNamespace: \"` + infra.Namespace + `\",\n    serviceAccount: \"` + infra.ServiceAccount + `\",\n    skipSsl: ` + fmt.Sprintf("%t", infra.SkipSSL) + `,\n    infraExists: ` + fmt.Sprintf("%t", infra.NsExists) + `,\n    infraSaExists: ` + fmt.Sprintf("%t", infra.SAExists) + `,\n tolerations: ` + infra.Tolerations + ` }){\n    infraID\n    name\n    token\n  }\n}"}`
 	}
 
 	resp, err := SendRequest(SendRequestParams{Endpoint: cred.Endpoint + utils.GQLAPIPath, Token: cred.Token}, []byte(query), string(types.Post))
 	if err != nil {
-		return AgentConnectionData{}, errors.New("Error in registering Chaos Delegate: " + err.Error())
+		return InfraConnectionData{}, errors.New("Error in registering Chaos Infrastructure: " + err.Error())
 	}
 
 	bodyBytes, err := ioutil.ReadAll(resp.Body)
 	defer resp.Body.Close()
 	if err != nil {
-		return AgentConnectionData{}, errors.New("Error in registering Chaos Delegate: " + err.Error())
+		return InfraConnectionData{}, errors.New("Error in registering Chaos Infrastructure: " + err.Error())
 	}
 
 	if resp.StatusCode == http.StatusOK {
-		var connectAgent AgentConnectionData
-		err = json.Unmarshal(bodyBytes, &connectAgent)
+		var connectInfra InfraConnectionData
+		err = json.Unmarshal(bodyBytes, &connectInfra)
 		if err != nil {
-			return AgentConnectionData{}, errors.New("Error in registering Chaos Delegate: " + err.Error())
+			return InfraConnectionData{}, errors.New("Error in registering Chaos Infrastructure: " + err.Error())
 		}
 
-		if len(connectAgent.Errors) > 0 {
-			return AgentConnectionData{}, errors.New(connectAgent.Errors[0].Message)
+		if len(connectInfra.Errors) > 0 {
+			return InfraConnectionData{}, errors.New(connectInfra.Errors[0].Message)
 		}
-		return connectAgent, nil
+		return connectInfra, nil
 	} else {
-		return AgentConnectionData{}, err
+		return InfraConnectionData{}, err
 	}
 }
 

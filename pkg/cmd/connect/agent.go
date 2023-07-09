@@ -235,7 +235,7 @@ var agentCmd = &cobra.Command{
 			agent.ConfirmInstallation()
 		}
 
-		agent, err := apis.ConnectAgent(newAgent, credentials)
+		agent, err := apis.ConnectInfra(newAgent, credentials)
 		if err != nil {
 			utils.Red.Println("\n❌ Chaos Delegate connection failed: " + err.Error() + "\n")
 			os.Exit(1)

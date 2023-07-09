@@ -90,16 +90,16 @@ repeat:
 }
 
 // GetInfraDetails take details of Chaos Infrastructure as input
-func GetInfraDetails(mode string, pid string, c types.Credentials, kubeconfig *string) (types.Agent, error) {
-	var newInfra types.Agent
+func GetInfraDetails(mode string, pid string, c types.Credentials, kubeconfig *string) (types.Infra, error) {
+	var newInfra types.Infra
 	// Get agent name as input
 	utils.White_B.Println("\nEnter the details of the Chaos Delegate")
 	// Label for goto statement in case of invalid Chaos Delegate name
 
 INFRA_NAME:
 	utils.White_B.Print("\nChaos Infra Name: ")
-	newInfra.AgentName = utils.Scanner()
-	if newInfra.AgentName == "" {
+	newInfra.InfraName = utils.Scanner()
+	if newInfra.InfraName == "" {
 		utils.Red.Println("⛔ Chaos Infra name cannot be empty. Please enter a valid name.")
 		goto INFRA_NAME
 	}
@@ -107,12 +107,12 @@ INFRA_NAME:
 	// Check if Chaos Delegate with the given name already exists
 	Infra, err := apis.GetInfraList(c, pid, model.ListInfraRequest{})
 	if err != nil {
-		return types.Agent{}, err
+		return types.Infra{}, err
 	}
 
 	var isAgentExist = false
 	for i := range Infra.Data.ListInfraDetails.Infras {
-		if newInfra.AgentName == Infra.Data.ListInfraDetails.Infras[i].Name {
+		if newInfra.InfraName == Infra.Data.ListInfraDetails.Infras[i].Name {
 			utils.White_B.Println(Infra.Data.ListInfraDetails.Infras[i].Name)
 			isAgentExist = true
 		}
@@ -206,7 +206,7 @@ INFRA_NAME:
 	// Get platform name as input
 	newInfra.PlatformName = GetPlatformName(kubeconfig)
 	// Set agent type
-	newInfra.ClusterType = utils.AgentType
+	newInfra.InfraType = utils.AgentType
 	// Set project id
 	newInfra.ProjectId = pid
 	// Get namespace
@@ -246,8 +246,8 @@ func ValidateSAPermissions(namespace string, mode string, kubeconfig *string) {
 }
 
 // Summary display the agent details based on input
-func Summary(agent types.Agent, kubeconfig *string) {
-	utils.White_B.Printf("\n📌 Summary \nChaos Delegate Name: %s\nChaos Delegate Description: %s\nChaos Delegate SSL/TLS Skip: %t\nPlatform Name: %s\n", agent.AgentName, agent.Description, agent.SkipSSL, agent.PlatformName)
+func Summary(agent types.Infra, kubeconfig *string) {
+	utils.White_B.Printf("\n📌 Summary \nChaos Delegate Name: %s\nChaos Delegate Description: %s\nChaos Delegate SSL/TLS Skip: %t\nPlatform Name: %s\n", agent.InfraName, agent.Description, agent.SkipSSL, agent.PlatformName)
 	if ok, _ := k8s.NsExists(agent.Namespace, kubeconfig); ok {
 		utils.White_B.Println("Namespace: ", agent.Namespace)
 	} else {
