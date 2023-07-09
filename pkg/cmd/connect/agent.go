@@ -5,7 +5,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+	http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,6 +18,7 @@ package connect
 import (
 	"encoding/json"
 	"fmt"
+	models "github.com/litmuschaos/litmus/chaoscenter/graphql/server/graph/model"
 	"os"
 
 	"github.com/litmuschaos/litmusctl/pkg/agent"
@@ -52,7 +53,7 @@ var agentCmd = &cobra.Command{
 		kubeconfig, err := cmd.Flags().GetString("kubeconfig")
 		utils.PrintError(err)
 
-		var newAgent types.Agent
+		var newAgent types.Infra
 
 		newAgent.ProjectId, err = cmd.Flags().GetString("project-id")
 		utils.PrintError(err)
@@ -92,13 +93,13 @@ var agentCmd = &cobra.Command{
 				os.Exit(1)
 			}
 
-			newAgent.AgentName, err = cmd.Flags().GetString("name")
+			newAgent.InfraName, err = cmd.Flags().GetString("name")
 			utils.PrintError(err)
 
 			newAgent.SkipSSL, err = cmd.Flags().GetBool("skip-ssl")
 			utils.PrintError(err)
 
-			if newAgent.AgentName == "" {
+			if newAgent.InfraName == "" {
 				utils.Red.Print("Error: --name flag is empty")
 				os.Exit(1)
 			}
@@ -114,9 +115,9 @@ var agentCmd = &cobra.Command{
 				os.Exit(1)
 			}
 
-			newAgent.ClusterType, err = cmd.Flags().GetString("chaos-delegate-type")
+			newAgent.InfraType, err = cmd.Flags().GetString("chaos-delegate-type")
 			utils.PrintError(err)
-			if newAgent.ClusterType == "" {
+			if newAgent.InfraType == "" {
 				utils.Red.Print("Error: --chaos-delegate-type flag is empty")
 				os.Exit(1)
 			}
@@ -189,15 +190,15 @@ var agentCmd = &cobra.Command{
 			// Check if user has sufficient permissions based on mode
 			utils.White_B.Print("\n🏃 Running prerequisites check....")
 			agent.ValidateSAPermissions(newAgent.Namespace, newAgent.Mode, &kubeconfig)
-
-			agents, err := apis.GetAgentList(credentials, newAgent.ProjectId)
+			var ListInfraRequest = models.ListInfraRequest{}
+			agents, err := apis.GetInfraList(credentials, newAgent.ProjectId, ListInfraRequest)
 			utils.PrintError(err)
 
 			// Duplicate agent check
 			var isAgentExist = false
-			for i := range agents.Data.GetAgent {
-				if newAgent.AgentName == agents.Data.GetAgent[i].AgentName {
-					utils.White_B.Print(agents.Data.GetAgent[i].AgentName)
+			for i := range agents.Data.ListInfraDetails.Infras {
+				if newAgent.InfraName == agents.Data.ListInfraDetails.Infras[i].Name {
+					utils.White_B.Print(agents.Data.ListInfraDetails.Infras[i].Name)
 					isAgentExist = true
 				}
 			}
@@ -221,7 +222,7 @@ var agentCmd = &cobra.Command{
 			// Check if user has sufficient permissions based on mode
 			utils.White_B.Print("\n🏃 Running prerequisites check....")
 			agent.ValidateSAPermissions(newAgent.Namespace, modeType, &kubeconfig)
-			newAgent, err = agent.GetAgentDetails(modeType, newAgent.ProjectId, credentials, &kubeconfig)
+			newAgent, err = agent.GetInfraDetails(modeType, newAgent.ProjectId, credentials, &kubeconfig)
 			utils.PrintError(err)
 
 			newAgent.ServiceAccount, newAgent.SAExists = k8s.ValidSA(newAgent.Namespace, &kubeconfig)
@@ -240,23 +241,23 @@ var agentCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		if agent.Data.UserAgentReg.Token == "" {
+		if agent.Data.UserInfraReg.Token == "" {
 			utils.Red.Println("\n❌ failed to get the agent registration token: " + "\n")
 			os.Exit(1)
 		}
 
-		path := fmt.Sprintf("%s/%s/%s.yaml", credentials.Endpoint, utils.ChaosYamlPath, agent.Data.UserAgentReg.Token)
+		path := fmt.Sprintf("%s/%s/%s.yaml", credentials.Endpoint, utils.ChaosYamlPath, agent.Data.UserInfraReg.Token)
 		utils.White_B.Print("Applying YAML:\n", path)
 
 		// Print error message in case Data field is null in response
-		if (agent.Data == apis.AgentConnect{}) {
+		if (agent.Data == apis.InfraConnect{}) {
 			utils.White_B.Print("\n🚫 Chaos Delegate connection failed: " + agent.Errors[0].Message + "\n")
 			os.Exit(1)
 		}
 
 		//Apply agent connection yaml
 		yamlOutput, err := k8s.ApplyYaml(k8s.ApplyYamlPrams{
-			Token:    agent.Data.UserAgentReg.Token,
+			Token:    agent.Data.UserInfraReg.Token,
 			Endpoint: credentials.Endpoint,
 			YamlPath: utils.ChaosYamlPath,
 		}, kubeconfig, false)

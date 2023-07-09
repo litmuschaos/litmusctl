@@ -5,7 +5,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+	http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,6 +17,7 @@ package get
 
 import (
 	"fmt"
+	models "github.com/litmuschaos/litmus/chaoscenter/graphql/server/graph/model"
 	"os"
 	"text/tabwriter"
 
@@ -47,7 +48,7 @@ var agentsCmd = &cobra.Command{
 			}
 		}
 
-		agents, err := apis.GetAgentList(credentials, projectID)
+		infras, err := apis.GetInfraList(credentials, projectID, models.ListInfraRequest{})
 		utils.PrintError(err)
 
 		output, err := cmd.Flags().GetString("output")
@@ -55,17 +56,17 @@ var agentsCmd = &cobra.Command{
 
 		switch output {
 		case "json":
-			utils.PrintInJsonFormat(agents.Data)
+			utils.PrintInJsonFormat(infras.Data)
 
 		case "yaml":
-			utils.PrintInYamlFormat(agents.Data)
+			utils.PrintInYamlFormat(infras.Data)
 
 		case "":
 
 			writer := tabwriter.NewWriter(os.Stdout, 4, 8, 1, '\t', 0)
 			utils.White_B.Fprintln(writer, "CHAOS DELEGATE ID \tCHAOS DELEGATE NAME\tSTATUS\tREGISTRATION\t")
 
-			for _, agent := range agents.Data.GetAgent {
+			for _, agent := range infras.Data.ListInfraDetails.Infras {
 				var status string
 				if agent.IsActive {
 					status = "ACTIVE"
@@ -79,7 +80,7 @@ var agentsCmd = &cobra.Command{
 				} else {
 					isRegistered = "NOT REGISTERED"
 				}
-				utils.White.Fprintln(writer, agent.ClusterID+"\t"+agent.AgentName+"\t"+status+"\t"+isRegistered+"\t")
+				utils.White.Fprintln(writer, agent.InfraID+"\t"+agent.Name+"\t"+status+"\t"+isRegistered+"\t")
 			}
 			writer.Flush()
 		}

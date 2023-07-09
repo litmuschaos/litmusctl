@@ -5,7 +5,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+	http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,6 +17,7 @@ package agent
 
 import (
 	"fmt"
+	"github.com/litmuschaos/litmus/chaoscenter/graphql/server/graph/model"
 	"os"
 	"strconv"
 	"strings"
@@ -27,13 +28,13 @@ import (
 	"github.com/litmuschaos/litmusctl/pkg/utils"
 )
 
-func PrintExistingAgents(agent apis.AgentData) {
-	utils.Red.Println("\nChaos Delegate with the given name already exists.")
+func PrintExistingAgents(agent apis.InfraData) {
+	utils.Red.Println("\nChaos Infrastructure with the given name already exists.")
 	// Print Chaos Delegate list if existing Chaos Delegate name is entered twice
-	utils.White_B.Println("\nConnected Chaos Delegates list:")
+	utils.White_B.Println("\nConnected Chaos Infrastructure list:")
 
-	for i := range agent.Data.GetAgent {
-		utils.White_B.Println("-", agent.Data.GetAgent[i].AgentName)
+	for i := range agent.Data.ListInfraDetails.Infras {
+		utils.White_B.Println("-", agent.Data.ListInfraDetails.Infras[i].Name)
 	}
 
 	utils.White_B.Println("\n❗ Please enter a different name.")
@@ -88,66 +89,66 @@ repeat:
 	return utils.DefaultMode
 }
 
-// GetAgentDetails take details of Chaos Delegate as input
-func GetAgentDetails(mode string, pid string, c types.Credentials, kubeconfig *string) (types.Agent, error) {
-	var newAgent types.Agent
+// GetInfraDetails take details of Chaos Infrastructure as input
+func GetInfraDetails(mode string, pid string, c types.Credentials, kubeconfig *string) (types.Agent, error) {
+	var newInfra types.Agent
 	// Get agent name as input
 	utils.White_B.Println("\nEnter the details of the Chaos Delegate")
 	// Label for goto statement in case of invalid Chaos Delegate name
 
-AGENT_NAME:
-	utils.White_B.Print("\nChaos Delegate Name: ")
-	newAgent.AgentName = utils.Scanner()
-	if newAgent.AgentName == "" {
-		utils.Red.Println("⛔ Chaos Delegate name cannot be empty. Please enter a valid name.")
-		goto AGENT_NAME
+INFRA_NAME:
+	utils.White_B.Print("\nChaos Infra Name: ")
+	newInfra.AgentName = utils.Scanner()
+	if newInfra.AgentName == "" {
+		utils.Red.Println("⛔ Chaos Infra name cannot be empty. Please enter a valid name.")
+		goto INFRA_NAME
 	}
 
 	// Check if Chaos Delegate with the given name already exists
-	agent, err := apis.GetAgentList(c, pid)
+	Infra, err := apis.GetInfraList(c, pid, model.ListInfraRequest{})
 	if err != nil {
 		return types.Agent{}, err
 	}
 
 	var isAgentExist = false
-	for i := range agent.Data.GetAgent {
-		if newAgent.AgentName == agent.Data.GetAgent[i].AgentName {
-			utils.White_B.Println(agent.Data.GetAgent[i].AgentName)
+	for i := range Infra.Data.ListInfraDetails.Infras {
+		if newInfra.AgentName == Infra.Data.ListInfraDetails.Infras[i].Name {
+			utils.White_B.Println(Infra.Data.ListInfraDetails.Infras[i].Name)
 			isAgentExist = true
 		}
 	}
 
 	if isAgentExist {
-		PrintExistingAgents(agent)
-		goto AGENT_NAME
+		PrintExistingAgents(Infra)
+		goto INFRA_NAME
 	}
 
 	// Get agent description as input
-	utils.White_B.Print("\nChaos Delegate Description: ")
-	newAgent.Description = utils.Scanner()
+	utils.White_B.Print("\nChaos Infrastructure Description: ")
+	newInfra.Description = utils.Scanner()
 
-	utils.White_B.Print("\nDo you want Chaos Delegate to skip SSL/TLS check (Y/N) (Default: N): ")
+	utils.White_B.Print("\nDo you want Chaos Infrastructure to skip SSL/TLS check (Y/N) (Default: N): ")
 	skipSSLDescision := utils.Scanner()
 
 	if strings.ToLower(skipSSLDescision) == "y" {
-		newAgent.SkipSSL = true
+		newInfra.SkipSSL = true
 	} else {
-		newAgent.SkipSSL = false
+		newInfra.SkipSSL = false
 	}
 
-	utils.White_B.Print("\nDo you want NodeSelector to be added in the Chaos Delegate deployments (Y/N) (Default: N): ")
+	utils.White_B.Print("\nDo you want NodeSelector to be added in the Chaos Infrastructure deployments (Y/N) (Default: N): ")
 	nodeSelectorDescision := utils.Scanner()
 
 	if strings.ToLower(nodeSelectorDescision) == "y" {
 		utils.White_B.Print("\nEnter the NodeSelector (Format: key1=value1,key2=value2): ")
-		newAgent.NodeSelector = utils.Scanner()
+		newInfra.NodeSelector = utils.Scanner()
 
-		if ok := utils.CheckKeyValueFormat(newAgent.NodeSelector); !ok {
+		if ok := utils.CheckKeyValueFormat(newInfra.NodeSelector); !ok {
 			os.Exit(1)
 		}
 	}
 
-	utils.White_B.Print("\nDo you want Tolerations to be added in the Chaos Delegate deployments? (Y/N) (Default: N): ")
+	utils.White_B.Print("\nDo you want Tolerations to be added in the Chaos Infrastructure deployments? (Y/N) (Default: N): ")
 	tolerationDescision := utils.Scanner()
 
 	if strings.ToLower(tolerationDescision) == "y" {
@@ -199,19 +200,19 @@ AGENT_NAME:
 		}
 		str += "]"
 
-		newAgent.Tolerations = str
+		newInfra.Tolerations = str
 	}
 
 	// Get platform name as input
-	newAgent.PlatformName = GetPlatformName(kubeconfig)
+	newInfra.PlatformName = GetPlatformName(kubeconfig)
 	// Set agent type
-	newAgent.ClusterType = utils.AgentType
+	newInfra.ClusterType = utils.AgentType
 	// Set project id
-	newAgent.ProjectId = pid
+	newInfra.ProjectId = pid
 	// Get namespace
-	newAgent.Namespace, newAgent.NsExists = k8s.ValidNs(mode, utils.ChaosAgentLabel, kubeconfig)
+	newInfra.Namespace, newInfra.NsExists = k8s.ValidNs(mode, utils.ChaosAgentLabel, kubeconfig)
 
-	return newAgent, nil
+	return newInfra, nil
 }
 
 func ValidateSAPermissions(namespace string, mode string, kubeconfig *string) {

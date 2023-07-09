@@ -5,7 +5,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+	http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,61 +19,79 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/litmuschaos/litmusctl/pkg/types"
 	"io/ioutil"
 	"net/http"
 
+	models "github.com/litmuschaos/litmus/chaoscenter/graphql/server/graph/model"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
-
-	types "github.com/litmuschaos/litmusctl/pkg/types"
 )
 
-type AgentData struct {
-	Data   AgentList `json:"data"`
+type InfraData struct {
+	Data   InfraList `json:"data"`
 	Errors []struct {
 		Message string   `json:"message"`
 		Path    []string `json:"path"`
 	} `json:"errors"`
 }
 
-type AgentDetails struct {
-	AgentName    string `json:"clusterName"`
-	IsActive     bool   `json:"isActive"`
-	IsRegistered bool   `json:"isRegistered"`
-	ClusterID    string `json:"clusterID"`
+type InfraList struct {
+	ListInfraDetails models.ListInfraResponse `json:"listInfras"`
 }
 
-type AgentList struct {
-	GetAgent []AgentDetails `json:"listClusters"`
+type ListInfraGraphQLRequest struct {
+	Query     string `json:"query"`
+	Variables struct {
+		ProjectID        string                  `json:"pid"`
+		ListInfraRequest models.ListInfraRequest `json:"request"`
+	} `json:"variables"`
 }
 
-// GetAgentList lists the Chaos Delegate connected to the specified project
-func GetAgentList(c types.Credentials, pid string) (AgentData, error) {
-	query := `{"query":"query{\n  listClusters(projectID: \"` + pid + `\"){\n  clusterID clusterName isActive isRegistered\n  }\n}"}`
+// GetInfraList lists the Chaos Delegate connected to the specified project
+func GetInfraList(c types.Credentials, pid string, request models.ListInfraRequest) (InfraData, error) {
+	var gplReq ListInfraGraphQLRequest
+	gplReq.Query = `query listInfras($pid: projectID!, $request: ListInfraRequest!){
+					listInfras(projectID: $pid, ListInfraRequest: $request){
+						totalNoOfInfras
+						Infras {
+							infraID
+							name
+							isActive
+						}
+					}
+					}`
+	gplReq.Variables.ProjectID = pid
+	gplReq.Variables.ListInfraRequest = request
+
+	query, err := json.Marshal(gplReq)
+	if err != nil {
+		return InfraData{}, err
+	}
 	resp, err := SendRequest(SendRequestParams{Endpoint: c.Endpoint + utils.GQLAPIPath, Token: c.Token}, []byte(query), string(types.Post))
 	if err != nil {
-		return AgentData{}, err
+		return InfraData{}, err
 	}
 
 	bodyBytes, err := ioutil.ReadAll(resp.Body)
 	defer resp.Body.Close()
 	if err != nil {
-		return AgentData{}, err
+		return InfraData{}, err
 	}
 
 	if resp.StatusCode == http.StatusOK {
-		var agent AgentData
-		err = json.Unmarshal(bodyBytes, &agent)
+		var Infra InfraData
+		err = json.Unmarshal(bodyBytes, &Infra)
 		if err != nil {
-			return AgentData{}, err
+			return InfraData{}, err
 		}
 
-		if len(agent.Errors) > 0 {
-			return AgentData{}, errors.New(agent.Errors[0].Message)
+		if len(Infra.Errors) > 0 {
+			return InfraData{}, errors.New(Infra.Errors[0].Message)
 		}
 
-		return agent, nil
+		return Infra, nil
 	} else {
-		return AgentData{}, err
+		return InfraData{}, err
 	}
 }
 
