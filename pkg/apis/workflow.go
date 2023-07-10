@@ -132,7 +132,7 @@ func GetExperimentList(pid string, in models.ListExperimentRequest, cred types.C
 	var gqlReq GetChaosExperimentsGraphQLRequest
 	var err error
 
-	gqlReq.Query = `query listExperiment($projectID: ProjectID!, $request: ListExperimentRequest!) {
+	gqlReq.Query = `query listExperiment($projectID: String!, $request: ListExperimentRequest!) {
                       listExperiment(project: $projectID, request: $request) {
                         totalNoOfExperiments
                         experiments {
@@ -202,61 +202,65 @@ func GetExperimentList(pid string, in models.ListExperimentRequest, cred types.C
 	}
 }
 
-type WorkflowRunsListData struct {
+type ExperimentRunListData struct {
 	Errors []struct {
 		Message string   `json:"message"`
 		Path    []string `json:"path"`
 	} `json:"errors"`
-	Data WorkflowRunsList `json:"data"`
+	Data ExperimentRunsList `json:"data"`
 }
 
-type WorkflowRunsList struct {
-	ListWorkflowRunsDetails model.ListWorkflowRunsResponse `json:"listWorkflowRuns"`
+type ExperimentRunsList struct {
+	ListExperimentRunDetails model.ListWorkflowRunsResponse `json:"listExperimentRun"`
 }
 
-type GetChaosWorkFlowRunsGraphQLRequest struct {
+type GetChaosExperimentRunGraphQLRequest struct {
 	Query     string `json:"query"`
 	Variables struct {
-		GetChaosWorkFlowRunsRequest model.ListWorkflowRunsRequest `json:"request"`
+		ProjectID                    string                          `json:"projectID"`
+		GetChaosExperimentRunRequest models.ListExperimentRunRequest `json:"request"`
 	} `json:"variables"`
 }
 
-// GetWorkflowRunsList sends GraphQL API request for fetching a list of workflow runs.
-func GetWorkflowRunsList(in model.ListWorkflowRunsRequest, cred types.Credentials) (WorkflowRunsListData, error) {
+// GetExperimentRunsList sends GraphQL API request for fetching a list of workflow runs.
+func GetExperimentRunsList(pid string, in models.ListExperimentRunRequest, cred types.Credentials) (ExperimentRunListData, error) {
 
-	var gqlReq GetChaosWorkFlowRunsGraphQLRequest
+	var gqlReq GetChaosExperimentRunGraphQLRequest
 	var err error
 
-	gqlReq.Query = `query listWorkflowRuns($request: ListWorkflowRunsRequest!) {
-                      listWorkflowRuns(request: $request) {
-                        totalNoOfWorkflowRuns
-                        workflowRuns {
-                          workflowRunID
-                          workflowID
-                          clusterName
-                          workflowName
+	gqlReq.Query = `query listExperimentRuns($projectID: String!, $request: ListExperimentRunRequest!) {
+                      listWorkflowRuns(projectID: $projectID, request: $request) {
+                        totalNoOfExperimentsRuns
+                        experimentRuns {
+                          experimentRunID
+                          experimentID
+                          experimentName
+                          infra {
+                          name
                           projectID
-                          clusterID
-                          clusterType
+                          infraID
+                          infraType
+                          }
                           isRemoved
-                          lastUpdated
+                          updatedAt
                           phase
                           resiliencyScore
-                          experimentsPassed
-                          experimentsFailed
-                          experimentsAwaited
-                          experimentsStopped
-                          experimentsNa
-                          totalExperiments
+                          faultsPassed
+                          faultsFailed
+                          faultsAwaited
+                          faultsStopped
+                          faultsNa
+                          totalFaults
                           executedBy
                         }
                       }
                     }`
-	gqlReq.Variables.GetChaosWorkFlowRunsRequest = in
+	gqlReq.Variables.ProjectID = pid
+	gqlReq.Variables.GetChaosExperimentRunRequest = in
 
 	query, err := json.Marshal(gqlReq)
 	if err != nil {
-		return WorkflowRunsListData{}, err
+		return ExperimentRunListData{}, err
 	}
 
 	resp, err := SendRequest(
@@ -268,29 +272,29 @@ func GetWorkflowRunsList(in model.ListWorkflowRunsRequest, cred types.Credential
 		string(types.Post),
 	)
 	if err != nil {
-		return WorkflowRunsListData{}, err
+		return ExperimentRunListData{}, err
 	}
 
 	bodyBytes, err := ioutil.ReadAll(resp.Body)
 	defer resp.Body.Close()
 	if err != nil {
-		return WorkflowRunsListData{}, err
+		return ExperimentRunListData{}, err
 	}
 
 	if resp.StatusCode == http.StatusOK {
-		var workflowRunsList WorkflowRunsListData
+		var workflowRunsList ExperimentRunListData
 		err = json.Unmarshal(bodyBytes, &workflowRunsList)
 		if err != nil {
-			return WorkflowRunsListData{}, err
+			return ExperimentRunListData{}, err
 		}
 
 		if len(workflowRunsList.Errors) > 0 {
-			return WorkflowRunsListData{}, errors.New(workflowRunsList.Errors[0].Message)
+			return ExperimentRunListData{}, errors.New(workflowRunsList.Errors[0].Message)
 		}
 
 		return workflowRunsList, nil
 	} else {
-		return WorkflowRunsListData{}, errors.New("Error while fetching the Chaos Scenario runs")
+		return ExperimentRunListData{}, errors.New("Error while fetching the Chaos Scenario runs")
 	}
 }
 

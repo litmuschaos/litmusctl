@@ -42,7 +42,7 @@ type InfraList struct {
 type ListInfraGraphQLRequest struct {
 	Query     string `json:"query"`
 	Variables struct {
-		ProjectID        string                  `json:"pid"`
+		ProjectID        string                  `json:"projectID"`
 		ListInfraRequest models.ListInfraRequest `json:"request"`
 	} `json:"variables"`
 }
@@ -50,10 +50,10 @@ type ListInfraGraphQLRequest struct {
 // GetInfraList lists the Chaos Infrastructure connected to the specified project
 func GetInfraList(c types.Credentials, pid string, request models.ListInfraRequest) (InfraData, error) {
 	var gplReq ListInfraGraphQLRequest
-	gplReq.Query = `query listInfras($pid: projectID!, $request: ListInfraRequest!){
-					listInfras(projectID: $pid, ListInfraRequest: $request){
+	gplReq.Query = `query listInfras($projectID: ID!, $request: ListInfraRequest!){
+					listInfras(projectID: $projectID, request: $request){
 						totalNoOfInfras
-						Infras {
+						infras {
 							infraID
 							name
 							isActive

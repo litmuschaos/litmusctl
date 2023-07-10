@@ -77,7 +77,7 @@ func UpgradeInfra(c context.Context, cred types.Credentials, projectID string, i
 	}
 
 	// Query to fetch upgraded manifest from the server
-	query = `{"query":"query {\n getInfraManifest(projectID : \"` + projectID + `\",\n infraID : \"` + infra.Data.GetInfraDetails.InfraID + `\",\n accessKey :\"` + infra.Data.GetInfraDetails.AccessKey + `\")}"}`
+	query = `{"query":"query {\n getInfraManifest(projectID : \"` + projectID + `\",\n infraID : \"` + infra.Data.GetInfraDetails.InfraID + `\", \n upgrade: true)}"}`
 	resp, err = SendRequest(SendRequestParams{Endpoint: cred.Endpoint + utils.GQLAPIPath, Token: cred.Token}, []byte(query), string(types.Post))
 	if err != nil {
 		return "", err
