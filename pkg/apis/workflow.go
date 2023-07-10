@@ -5,7 +5,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+	http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -21,6 +21,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	models "github.com/litmuschaos/litmus/chaoscenter/graphql/server/graph/model"
 	"github.com/litmuschaos/litmus/litmus-portal/graphql-server/graph/model"
 	types "github.com/litmuschaos/litmusctl/pkg/types"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
@@ -105,61 +106,65 @@ func CreateWorkflow(requestData model.ChaosWorkFlowRequest, cred types.Credentia
 	}
 }
 
-type WorkflowListData struct {
+type ExperimentListData struct {
 	Errors []struct {
 		Message string   `json:"message"`
 		Path    []string `json:"path"`
 	} `json:"errors"`
-	Data WorkflowList `json:"data"`
+	Data ExperimentList `json:"data"`
 }
 
-type WorkflowList struct {
-	ListWorkflowDetails model.ListWorkflowsResponse `json:"listWorkflows"`
+type ExperimentList struct {
+	ListExperimentDetails models.ListExperimentResponse `json:"listExperiment"`
 }
 
-type GetChaosWorkFlowsGraphQLRequest struct {
+type GetChaosExperimentsGraphQLRequest struct {
 	Query     string `json:"query"`
 	Variables struct {
-		GetChaosWorkFlowsRequest model.ListWorkflowsRequest `json:"request"`
+		GetChaosExperimentRequest models.ListExperimentRequest `json:"request"`
+		ProjectID                 string                       `json:"projectID"`
 	} `json:"variables"`
 }
 
-// GetWorkflowList sends GraphQL API request for fetching a list of workflows.
-func GetWorkflowList(in model.ListWorkflowsRequest, cred types.Credentials) (WorkflowListData, error) {
+// GetExperimentList sends GraphQL API request for fetching a list of experiments.
+func GetExperimentList(pid string, in models.ListExperimentRequest, cred types.Credentials) (ExperimentListData, error) {
 
-	var gqlReq GetChaosWorkFlowsGraphQLRequest
+	var gqlReq GetChaosExperimentsGraphQLRequest
 	var err error
 
-	gqlReq.Query = `query listWorkflows($request: ListWorkflowsRequest!) {
-                      listWorkflows(request: $request) {
-                        totalNoOfWorkflows
-                        workflows {
-                          workflowID
-                          workflowManifest
+	gqlReq.Query = `query listExperiment($projectID: ProjectID!, $request: ListExperimentRequest!) {
+                      listExperiment(project: $projectID, request: $request) {
+                        totalNoOfExperiments
+                        experiments {
+                          experimentID
+                          experimentManifest
                           cronSyntax
-                          clusterName
-                          workflowName
-                          workflowDescription
+                          name
+                          description
                           weightages {
-                            experimentName
+                            faultName
                             weightage
                           }
-                          isCustomWorkflow
+                          isCustomExperiment
                           updatedAt
                           createdAt
-                          projectID
-                          clusterID
-                          clusterType
+                          infra {
+                            projectID
+                            name
+                            infraID
+                            infraType
+                          }
                           isRemoved
-                          lastUpdatedBy
+                          updatedBy
                         }
                       }
                     }`
-	gqlReq.Variables.GetChaosWorkFlowsRequest = in
+	gqlReq.Variables.GetChaosExperimentRequest = in
+	gqlReq.Variables.ProjectID = pid
 
 	query, err := json.Marshal(gqlReq)
 	if err != nil {
-		return WorkflowListData{}, err
+		return ExperimentListData{}, err
 	}
 
 	resp, err := SendRequest(
@@ -171,29 +176,29 @@ func GetWorkflowList(in model.ListWorkflowsRequest, cred types.Credentials) (Wor
 		string(types.Post),
 	)
 	if err != nil {
-		return WorkflowListData{}, err
+		return ExperimentListData{}, err
 	}
 
 	bodyBytes, err := ioutil.ReadAll(resp.Body)
 	defer resp.Body.Close()
 	if err != nil {
-		return WorkflowListData{}, err
+		return ExperimentListData{}, err
 	}
 
 	if resp.StatusCode == http.StatusOK {
-		var workflowList WorkflowListData
-		err = json.Unmarshal(bodyBytes, &workflowList)
+		var experimentList ExperimentListData
+		err = json.Unmarshal(bodyBytes, &experimentList)
 		if err != nil {
-			return WorkflowListData{}, err
+			return ExperimentListData{}, err
 		}
 
-		if len(workflowList.Errors) > 0 {
-			return WorkflowListData{}, errors.New(workflowList.Errors[0].Message)
+		if len(experimentList.Errors) > 0 {
+			return ExperimentListData{}, errors.New(experimentList.Errors[0].Message)
 		}
 
-		return workflowList, nil
+		return experimentList, nil
 	} else {
-		return WorkflowListData{}, errors.New("Error while fetching the Chaos Scenarios")
+		return ExperimentListData{}, errors.New("Error while fetching the Chaos Scenarios")
 	}
 }
 
