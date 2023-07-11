@@ -26,11 +26,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// agentsCmd represents the agents command
-var agentsCmd = &cobra.Command{
-	Use:   "chaos-delegates",
-	Short: "Display list of Chaos Delegates within the project",
-	Long:  `Display list of Chaos Delegates within the project`,
+// InfraCmd represents the agents command
+var InfraCmd = &cobra.Command{
+	Use:   "chaos-Infrastructures",
+	Short: "Display list of Chaos Infrastructures within the project",
+	Long:  `Display list of Chaos Infrastructures within the project`,
 	Run: func(cmd *cobra.Command, args []string) {
 		credentials, err := utils.GetCredentials(cmd)
 		utils.PrintError(err)
@@ -64,23 +64,24 @@ var agentsCmd = &cobra.Command{
 		case "":
 
 			writer := tabwriter.NewWriter(os.Stdout, 4, 8, 1, '\t', 0)
-			utils.White_B.Fprintln(writer, "CHAOS DELEGATE ID \tCHAOS DELEGATE NAME\tSTATUS\tREGISTRATION\t")
+			utils.White_B.Fprintln(writer, "CHAOS INFRASTRUCTURE ID \tCHAOS INFRASTRUCTURE NAME\tSTATUS\t")
 
-			for _, agent := range infras.Data.ListInfraDetails.Infras {
+			for _, infra := range infras.Data.ListInfraDetails.Infras {
 				var status string
-				if agent.IsActive {
+				if infra.IsActive {
 					status = "ACTIVE"
 				} else {
 					status = "INACTIVE"
 				}
 
-				var isRegistered string
-				if agent.IsRegistered {
-					isRegistered = "REGISTERED"
-				} else {
-					isRegistered = "NOT REGISTERED"
-				}
-				utils.White.Fprintln(writer, agent.InfraID+"\t"+agent.Name+"\t"+status+"\t"+isRegistered+"\t")
+				//var isRegistered string
+				//if agent.IsRemoved {
+				//	isRegistered = "REGISTERED"
+				//} else {
+				//	isRegistered = "NOT REGISTERED"
+				//}
+				utils.White.Fprintln(writer, infra.InfraID+"\t"+infra.Name+"\t"+status+"\t")
+				//+isRegistered+"\t"
 			}
 			writer.Flush()
 		}
@@ -88,9 +89,9 @@ var agentsCmd = &cobra.Command{
 }
 
 func init() {
-	GetCmd.AddCommand(agentsCmd)
+	GetCmd.AddCommand(InfraCmd)
 
-	agentsCmd.Flags().String("project-id", "", "Set the project-id. To retrieve projects. Apply `litmusctl get projects`")
+	InfraCmd.Flags().String("project-id", "", "Set the project-id. To retrieve projects. Apply `litmusctl get projects`")
 
-	agentsCmd.Flags().StringP("output", "o", "", "Output format. One of:\njson|yaml")
+	InfraCmd.Flags().StringP("output", "o", "", "Output format. One of:\njson|yaml")
 }
