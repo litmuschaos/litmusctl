@@ -132,7 +132,7 @@ func GetExperimentList(pid string, in models.ListExperimentRequest, cred types.C
 	var gqlReq GetChaosExperimentsGraphQLRequest
 	var err error
 
-	gqlReq.Query = `query listExperiment($projectID: String!, $request: ListExperimentRequest!) {
+	gqlReq.Query = `query listExperiment($projectID: ID!, $request: ListExperimentRequest!) {
                       listExperiment(project: $projectID, request: $request) {
                         totalNoOfExperiments
                         experiments {
@@ -228,7 +228,7 @@ func GetExperimentRunsList(pid string, in models.ListExperimentRunRequest, cred 
 	var gqlReq GetChaosExperimentRunGraphQLRequest
 	var err error
 
-	gqlReq.Query = `query listExperimentRuns($projectID: String!, $request: ListExperimentRunRequest!) {
+	gqlReq.Query = `query listExperimentRuns($projectID: ID!, $request: ListExperimentRunRequest!) {
                       listWorkflowRuns(projectID: $projectID, request: $request) {
                         totalNoOfExperimentsRuns
                         experimentRuns {
@@ -298,48 +298,48 @@ func GetExperimentRunsList(pid string, in models.ListExperimentRunRequest, cred 
 	}
 }
 
-type DeleteChaosWorkflowData struct {
+type DeleteChaosExperimentData struct {
 	Errors []struct {
 		Message string   `json:"message"`
 		Path    []string `json:"path"`
 	} `json:"errors"`
-	Data DeleteChaosWorkflowDetails `json:"data"`
+	Data DeleteChaosExperimentDetails `json:"data"`
 }
 
-type DeleteChaosWorkflowDetails struct {
-	IsDeleted bool `json:"deleteChaosWorkflow"`
+type DeleteChaosExperimentDetails struct {
+	IsDeleted bool `json:"deleteChaosExperiment"`
 }
 
-type DeleteChaosWorkflowGraphQLRequest struct {
+type DeleteChaosExperimentGraphQLRequest struct {
 	Query     string `json:"query"`
 	Variables struct {
-		ProjectID     string  `json:"projectID"`
-		WorkflowID    *string `json:"workflowID"`
-		WorkflowRunID *string `json:"workflowRunID"`
+		ProjectID       string  `json:"projectID"`
+		ExperimentID    *string `json:"experimentID"`
+		ExperimentRunID *string `json:"experimentRunID"`
 	} `json:"variables"`
 }
 
-// DeleteChaosWorkflow sends GraphQL API request for deleting a given Chaos Workflow.
-func DeleteChaosWorkflow(projectID string, workflowID *string, cred types.Credentials) (DeleteChaosWorkflowData, error) {
+// DeleteChaosExperiment sends GraphQL API request for deleting a given Chaos Workflow.
+func DeleteChaosExperiment(projectID string, workflowID *string, cred types.Credentials) (DeleteChaosExperimentData, error) {
 
-	var gqlReq DeleteChaosWorkflowGraphQLRequest
+	var gqlReq DeleteChaosExperimentGraphQLRequest
 	var err error
 
-	gqlReq.Query = `mutation deleteChaosWorkflow($projectID: String!, $workflowID: String, $workflowRunID: String) {
-                      deleteChaosWorkflow(
+	gqlReq.Query = `mutation deleteChaosExperiment($projectID: ID!, $experimentID: String!, $experimentRunID: String) {
+                      deleteChaosExperiment(
                         projectID: $projectID
-                        workflowID: $workflowID
-                        workflowRunID: $workflowRunID
+                        experimentID: $experimentID
+                        experimentRunID: $experimentRunID
                       )
                     }`
 	gqlReq.Variables.ProjectID = projectID
-	gqlReq.Variables.WorkflowID = workflowID
-	var workflow_run_id string = ""
-	gqlReq.Variables.WorkflowRunID = &workflow_run_id
+	gqlReq.Variables.ExperimentID = workflowID
+	var experiment_run_id string = ""
+	gqlReq.Variables.ExperimentRunID = &experiment_run_id
 
 	query, err := json.Marshal(gqlReq)
 	if err != nil {
-		return DeleteChaosWorkflowData{}, err
+		return DeleteChaosExperimentData{}, err
 	}
 
 	resp, err := SendRequest(
@@ -351,29 +351,29 @@ func DeleteChaosWorkflow(projectID string, workflowID *string, cred types.Creden
 		string(types.Post),
 	)
 	if err != nil {
-		return DeleteChaosWorkflowData{}, err
+		return DeleteChaosExperimentData{}, err
 	}
 
 	bodyBytes, err := ioutil.ReadAll(resp.Body)
 	defer resp.Body.Close()
 	if err != nil {
-		return DeleteChaosWorkflowData{}, err
+		return DeleteChaosExperimentData{}, err
 	}
 
 	if resp.StatusCode == http.StatusOK {
-		var deletedWorkflow DeleteChaosWorkflowData
-		err = json.Unmarshal(bodyBytes, &deletedWorkflow)
+		var deletedExperiment DeleteChaosExperimentData
+		err = json.Unmarshal(bodyBytes, &deletedExperiment)
 		if err != nil {
-			return DeleteChaosWorkflowData{}, err
+			return DeleteChaosExperimentData{}, err
 		}
 
-		if len(deletedWorkflow.Errors) > 0 {
-			return DeleteChaosWorkflowData{}, errors.New(deletedWorkflow.Errors[0].Message)
+		if len(deletedExperiment.Errors) > 0 {
+			return DeleteChaosExperimentData{}, errors.New(deletedExperiment.Errors[0].Message)
 		}
 
-		return deletedWorkflow, nil
+		return deletedExperiment, nil
 	} else {
-		return DeleteChaosWorkflowData{}, errors.New("Error while deleting the Chaos Scenario")
+		return DeleteChaosExperimentData{}, errors.New("Error while deleting the Chaos Experiment")
 	}
 }
 

@@ -176,19 +176,19 @@ type DisconnectInfraDetails struct {
 type DisconnectInfraGraphQLRequest struct {
 	Query     string `json:"query"`
 	Variables struct {
-		ProjectID string    `json:"projectID"`
-		InfraID   []*string `json:"infraID"`
+		ProjectID string `json:"projectID"`
+		InfraID   string `json:"infraID"`
 	} `json:"variables"`
 }
 
 // DisconnectInfra sends GraphQL API request for disconnecting Chaos Delegate(s).
-func DisconnectInfra(projectID string, infraID []*string, cred types.Credentials) (DisconnectInfraData, error) {
+func DisconnectInfra(projectID string, infraID string, cred types.Credentials) (DisconnectInfraData, error) {
 
 	var gqlReq DisconnectInfraGraphQLRequest
 	var err error
 
-	gqlReq.Query = `mutation deleteInfra($projectID: String!, $infraID: [String]!) {
-                      deleteClusters(
+	gqlReq.Query = `mutation deleteInfra($projectID: ID!, $infraID: String!) {
+                      deleteInfra(
                         projectID: $projectID
                         infraID: $infraID
                       )

@@ -43,7 +43,6 @@ type GetInfraDetails struct {
 
 type InfrasDetails struct {
 	InfraID        string  `json:"infraID"`
-	AccessKey      string  `json:"accessKey"`
 	InfraNamespace *string `json:"infraNamespace"`
 }
 
