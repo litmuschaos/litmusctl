@@ -83,7 +83,7 @@ func CreateWorkflow(requestData model.ChaosWorkFlowRequest, cred types.Credentia
 
 	defer resp.Body.Close()
 	if err != nil {
-		return ChaosWorkflowCreationData{}, errors.New("Error in creating Chaos Scenario: " + err.Error())
+		return ChaosWorkflowCreationData{}, errors.New("Error in creating Chaos Experiment: " + err.Error())
 	}
 
 	if resp.StatusCode == http.StatusOK {
@@ -92,7 +92,7 @@ func CreateWorkflow(requestData model.ChaosWorkFlowRequest, cred types.Credentia
 		err = json.Unmarshal(bodyBytes, &createdWorkflow)
 
 		if err != nil {
-			return ChaosWorkflowCreationData{}, errors.New("Error in creating Chaos Scenario: " + err.Error())
+			return ChaosWorkflowCreationData{}, errors.New("Error in creating Chaos Experiment: " + err.Error())
 		}
 
 		// Errors present
@@ -133,7 +133,7 @@ func GetExperimentList(pid string, in models.ListExperimentRequest, cred types.C
 	var err error
 
 	gqlReq.Query = `query listExperiment($projectID: ID!, $request: ListExperimentRequest!) {
-                      listExperiment(project: $projectID, request: $request) {
+                      listExperiment(projectID: $projectID, request: $request) {
                         totalNoOfExperiments
                         experiments {
                           experimentID
@@ -155,10 +155,13 @@ func GetExperimentList(pid string, in models.ListExperimentRequest, cred types.C
                             infraType
                           }
                           isRemoved
-                          updatedBy
+                          updatedBy{
+                              username
+                              email
                         }
                       }
-                    }`
+                    }
+}`
 	gqlReq.Variables.GetChaosExperimentRequest = in
 	gqlReq.Variables.ProjectID = pid
 
@@ -198,7 +201,7 @@ func GetExperimentList(pid string, in models.ListExperimentRequest, cred types.C
 
 		return experimentList, nil
 	} else {
-		return ExperimentListData{}, errors.New("Error while fetching the Chaos Scenarios")
+		return ExperimentListData{}, errors.New("Error while fetching the Chaos Experiments")
 	}
 }
 
@@ -211,7 +214,7 @@ type ExperimentRunListData struct {
 }
 
 type ExperimentRunsList struct {
-	ListExperimentRunDetails model.ListWorkflowRunsResponse `json:"listExperimentRun"`
+	ListExperimentRunDetails models.ListExperimentRunResponse `json:"listExperimentRun"`
 }
 
 type GetChaosExperimentRunGraphQLRequest struct {
@@ -229,8 +232,8 @@ func GetExperimentRunsList(pid string, in models.ListExperimentRunRequest, cred 
 	var err error
 
 	gqlReq.Query = `query listExperimentRuns($projectID: ID!, $request: ListExperimentRunRequest!) {
-                      listWorkflowRuns(projectID: $projectID, request: $request) {
-                        totalNoOfExperimentsRuns
+                      listExperimentRun(projectID: $projectID, request: $request) {
+                        totalNoOfExperimentRuns
                         experimentRuns {
                           experimentRunID
                           experimentID
@@ -251,7 +254,7 @@ func GetExperimentRunsList(pid string, in models.ListExperimentRunRequest, cred 
                           faultsStopped
                           faultsNa
                           totalFaults
-                          executedBy
+                          executionData
                         }
                       }
                     }`
@@ -294,7 +297,7 @@ func GetExperimentRunsList(pid string, in models.ListExperimentRunRequest, cred 
 
 		return workflowRunsList, nil
 	} else {
-		return ExperimentRunListData{}, errors.New("Error while fetching the Chaos Scenario runs")
+		return ExperimentRunListData{}, errors.New("Error while fetching the Chaos Experiment runs")
 	}
 }
 

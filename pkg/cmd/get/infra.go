@@ -28,7 +28,7 @@ import (
 
 // InfraCmd represents the agents command
 var InfraCmd = &cobra.Command{
-	Use:   "chaos-Infrastructures",
+	Use:   "chaos-infra",
 	Short: "Display list of Chaos Infrastructures within the project",
 	Long:  `Display list of Chaos Infrastructures within the project`,
 	Run: func(cmd *cobra.Command, args []string) {

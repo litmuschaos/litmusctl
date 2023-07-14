@@ -5,7 +5,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+	http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,7 +17,6 @@ package get
 
 import (
 	"os"
-	"strconv"
 	"text/tabwriter"
 	"time"
 
@@ -34,7 +33,6 @@ var projectsCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		credentials, err := utils.GetCredentials(cmd)
 		utils.PrintError(err)
-
 		projects, err := apis.ListProject(credentials)
 		utils.PrintError(err)
 
@@ -52,7 +50,7 @@ var projectsCmd = &cobra.Command{
 			writer := tabwriter.NewWriter(os.Stdout, 8, 8, 8, '\t', tabwriter.AlignRight)
 			utils.White_B.Fprintln(writer, "PROJECT ID\tPROJECT NAME\tCREATED AT")
 			for _, project := range projects.Data {
-				intTime, err := strconv.ParseInt(project.CreatedAt, 10, 64)
+				intTime := project.CreatedAt
 				utils.PrintError(err)
 
 				humanTime := time.Unix(intTime, 0)

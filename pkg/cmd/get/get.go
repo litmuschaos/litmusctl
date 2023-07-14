@@ -30,7 +30,7 @@ var GetCmd = &cobra.Command{
 		litmusctl get chaos-infra --project-id=""
 
 		#get list of chaos Chaos Scenarios
-		litmusctl get chaos-experiment --project-id=""
+		litmusctl get chaos-experiments --project-id=""
 
 		#get list of Chaos Scenario runs
 		litmusctl get chaos-experiment-runs --project-id=""
