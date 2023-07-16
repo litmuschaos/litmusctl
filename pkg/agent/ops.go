@@ -28,16 +28,28 @@ import (
 	"github.com/litmuschaos/litmusctl/pkg/utils"
 )
 
-func PrintExistingAgents(agent apis.InfraData) {
+func PrintExistingInfra(infra apis.InfraData) {
 	utils.Red.Println("\nChaos Infrastructure with the given name already exists.")
-	// Print Chaos Delegate list if existing Chaos Delegate name is entered twice
+	// Print Chaos Infra list if existing Chaos Infra name is entered twice
 	utils.White_B.Println("\nConnected Chaos Infrastructure list:")
 
-	for i := range agent.Data.ListInfraDetails.Infras {
-		utils.White_B.Println("-", agent.Data.ListInfraDetails.Infras[i].Name)
+	for i := range infra.Data.ListInfraDetails.Infras {
+		utils.White_B.Println("-", infra.Data.ListInfraDetails.Infras[i].Name)
 	}
 
 	utils.White_B.Println("\n❗ Please enter a different name.")
+}
+
+func PrintExistingEnvironments(env apis.ListEnvironmentData) {
+	utils.Red.Println("\nChaos Environment with the given ID doesn't exists.")
+	// Print Chaos EnvironmentID list if Given ID doesn't exist
+	utils.White_B.Println("\nCreated Chaos Environments list:")
+
+	for i := range env.Data.ListEnvironmentDetails.Environments {
+		utils.White_B.Println("-", env.Data.ListEnvironmentDetails.Environments[i].EnvironmentID)
+	}
+
+	utils.White_B.Println("\n❗ Please enter a name from the List.")
 }
 
 // GetProjectID display list of projects and returns the project id based on input
@@ -92,9 +104,9 @@ repeat:
 // GetInfraDetails take details of Chaos Infrastructure as input
 func GetInfraDetails(mode string, pid string, c types.Credentials, kubeconfig *string) (types.Infra, error) {
 	var newInfra types.Infra
-	// Get agent name as input
-	utils.White_B.Println("\nEnter the details of the Chaos Delegate")
-	// Label for goto statement in case of invalid Chaos Delegate name
+	// Get Infra name as input
+	utils.White_B.Println("\nEnter the details of the Chaos Infrastructure")
+	// Label for goto statement in case of invalid Chaos Infra name
 
 INFRA_NAME:
 	utils.White_B.Print("\nChaos Infra Name: ")
@@ -104,28 +116,57 @@ INFRA_NAME:
 		goto INFRA_NAME
 	}
 
-	// Check if Chaos Delegate with the given name already exists
+	// Check if Chaos Infra with the given name already exists
 	Infra, err := apis.GetInfraList(c, pid, model.ListInfraRequest{})
 	if err != nil {
 		return types.Infra{}, err
 	}
 
-	var isAgentExist = false
+	var isInfraExist = false
 	for i := range Infra.Data.ListInfraDetails.Infras {
 		if newInfra.InfraName == Infra.Data.ListInfraDetails.Infras[i].Name {
 			utils.White_B.Println(Infra.Data.ListInfraDetails.Infras[i].Name)
-			isAgentExist = true
+			isInfraExist = true
 		}
 	}
 
-	if isAgentExist {
-		PrintExistingAgents(Infra)
+	if isInfraExist {
+		PrintExistingInfra(Infra)
 		goto INFRA_NAME
 	}
 
-	// Get agent description as input
+	// Get Infra description as input
 	utils.White_B.Print("\nChaos Infrastructure Description: ")
 	newInfra.Description = utils.Scanner()
+
+ENVIRONMENT:
+	utils.White_B.Print("\nChaos EnvironmentID: ")
+	newInfra.EnvironmentID = utils.Scanner()
+
+	if newInfra.EnvironmentID == "" {
+		utils.Red.Println("⛔ Chaos Environment ID cannot be empty. Please enter a valid Environment.")
+		goto ENVIRONMENT
+	}
+
+	// Check if Chaos Environment with the given name exists
+	Env, err := apis.GetEnvironmentList(pid, c)
+	if err != nil {
+		return types.Infra{}, err
+	}
+
+	var isEnvExist = false
+	for i := range Env.Data.ListEnvironmentDetails.Environments {
+		if newInfra.EnvironmentID == Env.Data.ListEnvironmentDetails.Environments[i].EnvironmentID {
+			utils.White_B.Println(Env.Data.ListEnvironmentDetails.Environments[i].EnvironmentID)
+			isEnvExist = true
+			break
+		}
+	}
+
+	if !isEnvExist {
+		PrintExistingEnvironments(Env)
+		goto ENVIRONMENT
+	}
 
 	utils.White_B.Print("\nDo you want Chaos Infrastructure to skip SSL/TLS check (Y/N) (Default: N): ")
 	skipSSLDescision := utils.Scanner()
@@ -170,33 +211,39 @@ INFRA_NAME:
 			utils.White_B.Print("\nOperator: ")
 			operator := utils.Scanner()
 			if operator != "" {
-				str += "operator : \\\"" + operator + "\\\" "
+				str += "\"operator\" : \"" + operator + "\" ,"
 			}
 
 			utils.White_B.Print("\nEffect: ")
 			effect := utils.Scanner()
 
 			if effect != "" {
-				str += "effect: \\\"" + effect + "\\\" "
+				str += "\"effect\": \"" + effect + "\" ,"
 			}
 
 			if ts != "" {
-				str += "tolerationSeconds: " + ts + " "
+				// check whether if effect is "NoSchedule" then tolerationsSeconds should be 0
+				if effect != "NoSchedule" {
+					str += "\"tolerationSeconds\": " + ts + " ,"
+				}
 			}
 
 			utils.White_B.Print("\nKey: ")
 			key := utils.Scanner()
 			if key != "" {
-				str += "key: \\\"" + key + "\\\" "
+				str += "\"key\": \"" + key + "\" ,"
 			}
 
 			utils.White_B.Print("\nValue: ")
 			value := utils.Scanner()
 			if key != "" {
-				str += "value: \\\"" + value + "\\\" "
+				str += "\"value\": \"" + value + "\""
 			}
 
-			str += " }"
+			str += " },"
+		}
+		if nts > 0 {
+			str = str[:len(str)-1]
 		}
 		str += "]"
 
@@ -205,12 +252,12 @@ INFRA_NAME:
 
 	// Get platform name as input
 	newInfra.PlatformName = GetPlatformName(kubeconfig)
-	// Set agent type
-	newInfra.InfraType = utils.AgentType
+	// Set Infra type
+	newInfra.InfraType = utils.InfraType
 	// Set project id
 	newInfra.ProjectId = pid
 	// Get namespace
-	newInfra.Namespace, newInfra.NsExists = k8s.ValidNs(mode, utils.ChaosAgentLabel, kubeconfig)
+	newInfra.Namespace, newInfra.NsExists = k8s.ValidNs(mode, utils.ChaosInfraLabel, kubeconfig)
 
 	return newInfra, nil
 }
@@ -242,25 +289,25 @@ func ValidateSAPermissions(namespace string, mode string, kubeconfig *string) {
 		}
 	}
 
-	utils.White_B.Println("\n🌟 Sufficient permissions. Installing the Chaos Delegate...")
+	utils.White_B.Println("\n🌟 Sufficient permissions. Installing the Chaos Infra...")
 }
 
-// Summary display the agent details based on input
-func Summary(agent types.Infra, kubeconfig *string) {
-	utils.White_B.Printf("\n📌 Summary \nChaos Delegate Name: %s\nChaos Delegate Description: %s\nChaos Delegate SSL/TLS Skip: %t\nPlatform Name: %s\n", agent.InfraName, agent.Description, agent.SkipSSL, agent.PlatformName)
-	if ok, _ := k8s.NsExists(agent.Namespace, kubeconfig); ok {
-		utils.White_B.Println("Namespace: ", agent.Namespace)
+// Summary display the Infra details based on input
+func Summary(infra types.Infra, kubeconfig *string) {
+	utils.White_B.Printf("\n📌 Summary \nChaos Infra Name: %s\nChaos EnvironmentID: %s\nChaos Infra Description: %s\nChaos Infra SSL/TLS Skip: %t\nPlatform Name: %s\n", infra.InfraName, infra.EnvironmentID, infra.Description, infra.SkipSSL, infra.PlatformName)
+	if ok, _ := k8s.NsExists(infra.Namespace, kubeconfig); ok {
+		utils.White_B.Println("Namespace: ", infra.Namespace)
 	} else {
-		utils.White_B.Println("Namespace: ", agent.Namespace, "(new)")
+		utils.White_B.Println("Namespace: ", infra.Namespace, "(new)")
 	}
 
-	if k8s.SAExists(k8s.SAExistsParams{Namespace: agent.Namespace, Serviceaccount: agent.ServiceAccount}, kubeconfig) {
-		utils.White_B.Println("Service Account: ", agent.ServiceAccount)
+	if k8s.SAExists(k8s.SAExistsParams{Namespace: infra.Namespace, Serviceaccount: infra.ServiceAccount}, kubeconfig) {
+		utils.White_B.Println("Service Account: ", infra.ServiceAccount)
 	} else {
-		utils.White_B.Println("Service Account: ", agent.ServiceAccount, "(new)")
+		utils.White_B.Println("Service Account: ", infra.ServiceAccount, "(new)")
 	}
 
-	utils.White_B.Printf("\nInstallation Mode: %s\n", agent.Mode)
+	utils.White_B.Printf("\nInstallation Mode: %s\n", infra.Mode)
 }
 
 func ConfirmInstallation() {
@@ -269,9 +316,9 @@ func ConfirmInstallation() {
 	fmt.Scanln(&descision)
 
 	if strings.ToLower(descision) == "yes" || strings.ToLower(descision) == "y" {
-		utils.White_B.Println("👍 Continuing Chaos Delegate connection!!")
+		utils.White_B.Println("👍 Continuing Chaos Infrastructure connection!!")
 	} else {
-		utils.Red.Println("✋ Exiting Chaos Delegate connection!!")
+		utils.Red.Println("✋ Exiting Chaos Infrastructure connection!!")
 		os.Exit(1)
 	}
 }

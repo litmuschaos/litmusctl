@@ -146,7 +146,7 @@ type Member struct {
 type Project struct {
 	ID        string   `json:"ID"`
 	Name      string   `json:"Name"`
-	CreatedAt string   `json:"CreatedAt"`
+	CreatedAt string   `json:"created_at"`
 	Members   []Member `json:"Members"`
 }
 

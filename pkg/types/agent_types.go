@@ -20,6 +20,7 @@ type Infra struct {
 	Mode           string
 	Description    string `json:"description,omitempty"`
 	PlatformName   string `json:"platformName"`
+	EnvironmentID  string `json:"environmentID"`
 	ProjectId      string `json:"projectID"`
 	InfraType      string `json:"infraType"`
 	NodeSelector   string `json:"nodeSelector"`

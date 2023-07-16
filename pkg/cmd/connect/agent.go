@@ -16,7 +16,6 @@ limitations under the License.
 package connect
 
 import (
-	"encoding/json"
 	"fmt"
 	models "github.com/litmuschaos/litmus/chaoscenter/graphql/server/graph/model"
 	"os"
@@ -30,16 +29,16 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// agentCmd represents the Chaos Delegate command
-var agentCmd = &cobra.Command{
-	Use: "chaos-delegate",
-	Short: `Connect an external Chaos Delegate.
+// infraCmd represents the Chaos infra command
+var infraCmd = &cobra.Command{
+	Use: "chaos-infra",
+	Short: `Connect an external Chaos infra.
 	Example(s):
-	#connect a Chaos Delegate
-	litmusctl connect chaos-delegate --name="new-chaos-delegate" --non-interactive
+	#connect a Chaos infra
+	litmusctl connect chaos-infra --name="new-chaos-infra" --non-interactive
 
-	#connect a Chaos Delegate within a project
-	litmusctl connect chaos-delegate --name="new-chaos-delegate" --project-id="d861b650-1549-4574-b2ba-ab754058dd04" --non-interactive
+	#connect a Chaos infra within a project
+	litmusctl connect chaos-infra --name="new-chaos-infra" --project-id="d861b650-1549-4574-b2ba-ab754058dd04" --non-interactive
 
 	Note: The default location of the config file is $HOME/.litmusconfig, and can be overridden by a --config flag
 `,
@@ -53,12 +52,12 @@ var agentCmd = &cobra.Command{
 		kubeconfig, err := cmd.Flags().GetString("kubeconfig")
 		utils.PrintError(err)
 
-		var newAgent types.Infra
+		var newInfra types.Infra
 
-		newAgent.ProjectId, err = cmd.Flags().GetString("project-id")
+		newInfra.ProjectId, err = cmd.Flags().GetString("project-id")
 		utils.PrintError(err)
 
-		if newAgent.ProjectId == "" {
+		if newInfra.ProjectId == "" {
 			userDetails, err := apis.GetProjectDetails(credentials)
 			utils.PrintError(err)
 
@@ -79,53 +78,59 @@ var agentCmd = &cobra.Command{
 
 			if !projectExists {
 				utils.White_B.Print("Creating a random project...")
-				newAgent.ProjectId = agent.CreateRandomProject(credentials)
+				newInfra.ProjectId = agent.CreateRandomProject(credentials)
 			}
 		}
 
 		if nonInteractive {
 
-			newAgent.Mode, err = cmd.Flags().GetString("installation-mode")
+			newInfra.Mode, err = cmd.Flags().GetString("installation-mode")
 			utils.PrintError(err)
 
-			if newAgent.Mode == "" {
+			if newInfra.Mode == "" {
 				utils.Red.Print("Error: --installation-mode flag is empty")
 				os.Exit(1)
 			}
 
-			newAgent.InfraName, err = cmd.Flags().GetString("name")
+			newInfra.InfraName, err = cmd.Flags().GetString("name")
 			utils.PrintError(err)
 
-			newAgent.SkipSSL, err = cmd.Flags().GetBool("skip-ssl")
+			newInfra.SkipSSL, err = cmd.Flags().GetBool("skip-ssl")
 			utils.PrintError(err)
 
-			if newAgent.InfraName == "" {
+			if newInfra.InfraName == "" {
 				utils.Red.Print("Error: --name flag is empty")
 				os.Exit(1)
 			}
 
-			newAgent.Description, err = cmd.Flags().GetString("description")
+			newInfra.EnvironmentID, err = cmd.Flags().GetString("environmentID")
+			if newInfra.EnvironmentID == "" {
+				utils.Red.Print("Error: --environment flag is empty")
+				os.Exit(1)
+			}
+
+			newInfra.Description, err = cmd.Flags().GetString("description")
 			utils.PrintError(err)
 
-			newAgent.PlatformName, err = cmd.Flags().GetString("platform-name")
+			newInfra.PlatformName, err = cmd.Flags().GetString("platform-name")
 			utils.PrintError(err)
 
-			if newAgent.PlatformName == "" {
+			if newInfra.PlatformName == "" {
 				utils.Red.Print("Error: --platform-name flag is empty")
 				os.Exit(1)
 			}
 
-			newAgent.InfraType, err = cmd.Flags().GetString("chaos-delegate-type")
+			newInfra.InfraType, err = cmd.Flags().GetString("chaos-infra-type")
 			utils.PrintError(err)
-			if newAgent.InfraType == "" {
-				utils.Red.Print("Error: --chaos-delegate-type flag is empty")
+			if newInfra.InfraType == "" {
+				utils.Red.Print("Error: --chaos-infra-type flag is empty")
 				os.Exit(1)
 			}
 
-			newAgent.NodeSelector, err = cmd.Flags().GetString("node-selector")
+			newInfra.NodeSelector, err = cmd.Flags().GetString("node-selector")
 			utils.PrintError(err)
-			if newAgent.NodeSelector != "" {
-				if ok := utils.CheckKeyValueFormat(newAgent.NodeSelector); !ok {
+			if newInfra.NodeSelector != "" {
+				if ok := utils.CheckKeyValueFormat(newInfra.NodeSelector); !ok {
 					os.Exit(1)
 				}
 			}
@@ -134,77 +139,68 @@ var agentCmd = &cobra.Command{
 			utils.PrintError(err)
 
 			if toleration != "" {
-				var tolerations []types.Toleration
-				err := json.Unmarshal([]byte(toleration), &tolerations)
-				utils.PrintError(err)
-
-				str := "["
-				for _, tol := range tolerations {
-					str += "{"
-					if tol.TolerationSeconds > 0 {
-						str += "tolerationSeconds: " + fmt.Sprint(tol.TolerationSeconds) + " "
-					}
-					if tol.Effect != "" {
-						str += "effect: \\\"" + tol.Effect + "\\\" "
-					}
-					if tol.Key != "" {
-						str += "key: \\\"" + tol.Key + "\\\" "
-					}
-
-					if tol.Value != "" {
-						str += "value: \\\"" + tol.Value + "\\\" "
-					}
-
-					if tol.Operator != "" {
-						str += "operator : \\\"" + tol.Operator + "\\\" "
-					}
-
-					str += " }"
-				}
-				str += "]"
-
-				newAgent.Tolerations = str
+				//var tolerations []types.Toleration
+				//err := json.Unmarshal([]byte(toleration), &tolerations)
+				//utils.PrintError(err)
+				//
+				newInfra.Tolerations = toleration
 			}
 
-			newAgent.Namespace, err = cmd.Flags().GetString("namespace")
+			newInfra.Namespace, err = cmd.Flags().GetString("namespace")
 			utils.PrintError(err)
 
-			newAgent.ServiceAccount, err = cmd.Flags().GetString("service-account")
+			newInfra.ServiceAccount, err = cmd.Flags().GetString("service-account")
 			utils.PrintError(err)
 
-			newAgent.NsExists, err = cmd.Flags().GetBool("ns-exists")
+			newInfra.NsExists, err = cmd.Flags().GetBool("ns-exists")
 			utils.PrintError(err)
 
-			newAgent.SAExists, err = cmd.Flags().GetBool("sa-exists")
+			newInfra.SAExists, err = cmd.Flags().GetBool("sa-exists")
 			utils.PrintError(err)
 
-			if newAgent.Mode == "" {
-				newAgent.Mode = utils.DefaultMode
+			if newInfra.Mode == "" {
+				newInfra.Mode = utils.DefaultMode
 			}
 
-			if newAgent.ProjectId == "" {
+			if newInfra.ProjectId == "" {
 				utils.Red.Println("Error: --project-id flag is empty")
 				os.Exit(1)
 			}
 
 			// Check if user has sufficient permissions based on mode
 			utils.White_B.Print("\n🏃 Running prerequisites check....")
-			agent.ValidateSAPermissions(newAgent.Namespace, newAgent.Mode, &kubeconfig)
+			agent.ValidateSAPermissions(newInfra.Namespace, newInfra.Mode, &kubeconfig)
 			var ListInfraRequest = models.ListInfraRequest{}
-			agents, err := apis.GetInfraList(credentials, newAgent.ProjectId, ListInfraRequest)
+			infras, err := apis.GetInfraList(credentials, newInfra.ProjectId, ListInfraRequest)
 			utils.PrintError(err)
 
-			// Duplicate agent check
-			var isAgentExist = false
-			for i := range agents.Data.ListInfraDetails.Infras {
-				if newAgent.InfraName == agents.Data.ListInfraDetails.Infras[i].Name {
-					utils.White_B.Print(agents.Data.ListInfraDetails.Infras[i].Name)
-					isAgentExist = true
+			// Duplicate Infra check
+			var isInfraExist = false
+			for i := range infras.Data.ListInfraDetails.Infras {
+				if newInfra.InfraName == infras.Data.ListInfraDetails.Infras[i].Name {
+					utils.White_B.Print(infras.Data.ListInfraDetails.Infras[i].Name)
+					isInfraExist = true
 				}
 			}
 
-			if isAgentExist {
-				agent.PrintExistingAgents(agents)
+			if isInfraExist {
+				agent.PrintExistingInfra(infras)
+				os.Exit(1)
+			}
+			envIDs, err := apis.GetEnvironmentList(newInfra.ProjectId, credentials)
+			utils.PrintError(err)
+
+			// Check if Environment exists
+			var isEnvExist = false
+			for i := range envIDs.Data.ListEnvironmentDetails.Environments {
+				if newInfra.EnvironmentID == envIDs.Data.ListEnvironmentDetails.Environments[i].EnvironmentID {
+					utils.White_B.Print(envIDs.Data.ListEnvironmentDetails.Environments[i].EnvironmentID)
+					isEnvExist = true
+					break
+				}
+			}
+			if !isEnvExist {
+				agent.PrintExistingEnvironments(envIDs)
 				os.Exit(1)
 			}
 
@@ -212,52 +208,52 @@ var agentCmd = &cobra.Command{
 			userDetails, err := apis.GetProjectDetails(credentials)
 			utils.PrintError(err)
 
-			if newAgent.ProjectId == "" {
+			if newInfra.ProjectId == "" {
 				// Fetch project id
-				newAgent.ProjectId = agent.GetProjectID(userDetails)
+				newInfra.ProjectId = agent.GetProjectID(userDetails)
 			}
 
 			modeType := agent.GetModeType()
 
 			// Check if user has sufficient permissions based on mode
 			utils.White_B.Print("\n🏃 Running prerequisites check....")
-			agent.ValidateSAPermissions(newAgent.Namespace, modeType, &kubeconfig)
-			newAgent, err = agent.GetInfraDetails(modeType, newAgent.ProjectId, credentials, &kubeconfig)
+			agent.ValidateSAPermissions(newInfra.Namespace, modeType, &kubeconfig)
+			newInfra, err = agent.GetInfraDetails(modeType, newInfra.ProjectId, credentials, &kubeconfig)
 			utils.PrintError(err)
 
-			newAgent.ServiceAccount, newAgent.SAExists = k8s.ValidSA(newAgent.Namespace, &kubeconfig)
-			newAgent.Mode = modeType
+			newInfra.ServiceAccount, newInfra.SAExists = k8s.ValidSA(newInfra.Namespace, &kubeconfig)
+			newInfra.Mode = modeType
 		}
 
-		agent.Summary(newAgent, &kubeconfig)
+		agent.Summary(newInfra, &kubeconfig)
 
 		if !nonInteractive {
 			agent.ConfirmInstallation()
 		}
 
-		agent, err := apis.ConnectInfra(newAgent, credentials)
+		infra, err := apis.ConnectInfra(newInfra, credentials)
 		if err != nil {
-			utils.Red.Println("\n❌ Chaos Delegate connection failed: " + err.Error() + "\n")
+			utils.Red.Println("\n❌ Chaos Infra connection failed: " + err.Error() + "\n")
 			os.Exit(1)
 		}
 
-		if agent.Data.UserInfraReg.Token == "" {
-			utils.Red.Println("\n❌ failed to get the agent registration token: " + "\n")
+		if infra.Data.RegisterInfraDetails.Token == "" {
+			utils.Red.Println("\n❌ failed to get the Infra registration token: " + "\n")
 			os.Exit(1)
 		}
 
-		path := fmt.Sprintf("%s/%s/%s.yaml", credentials.Endpoint, utils.ChaosYamlPath, agent.Data.UserInfraReg.Token)
+		path := fmt.Sprintf("%s%s/%s.yaml", credentials.Endpoint, utils.ChaosYamlPath, infra.Data.RegisterInfraDetails.Token)
 		utils.White_B.Print("Applying YAML:\n", path)
 
 		// Print error message in case Data field is null in response
-		if (agent.Data == apis.InfraConnect{}) {
-			utils.White_B.Print("\n🚫 Chaos Delegate connection failed: " + agent.Errors[0].Message + "\n")
+		if (infra.Data == apis.RegisterInfra{}) {
+			utils.White_B.Print("\n🚫 Chaos newInfra connection failed: " + infra.Errors[0].Message + "\n")
 			os.Exit(1)
 		}
 
-		//Apply agent connection yaml
+		//Apply infra connection yaml
 		yamlOutput, err := k8s.ApplyYaml(k8s.ApplyYamlPrams{
-			Token:    agent.Data.UserInfraReg.Token,
+			Token:    infra.Data.RegisterInfraDetails.Token,
 			Endpoint: credentials.Endpoint,
 			YamlPath: utils.ChaosYamlPath,
 		}, kubeconfig, false)
@@ -270,30 +266,30 @@ var agentCmd = &cobra.Command{
 		utils.White_B.Print("\n", yamlOutput)
 
 		// Watch subscriber pod status
-		k8s.WatchPod(k8s.WatchPodParams{Namespace: newAgent.Namespace, Label: utils.ChaosAgentLabel}, &kubeconfig)
+		k8s.WatchPod(k8s.WatchPodParams{Namespace: newInfra.Namespace, Label: utils.ChaosInfraLabel}, &kubeconfig)
 
-		utils.White_B.Println("\n🚀 Chaos Delegate connection successful!! 🎉")
-		utils.White_B.Println("👉 Litmus Chaos Delegates can be accessed here: " + fmt.Sprintf("%s/%s", credentials.Endpoint, utils.ChaosAgentPath))
+		utils.White_B.Println("\n🚀 Chaos newInfra connection successful!! 🎉")
+		utils.White_B.Println("👉 Litmus Chaos Infrastructure can be accessed here: " + fmt.Sprintf("%s/%s", credentials.Endpoint, utils.ChaosInfraPath))
 	},
 }
 
 func init() {
-	ConnectCmd.AddCommand(agentCmd)
+	ConnectCmd.AddCommand(infraCmd)
 
-	agentCmd.Flags().BoolP("non-interactive", "n", false, "Set it to true for non interactive mode | Note: Always set the boolean flag as --non-interactive=Boolean")
-	agentCmd.Flags().StringP("kubeconfig", "k", "", "Set to pass kubeconfig file if it is not in the default location ($HOME/.kube/config)")
-	agentCmd.Flags().String("tolerations", "", "Set the tolerations for Chaos Delegate components | Format: '[{\"key\":\"key1\",\"value\":\"value1\",\"operator\":\"Exist\",\"effect\":\"NoSchedule\",\"tolerationSeconds\":30}]'")
+	infraCmd.Flags().BoolP("non-interactive", "n", false, "Set it to true for non interactive mode | Note: Always set the boolean flag as --non-interactive=Boolean")
+	infraCmd.Flags().StringP("kubeconfig", "k", "", "Set to pass kubeconfig file if it is not in the default location ($HOME/.kube/config)")
+	infraCmd.Flags().String("tolerations", "", "Set the tolerations for Chaos infra components | Format: '[{\"key\":\"key1\",\"value\":\"value1\",\"operator\":\"Exist\",\"effect\":\"NoSchedule\",\"tolerationSeconds\":30}]'")
 
-	agentCmd.Flags().String("project-id", "", "Set the project-id to install Chaos Delegate for the particular project. To see the projects, apply litmusctl get projects")
-	agentCmd.Flags().String("installation-mode", "cluster", "Set the installation mode for the kind of Chaos Delegate | Supported=cluster/namespace")
-	agentCmd.Flags().String("name", "", "Set the Chaos Delegate name")
-	agentCmd.Flags().String("description", "---", "Set the Chaos Delegate description")
-	agentCmd.Flags().String("platform-name", "Others", "Set the platform name. Supported- AWS/GKE/Openshift/Rancher/Others")
-	agentCmd.Flags().String("chaos-delegate-type", "external", "Set the chaos-delegate-type to external for external Chaos Delegates | Supported=external/internal")
-	agentCmd.Flags().String("node-selector", "", "Set the node-selector for Chaos Delegate components | Format: \"key1=value1,key2=value2\")")
-	agentCmd.Flags().String("namespace", "litmus", "Set the namespace for the Chaos Delegate installation")
-	agentCmd.Flags().String("service-account", "litmus", "Set the service account to be used by the Chaos Delegate")
-	agentCmd.Flags().Bool("skip-ssl", false, "Set whether Chaos Delegate will skip ssl/tls check (can be used for self-signed certs, if cert is not provided in portal)")
-	agentCmd.Flags().Bool("ns-exists", false, "Set the --ns-exists=false if the namespace mentioned in the --namespace flag is not existed else set it to --ns-exists=true | Note: Always set the boolean flag as --ns-exists=Boolean")
-	agentCmd.Flags().Bool("sa-exists", false, "Set the --sa-exists=false if the service-account mentioned in the --service-account flag is not existed else set it to --sa-exists=true | Note: Always set the boolean flag as --sa-exists=Boolean\"\n")
+	infraCmd.Flags().String("project-id", "", "Set the project-id to install Chaos infra for the particular project. To see the projects, apply litmusctl get projects")
+	infraCmd.Flags().String("installation-mode", "cluster", "Set the installation mode for the kind of Chaos infra | Supported=cluster/namespace")
+	infraCmd.Flags().String("name", "", "Set the Chaos infra name")
+	infraCmd.Flags().String("description", "---", "Set the Chaos infra description")
+	infraCmd.Flags().String("platform-name", "Others", "Set the platform name. Supported- AWS/GKE/Openshift/Rancher/Others")
+	infraCmd.Flags().String("chaos-infra-type", "external", "Set the chaos-infra-type to external for external Chaos infras | Supported=external/internal")
+	infraCmd.Flags().String("node-selector", "", "Set the node-selector for Chaos infra components | Format: \"key1=value1,key2=value2\")")
+	infraCmd.Flags().String("namespace", "litmus", "Set the namespace for the Chaos infra installation")
+	infraCmd.Flags().String("service-account", "litmus", "Set the service account to be used by the Chaos infra")
+	infraCmd.Flags().Bool("skip-ssl", false, "Set whether Chaos infra will skip ssl/tls check (can be used for self-signed certs, if cert is not provided in portal)")
+	infraCmd.Flags().Bool("ns-exists", false, "Set the --ns-exists=false if the namespace mentioned in the --namespace flag is not existed else set it to --ns-exists=true | Note: Always set the boolean flag as --ns-exists=Boolean")
+	infraCmd.Flags().Bool("sa-exists", false, "Set the --sa-exists=false if the service-account mentioned in the --service-account flag is not existed else set it to --sa-exists=true | Note: Always set the boolean flag as --sa-exists=Boolean\"\n")
 }

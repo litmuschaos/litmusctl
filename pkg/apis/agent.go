@@ -18,7 +18,6 @@ package apis
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"github.com/litmuschaos/litmusctl/pkg/types"
 	"io/ioutil"
 	"net/http"
@@ -95,46 +94,70 @@ func GetInfraList(c types.Credentials, pid string, request models.ListInfraReque
 	}
 }
 
-type InfraConnectionData struct {
-	Errors []struct {
-		Message string   `json:"message"`
-		Path    []string `json:"path"`
-	} `json:"errors"`
-	Data InfraConnect `json:"data"`
-}
-
 type Errors struct {
 	Message string   `json:"message"`
 	Path    []string `json:"path"`
 }
 
-type InfraConnect struct {
-	UserInfraReg InfraAgentReg `json:"registerInfra"`
+type RegisterInfraGqlRequest struct {
+	Query     string `json:"query"`
+	Variables struct {
+		ProjectId            string                      `json:"projectID"`
+		RegisterInfraRequest models.RegisterInfraRequest `json:"request"`
+	} `json:"variables"`
 }
 
-type InfraAgentReg struct {
-	InfraID   string `json:"infraID"`
-	InfraName string `json:"name"`
-	Token     string `json:"token"`
+type InfraConnectionData struct {
+	Data   RegisterInfra `json:"data"`
+	Errors []struct {
+		Message string   `json:"message"`
+		Path    []string `json:"path"`
+	} `json:"errors"`
+}
+
+type RegisterInfra struct {
+	RegisterInfraDetails models.RegisterInfraResponse `json:"registerInfra"`
 }
 
 // ConnectInfra connects the  Infra with the given details
 func ConnectInfra(infra types.Infra, cred types.Credentials) (InfraConnectionData, error) {
-	query := `{"query":"mutation {\n  registerInfra(projectID: \"` + infra.ProjectId + `\", request: \n    { \n    name: \"` + infra.InfraName + `\", \n    description: \"` + infra.Description + `\",\n  \tplatformName: \"` + infra.PlatformName + `\",\n    infrastructureType: \"` + infra.InfraType + `\",\n  infraScope: \"` + infra.Mode + `\",\n    infraNamespace: \"` + infra.Namespace + `\",\n    serviceAccount: \"` + infra.ServiceAccount + `\",\n    skipSsl: ` + fmt.Sprintf("%t", infra.SkipSSL) + `,\n    infraNsExists: ` + fmt.Sprintf("%t", infra.NsExists) + `,\n    agentSaExists: ` + fmt.Sprintf("%t", infra.SAExists) + `,\n  }){\n    infraID\n    name\n    token\n  }\n}"}`
+	var gqlReq RegisterInfraGqlRequest
+	gqlReq.Query = `mutation registerInfra($projectID: ID!, $request: RegisterInfraRequest!) {
+					  registerInfra(
+						projectID: $projectID
+						request: $request
+					  ) {
+						infraID
+						name
+						token
+					  }
+					}
+					`
+	gqlReq.Variables.ProjectId = infra.ProjectId
+	gqlReq.Variables.RegisterInfraRequest = CreateRegisterInfraRequest(infra)
 
 	if infra.NodeSelector != "" {
-		query = `{"query":"mutation {\n  registerInfra(projectID: \"` + infra.ProjectId + `\", request: \n    { \n    name: \"` + infra.InfraName + `\", \n    description: \"` + infra.Description + `\",\n  nodeSelector: \"` + infra.NodeSelector + `\",\n  \tplatformName: \"` + infra.PlatformName + `\",\n   infrastructureType: \"` + infra.InfraType + `\",\n  infraScope: \"` + infra.Mode + `\",\n   infraNamespace: \"` + infra.Namespace + `\",\n    skipSsl: ` + fmt.Sprintf("%t", infra.SkipSSL) + `,\n    serviceAccount: \"` + infra.ServiceAccount + `\",\n    infraNsExists: ` + fmt.Sprintf("%t", infra.NsExists) + `,\n    infraSaExists: ` + fmt.Sprintf("%t", infra.SAExists) + `,\n  }){\n    infraID\n    name\n    token\n  }\n}"}`
+		gqlReq.Variables.RegisterInfraRequest.NodeSelector = &infra.NodeSelector
 	}
 
 	if infra.Tolerations != "" {
-		query = `{"query":"mutation {\n  registerInfra(projectID: \"` + infra.ProjectId + `\",request: \n    { \n    infraName: \"` + infra.InfraName + `\", \n    description: \"` + infra.Description + `\",\n  \tplatformName: \"` + infra.PlatformName + `\",\n    infraType: \"` + infra.InfraType + `\",\n  infraScope: \"` + infra.Mode + `\",\n    infraNamespace: \"` + infra.Namespace + `\",\n    serviceAccount: \"` + infra.ServiceAccount + `\",\n    skipSsl: ` + fmt.Sprintf("%t", infra.SkipSSL) + `,\n    infraExists: ` + fmt.Sprintf("%t", infra.NsExists) + `,\n    infraSaExists: ` + fmt.Sprintf("%t", infra.SAExists) + `,\n tolerations: ` + infra.Tolerations + ` }){\n    infraID\n    name\n    token\n  }\n}"}`
+		var toleration []*models.Toleration
+		err := json.Unmarshal([]byte(infra.Tolerations), &toleration)
+		utils.PrintError(err)
+		gqlReq.Variables.RegisterInfraRequest.Tolerations = toleration
 	}
 
 	if infra.NodeSelector != "" && infra.Tolerations != "" {
-		query = `{"query":"mutation {\n  registerInfra(projectID: \"` + infra.ProjectId + `\", request: \n    { \n    infraName: \"` + infra.InfraName + `\", \n    description: \"` + infra.Description + `\",\n  nodeSelector: \"` + infra.NodeSelector + `\",\n  \tplatformName: \"` + infra.PlatformName + `\",\n    infraType: \"` + infra.InfraType + `\",\n  infraScope: \"` + infra.Mode + `\",\n    infraNamespace: \"` + infra.Namespace + `\",\n    serviceAccount: \"` + infra.ServiceAccount + `\",\n    skipSsl: ` + fmt.Sprintf("%t", infra.SkipSSL) + `,\n    infraExists: ` + fmt.Sprintf("%t", infra.NsExists) + `,\n    infraSaExists: ` + fmt.Sprintf("%t", infra.SAExists) + `,\n tolerations: ` + infra.Tolerations + ` }){\n    infraID\n    name\n    token\n  }\n}"}`
+		gqlReq.Variables.RegisterInfraRequest.NodeSelector = &infra.NodeSelector
+
+		var toleration []*models.Toleration
+		err := json.Unmarshal([]byte(infra.Tolerations), &toleration)
+		utils.PrintError(err)
+		gqlReq.Variables.RegisterInfraRequest.Tolerations = toleration
 	}
 
-	resp, err := SendRequest(SendRequestParams{Endpoint: cred.Endpoint + utils.GQLAPIPath, Token: cred.Token}, []byte(query), string(types.Post))
+	query, err := json.Marshal(gqlReq)
+	resp, err := SendRequest(SendRequestParams{Endpoint: cred.Endpoint + utils.GQLAPIPath, Token: cred.Token}, query, string(types.Post))
 	if err != nil {
 		return InfraConnectionData{}, errors.New("Error in registering Chaos Infrastructure: " + err.Error())
 	}
@@ -161,6 +184,28 @@ func ConnectInfra(infra types.Infra, cred types.Credentials) (InfraConnectionDat
 	}
 }
 
+func CreateRegisterInfraRequest(infra types.Infra) (request models.RegisterInfraRequest) {
+	var mode models.InfrastructureType
+	if infra.InfraType == "external" {
+		mode = models.InfrastructureTypeExternal
+	} else {
+		mode = models.InfrastructureTypeInternal
+	}
+	return models.RegisterInfraRequest{
+		Name:               infra.InfraName,
+		InfraScope:         infra.Mode,
+		Description:        &infra.Description,
+		PlatformName:       infra.PlatformName,
+		EnvironmentID:      infra.EnvironmentID,
+		InfrastructureType: mode,
+		InfraNamespace:     &infra.Namespace,
+		ServiceAccount:     &infra.ServiceAccount,
+		InfraNsExists:      &infra.NsExists,
+		InfraSaExists:      &infra.SAExists,
+		SkipSsl:            &infra.SkipSSL,
+	}
+}
+
 type DisconnectInfraData struct {
 	Errors []struct {
 		Message string   `json:"message"`
@@ -181,7 +226,7 @@ type DisconnectInfraGraphQLRequest struct {
 	} `json:"variables"`
 }
 
-// DisconnectInfra sends GraphQL API request for disconnecting Chaos Delegate(s).
+// DisconnectInfra sends GraphQL API request for disconnecting Chaos Infra(s).
 func DisconnectInfra(projectID string, infraID string, cred types.Credentials) (DisconnectInfraData, error) {
 
 	var gqlReq DisconnectInfraGraphQLRequest
@@ -233,5 +278,76 @@ func DisconnectInfra(projectID string, infraID string, cred types.Credentials) (
 		return disconnectInfraData, nil
 	} else {
 		return DisconnectInfraData{}, err
+	}
+}
+
+type ListEnvironmentData struct {
+	Errors []struct {
+		Message string   `json:"message"`
+		Path    []string `json:"path"`
+	} `json:"errors"`
+	Data EnvironmentsList `json:"data"`
+}
+
+type EnvironmentsList struct {
+	ListEnvironmentDetails models.ListEnvironmentResponse `json:"listEnvironments"`
+}
+type EnvironmentListGQLRequest struct {
+	Query     string `json:"query"`
+	Variables struct {
+		ProjectID string                        `json:"projectID"`
+		Request   models.ListEnvironmentRequest `json:"request"`
+	}
+}
+
+func GetEnvironmentList(pid string, cred types.Credentials) (ListEnvironmentData, error) {
+	var err error
+	var gqlReq EnvironmentListGQLRequest
+	gqlReq.Query = `query listEnvironments($projectID: ID!, $request: ListEnvironmentRequest) {
+	                 listEnvironments(projectID: $projectID,request: $request){
+						environments {
+							environmentID
+						}
+					}
+	               }`
+
+	gqlReq.Variables.Request = models.ListEnvironmentRequest{}
+	gqlReq.Variables.ProjectID = pid
+	query, err := json.Marshal(gqlReq)
+	if err != nil {
+		return ListEnvironmentData{}, err
+	}
+
+	resp, err := SendRequest(
+		SendRequestParams{
+			Endpoint: cred.Endpoint + utils.GQLAPIPath,
+			Token:    cred.Token,
+		},
+		query,
+		string(types.Post),
+	)
+
+	if err != nil {
+		return ListEnvironmentData{}, errors.New("Error in Getting Chaos Environment List: " + err.Error())
+	}
+
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	defer resp.Body.Close()
+	if err != nil {
+		return ListEnvironmentData{}, errors.New("Error in Getting Chaos Environment List: " + err.Error())
+	}
+
+	if resp.StatusCode == http.StatusOK {
+		var listEnvironment ListEnvironmentData
+		err = json.Unmarshal(bodyBytes, &listEnvironment)
+		if err != nil {
+			return ListEnvironmentData{}, errors.New("Error in Getting Chaos Environment List: " + err.Error())
+		}
+		if len(listEnvironment.Errors) > 0 {
+			return ListEnvironmentData{}, errors.New(listEnvironment.Errors[0].Message)
+		}
+		return listEnvironment, nil
+	} else {
+		return ListEnvironmentData{}, err
 	}
 }

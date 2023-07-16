@@ -5,7 +5,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+	http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -25,10 +25,10 @@ var ConnectCmd = &cobra.Command{
 	Short: `Connect resources for LitmusChaos agent plane.
 		Examples:
 		#connect a Chaos Delegate
-		litmusctl connect chaos-delegate --name="new-chaos-delegate" --non-interactive
+		litmusctl connect chaos-infra --name="new-chaos-infra" --non-interactive
 
 		#connect a chaos-delegate within a project
-		litmusctl connect chaos-delegate --name="new-chaos-delegate" --project-id="d861b650-1549-4574-b2ba-ab754058dd04" --non-interactive
+		litmusctl connect chaos-infra --name="new-chaos-infra" --project-id="d861b650-1549-4574-b2ba-ab754058dd04" --non-interactive
 
 		Note: The default location of the config file is $HOME/.litmusconfig, and can be overridden by a --config flag
 	`,

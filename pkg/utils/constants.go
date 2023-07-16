@@ -40,10 +40,10 @@ const (
 	DefaultPlatform = "Others"
 
 	// Label of subscriber agent being deployed
-	ChaosAgentLabel = "app=subscriber"
+	ChaosInfraLabel = "app=subscriber"
 
 	// Agent type is "external" for agents connected via litmusctl
-	AgentType = "external"
+	InfraType = "external"
 
 	// Default namespace for agent installation
 	DefaultNs = "litmus"
@@ -52,13 +52,13 @@ const (
 	DefaultSA = "litmus"
 
 	// Chaos agent connection yaml path
-	ChaosYamlPath = "api/file"
+	ChaosYamlPath = "/api/file"
 
-	ChaosAgentPath = "targets"
+	ChaosInfraPath = "targets"
 
 	// Graphql server api path
-	GQLAPIPath = "/query"
+	GQLAPIPath = "/api/query"
 
 	// Auth server api path
-	AuthAPIPath = ""
+	AuthAPIPath = "/auth"
 )
