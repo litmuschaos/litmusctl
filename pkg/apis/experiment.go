@@ -18,53 +18,63 @@ package apis
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strings"
 
-	models "github.com/litmuschaos/litmus/chaoscenter/graphql/server/graph/model"
-	"github.com/litmuschaos/litmus/litmus-portal/graphql-server/graph/model"
+	"github.com/litmuschaos/litmus/chaoscenter/graphql/server/graph/model"
 	types "github.com/litmuschaos/litmusctl/pkg/types"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
 )
 
-type ChaosWorkflowCreationData struct {
+type SaveExperimentData struct {
 	Errors []struct {
 		Message string   `json:"message"`
 		Path    []string `json:"path"`
 	} `json:"errors"`
-	Data CreatedChaosWorkflow `json:"data"`
+	Data SavedExperimentDetails `json:"data"`
 }
 
-type CreatedChaosWorkflow struct {
-	CreateChaosWorkflow model.ChaosWorkFlowResponse `json:"createChaosWorkFlow"`
+type SavedExperimentDetails struct {
+	Message string `json:"saveChaosExperiment"`
 }
 
-type CreateChaosWorkFlowGraphQLRequest struct {
+type SaveChaosExperimentGraphQLRequest struct {
 	Query     string `json:"query"`
 	Variables struct {
-		CreateChaosWorkFlowRequest model.ChaosWorkFlowRequest `json:"request"`
+		ProjectID                  string                           `json:"projectID"`
+		SaveChaosExperimentRequest model.SaveChaosExperimentRequest `json:"request"`
 	} `json:"variables"`
 }
 
-// CreateWorkflow sends GraphQL API request for creating a workflow
-func CreateWorkflow(requestData model.ChaosWorkFlowRequest, cred types.Credentials) (ChaosWorkflowCreationData, error) {
+type RunExperimentData struct {
+	Errors []struct {
+		Message string   `json:"message"`
+		Path    []string `json:"path"`
+	} `json:"errors"`
+	Data RunExperimentDetails `json:"data"`
+}
 
-	var gqlReq CreateChaosWorkFlowGraphQLRequest
+type RunExperimentDetails struct {
+	RunExperimentResponse model.RunChaosExperimentResponse `json:"runChaosExperiment"`
+}
 
-	gqlReq.Query = `mutation createChaosWorkFlow($request: ChaosWorkFlowRequest!) {
-                      createChaosWorkFlow(request: $request) {
-                        workflowID
-                        cronSyntax
-                        workflowName
-                        workflowDescription
-                        isCustomWorkflow
-                      }
+// CreateExperiment sends GraphQL API request for creating a workflow
+func CreateExperiment(pid string, requestData model.SaveChaosExperimentRequest, cred types.Credentials) (RunExperimentData, error) {
+
+	// Query to Save the Experiment
+	var gqlReq SaveChaosExperimentGraphQLRequest
+
+	gqlReq.Query = `mutation saveChaosExperiment($projectID: ID!, $request: SaveChaosExperimentRequest!) {
+                      saveChaosExperiment(projectID: $projectID, request: $request)
                     }`
-	gqlReq.Variables.CreateChaosWorkFlowRequest = requestData
+	gqlReq.Variables.ProjectID = pid
+	gqlReq.Variables.SaveChaosExperimentRequest = requestData
 
 	query, err := json.Marshal(gqlReq)
 	if err != nil {
-		return ChaosWorkflowCreationData{}, err
+		return RunExperimentData{}, err
 	}
 
 	resp, err := SendRequest(
@@ -76,33 +86,156 @@ func CreateWorkflow(requestData model.ChaosWorkFlowRequest, cred types.Credentia
 		string(types.Post),
 	)
 	if err != nil {
-		return ChaosWorkflowCreationData{}, err
+		return RunExperimentData{}, err
 	}
 
 	bodyBytes, err := ioutil.ReadAll(resp.Body)
 
 	defer resp.Body.Close()
 	if err != nil {
-		return ChaosWorkflowCreationData{}, errors.New("Error in creating Chaos Experiment: " + err.Error())
+		return RunExperimentData{}, errors.New("Error in creating Chaos Experiment: " + err.Error())
 	}
 
 	if resp.StatusCode == http.StatusOK {
-		var createdWorkflow ChaosWorkflowCreationData
+		var savedExperiment SaveExperimentData
 
-		err = json.Unmarshal(bodyBytes, &createdWorkflow)
+		err = json.Unmarshal(bodyBytes, &savedExperiment)
 
 		if err != nil {
-			return ChaosWorkflowCreationData{}, errors.New("Error in creating Chaos Experiment: " + err.Error())
+			return RunExperimentData{}, errors.New("Error in creating Chaos Experiment: " + err.Error())
 		}
 
 		// Errors present
-		if len(createdWorkflow.Errors) > 0 {
-			return ChaosWorkflowCreationData{}, errors.New(createdWorkflow.Errors[0].Message)
+		if len(savedExperiment.Errors) > 0 {
+			return RunExperimentData{}, errors.New(savedExperiment.Errors[0].Message)
 		}
 
-		return createdWorkflow, nil
+		if strings.Contains(savedExperiment.Data.Message, "experiment saved successfully") {
+			fmt.Print("\n🚀 Chaos Experiment successfully Saved 🎉")
+		}
 	} else {
-		return ChaosWorkflowCreationData{}, errors.New("graphql schema error")
+		return RunExperimentData{}, errors.New("graphql schema error")
+	}
+
+	// Query to Run the Chaos Experiment
+	runQuery := `{"query":"mutation{ \n runChaosExperiment(experimentID:  \"` + requestData.ID + `\", projectID:  \"` + pid + `\"){\n notifyID \n}}"}`
+	resp, err = SendRequest(SendRequestParams{Endpoint: cred.Endpoint + utils.GQLAPIPath, Token: cred.Token}, []byte(runQuery), string(types.Post))
+
+	if err != nil {
+		return RunExperimentData{}, errors.New("Error in Running Chaos Experiment: " + err.Error())
+	}
+
+	bodyBytes, err = ioutil.ReadAll(resp.Body)
+	defer resp.Body.Close()
+	if err != nil {
+		return RunExperimentData{}, errors.New("Error in Running Chaos Experiment: " + err.Error())
+	}
+
+	if resp.StatusCode == http.StatusOK {
+		var runExperiment RunExperimentData
+		err = json.Unmarshal(bodyBytes, &runExperiment)
+		if err != nil {
+			return RunExperimentData{}, errors.New("Error in Running Chaos Experiment: " + err.Error())
+		}
+
+		if len(runExperiment.Errors) > 0 {
+			return RunExperimentData{}, errors.New(runExperiment.Errors[0].Message)
+		}
+		return runExperiment, nil
+	} else {
+		return RunExperimentData{}, err
+	}
+}
+
+func SaveExperiment(pid string, requestData model.SaveChaosExperimentRequest, cred types.Credentials) (SaveExperimentData, error) {
+
+	// Query to Save the Experiment
+	var gqlReq SaveChaosExperimentGraphQLRequest
+
+	gqlReq.Query = `mutation saveChaosExperiment($projectID: ID!, $request: SaveChaosExperimentRequest!) {
+                      saveChaosExperiment(projectID: $projectID, request: $request)
+                    }`
+	gqlReq.Variables.ProjectID = pid
+	gqlReq.Variables.SaveChaosExperimentRequest = requestData
+
+	query, err := json.Marshal(gqlReq)
+	if err != nil {
+		return SaveExperimentData{}, err
+	}
+
+	resp, err := SendRequest(
+		SendRequestParams{
+			Endpoint: cred.Endpoint + utils.GQLAPIPath,
+			Token:    cred.Token,
+		},
+		query,
+		string(types.Post),
+	)
+	if err != nil {
+		return SaveExperimentData{}, err
+	}
+
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
+
+	defer resp.Body.Close()
+	if err != nil {
+		return SaveExperimentData{}, errors.New("Error in creating Chaos Experiment: " + err.Error())
+	}
+
+	if resp.StatusCode == http.StatusOK {
+		var savedExperiment SaveExperimentData
+
+		err = json.Unmarshal(bodyBytes, &savedExperiment)
+
+		if err != nil {
+			return SaveExperimentData{}, errors.New("Error in creating Chaos Experiment: " + err.Error())
+		}
+
+		// Errors present
+		if len(savedExperiment.Errors) > 0 {
+			return SaveExperimentData{}, errors.New(savedExperiment.Errors[0].Message)
+		}
+
+		if strings.Contains(savedExperiment.Data.Message, "experiment saved successfully") {
+			fmt.Print("\n🚀 Chaos Experiment successfully Saved 🎉")
+		}
+		return savedExperiment, nil
+
+	} else {
+		return SaveExperimentData{}, errors.New("graphql schema error")
+	}
+
+}
+
+func RunExperiment(pid string, eid string, cred types.Credentials) (RunExperimentData, error) {
+	var err error
+	runQuery := `{"query":"mutation{ \n runChaosExperiment(experimentID:  \"` + eid + `\", projectID:  \"` + pid + `\"){\n notifyID \n}}"}`
+
+	resp, err := SendRequest(SendRequestParams{Endpoint: cred.Endpoint + utils.GQLAPIPath, Token: cred.Token}, []byte(runQuery), string(types.Post))
+
+	if err != nil {
+		return RunExperimentData{}, errors.New("Error in Running Chaos Experiment: " + err.Error())
+	}
+
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	defer resp.Body.Close()
+	if err != nil {
+		return RunExperimentData{}, errors.New("Error in Running Chaos Experiment: " + err.Error())
+	}
+
+	if resp.StatusCode == http.StatusOK {
+		var runExperiment RunExperimentData
+		err = json.Unmarshal(bodyBytes, &runExperiment)
+		if err != nil {
+			return RunExperimentData{}, errors.New("Error in Running Chaos Experiment: " + err.Error())
+		}
+
+		if len(runExperiment.Errors) > 0 {
+			return RunExperimentData{}, errors.New(runExperiment.Errors[0].Message)
+		}
+		return runExperiment, nil
+	} else {
+		return RunExperimentData{}, err
 	}
 }
 
@@ -115,19 +248,19 @@ type ExperimentListData struct {
 }
 
 type ExperimentList struct {
-	ListExperimentDetails models.ListExperimentResponse `json:"listExperiment"`
+	ListExperimentDetails model.ListExperimentResponse `json:"listExperiment"`
 }
 
 type GetChaosExperimentsGraphQLRequest struct {
 	Query     string `json:"query"`
 	Variables struct {
-		GetChaosExperimentRequest models.ListExperimentRequest `json:"request"`
-		ProjectID                 string                       `json:"projectID"`
+		GetChaosExperimentRequest model.ListExperimentRequest `json:"request"`
+		ProjectID                 string                      `json:"projectID"`
 	} `json:"variables"`
 }
 
 // GetExperimentList sends GraphQL API request for fetching a list of experiments.
-func GetExperimentList(pid string, in models.ListExperimentRequest, cred types.Credentials) (ExperimentListData, error) {
+func GetExperimentList(pid string, in model.ListExperimentRequest, cred types.Credentials) (ExperimentListData, error) {
 
 	var gqlReq GetChaosExperimentsGraphQLRequest
 	var err error
@@ -214,19 +347,19 @@ type ExperimentRunListData struct {
 }
 
 type ExperimentRunsList struct {
-	ListExperimentRunDetails models.ListExperimentRunResponse `json:"listExperimentRun"`
+	ListExperimentRunDetails model.ListExperimentRunResponse `json:"listExperimentRun"`
 }
 
 type GetChaosExperimentRunGraphQLRequest struct {
 	Query     string `json:"query"`
 	Variables struct {
-		ProjectID                    string                          `json:"projectID"`
-		GetChaosExperimentRunRequest models.ListExperimentRunRequest `json:"request"`
+		ProjectID                    string                         `json:"projectID"`
+		GetChaosExperimentRunRequest model.ListExperimentRunRequest `json:"request"`
 	} `json:"variables"`
 }
 
 // GetExperimentRunsList sends GraphQL API request for fetching a list of workflow runs.
-func GetExperimentRunsList(pid string, in models.ListExperimentRunRequest, cred types.Credentials) (ExperimentRunListData, error) {
+func GetExperimentRunsList(pid string, in model.ListExperimentRunRequest, cred types.Credentials) (ExperimentRunListData, error) {
 
 	var gqlReq GetChaosExperimentRunGraphQLRequest
 	var err error
@@ -323,7 +456,7 @@ type DeleteChaosExperimentGraphQLRequest struct {
 }
 
 // DeleteChaosExperiment sends GraphQL API request for deleting a given Chaos Workflow.
-func DeleteChaosExperiment(projectID string, workflowID *string, cred types.Credentials) (DeleteChaosExperimentData, error) {
+func DeleteChaosExperiment(projectID string, experimentID *string, cred types.Credentials) (DeleteChaosExperimentData, error) {
 
 	var gqlReq DeleteChaosExperimentGraphQLRequest
 	var err error
@@ -336,9 +469,9 @@ func DeleteChaosExperiment(projectID string, workflowID *string, cred types.Cred
                       )
                     }`
 	gqlReq.Variables.ProjectID = projectID
-	gqlReq.Variables.ExperimentID = workflowID
-	var experiment_run_id string = ""
-	gqlReq.Variables.ExperimentRunID = &experiment_run_id
+	gqlReq.Variables.ExperimentID = experimentID
+	//var experiment_run_id string = ""
+	//gqlReq.Variables.ExperimentRunID = &experiment_run_id
 
 	query, err := json.Marshal(gqlReq)
 	if err != nil {
