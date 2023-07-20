@@ -39,19 +39,19 @@ const (
 	// Default platform name
 	DefaultPlatform = "Others"
 
-	// Label of subscriber agent being deployed
+	// Label of subscriber infra being deployed
 	ChaosInfraLabel = "app=subscriber"
 
 	// Agent type is "external" for agents connected via litmusctl
 	InfraType = "external"
 
-	// Default namespace for agent installation
+	// Default namespace for infra installation
 	DefaultNs = "litmus"
 
-	// Default service account used for agent installation
+	// Default service account used for infra installation
 	DefaultSA = "litmus"
 
-	// Chaos agent connection yaml path
+	// Chaos infra connection yaml path
 	ChaosYamlPath = "/api/file"
 
 	ChaosInfraPath = "targets"

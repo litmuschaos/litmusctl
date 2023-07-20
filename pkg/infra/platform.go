@@ -5,7 +5,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+	http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package agent
+package infra
 
 import (
 	"context"
@@ -72,15 +72,16 @@ func DiscoverPlatform(kubeconfig *string) string {
 // by checking the ProviderID inside node spec
 //
 // Sample node custom resource of an AWS node
-// {
-//     "apiVersion": "v1",
-//     "kind": "Node",
-//     ....
-//     "spec": {
-//         "providerID": "aws:///us-east-2b/i-0bf24d83f4b993738"
-//     }
-//   }
-// }
+//
+//	{
+//	    "apiVersion": "v1",
+//	    "kind": "Node",
+//	    ....
+//	    "spec": {
+//	        "providerID": "aws:///us-east-2b/i-0bf24d83f4b993738"
+//	    }
+//	  }
+//	}
 func IsAWSPlatform(kubeconfig *string) (bool, error) {
 	clientset, err := k8s.ClientSet(kubeconfig)
 	if err != nil {
@@ -100,15 +101,16 @@ func IsAWSPlatform(kubeconfig *string) (bool, error) {
 // by checking the ProviderID inside node spec
 //
 // Sample node custom resource of an GKE node
-// {
-//     "apiVersion": "v1",
-//     "kind": "Node",
-//     ....
-//     "spec": {
-//         "providerID": ""
-//     }
-//   }
-// }
+//
+//	{
+//	    "apiVersion": "v1",
+//	    "kind": "Node",
+//	    ....
+//	    "spec": {
+//	        "providerID": ""
+//	    }
+//	  }
+//	}
 func IsGKEPlatform(kubeconfig *string) (bool, error) {
 	clientset, err := k8s.ClientSet(kubeconfig)
 	if err != nil {
@@ -129,16 +131,17 @@ func IsGKEPlatform(kubeconfig *string) (bool, error) {
 // label on the nodes
 //
 // Sample node custom resource of an Openshift node
-// {
-//     "apiVersion": "v1",
-//     "kind": "Node",
-//     "metadata": {
-//         "labels": {
-//             "node.openshift.io/os_id": "rhcos"
-//         }
-//    }
-//    ....
-// }
+//
+//	{
+//	    "apiVersion": "v1",
+//	    "kind": "Node",
+//	    "metadata": {
+//	        "labels": {
+//	            "node.openshift.io/os_id": "rhcos"
+//	        }
+//	   }
+//	   ....
+//	}
 func IsOpenshiftPlatform(kubeconfig *string) (bool, error) {
 	clientset, err := k8s.ClientSet(kubeconfig)
 	if err != nil {

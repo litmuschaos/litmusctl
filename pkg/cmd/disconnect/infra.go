@@ -26,13 +26,13 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// agentCmd represents the agent command
-var agentCmd = &cobra.Command{
-	Use: "chaos-delegate",
+// infraCmd represents the infra command
+var infraCmd = &cobra.Command{
+	Use: "chaos-infra",
 	Short: `Disconnect a Chaos Infrastructure
 	Example:
 	#disconnect a Chaos Delegate
-	litmusctl disconnect chaos-delegate c520650e-7cb6-474c-b0f0-4df07b2b025b --project-id=c520650e-7cb6-474c-b0f0-4df07b2b025b
+	litmusctl disconnect chaos-infra c520650e-7cb6-474c-b0f0-4df07b2b025b --project-id=c520650e-7cb6-474c-b0f0-4df07b2b025b
 
 	Note: The default location of the config file is $HOME/.litmusconfig, and can be overridden by a --config flag
 	`,
@@ -56,16 +56,16 @@ var agentCmd = &cobra.Command{
 			}
 		}
 
-		var agentID string
+		var infraID string
 		if len(args) == 0 {
-			utils.White_B.Print("\nEnter the Agent ID: ")
-			fmt.Scanln(&agentID)
+			utils.White_B.Print("\nEnter the Infra ID: ")
+			fmt.Scanln(&infraID)
 		} else {
-			agentID = args[0]
+			infraID = args[0]
 		}
-		// Handle blank input for agent ID
-		if agentID == "" {
-			utils.Red.Println("⛔ Chaos Delegate ID can't be empty!!")
+		// Handle blank input for Infra ID
+		if infraID == "" {
+			utils.Red.Println("⛔ Chaos Infra ID can't be empty!!")
 			os.Exit(1)
 		}
 
@@ -90,9 +90,9 @@ var agentCmd = &cobra.Command{
 		}
 
 		// Make API call
-		var agentIDs []*string
-		agentIDs = append(agentIDs, &agentID)
-		disconnectedInfra, err := apis.DisconnectInfra(projectID, agentIDs, credentials)
+		//var agentIDs []*string
+		//agentIDs = append(agentIDs, &infraID)
+		disconnectedInfra, err := apis.DisconnectInfra(projectID, infraID, credentials)
 		if err != nil {
 			utils.Red.Println("\n❌ Error in disconnecting Chaos Infrastructure: ", err.Error())
 			os.Exit(1)
@@ -107,7 +107,7 @@ var agentCmd = &cobra.Command{
 }
 
 func init() {
-	DisconnectCmd.AddCommand(agentCmd)
+	DisconnectCmd.AddCommand(infraCmd)
 
-	agentCmd.Flags().String("project-id", "", "Set the project-id to disconnect Chaos Infrastructure for the particular project. To see the projects, apply litmusctl get projects")
+	infraCmd.Flags().String("project-id", "", "Set the project-id to disconnect Chaos Infrastructure for the particular project. To see the projects, apply litmusctl get projects")
 }

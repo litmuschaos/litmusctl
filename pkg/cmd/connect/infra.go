@@ -20,8 +20,8 @@ import (
 	models "github.com/litmuschaos/litmus/chaoscenter/graphql/server/graph/model"
 	"os"
 
-	"github.com/litmuschaos/litmusctl/pkg/agent"
 	"github.com/litmuschaos/litmusctl/pkg/apis"
+	"github.com/litmuschaos/litmusctl/pkg/infra"
 	"github.com/litmuschaos/litmusctl/pkg/k8s"
 	"github.com/litmuschaos/litmusctl/pkg/types"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
@@ -78,7 +78,7 @@ var infraCmd = &cobra.Command{
 
 			if !projectExists {
 				utils.White_B.Print("Creating a random project...")
-				newInfra.ProjectId = agent.CreateRandomProject(credentials)
+				newInfra.ProjectId = infra.CreateRandomProject(credentials)
 			}
 		}
 
@@ -169,7 +169,7 @@ var infraCmd = &cobra.Command{
 
 			// Check if user has sufficient permissions based on mode
 			utils.White_B.Print("\n🏃 Running prerequisites check....")
-			agent.ValidateSAPermissions(newInfra.Namespace, newInfra.Mode, &kubeconfig)
+			infra.ValidateSAPermissions(newInfra.Namespace, newInfra.Mode, &kubeconfig)
 			var ListInfraRequest = models.ListInfraRequest{}
 			infras, err := apis.GetInfraList(credentials, newInfra.ProjectId, ListInfraRequest)
 			utils.PrintError(err)
@@ -184,7 +184,7 @@ var infraCmd = &cobra.Command{
 			}
 
 			if isInfraExist {
-				agent.PrintExistingInfra(infras)
+				infra.PrintExistingInfra(infras)
 				os.Exit(1)
 			}
 			envIDs, err := apis.GetEnvironmentList(newInfra.ProjectId, credentials)
@@ -200,7 +200,7 @@ var infraCmd = &cobra.Command{
 				}
 			}
 			if !isEnvExist {
-				agent.PrintExistingEnvironments(envIDs)
+				infra.PrintExistingEnvironments(envIDs)
 				os.Exit(1)
 			}
 
@@ -210,25 +210,25 @@ var infraCmd = &cobra.Command{
 
 			if newInfra.ProjectId == "" {
 				// Fetch project id
-				newInfra.ProjectId = agent.GetProjectID(userDetails)
+				newInfra.ProjectId = infra.GetProjectID(userDetails)
 			}
 
-			modeType := agent.GetModeType()
+			modeType := infra.GetModeType()
 
 			// Check if user has sufficient permissions based on mode
 			utils.White_B.Print("\n🏃 Running prerequisites check....")
-			agent.ValidateSAPermissions(newInfra.Namespace, modeType, &kubeconfig)
-			newInfra, err = agent.GetInfraDetails(modeType, newInfra.ProjectId, credentials, &kubeconfig)
+			infra.ValidateSAPermissions(newInfra.Namespace, modeType, &kubeconfig)
+			newInfra, err = infra.GetInfraDetails(modeType, newInfra.ProjectId, credentials, &kubeconfig)
 			utils.PrintError(err)
 
 			newInfra.ServiceAccount, newInfra.SAExists = k8s.ValidSA(newInfra.Namespace, &kubeconfig)
 			newInfra.Mode = modeType
 		}
 
-		agent.Summary(newInfra, &kubeconfig)
+		infra.Summary(newInfra, &kubeconfig)
 
 		if !nonInteractive {
-			agent.ConfirmInstallation()
+			infra.ConfirmInstallation()
 		}
 
 		infra, err := apis.ConnectInfra(newInfra, credentials)
