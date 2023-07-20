@@ -5,7 +5,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+	http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -25,13 +25,13 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// workflowCmd represents the Chaos Scenario command
-var workflowCmd = &cobra.Command{
-	Use: "chaos-scenario",
-	Short: `Delete a Chaos Scenario
+// experimentCmd represents the Chaos Scenario command
+var experimentCmd = &cobra.Command{
+	Use: "chaos-experiment",
+	Short: `Delete a Chaos experiment
 	Example:
-	#delete a Chaos Scenario
-	litmusctl delete chaos-scenario c520650e-7cb6-474c-b0f0-4df07b2b025b --project-id=c520650e-7cb6-474c-b0f0-4df07b2b025b
+	#delete a Chaos Experiment
+	litmusctl delete chaos-experiment c520650e-7cb6-474c-b0f0-4df07b2b025b --project-id=c520650e-7cb6-474c-b0f0-4df07b2b025b
 
 	Note: The default location of the config file is $HOME/.litmusconfig, and can be overridden by a --config flag
 	`,
@@ -56,15 +56,15 @@ var workflowCmd = &cobra.Command{
 			}
 		}
 
-		workflowID := args[0]
+		experimentID := args[0]
 
 		// Handle blank input for Chaos Scenario ID
-		if workflowID == "" {
-			utils.White_B.Print("\nEnter the Chaos Scenario ID: ")
-			fmt.Scanln(&workflowID)
+		if experimentID == "" {
+			utils.White_B.Print("\nEnter the Chaos Experiment ID: ")
+			fmt.Scanln(&experimentID)
 
-			if workflowID == "" {
-				utils.Red.Println("⛔ Chaos Scenario ID can't be empty!!")
+			if experimentID == "" {
+				utils.Red.Println("⛔ Chaos Experiment ID can't be empty!!")
 				os.Exit(1)
 			}
 		}
@@ -90,22 +90,22 @@ var workflowCmd = &cobra.Command{
 		}
 
 		// Make API call
-		deletedWorkflow, err := apis.DeleteChaosWorkflow(projectID, &workflowID, credentials)
+		deletedWorkflow, err := apis.DeleteChaosExperiment(projectID, &experimentID, credentials)
 		if err != nil {
-			utils.Red.Println("\n❌ Error in deleting Chaos Scenario: ", err.Error())
+			utils.Red.Println("\n❌ Error in deleting Chaos Experiment: ", err.Error())
 			os.Exit(1)
 		}
 
 		if deletedWorkflow.Data.IsDeleted {
-			utils.White_B.Println("\n🚀 Chaos Scenario successfully deleted.")
+			utils.White_B.Println("\n🚀 Chaos Experiment successfully deleted.")
 		} else {
-			utils.White_B.Println("\n❌ Failed to delete Chaos Scenario. Please check if the ID is correct or not.")
+			utils.White_B.Println("\n❌ Failed to delete Chaos Experiment. Please check if the ID is correct or not.")
 		}
 	},
 }
 
 func init() {
-	DeleteCmd.AddCommand(workflowCmd)
+	DeleteCmd.AddCommand(experimentCmd)
 
-	workflowCmd.Flags().String("project-id", "", "Set the project-id to create Chaos Scenario for the particular project. To see the projects, apply litmusctl get projects")
+	experimentCmd.Flags().String("project-id", "", "Set the project-id to create Chaos Experiment for the particular project. To see the projects, apply litmusctl get projects")
 }
