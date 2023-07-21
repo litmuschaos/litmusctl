@@ -83,9 +83,9 @@ func CreateProjectRequest(projectName string, cred types.Credentials) (createPro
 
 type listProjectResponse struct {
 	Data []struct {
-		ID        string `json:"_id"`
-		Name      string `json:"name"`
-		CreatedAt int64  `json:"created_at"`
+		ID        string `json:"ID"`
+		Name      string `json:"Name"`
+		CreatedAt int64  `json:"CreatedAt"`
 	} `json:"data"`
 	Errors []struct {
 		Message string   `json:"message"`
