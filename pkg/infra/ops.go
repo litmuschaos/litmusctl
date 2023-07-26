@@ -41,15 +41,12 @@ func PrintExistingInfra(infra apis.InfraData) {
 }
 
 func PrintExistingEnvironments(env apis.ListEnvironmentData) {
-	utils.Red.Println("\nChaos Environment with the given ID doesn't exists.")
 	// Print Chaos EnvironmentID list if Given ID doesn't exist
-	utils.White_B.Println("\nCreated Chaos Environments list:")
+	utils.White_B.Println("\nExisting Chaos Environments list:")
 
 	for i := range env.Data.ListEnvironmentDetails.Environments {
 		utils.White_B.Println("-", env.Data.ListEnvironmentDetails.Environments[i].EnvironmentID)
 	}
-
-	utils.White_B.Println("\n❗ Please enter a name from the List.")
 }
 
 // GetProjectID display list of projects and returns the project id based on input
@@ -164,7 +161,9 @@ ENVIRONMENT:
 	}
 
 	if !isEnvExist {
+		utils.Red.Println("\nChaos Environment with the given ID doesn't exists.")
 		PrintExistingEnvironments(Env)
+		utils.White_B.Println("\n❗ Please enter a name from the List.")
 		goto ENVIRONMENT
 	}
 

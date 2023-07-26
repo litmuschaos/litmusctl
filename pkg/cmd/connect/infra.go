@@ -200,7 +200,9 @@ var infraCmd = &cobra.Command{
 				}
 			}
 			if !isEnvExist {
+				utils.Red.Println("\nChaos Environment with the given ID doesn't exists.")
 				infra.PrintExistingEnvironments(envIDs)
+				utils.White_B.Println("\n❗ Please enter a name from the List.")
 				os.Exit(1)
 			}
 
