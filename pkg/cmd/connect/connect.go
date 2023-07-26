@@ -24,12 +24,11 @@ var ConnectCmd = &cobra.Command{
 	Use: "connect",
 	Short: `Connect resources for LitmusChaos infra plane.
 		Examples:
-		#connect a Chaos Delegate
+		#connect a Chaos Infrastructure
 		litmusctl connect chaos-infra --name="new-chaos-infra" --non-interactive
 
-		#connect a chaos-delegate within a project
+		#connect a chaos-infrastructure within a project
 		litmusctl connect chaos-infra --name="new-chaos-infra" --project-id="d861b650-1549-4574-b2ba-ab754058dd04" --non-interactive
-
 		Note: The default location of the config file is $HOME/.litmusconfig, and can be overridden by a --config flag
 	`,
 }

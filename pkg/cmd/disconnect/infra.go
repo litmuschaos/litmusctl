@@ -31,7 +31,7 @@ var infraCmd = &cobra.Command{
 	Use: "chaos-infra",
 	Short: `Disconnect a Chaos Infrastructure
 	Example:
-	#disconnect a Chaos Delegate
+	#disconnect a Chaos Infrastructure
 	litmusctl disconnect chaos-infra c520650e-7cb6-474c-b0f0-4df07b2b025b --project-id=c520650e-7cb6-474c-b0f0-4df07b2b025b
 
 	Note: The default location of the config file is $HOME/.litmusconfig, and can be overridden by a --config flag

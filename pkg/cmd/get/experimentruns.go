@@ -89,7 +89,7 @@ var experimentRunsCmd = &cobra.Command{
 
 				utils.White.Fprintln(
 					writer,
-					experimentRun.ExperimentRunID+"\t"+experimentRun.Phase.String()+"\t"+strconv.FormatFloat(*experimentRun.ResiliencyScore, 'f', 2, 64)+"\t"+experimentRun.ExperimentID+"\t"+experimentRun.ExperimentName+"\t"+experimentRun.Infra.Name+"\t"+lastUpdated+"\t"+experimentRun.ExecutionData)
+					experimentRun.ExperimentRunID+"\t"+experimentRun.Phase.String()+"\t"+strconv.FormatFloat(*experimentRun.ResiliencyScore, 'f', 2, 64)+"\t"+experimentRun.ExperimentID+"\t"+experimentRun.ExperimentName+"\t"+experimentRun.Infra.Name+"\t"+lastUpdated+"\t"+experimentRun.UpdatedBy.Username)
 			}
 
 			if listAllExperimentRuns || (experimentRuns.Data.ListExperimentRunDetails.TotalNoOfExperimentRuns <= listExperimentRunsRequest.Pagination.Limit) {

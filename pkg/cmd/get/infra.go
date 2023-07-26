@@ -26,7 +26,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// InfraCmd represents the agents command
+// InfraCmd represents the Infra command
 var InfraCmd = &cobra.Command{
 	Use:   "chaos-infra",
 	Short: "Display list of Chaos Infrastructures within the project",

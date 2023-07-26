@@ -60,7 +60,7 @@ type RunExperimentDetails struct {
 	RunExperimentResponse model.RunChaosExperimentResponse `json:"runChaosExperiment"`
 }
 
-// CreateExperiment sends GraphQL API request for creating a workflow
+// CreateExperiment sends GraphQL API request for creating a Experiment
 func CreateExperiment(pid string, requestData model.SaveChaosExperimentRequest, cred types.Credentials) (RunExperimentData, error) {
 
 	// Query to Save the Experiment
@@ -358,7 +358,7 @@ type GetChaosExperimentRunGraphQLRequest struct {
 	} `json:"variables"`
 }
 
-// GetExperimentRunsList sends GraphQL API request for fetching a list of workflow runs.
+// GetExperimentRunsList sends GraphQL API request for fetching a list of experiment runs.
 func GetExperimentRunsList(pid string, in model.ListExperimentRunRequest, cred types.Credentials) (ExperimentRunListData, error) {
 
 	var gqlReq GetChaosExperimentRunGraphQLRequest
@@ -418,17 +418,17 @@ func GetExperimentRunsList(pid string, in model.ListExperimentRunRequest, cred t
 	}
 
 	if resp.StatusCode == http.StatusOK {
-		var workflowRunsList ExperimentRunListData
-		err = json.Unmarshal(bodyBytes, &workflowRunsList)
+		var experimentRunList ExperimentRunListData
+		err = json.Unmarshal(bodyBytes, &experimentRunList)
 		if err != nil {
 			return ExperimentRunListData{}, err
 		}
 
-		if len(workflowRunsList.Errors) > 0 {
-			return ExperimentRunListData{}, errors.New(workflowRunsList.Errors[0].Message)
+		if len(experimentRunList.Errors) > 0 {
+			return ExperimentRunListData{}, errors.New(experimentRunList.Errors[0].Message)
 		}
 
-		return workflowRunsList, nil
+		return experimentRunList, nil
 	} else {
 		return ExperimentRunListData{}, errors.New("Error while fetching the Chaos Experiment runs")
 	}
@@ -455,7 +455,7 @@ type DeleteChaosExperimentGraphQLRequest struct {
 	} `json:"variables"`
 }
 
-// DeleteChaosExperiment sends GraphQL API request for deleting a given Chaos Workflow.
+// DeleteChaosExperiment sends GraphQL API request for deleting a given Chaos Experiment.
 func DeleteChaosExperiment(projectID string, experimentID *string, cred types.Credentials) (DeleteChaosExperimentData, error) {
 
 	var gqlReq DeleteChaosExperimentGraphQLRequest

@@ -112,5 +112,5 @@ func init() {
 	RunCmd.AddCommand(experimentCmd)
 
 	experimentCmd.Flags().String("project-id", "", "Set the project-id to create Chaos Experiment for the particular project. To see the projects, apply litmusctl get projects")
-	experimentCmd.Flags().String("experiment-id", "", "Set the cenvironment-id to create Chaos Experiment for the particular Chaos Delegate. To see the Chaos Delegates, apply litmusctl get chaos-delegates")
+	experimentCmd.Flags().String("experiment-id", "", "Set the environment-id to create Chaos Experiment for the particular Chaos Infrastructure. To see the Chaos Infrastructures, apply litmusctl get chaos-infra")
 }

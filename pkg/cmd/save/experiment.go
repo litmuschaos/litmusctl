@@ -78,19 +78,19 @@ var experimentCmd = &cobra.Command{
 			}
 		}
 
-		chaosExperimentRequest.ID, err = cmd.Flags().GetString("experiment-id")
-		utils.PrintError(err)
-
-		//Handle blank input for Chaos EnvironmentID
-		if chaosExperimentRequest.ID == "" {
-			utils.White_B.Print("\nEnter the Chaos Experiment ID: ")
-			fmt.Scanln(&chaosExperimentRequest.ID)
-
-			if chaosExperimentRequest.ID == "" {
-				utils.Red.Println("⛔ Chaos Experiment ID can't be empty!!")
-				os.Exit(1)
-			}
-		}
+		//chaosExperimentRequest.ID, err = cmd.Flags().GetString("experiment-id")
+		//utils.PrintError(err)
+		//
+		////Handle blank input for Chaos EnvironmentID
+		//if chaosExperimentRequest.ID == "" {
+		//	utils.White_B.Print("\nEnter the Chaos Experiment ID: ")
+		//	fmt.Scanln(&chaosExperimentRequest.ID)
+		//
+		//	if chaosExperimentRequest.ID == "" {
+		//		utils.Red.Println("⛔ Chaos Experiment ID can't be empty!!")
+		//		os.Exit(1)
+		//	}
+		//}
 
 		chaosExperimentRequest.Name, err = cmd.Flags().GetString("name")
 		utils.PrintError(err)
@@ -126,13 +126,13 @@ var experimentCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		// Parse workflow manifest and populate chaosWorkFlowInput
-		err = utils.ParseWorkflowManifest(experimentManifest, &chaosExperimentRequest)
+		// Parse experiment manifest and populate chaosexperimentInput
+		err = utils.ParseExperimentManifest(experimentManifest, &chaosExperimentRequest)
 		if err != nil {
 			utils.Red.Println("❌ Error parsing Chaos Experiment manifest: " + err.Error())
 			os.Exit(1)
 		}
-
+		chaosExperimentRequest.ID = utils.GenerateNameID(chaosExperimentRequest.Name)
 		// Make API call
 		saveExperiment, err := apis.SaveExperiment(pid, chaosExperimentRequest, credentials)
 		if err != nil {
@@ -156,8 +156,8 @@ func init() {
 	SaveCmd.AddCommand(experimentCmd)
 
 	experimentCmd.Flags().String("project-id", "", "Set the project-id to create Chaos Experiment for the particular project. To see the projects, apply litmusctl get projects")
-	experimentCmd.Flags().String("chaos-infra-id", "", "Set the chaos-delegate-id to create Chaos Experiment for the particular Chaos Delegate. To see the Chaos Delegates, apply litmusctl get chaos-delegates")
-	experimentCmd.Flags().String("experiment-id", "", "Set the cenvironment-id to create Chaos Experiment for the particular Chaos Delegate. To see the Chaos Delegates, apply litmusctl get chaos-delegates")
+	experimentCmd.Flags().String("chaos-infra-id", "", "Set the chaos-infra-id to create Chaos Experiment for the particular Chaos Infrastructure. To see the Chaos Infrastructures, apply litmusctl get chaos-infra")
+	experimentCmd.Flags().String("experiment-id", "", "Set the environment-id to create Chaos Experiment for the particular Chaos Infrastructure. To see the Chaos Infrastructures, apply litmusctl get chaos-infra")
 	experimentCmd.Flags().StringP("file", "f", "", "The manifest file for the Chaos Experiment")
 	experimentCmd.Flags().StringP("name", "n", "", "The Name for the Chaos Experiment")
 	experimentCmd.Flags().StringP("description", "d", "", "The Description for the Chaos Experiment")

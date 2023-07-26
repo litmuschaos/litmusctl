@@ -25,7 +25,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// experimentCmd represents the Chaos Scenario command
+// experimentCmd represents the Chaos Experiment command
 var experimentCmd = &cobra.Command{
 	Use: "chaos-experiment",
 	Short: `Delete a Chaos experiment
@@ -58,7 +58,7 @@ var experimentCmd = &cobra.Command{
 
 		experimentID := args[0]
 
-		// Handle blank input for Chaos Scenario ID
+		// Handle blank input for Chaos Experiment ID
 		if experimentID == "" {
 			utils.White_B.Print("\nEnter the Chaos Experiment ID: ")
 			fmt.Scanln(&experimentID)
@@ -90,13 +90,13 @@ var experimentCmd = &cobra.Command{
 		}
 
 		// Make API call
-		deletedWorkflow, err := apis.DeleteChaosExperiment(projectID, &experimentID, credentials)
+		deleteExperiment, err := apis.DeleteChaosExperiment(projectID, &experimentID, credentials)
 		if err != nil {
 			utils.Red.Println("\n❌ Error in deleting Chaos Experiment: ", err.Error())
 			os.Exit(1)
 		}
 
-		if deletedWorkflow.Data.IsDeleted {
+		if deleteExperiment.Data.IsDeleted {
 			utils.White_B.Println("\n🚀 Chaos Experiment successfully deleted.")
 		} else {
 			utils.White_B.Println("\n❌ Failed to delete Chaos Experiment. Please check if the ID is correct or not.")

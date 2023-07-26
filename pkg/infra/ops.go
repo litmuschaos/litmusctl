@@ -69,7 +69,7 @@ repeat:
 	return u.Data.Projects[pid-1].ID
 }
 
-// GetModeType gets mode of Chaos Delegate installation as input
+// GetModeType gets mode of Chaos Infrastructure installation as input
 func GetModeType() string {
 repeat:
 	var (

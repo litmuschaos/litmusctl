@@ -42,7 +42,7 @@ const (
 	// Label of subscriber infra being deployed
 	ChaosInfraLabel = "app=subscriber"
 
-	// Agent type is "external" for agents connected via litmusctl
+	// infra type is "external" for infras connected via litmusctl
 	InfraType = "external"
 
 	// Default namespace for infra installation

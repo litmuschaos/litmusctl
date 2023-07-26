@@ -26,7 +26,7 @@ import (
 	"sigs.k8s.io/yaml"
 )
 
-// experimentCmd represents the Chaos Scenario command
+// experimentCmd represents the Chaos Experiment command
 var experimentCmd = &cobra.Command{
 	Use:   "chaos-experiment",
 	Short: "Describe a Chaos Experiment within the project",
@@ -58,7 +58,7 @@ var experimentCmd = &cobra.Command{
 			experimentID = args[0]
 		}
 
-		// Handle blank input for Chaos Scenario ID
+		// Handle blank input for Chaos Experiment ID
 		if experimentID == "" {
 			utils.Red.Println("⛔ Chaos Experiment ID can't be empty!!")
 			os.Exit(1)
@@ -66,15 +66,15 @@ var experimentCmd = &cobra.Command{
 
 		describeExperimentRequest.ExperimentIDs = append(describeExperimentRequest.ExperimentIDs, &experimentID)
 
-		workflow, err := apis.GetExperimentList(pid, describeExperimentRequest, credentials)
+		experiment, err := apis.GetExperimentList(pid, describeExperimentRequest, credentials)
 		utils.PrintError(err)
 
-		if len(workflow.Data.ListExperimentDetails.Experiments) == 0 {
+		if len(experiment.Data.ListExperimentDetails.Experiments) == 0 {
 			utils.Red.Println("⛔ No chaos experiment found with ID: ", experimentID)
 			os.Exit(1)
 		}
 
-		yamlManifest, err := yaml.JSONToYAML([]byte(workflow.Data.ListExperimentDetails.Experiments[0].ExperimentManifest))
+		yamlManifest, err := yaml.JSONToYAML([]byte(experiment.Data.ListExperimentDetails.Experiments[0].ExperimentManifest))
 		if err != nil {
 			utils.Red.Println("❌ Error parsing Chaos Experiment manifest: " + err.Error())
 			os.Exit(1)

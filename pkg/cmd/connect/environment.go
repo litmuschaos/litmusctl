@@ -146,8 +146,7 @@ var environmentCmd = &cobra.Command{
 		//	os.Exit(1)
 		//}
 
-		utils.White_B.Println("\n🚀 Chaos newInfra connection successful!! 🎉" + environment.Data.EnvironmentDetails.EnvironmentID)
-		//utils.White_B.Println("👉 Litmus Chaos Infrastructure can be accessed here: " + fmt.Sprintf("%s/%s", credentials.Endpoint, utils.ChaosInfraPath))
+		utils.White_B.Println("\n🚀 Chaos New Environment Created successful!! 🎉" + environment.Data.EnvironmentDetails.EnvironmentID)
 	},
 }
 

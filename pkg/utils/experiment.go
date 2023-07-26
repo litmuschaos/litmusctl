@@ -33,10 +33,10 @@ import (
 	"sigs.k8s.io/yaml"
 )
 
-// ParseWorkflowManifest reads the manifest that is passed as an argument and
+// ParseExperimentManifest reads the manifest that is passed as an argument and
 // populates the payload for the Message API request. The manifest
 // can be either a local file or a remote file.
-func ParseWorkflowManifest(file string, chaosWorkFlowRequest *model.SaveChaosExperimentRequest) error {
+func ParseExperimentManifest(file string, chaosWorkFlowRequest *model.SaveChaosExperimentRequest) error {
 
 	var body []byte
 	var err error
@@ -72,7 +72,7 @@ func ParseWorkflowManifest(file string, chaosWorkFlowRequest *model.SaveChaosExp
 			workflow.ObjectMeta.GenerateName = "TOBEDELETED"
 			chaosWorkFlowRequest.Name = workflow.ObjectMeta.Name
 		} else {
-			return errors.New("No name or generateName provided for the Chaos scenario.")
+			return errors.New("No name or generateName provided for the Chaos experiment.")
 		}
 
 		// Marshal the workflow back to JSON for API payload.
@@ -106,7 +106,7 @@ func ParseWorkflowManifest(file string, chaosWorkFlowRequest *model.SaveChaosExp
 			cronWorkflow.ObjectMeta.GenerateName = "TOBEDELETED"
 			chaosWorkFlowRequest.Name = cronWorkflow.ObjectMeta.Name
 		} else {
-			return errors.New("No name or generateName provided for the Chaos scenario.")
+			return errors.New("No name or generateName provided for the Chaos experiment.")
 		}
 
 		// Marshal the workflow back to JSON for API payload.
