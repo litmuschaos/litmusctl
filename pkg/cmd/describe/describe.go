@@ -22,7 +22,7 @@ import (
 // DescribeCmd represents the describe command
 var DescribeCmd = &cobra.Command{
 	Use: "describe",
-	Short: `Describe resources for LitmusChaos agent plane.
+	Short: `Describe resources for LitmusChaos Execution plane.
 		Examples:
 		#describe a Chaos Experiment
 		litmusctl describe chaos-experiment d861b650-1549-4574-b2ba-ab754058dd04 --project-id="d861b650-1549-4574-b2ba-ab754058dd04"

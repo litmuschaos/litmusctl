@@ -18,11 +18,13 @@ package connect
 import (
 	"fmt"
 	models "github.com/litmuschaos/litmus/chaoscenter/graphql/server/graph/model"
+	"github.com/litmuschaos/litmusctl/pkg/apis/environment"
+	"github.com/litmuschaos/litmusctl/pkg/apis/infrastructure"
 	"os"
 
 	"github.com/litmuschaos/litmusctl/pkg/apis"
-	"github.com/litmuschaos/litmusctl/pkg/infra"
 	"github.com/litmuschaos/litmusctl/pkg/k8s"
+	"github.com/litmuschaos/litmusctl/pkg/ops"
 	"github.com/litmuschaos/litmusctl/pkg/types"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
 
@@ -78,7 +80,7 @@ var infraCmd = &cobra.Command{
 
 			if !projectExists {
 				utils.White_B.Print("Creating a random project...")
-				newInfra.ProjectId = infra.CreateRandomProject(credentials)
+				newInfra.ProjectId = ops.CreateRandomProject(credentials)
 			}
 		}
 
@@ -139,10 +141,6 @@ var infraCmd = &cobra.Command{
 			utils.PrintError(err)
 
 			if toleration != "" {
-				//var tolerations []types.Toleration
-				//err := json.Unmarshal([]byte(toleration), &tolerations)
-				//utils.PrintError(err)
-				//
 				newInfra.Tolerations = toleration
 			}
 
@@ -169,9 +167,9 @@ var infraCmd = &cobra.Command{
 
 			// Check if user has sufficient permissions based on mode
 			utils.White_B.Print("\n🏃 Running prerequisites check....")
-			infra.ValidateSAPermissions(newInfra.Namespace, newInfra.Mode, &kubeconfig)
+			ops.ValidateSAPermissions(newInfra.Namespace, newInfra.Mode, &kubeconfig)
 			var ListInfraRequest = models.ListInfraRequest{}
-			infras, err := apis.GetInfraList(credentials, newInfra.ProjectId, ListInfraRequest)
+			infras, err := infrastructure.GetInfraList(credentials, newInfra.ProjectId, ListInfraRequest)
 			utils.PrintError(err)
 
 			// Duplicate Infra check
@@ -184,10 +182,10 @@ var infraCmd = &cobra.Command{
 			}
 
 			if isInfraExist {
-				infra.PrintExistingInfra(infras)
+				ops.PrintExistingInfra(infras)
 				os.Exit(1)
 			}
-			envIDs, err := apis.GetEnvironmentList(newInfra.ProjectId, credentials)
+			envIDs, err := environment.GetEnvironmentList(newInfra.ProjectId, credentials)
 			utils.PrintError(err)
 
 			// Check if Environment exists
@@ -201,7 +199,7 @@ var infraCmd = &cobra.Command{
 			}
 			if !isEnvExist {
 				utils.Red.Println("\nChaos Environment with the given ID doesn't exists.")
-				infra.PrintExistingEnvironments(envIDs)
+				ops.PrintExistingEnvironments(envIDs)
 				utils.White_B.Println("\n❗ Please enter a name from the List.")
 				os.Exit(1)
 			}
@@ -212,28 +210,28 @@ var infraCmd = &cobra.Command{
 
 			if newInfra.ProjectId == "" {
 				// Fetch project id
-				newInfra.ProjectId = infra.GetProjectID(userDetails)
+				newInfra.ProjectId = ops.GetProjectID(userDetails)
 			}
 
-			modeType := infra.GetModeType()
+			modeType := ops.GetModeType()
 
 			// Check if user has sufficient permissions based on mode
 			utils.White_B.Print("\n🏃 Running prerequisites check....")
-			infra.ValidateSAPermissions(newInfra.Namespace, modeType, &kubeconfig)
-			newInfra, err = infra.GetInfraDetails(modeType, newInfra.ProjectId, credentials, &kubeconfig)
+			ops.ValidateSAPermissions(newInfra.Namespace, modeType, &kubeconfig)
+			newInfra, err = ops.GetInfraDetails(modeType, newInfra.ProjectId, credentials, &kubeconfig)
 			utils.PrintError(err)
 
 			newInfra.ServiceAccount, newInfra.SAExists = k8s.ValidSA(newInfra.Namespace, &kubeconfig)
 			newInfra.Mode = modeType
 		}
 
-		infra.Summary(newInfra, &kubeconfig)
+		ops.Summary(newInfra, &kubeconfig)
 
 		if !nonInteractive {
-			infra.ConfirmInstallation()
+			ops.ConfirmInstallation()
 		}
 
-		infra, err := apis.ConnectInfra(newInfra, credentials)
+		infra, err := infrastructure.ConnectInfra(newInfra, credentials)
 		if err != nil {
 			utils.Red.Println("\n❌ Chaos Infra connection failed: " + err.Error() + "\n")
 			os.Exit(1)
@@ -248,7 +246,7 @@ var infraCmd = &cobra.Command{
 		utils.White_B.Print("Applying YAML:\n", path)
 
 		// Print error message in case Data field is null in response
-		if (infra.Data == apis.RegisterInfra{}) {
+		if (infra.Data == infrastructure.RegisterInfra{}) {
 			utils.White_B.Print("\n🚫 Chaos newInfra connection failed: " + infra.Errors[0].Message + "\n")
 			os.Exit(1)
 		}

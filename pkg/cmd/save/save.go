@@ -22,7 +22,7 @@ import (
 // createCmd represents the create command
 var SaveCmd = &cobra.Command{
 	Use: "save",
-	Short: `Save Experiment for LitmusChaos agent plane.
+	Short: `Save Experiment for LitmusChaos Execution plane.
 		Examples:
 
 		#Save a Chaos Experiment from a file

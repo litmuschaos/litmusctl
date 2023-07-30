@@ -18,6 +18,7 @@ package run
 import (
 	"fmt"
 	"github.com/litmuschaos/litmusctl/pkg/apis"
+	"github.com/litmuschaos/litmusctl/pkg/apis/experiment"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
 	"github.com/spf13/cobra"
 	"os"
@@ -89,9 +90,9 @@ var experimentCmd = &cobra.Command{
 		}
 
 		// Make API call
-		runExperiment, err := apis.RunExperiment(pid, eid, credentials)
+		runExperiment, err := experiment.RunExperiment(pid, eid, credentials)
 		if err != nil {
-			if (runExperiment.Data == apis.RunExperimentDetails{}) {
+			if (runExperiment.Data == experiment.RunExperimentDetails{}) {
 				if strings.Contains(err.Error(), "multiple run errors") {
 					utils.Red.Println("\n❌ Chaos Experiment already exists")
 					os.Exit(1)
@@ -103,7 +104,7 @@ var experimentCmd = &cobra.Command{
 		}
 
 		//Successful run
-		utils.White_B.Println("\n🚀 Chaos Experiment successfully running 🎉")
+		utils.White_B.Println("\n🚀 Chaos Experiment running successfully 🎉")
 
 	},
 }

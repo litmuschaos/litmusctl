@@ -17,6 +17,7 @@ package disconnect
 
 import (
 	"fmt"
+	"github.com/litmuschaos/litmusctl/pkg/apis/infrastructure"
 	"os"
 	"strings"
 
@@ -92,7 +93,7 @@ var infraCmd = &cobra.Command{
 		// Make API call
 		//var agentIDs []*string
 		//agentIDs = append(agentIDs, &infraID)
-		disconnectedInfra, err := apis.DisconnectInfra(projectID, infraID, credentials)
+		disconnectedInfra, err := infrastructure.DisconnectInfra(projectID, infraID, credentials)
 		if err != nil {
 			utils.Red.Println("\n❌ Error in disconnecting Chaos Infrastructure: ", err.Error())
 			os.Exit(1)

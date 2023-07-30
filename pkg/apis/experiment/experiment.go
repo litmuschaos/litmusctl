@@ -13,52 +13,18 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package apis
+package experiment
 
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
-	"io/ioutil"
-	"net/http"
-	"strings"
-
 	"github.com/litmuschaos/litmus/chaoscenter/graphql/server/graph/model"
+	"github.com/litmuschaos/litmusctl/pkg/apis"
 	types "github.com/litmuschaos/litmusctl/pkg/types"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
+	"io/ioutil"
+	"net/http"
 )
-
-type SaveExperimentData struct {
-	Errors []struct {
-		Message string   `json:"message"`
-		Path    []string `json:"path"`
-	} `json:"errors"`
-	Data SavedExperimentDetails `json:"data"`
-}
-
-type SavedExperimentDetails struct {
-	Message string `json:"saveChaosExperiment"`
-}
-
-type SaveChaosExperimentGraphQLRequest struct {
-	Query     string `json:"query"`
-	Variables struct {
-		ProjectID                  string                           `json:"projectID"`
-		SaveChaosExperimentRequest model.SaveChaosExperimentRequest `json:"request"`
-	} `json:"variables"`
-}
-
-type RunExperimentData struct {
-	Errors []struct {
-		Message string   `json:"message"`
-		Path    []string `json:"path"`
-	} `json:"errors"`
-	Data RunExperimentDetails `json:"data"`
-}
-
-type RunExperimentDetails struct {
-	RunExperimentResponse model.RunChaosExperimentResponse `json:"runChaosExperiment"`
-}
 
 // CreateExperiment sends GraphQL API request for creating a Experiment
 func CreateExperiment(pid string, requestData model.SaveChaosExperimentRequest, cred types.Credentials) (RunExperimentData, error) {
@@ -66,9 +32,7 @@ func CreateExperiment(pid string, requestData model.SaveChaosExperimentRequest, 
 	// Query to Save the Experiment
 	var gqlReq SaveChaosExperimentGraphQLRequest
 
-	gqlReq.Query = `mutation saveChaosExperiment($projectID: ID!, $request: SaveChaosExperimentRequest!) {
-                      saveChaosExperiment(projectID: $projectID, request: $request)
-                    }`
+	gqlReq.Query = SaveExperimentQuery
 	gqlReq.Variables.ProjectID = pid
 	gqlReq.Variables.SaveChaosExperimentRequest = requestData
 
@@ -77,8 +41,8 @@ func CreateExperiment(pid string, requestData model.SaveChaosExperimentRequest, 
 		return RunExperimentData{}, err
 	}
 
-	resp, err := SendRequest(
-		SendRequestParams{
+	resp, err := apis.SendRequest(
+		apis.SendRequestParams{
 			Endpoint: cred.Endpoint + utils.GQLAPIPath,
 			Token:    cred.Token,
 		},
@@ -110,16 +74,13 @@ func CreateExperiment(pid string, requestData model.SaveChaosExperimentRequest, 
 			return RunExperimentData{}, errors.New(savedExperiment.Errors[0].Message)
 		}
 
-		if strings.Contains(savedExperiment.Data.Message, "experiment saved successfully") {
-			fmt.Print("\n🚀 Chaos Experiment successfully Saved 🎉")
-		}
 	} else {
 		return RunExperimentData{}, errors.New("graphql schema error")
 	}
 
 	// Query to Run the Chaos Experiment
 	runQuery := `{"query":"mutation{ \n runChaosExperiment(experimentID:  \"` + requestData.ID + `\", projectID:  \"` + pid + `\"){\n notifyID \n}}"}`
-	resp, err = SendRequest(SendRequestParams{Endpoint: cred.Endpoint + utils.GQLAPIPath, Token: cred.Token}, []byte(runQuery), string(types.Post))
+	resp, err = apis.SendRequest(apis.SendRequestParams{Endpoint: cred.Endpoint + utils.GQLAPIPath, Token: cred.Token}, []byte(runQuery), string(types.Post))
 
 	if err != nil {
 		return RunExperimentData{}, errors.New("Error in Running Chaos Experiment: " + err.Error())
@@ -152,9 +113,7 @@ func SaveExperiment(pid string, requestData model.SaveChaosExperimentRequest, cr
 	// Query to Save the Experiment
 	var gqlReq SaveChaosExperimentGraphQLRequest
 
-	gqlReq.Query = `mutation saveChaosExperiment($projectID: ID!, $request: SaveChaosExperimentRequest!) {
-                      saveChaosExperiment(projectID: $projectID, request: $request)
-                    }`
+	gqlReq.Query = SaveExperimentQuery
 	gqlReq.Variables.ProjectID = pid
 	gqlReq.Variables.SaveChaosExperimentRequest = requestData
 
@@ -163,8 +122,8 @@ func SaveExperiment(pid string, requestData model.SaveChaosExperimentRequest, cr
 		return SaveExperimentData{}, err
 	}
 
-	resp, err := SendRequest(
-		SendRequestParams{
+	resp, err := apis.SendRequest(
+		apis.SendRequestParams{
 			Endpoint: cred.Endpoint + utils.GQLAPIPath,
 			Token:    cred.Token,
 		},
@@ -195,10 +154,6 @@ func SaveExperiment(pid string, requestData model.SaveChaosExperimentRequest, cr
 		if len(savedExperiment.Errors) > 0 {
 			return SaveExperimentData{}, errors.New(savedExperiment.Errors[0].Message)
 		}
-
-		if strings.Contains(savedExperiment.Data.Message, "experiment saved successfully") {
-			fmt.Print("\n🚀 Chaos Experiment successfully Saved 🎉")
-		}
 		return savedExperiment, nil
 
 	} else {
@@ -211,7 +166,7 @@ func RunExperiment(pid string, eid string, cred types.Credentials) (RunExperimen
 	var err error
 	runQuery := `{"query":"mutation{ \n runChaosExperiment(experimentID:  \"` + eid + `\", projectID:  \"` + pid + `\"){\n notifyID \n}}"}`
 
-	resp, err := SendRequest(SendRequestParams{Endpoint: cred.Endpoint + utils.GQLAPIPath, Token: cred.Token}, []byte(runQuery), string(types.Post))
+	resp, err := apis.SendRequest(apis.SendRequestParams{Endpoint: cred.Endpoint + utils.GQLAPIPath, Token: cred.Token}, []byte(runQuery), string(types.Post))
 
 	if err != nil {
 		return RunExperimentData{}, errors.New("Error in Running Chaos Experiment: " + err.Error())
@@ -239,62 +194,13 @@ func RunExperiment(pid string, eid string, cred types.Credentials) (RunExperimen
 	}
 }
 
-type ExperimentListData struct {
-	Errors []struct {
-		Message string   `json:"message"`
-		Path    []string `json:"path"`
-	} `json:"errors"`
-	Data ExperimentList `json:"data"`
-}
-
-type ExperimentList struct {
-	ListExperimentDetails model.ListExperimentResponse `json:"listExperiment"`
-}
-
-type GetChaosExperimentsGraphQLRequest struct {
-	Query     string `json:"query"`
-	Variables struct {
-		GetChaosExperimentRequest model.ListExperimentRequest `json:"request"`
-		ProjectID                 string                      `json:"projectID"`
-	} `json:"variables"`
-}
-
 // GetExperimentList sends GraphQL API request for fetching a list of experiments.
 func GetExperimentList(pid string, in model.ListExperimentRequest, cred types.Credentials) (ExperimentListData, error) {
 
 	var gqlReq GetChaosExperimentsGraphQLRequest
 	var err error
 
-	gqlReq.Query = `query listExperiment($projectID: ID!, $request: ListExperimentRequest!) {
-                      listExperiment(projectID: $projectID, request: $request) {
-                        totalNoOfExperiments
-                        experiments {
-                          experimentID
-                          experimentManifest
-                          cronSyntax
-                          name
-                          description
-                          weightages {
-                            faultName
-                            weightage
-                          }
-                          isCustomExperiment
-                          updatedAt
-                          createdAt
-                          infra {
-                            projectID
-                            name
-                            infraID
-                            infraType
-                          }
-                          isRemoved
-                          updatedBy{
-                              username
-                              email
-                        }
-                      }
-                    }
-}`
+	gqlReq.Query = ListExperimentQuery
 	gqlReq.Variables.GetChaosExperimentRequest = in
 	gqlReq.Variables.ProjectID = pid
 
@@ -303,8 +209,8 @@ func GetExperimentList(pid string, in model.ListExperimentRequest, cred types.Cr
 		return ExperimentListData{}, err
 	}
 
-	resp, err := SendRequest(
-		SendRequestParams{
+	resp, err := apis.SendRequest(
+		apis.SendRequestParams{
 			Endpoint: cred.Endpoint + utils.GQLAPIPath,
 			Token:    cred.Token,
 		},
@@ -338,59 +244,13 @@ func GetExperimentList(pid string, in model.ListExperimentRequest, cred types.Cr
 	}
 }
 
-type ExperimentRunListData struct {
-	Errors []struct {
-		Message string   `json:"message"`
-		Path    []string `json:"path"`
-	} `json:"errors"`
-	Data ExperimentRunsList `json:"data"`
-}
-
-type ExperimentRunsList struct {
-	ListExperimentRunDetails model.ListExperimentRunResponse `json:"listExperimentRun"`
-}
-
-type GetChaosExperimentRunGraphQLRequest struct {
-	Query     string `json:"query"`
-	Variables struct {
-		ProjectID                    string                         `json:"projectID"`
-		GetChaosExperimentRunRequest model.ListExperimentRunRequest `json:"request"`
-	} `json:"variables"`
-}
-
 // GetExperimentRunsList sends GraphQL API request for fetching a list of experiment runs.
 func GetExperimentRunsList(pid string, in model.ListExperimentRunRequest, cred types.Credentials) (ExperimentRunListData, error) {
 
 	var gqlReq GetChaosExperimentRunGraphQLRequest
 	var err error
 
-	gqlReq.Query = `query listExperimentRuns($projectID: ID!, $request: ListExperimentRunRequest!) {
-                      listExperimentRun(projectID: $projectID, request: $request) {
-                        totalNoOfExperimentRuns
-                        experimentRuns {
-                          experimentRunID
-                          experimentID
-                          experimentName
-                          infra {
-                          name
-                          projectID
-                          infraID
-                          infraType
-                          }
-                          isRemoved
-                          updatedAt
-                          phase
-                          resiliencyScore
-                          faultsPassed
-                          faultsFailed
-                          faultsAwaited
-                          faultsStopped
-                          faultsNa
-                          totalFaults
-                          executionData
-                        }
-                      }
-                    }`
+	gqlReq.Query = ListExperimentRunsQuery
 	gqlReq.Variables.ProjectID = pid
 	gqlReq.Variables.GetChaosExperimentRunRequest = in
 
@@ -399,8 +259,8 @@ func GetExperimentRunsList(pid string, in model.ListExperimentRunRequest, cred t
 		return ExperimentRunListData{}, err
 	}
 
-	resp, err := SendRequest(
-		SendRequestParams{
+	resp, err := apis.SendRequest(
+		apis.SendRequestParams{
 			Endpoint: cred.Endpoint + utils.GQLAPIPath,
 			Token:    cred.Token,
 		},
@@ -434,40 +294,13 @@ func GetExperimentRunsList(pid string, in model.ListExperimentRunRequest, cred t
 	}
 }
 
-type DeleteChaosExperimentData struct {
-	Errors []struct {
-		Message string   `json:"message"`
-		Path    []string `json:"path"`
-	} `json:"errors"`
-	Data DeleteChaosExperimentDetails `json:"data"`
-}
-
-type DeleteChaosExperimentDetails struct {
-	IsDeleted bool `json:"deleteChaosExperiment"`
-}
-
-type DeleteChaosExperimentGraphQLRequest struct {
-	Query     string `json:"query"`
-	Variables struct {
-		ProjectID       string  `json:"projectID"`
-		ExperimentID    *string `json:"experimentID"`
-		ExperimentRunID *string `json:"experimentRunID"`
-	} `json:"variables"`
-}
-
 // DeleteChaosExperiment sends GraphQL API request for deleting a given Chaos Experiment.
 func DeleteChaosExperiment(projectID string, experimentID *string, cred types.Credentials) (DeleteChaosExperimentData, error) {
 
 	var gqlReq DeleteChaosExperimentGraphQLRequest
 	var err error
 
-	gqlReq.Query = `mutation deleteChaosExperiment($projectID: ID!, $experimentID: String!, $experimentRunID: String) {
-                      deleteChaosExperiment(
-                        projectID: $projectID
-                        experimentID: $experimentID
-                        experimentRunID: $experimentRunID
-                      )
-                    }`
+	gqlReq.Query = DeleteExperimentQuery
 	gqlReq.Variables.ProjectID = projectID
 	gqlReq.Variables.ExperimentID = experimentID
 	//var experiment_run_id string = ""
@@ -478,8 +311,8 @@ func DeleteChaosExperiment(projectID string, experimentID *string, cred types.Cr
 		return DeleteChaosExperimentData{}, err
 	}
 
-	resp, err := SendRequest(
-		SendRequestParams{
+	resp, err := apis.SendRequest(
+		apis.SendRequestParams{
 			Endpoint: cred.Endpoint + utils.GQLAPIPath,
 			Token:    cred.Token,
 		},
@@ -513,28 +346,11 @@ func DeleteChaosExperiment(projectID string, experimentID *string, cred types.Cr
 	}
 }
 
-type ServerVersionResponse struct {
-	Data   ServerVersionData `json:"data"`
-	Errors []struct {
-		Message string   `json:"message"`
-		Path    []string `json:"path"`
-	} `json:"errors"`
-}
-
-type ServerVersionData struct {
-	GetServerVersion GetServerVersionData `json:"getServerVersion"`
-}
-
-type GetServerVersionData struct {
-	Key   string `json:"key"`
-	Value string `json:"value"`
-}
-
 // GetServerVersion fetches the GQL server version
 func GetServerVersion(endpoint string) (ServerVersionResponse, error) {
 	query := `{"query":"query{\n getServerVersion{\n key value\n }\n}"}`
-	resp, err := SendRequest(
-		SendRequestParams{
+	resp, err := apis.SendRequest(
+		apis.SendRequestParams{
 			Endpoint: endpoint + utils.GQLAPIPath,
 		},
 		[]byte(query),

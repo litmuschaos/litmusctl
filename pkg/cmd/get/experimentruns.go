@@ -17,20 +17,20 @@ package get
 
 import (
 	"fmt"
+	"github.com/litmuschaos/litmusctl/pkg/apis/experiment"
 	"os"
 	"strconv"
 	"text/tabwriter"
 	"time"
 
 	"github.com/litmuschaos/litmus/chaoscenter/graphql/server/graph/model"
-	"github.com/litmuschaos/litmusctl/pkg/apis"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
 	"github.com/spf13/cobra"
 )
 
 // experimentRunsCmd represents the Chaos Experiments runs command
 var experimentRunsCmd = &cobra.Command{
-	Use:   "chaos-experiments-runs",
+	Use:   "chaos-experiment-runs",
 	Short: "Display list of Chaos Experiments runs within the project",
 	Long:  `Display list of Chaos Experiments runs within the project`,
 	Run: func(cmd *cobra.Command, args []string) {
@@ -59,7 +59,7 @@ var experimentRunsCmd = &cobra.Command{
 			listExperimentRunsRequest.Pagination.Limit, _ = cmd.Flags().GetInt("count")
 		}
 
-		experimentRuns, err := apis.GetExperimentRunsList(projectID, listExperimentRunsRequest, credentials)
+		experimentRuns, err := experiment.GetExperimentRunsList(projectID, listExperimentRunsRequest, credentials)
 		utils.PrintError(err)
 
 		output, err := cmd.Flags().GetString("output")
@@ -75,7 +75,7 @@ var experimentRunsCmd = &cobra.Command{
 		case "":
 
 			writer := tabwriter.NewWriter(os.Stdout, 4, 8, 1, '\t', 0)
-			utils.White_B.Fprintln(writer, "CHAOS EXPERIMENT RUN ID\tSTATUS\tRESILIENCY SCORE\tCHAOS EXPERIMENT ID\tCHAOS EXPERIMENT NAME\tTARGET CHAOS INFRA\tUPDATED AT\tEXECUTED DATA")
+			utils.White_B.Fprintln(writer, "CHAOS EXPERIMENT RUN ID\tSTATUS\tRESILIENCY SCORE\tCHAOS EXPERIMENT ID\tCHAOS EXPERIMENT NAME\tTARGET CHAOS INFRA\tUPDATED AT\tUPDATED BY")
 
 			for _, experimentRun := range experimentRuns.Data.ListExperimentRunDetails.ExperimentRuns {
 
@@ -106,7 +106,7 @@ var experimentRunsCmd = &cobra.Command{
 func init() {
 	GetCmd.AddCommand(experimentRunsCmd)
 
-	experimentRunsCmd.Flags().String("project-id", "", "Set the project-id to list Chaos Experimentss from the particular project. To see the projects, apply litmusctl get projects")
+	experimentRunsCmd.Flags().String("project-id", "", "Set the project-id to list Chaos Experiments from the particular project. To see the projects, apply litmusctl get projects")
 	experimentRunsCmd.Flags().Int("count", 30, "Set the count of Chaos Experiments runs to display. Default value is 30")
 	experimentRunsCmd.Flags().BoolP("all", "A", false, "Set to true to display all Chaos Experiments runs")
 

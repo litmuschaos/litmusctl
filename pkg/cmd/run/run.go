@@ -7,7 +7,7 @@ import (
 // createCmd represents the create command
 var RunCmd = &cobra.Command{
 	Use: "run",
-	Short: `Runs Experiment for LitmusChaos agent plane.
+	Short: `Runs Experiment for LitmusChaos Execution plane.
 		Examples:
 
 		#Run a Chaos Experiment

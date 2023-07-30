@@ -13,11 +13,13 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package infra
+package ops
 
 import (
 	"fmt"
 	"github.com/litmuschaos/litmus/chaoscenter/graphql/server/graph/model"
+	"github.com/litmuschaos/litmusctl/pkg/apis/environment"
+	"github.com/litmuschaos/litmusctl/pkg/apis/infrastructure"
 	"os"
 	"strconv"
 	"strings"
@@ -28,7 +30,7 @@ import (
 	"github.com/litmuschaos/litmusctl/pkg/utils"
 )
 
-func PrintExistingInfra(infra apis.InfraData) {
+func PrintExistingInfra(infra infrastructure.InfraData) {
 	utils.Red.Println("\nChaos Infrastructure with the given name already exists.")
 	// Print Chaos Infra list if existing Chaos Infra name is entered twice
 	utils.White_B.Println("\nConnected Chaos Infrastructure list:")
@@ -40,7 +42,7 @@ func PrintExistingInfra(infra apis.InfraData) {
 	utils.White_B.Println("\n❗ Please enter a different name.")
 }
 
-func PrintExistingEnvironments(env apis.ListEnvironmentData) {
+func PrintExistingEnvironments(env environment.ListEnvironmentData) {
 	// Print Chaos EnvironmentID list if Given ID doesn't exist
 	utils.White_B.Println("\nExisting Chaos Environments list:")
 
@@ -114,7 +116,7 @@ INFRA_NAME:
 	}
 
 	// Check if Chaos Infra with the given name already exists
-	Infra, err := apis.GetInfraList(c, pid, model.ListInfraRequest{})
+	Infra, err := infrastructure.GetInfraList(c, pid, model.ListInfraRequest{})
 	if err != nil {
 		return types.Infra{}, err
 	}
@@ -146,7 +148,7 @@ ENVIRONMENT:
 	}
 
 	// Check if Chaos Environment with the given name exists
-	Env, err := apis.GetEnvironmentList(pid, c)
+	Env, err := environment.GetEnvironmentList(pid, c)
 	if err != nil {
 		return types.Infra{}, err
 	}

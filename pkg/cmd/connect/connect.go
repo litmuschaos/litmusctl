@@ -22,7 +22,7 @@ import (
 // connectCmd represents the connect command
 var ConnectCmd = &cobra.Command{
 	Use: "connect",
-	Short: `Connect resources for LitmusChaos infra plane.
+	Short: `Connect resources for LitmusChaos Execution plane.
 		Examples:
 		#connect a Chaos Infrastructure
 		litmusctl connect chaos-infra --name="new-chaos-infra" --non-interactive

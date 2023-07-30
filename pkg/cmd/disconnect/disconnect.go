@@ -22,7 +22,7 @@ import (
 // disconnectCmd represents the disconnect command
 var DisconnectCmd = &cobra.Command{
 	Use: "disconnect",
-	Short: `Disconnect resources for LitmusChaos infra plane.
+	Short: `Disconnect resources for LitmusChaos Execution plane.
 		Examples:
 		#disconnect a Chaos Infra
 		litmusctl disconnect chaos-infra c520650e-7cb6-474c-b0f0-4df07b2b025b --project-id=c520650e-7cb6-474c-b0f0-4df07b2b025b

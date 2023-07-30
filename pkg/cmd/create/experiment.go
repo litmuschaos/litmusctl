@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package save
+package create
 
 import (
 	"fmt"
@@ -30,13 +30,13 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// experimentCmd represents the project command
-var experimentCmd = &cobra.Command{
+// workflowCmd represents the project command
+var workflowCmd = &cobra.Command{
 	Use: "chaos-experiment",
 	Short: `Create a Chaos Experiment
 	Example:
-	#Save a Chaos Experiment
-	litmusctl save chaos-experiment -f chaos-experiment.yaml --project-id="d861b650-1549-4574-b2ba-ab754058dd04" --chaos-infra-id="1c9c5801-8789-4ac9-bf5f-32649b707a5c"
+	#create a Chaos Experiment
+	litmusctl create chaos-experiment -f chaos-experiment.yaml --project-id="d861b650-1549-4574-b2ba-ab754058dd04" --chaos-infra-id="1c9c5801-8789-4ac9-bf5f-32649b707a5c"
 
 	Note: The default location of the config file is $HOME/.litmusconfig, and can be overridden by a --config flag
 	`,
@@ -48,7 +48,7 @@ var experimentCmd = &cobra.Command{
 
 		var chaosExperimentRequest models.SaveChaosExperimentRequest
 
-		experimentManifest, err := cmd.Flags().GetString("file")
+		workflowManifest, err := cmd.Flags().GetString("file")
 		utils.PrintError(err)
 
 		pid, err := cmd.Flags().GetString("project-id")
@@ -106,39 +106,42 @@ var experimentCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		// Parse experiment manifest and populate chaosexperimentInput
-		err = utils.ParseExperimentManifest(experimentManifest, &chaosExperimentRequest)
+		// Parse workflow manifest and populate chaosWorkFlowInput
+		err = utils.ParseExperimentManifest(workflowManifest, &chaosExperimentRequest)
 		if err != nil {
 			utils.Red.Println("❌ Error parsing Chaos Experiment manifest: " + err.Error())
 			os.Exit(1)
 		}
-
-		// Generate ExperimentID from the ExperimentName
+		// Generate ExperimentID from ExperimentName
 		chaosExperimentRequest.ID = utils.GenerateNameID(chaosExperimentRequest.Name)
 		// Make API call
-		saveExperiment, err := experiment.SaveExperiment(pid, chaosExperimentRequest, credentials)
+		createExperiment, err := experiment.CreateExperiment(pid, chaosExperimentRequest, credentials)
 		if err != nil {
-			if (saveExperiment.Data == experiment.SavedExperimentDetails{}) {
+			if (createExperiment.Data == experiment.RunExperimentDetails{}) {
 				if strings.Contains(err.Error(), "multiple write errors") {
 					utils.Red.Println("\n❌ Chaos Experiment/" + chaosExperimentRequest.Name + " already exists")
 					os.Exit(1)
-				} else {
-					utils.White_B.Print("\n❌ Chaos Experiment/" + chaosExperimentRequest.Name + " failed to be created: " + err.Error())
+				}
+				if strings.Contains(err.Error(), "multiple run errors") {
+					utils.Red.Println("\n❌ Chaos Experiment already exists")
 					os.Exit(1)
 				}
+			} else {
+				utils.White_B.Print("\n❌ Chaos Experiment/" + chaosExperimentRequest.Name + " failed to be created: " + err.Error())
+				os.Exit(1)
 			}
 		}
 
 		//Successful creation
-		utils.White_B.Println("\n🚀 Chaos Experiment/" + chaosExperimentRequest.Name + " successfully saved 🎉")
+		utils.White_B.Println("\n🚀 Chaos Experiment successfully created🎉")
 	},
 }
 
 func init() {
-	SaveCmd.AddCommand(experimentCmd)
+	CreateCmd.AddCommand(workflowCmd)
 
-	experimentCmd.Flags().String("project-id", "", "Set the project-id to create Chaos Experiment for the particular project. To see the projects, apply litmusctl get projects")
-	experimentCmd.Flags().String("chaos-infra-id", "", "Set the chaos-infra-id to create Chaos Experiment for the particular Chaos Infrastructure. To see the Chaos Infrastructures, apply litmusctl get chaos-infra")
-	experimentCmd.Flags().StringP("file", "f", "", "The manifest file for the Chaos Experiment")
-	experimentCmd.Flags().StringP("description", "d", "", "The Description for the Chaos Experiment")
+	workflowCmd.Flags().String("project-id", "", "Set the project-id to create Chaos Experiment for the particular project. To see the projects, apply litmusctl get projects")
+	workflowCmd.Flags().String("chaos-infra-id", "", "Set the chaos-delegate-id to create Chaos Experiment for the particular Chaos Infrastructure. To see the Chaos Infrastructures, apply litmusctl get chaos-infra")
+	workflowCmd.Flags().StringP("file", "f", "", "The manifest file for the Chaos Experiment")
+	workflowCmd.Flags().StringP("description", "d", "", "The Description for the Chaos Experiment")
 }

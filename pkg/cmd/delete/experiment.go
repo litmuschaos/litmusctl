@@ -17,6 +17,7 @@ package delete
 
 import (
 	"fmt"
+	"github.com/litmuschaos/litmusctl/pkg/apis/experiment"
 	"os"
 
 	"github.com/litmuschaos/litmusctl/pkg/apis"
@@ -90,7 +91,7 @@ var experimentCmd = &cobra.Command{
 		}
 
 		// Make API call
-		deleteExperiment, err := apis.DeleteChaosExperiment(projectID, &experimentID, credentials)
+		deleteExperiment, err := experiment.DeleteChaosExperiment(projectID, &experimentID, credentials)
 		if err != nil {
 			utils.Red.Println("\n❌ Error in deleting Chaos Experiment: ", err.Error())
 			os.Exit(1)

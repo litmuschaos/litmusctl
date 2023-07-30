@@ -17,13 +17,13 @@ package get
 
 import (
 	"fmt"
+	"github.com/litmuschaos/litmusctl/pkg/apis/experiment"
 	"os"
 	"text/tabwriter"
 	"time"
 
 	"github.com/gorhill/cronexpr"
 	"github.com/litmuschaos/litmus/chaoscenter/graphql/server/graph/model"
-	"github.com/litmuschaos/litmusctl/pkg/apis"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
 	"github.com/spf13/cobra"
 )
@@ -63,7 +63,7 @@ var experimentsCmd = &cobra.Command{
 		utils.PrintError(err)
 		listExperimentRequest.Filter.InfraName = &infraName
 
-		experiments, err := apis.GetExperimentList(pid, listExperimentRequest, credentials)
+		experiments, err := experiment.GetExperimentList(pid, listExperimentRequest, credentials)
 		utils.PrintError(err)
 
 		output, err := cmd.Flags().GetString("output")

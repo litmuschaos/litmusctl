@@ -13,13 +13,14 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package connect
+package create
 
 import (
 	"fmt"
 	models "github.com/litmuschaos/litmus/chaoscenter/graphql/server/graph/model"
 	"github.com/litmuschaos/litmusctl/pkg/apis"
-	"github.com/litmuschaos/litmusctl/pkg/infra"
+	"github.com/litmuschaos/litmusctl/pkg/apis/environment"
+	"github.com/litmuschaos/litmusctl/pkg/ops"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
 	"github.com/spf13/cobra"
 	"os"
@@ -30,11 +31,9 @@ var environmentCmd = &cobra.Command{
 	Use: "chaos-environment",
 	Short: `Create an Environment.
 	Example(s):
-	#connect a Chaos infra
-	litmusctl connect chaos-infra --name="new-chaos-infra" --non-interactive
 
-	#connect a Chaos infra within a project
-	litmusctl connect chaos-infra --name="new-chaos-infra" --project-id="d861b650-1549-4574-b2ba-ab754058dd04" --non-interactive
+	#create a Chaos Environment
+	litmusctl create chaos-environment --project-id="d861b650-1549-4574-b2ba-ab754058dd04" --name="new-chaos-environment"
 
 	Note: The default location of the config file is $HOME/.litmusconfig, and can be overridden by a --config flag
 `,
@@ -92,7 +91,7 @@ var environmentCmd = &cobra.Command{
 		}
 		newEnvironment.Type = models.EnvironmentType(envType)
 
-		envs, err := apis.GetEnvironmentList(pid, credentials)
+		envs, err := environment.GetEnvironmentList(pid, credentials)
 		utils.PrintError(err)
 
 		// Generate EnvironmentID from Environment Name
@@ -109,8 +108,8 @@ var environmentCmd = &cobra.Command{
 			}
 		}
 		if isEnvExist {
-			utils.Red.Println("\nChaos Environment with the given ID already exists. try a different name")
-			infra.PrintExistingEnvironments(envs)
+			utils.Red.Println("\nChaos Environment with the given ID already exists, try with a different name")
+			ops.PrintExistingEnvironments(envs)
 			os.Exit(1)
 		}
 
@@ -134,24 +133,25 @@ var environmentCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		environment, err := apis.ConnectEnvironment(pid, newEnvironment, credentials)
+		newEnv, err := environment.ConnectEnvironment(pid, newEnvironment, credentials)
 		if err != nil {
 			utils.Red.Println("\n❌ Chaos Environment connection failed: " + err.Error() + "\n")
 			os.Exit(1)
 		}
 
-		// Print error message in case Data field is null in response
-		//if (environment.Data == }) {
-		//	utils.White_B.Print("\n🚫 Chaos newInfra connection failed: " + environment.Errors[0].Message + "\n")
+		//Print error message in case Data field is null in response
+		//if (newEnv.Data == environment.CreateEnvironmentData{}) {
+		//	utils.White_B.Print("\n🚫 Chaos newInfra connection failed: " + newEnv.Errors[0].Message + "\n")
 		//	os.Exit(1)
 		//}
 
-		utils.White_B.Println("\n🚀 Chaos New Environment Created successful!! 🎉" + environment.Data.EnvironmentDetails.EnvironmentID)
+		utils.White_B.Println("\n🚀 New Chaos Environment Created successful!! 🎉")
+		utils.White_B.Println("EnvironmentID: " + newEnv.Data.EnvironmentDetails.EnvironmentID)
 	},
 }
 
 func init() {
-	ConnectCmd.AddCommand(environmentCmd)
+	CreateCmd.AddCommand(environmentCmd)
 	environmentCmd.Flags().String("project-id", "", "Set the project-id to install Chaos infra for the particular project. To see the projects, apply litmusctl get projects")
 	environmentCmd.Flags().String("type", "NON_PROD", "Set the installation mode for the kind of Chaos infra | Supported=cluster/namespace")
 	environmentCmd.Flags().String("name", "", "Set the Chaos infra name")

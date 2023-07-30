@@ -22,7 +22,7 @@ import (
 // deleteCmd represents the delete command
 var DeleteCmd = &cobra.Command{
 	Use: "delete",
-	Short: `Delete resources for LitmusChaos agent plane.
+	Short: `Delete resources for LitmusChaos Execution plane.
 		Examples:
 		#delete a Chaos Experiment
 		litmusctl delete chaos-experiment c520650e-7cb6-474c-b0f0-4df07b2b025b --project-id=c520650e-7cb6-474c-b0f0-4df07b2b025b

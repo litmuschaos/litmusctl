@@ -18,10 +18,10 @@ package get
 import (
 	"fmt"
 	models "github.com/litmuschaos/litmus/chaoscenter/graphql/server/graph/model"
+	"github.com/litmuschaos/litmusctl/pkg/apis/infrastructure"
 	"os"
 	"text/tabwriter"
 
-	"github.com/litmuschaos/litmusctl/pkg/apis"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
 	"github.com/spf13/cobra"
 )
@@ -48,7 +48,7 @@ var InfraCmd = &cobra.Command{
 			}
 		}
 
-		infras, err := apis.GetInfraList(credentials, projectID, models.ListInfraRequest{})
+		infras, err := infrastructure.GetInfraList(credentials, projectID, models.ListInfraRequest{})
 		utils.PrintError(err)
 
 		output, err := cmd.Flags().GetString("output")
@@ -64,7 +64,7 @@ var InfraCmd = &cobra.Command{
 		case "":
 
 			writer := tabwriter.NewWriter(os.Stdout, 4, 8, 1, '\t', 0)
-			utils.White_B.Fprintln(writer, "CHAOS INFRASTRUCTURE ID \tCHAOS INFRASTRUCTURE NAME\tSTATUS\t")
+			utils.White_B.Fprintln(writer, "CHAOS INFRASTRUCTURE ID \tCHAOS INFRASTRUCTURE NAME\tSTATUS\tCHAOS ENVIRONMENT ID\t")
 
 			for _, infra := range infras.Data.ListInfraDetails.Infras {
 				var status string
@@ -80,7 +80,7 @@ var InfraCmd = &cobra.Command{
 				//} else {
 				//	isRegistered = "NOT REGISTERED"
 				//}
-				utils.White.Fprintln(writer, infra.InfraID+"\t"+infra.Name+"\t"+status+"\t")
+				utils.White.Fprintln(writer, infra.InfraID+"\t"+infra.Name+"\t"+status+"\t"+infra.EnvironmentID+"\t")
 				//+isRegistered+"\t"
 			}
 			writer.Flush()

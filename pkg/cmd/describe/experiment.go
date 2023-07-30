@@ -17,10 +17,10 @@ package describe
 
 import (
 	"fmt"
+	"github.com/litmuschaos/litmusctl/pkg/apis/experiment"
 	"os"
 
 	"github.com/litmuschaos/litmus/chaoscenter/graphql/server/graph/model"
-	"github.com/litmuschaos/litmusctl/pkg/apis"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
 	"github.com/spf13/cobra"
 	"sigs.k8s.io/yaml"
@@ -66,7 +66,7 @@ var experimentCmd = &cobra.Command{
 
 		describeExperimentRequest.ExperimentIDs = append(describeExperimentRequest.ExperimentIDs, &experimentID)
 
-		experiment, err := apis.GetExperimentList(pid, describeExperimentRequest, credentials)
+		experiment, err := experiment.GetExperimentList(pid, describeExperimentRequest, credentials)
 		utils.PrintError(err)
 
 		if len(experiment.Data.ListExperimentDetails.Experiments) == 0 {

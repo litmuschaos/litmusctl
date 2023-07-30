@@ -13,11 +13,12 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package apis
+package infrastructure
 
 import (
 	"encoding/json"
 	"errors"
+	"github.com/litmuschaos/litmusctl/pkg/apis"
 	"github.com/litmuschaos/litmusctl/pkg/types"
 	"io/ioutil"
 	"net/http"
@@ -26,39 +27,10 @@ import (
 	"github.com/litmuschaos/litmusctl/pkg/utils"
 )
 
-type InfraData struct {
-	Data   InfraList `json:"data"`
-	Errors []struct {
-		Message string   `json:"message"`
-		Path    []string `json:"path"`
-	} `json:"errors"`
-}
-
-type InfraList struct {
-	ListInfraDetails models.ListInfraResponse `json:"listInfras"`
-}
-
-type ListInfraGraphQLRequest struct {
-	Query     string `json:"query"`
-	Variables struct {
-		ProjectID        string                  `json:"projectID"`
-		ListInfraRequest models.ListInfraRequest `json:"request"`
-	} `json:"variables"`
-}
-
 // GetInfraList lists the Chaos Infrastructure connected to the specified project
 func GetInfraList(c types.Credentials, pid string, request models.ListInfraRequest) (InfraData, error) {
 	var gplReq ListInfraGraphQLRequest
-	gplReq.Query = `query listInfras($projectID: ID!, $request: ListInfraRequest!){
-					listInfras(projectID: $projectID, request: $request){
-						totalNoOfInfras
-						infras {
-							infraID
-							name
-							isActive
-						}
-					}
-					}`
+	gplReq.Query = ListInfraQuery
 	gplReq.Variables.ProjectID = pid
 	gplReq.Variables.ListInfraRequest = request
 
@@ -66,7 +38,7 @@ func GetInfraList(c types.Credentials, pid string, request models.ListInfraReque
 	if err != nil {
 		return InfraData{}, err
 	}
-	resp, err := SendRequest(SendRequestParams{Endpoint: c.Endpoint + utils.GQLAPIPath, Token: c.Token}, query, string(types.Post))
+	resp, err := apis.SendRequest(apis.SendRequestParams{Endpoint: c.Endpoint + utils.GQLAPIPath, Token: c.Token}, query, string(types.Post))
 	if err != nil {
 		return InfraData{}, err
 	}
@@ -94,45 +66,10 @@ func GetInfraList(c types.Credentials, pid string, request models.ListInfraReque
 	}
 }
 
-type Errors struct {
-	Message string   `json:"message"`
-	Path    []string `json:"path"`
-}
-
-type RegisterInfraGqlRequest struct {
-	Query     string `json:"query"`
-	Variables struct {
-		ProjectId            string                      `json:"projectID"`
-		RegisterInfraRequest models.RegisterInfraRequest `json:"request"`
-	} `json:"variables"`
-}
-
-type InfraConnectionData struct {
-	Data   RegisterInfra `json:"data"`
-	Errors []struct {
-		Message string   `json:"message"`
-		Path    []string `json:"path"`
-	} `json:"errors"`
-}
-
-type RegisterInfra struct {
-	RegisterInfraDetails models.RegisterInfraResponse `json:"registerInfra"`
-}
-
 // ConnectInfra connects the  Infra with the given details
 func ConnectInfra(infra types.Infra, cred types.Credentials) (InfraConnectionData, error) {
 	var gqlReq RegisterInfraGqlRequest
-	gqlReq.Query = `mutation registerInfra($projectID: ID!, $request: RegisterInfraRequest!) {
-					  registerInfra(
-						projectID: $projectID
-						request: $request
-					  ) {
-						infraID
-						name
-						token
-					  }
-					}
-					`
+	gqlReq.Query = RegisterInfraQuery
 	gqlReq.Variables.ProjectId = infra.ProjectId
 	gqlReq.Variables.RegisterInfraRequest = CreateRegisterInfraRequest(infra)
 
@@ -157,7 +94,7 @@ func ConnectInfra(infra types.Infra, cred types.Credentials) (InfraConnectionDat
 	}
 
 	query, err := json.Marshal(gqlReq)
-	resp, err := SendRequest(SendRequestParams{Endpoint: cred.Endpoint + utils.GQLAPIPath, Token: cred.Token}, query, string(types.Post))
+	resp, err := apis.SendRequest(apis.SendRequestParams{Endpoint: cred.Endpoint + utils.GQLAPIPath, Token: cred.Token}, query, string(types.Post))
 	if err != nil {
 		return InfraConnectionData{}, errors.New("Error in registering Chaos Infrastructure: " + err.Error())
 	}
@@ -206,38 +143,13 @@ func CreateRegisterInfraRequest(infra types.Infra) (request models.RegisterInfra
 	}
 }
 
-type DisconnectInfraData struct {
-	Errors []struct {
-		Message string   `json:"message"`
-		Path    []string `json:"path"`
-	} `json:"errors"`
-	Data DisconnectInfraDetails `json:"data"`
-}
-
-type DisconnectInfraDetails struct {
-	Message string `json:"deleteInfra"`
-}
-
-type DisconnectInfraGraphQLRequest struct {
-	Query     string `json:"query"`
-	Variables struct {
-		ProjectID string `json:"projectID"`
-		InfraID   string `json:"infraID"`
-	} `json:"variables"`
-}
-
 // DisconnectInfra sends GraphQL API request for disconnecting Chaos Infra(s).
 func DisconnectInfra(projectID string, infraID string, cred types.Credentials) (DisconnectInfraData, error) {
 
 	var gqlReq DisconnectInfraGraphQLRequest
 	var err error
 
-	gqlReq.Query = `mutation deleteInfra($projectID: ID!, $infraID: String!) {
-                      deleteInfra(
-                        projectID: $projectID
-                        infraID: $infraID
-                      )
-                    }`
+	gqlReq.Query = DisconnectInfraQuery
 	gqlReq.Variables.ProjectID = projectID
 	gqlReq.Variables.InfraID = infraID
 
@@ -246,8 +158,8 @@ func DisconnectInfra(projectID string, infraID string, cred types.Credentials) (
 		return DisconnectInfraData{}, err
 	}
 
-	resp, err := SendRequest(
-		SendRequestParams{
+	resp, err := apis.SendRequest(
+		apis.SendRequestParams{
 			Endpoint: cred.Endpoint + utils.GQLAPIPath,
 			Token:    cred.Token,
 		},
@@ -278,76 +190,5 @@ func DisconnectInfra(projectID string, infraID string, cred types.Credentials) (
 		return disconnectInfraData, nil
 	} else {
 		return DisconnectInfraData{}, err
-	}
-}
-
-type ListEnvironmentData struct {
-	Errors []struct {
-		Message string   `json:"message"`
-		Path    []string `json:"path"`
-	} `json:"errors"`
-	Data EnvironmentsList `json:"data"`
-}
-
-type EnvironmentsList struct {
-	ListEnvironmentDetails models.ListEnvironmentResponse `json:"listEnvironments"`
-}
-type EnvironmentListGQLRequest struct {
-	Query     string `json:"query"`
-	Variables struct {
-		ProjectID string                        `json:"projectID"`
-		Request   models.ListEnvironmentRequest `json:"request"`
-	}
-}
-
-func GetEnvironmentList(pid string, cred types.Credentials) (ListEnvironmentData, error) {
-	var err error
-	var gqlReq EnvironmentListGQLRequest
-	gqlReq.Query = `query listEnvironments($projectID: ID!, $request: ListEnvironmentRequest) {
-	                 listEnvironments(projectID: $projectID,request: $request){
-						environments {
-							environmentID
-						}
-					}
-	               }`
-
-	gqlReq.Variables.Request = models.ListEnvironmentRequest{}
-	gqlReq.Variables.ProjectID = pid
-	query, err := json.Marshal(gqlReq)
-	if err != nil {
-		return ListEnvironmentData{}, err
-	}
-
-	resp, err := SendRequest(
-		SendRequestParams{
-			Endpoint: cred.Endpoint + utils.GQLAPIPath,
-			Token:    cred.Token,
-		},
-		query,
-		string(types.Post),
-	)
-
-	if err != nil {
-		return ListEnvironmentData{}, errors.New("Error in Getting Chaos Environment List: " + err.Error())
-	}
-
-	bodyBytes, err := ioutil.ReadAll(resp.Body)
-	defer resp.Body.Close()
-	if err != nil {
-		return ListEnvironmentData{}, errors.New("Error in Getting Chaos Environment List: " + err.Error())
-	}
-
-	if resp.StatusCode == http.StatusOK {
-		var listEnvironment ListEnvironmentData
-		err = json.Unmarshal(bodyBytes, &listEnvironment)
-		if err != nil {
-			return ListEnvironmentData{}, errors.New("Error in Getting Chaos Environment List: " + err.Error())
-		}
-		if len(listEnvironment.Errors) > 0 {
-			return ListEnvironmentData{}, errors.New(listEnvironment.Errors[0].Message)
-		}
-		return listEnvironment, nil
-	} else {
-		return ListEnvironmentData{}, err
 	}
 }
