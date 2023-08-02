@@ -22,16 +22,16 @@ type SaveChaosExperimentGraphQLRequest struct {
 	} `json:"variables"`
 }
 
-type RunExperimentData struct {
+type RunExperimentResponse struct {
 	Errors []struct {
 		Message string   `json:"message"`
 		Path    []string `json:"path"`
 	} `json:"errors"`
-	Data RunExperimentDetails `json:"data"`
+	Data RunExperimentData `json:"data"`
 }
 
-type RunExperimentDetails struct {
-	RunExperimentResponse model.RunChaosExperimentResponse `json:"runChaosExperiment"`
+type RunExperimentData struct {
+	RunExperimentDetails model.RunChaosExperimentResponse `json:"runChaosExperiment"`
 }
 
 type ExperimentListData struct {

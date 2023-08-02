@@ -17,7 +17,6 @@ package connect
 
 import (
 	"fmt"
-	models "github.com/litmuschaos/litmus/chaoscenter/graphql/server/graph/model"
 	"github.com/litmuschaos/litmusctl/pkg/apis/environment"
 	"github.com/litmuschaos/litmusctl/pkg/apis/infrastructure"
 	"os"
@@ -168,21 +167,13 @@ var infraCmd = &cobra.Command{
 			// Check if user has sufficient permissions based on mode
 			utils.White_B.Print("\n🏃 Running prerequisites check....")
 			ops.ValidateSAPermissions(newInfra.Namespace, newInfra.Mode, &kubeconfig)
-			var ListInfraRequest = models.ListInfraRequest{}
-			infras, err := infrastructure.GetInfraList(credentials, newInfra.ProjectId, ListInfraRequest)
+
+			// Check if infra already exists
+			isInfraExist, err, infraList := ops.ValidateInfraNameExists(newInfra.InfraName, newInfra.ProjectId, credentials)
 			utils.PrintError(err)
 
-			// Duplicate Infra check
-			var isInfraExist = false
-			for i := range infras.Data.ListInfraDetails.Infras {
-				if newInfra.InfraName == infras.Data.ListInfraDetails.Infras[i].Name {
-					utils.White_B.Print(infras.Data.ListInfraDetails.Infras[i].Name)
-					isInfraExist = true
-				}
-			}
-
 			if isInfraExist {
-				ops.PrintExistingInfra(infras)
+				ops.PrintExistingInfra(infraList)
 				os.Exit(1)
 			}
 			envIDs, err := environment.GetEnvironmentList(newInfra.ProjectId, credentials)
@@ -200,7 +191,7 @@ var infraCmd = &cobra.Command{
 			if !isEnvExist {
 				utils.Red.Println("\nChaos Environment with the given ID doesn't exists.")
 				ops.PrintExistingEnvironments(envIDs)
-				utils.White_B.Println("\n❗ Please enter a name from the List.")
+				utils.White_B.Println("\n❗ Please enter a name from the List or Create a new environment using `litmusctl create chaos-environment`")
 				os.Exit(1)
 			}
 
@@ -247,7 +238,7 @@ var infraCmd = &cobra.Command{
 
 		// Print error message in case Data field is null in response
 		if (infra.Data == infrastructure.RegisterInfra{}) {
-			utils.White_B.Print("\n🚫 Chaos newInfra connection failed: " + infra.Errors[0].Message + "\n")
+			utils.White_B.Print("\n🚫 Chaos new infrastructure connection failed: " + infra.Errors[0].Message + "\n")
 			os.Exit(1)
 		}
 
@@ -258,7 +249,7 @@ var infraCmd = &cobra.Command{
 			YamlPath: utils.ChaosYamlPath,
 		}, kubeconfig, false)
 		if err != nil {
-			utils.Red.Print("\n❌ Failed in applying connection yaml: \n" + err.Error() + "\n")
+			utils.Red.Print("\n❌ Failed to apply connection yaml: \n" + err.Error() + "\n")
 			utils.White_B.Print("\n Error:  \n" + err.Error())
 			os.Exit(1)
 		}
@@ -268,7 +259,7 @@ var infraCmd = &cobra.Command{
 		// Watch subscriber pod status
 		k8s.WatchPod(k8s.WatchPodParams{Namespace: newInfra.Namespace, Label: utils.ChaosInfraLabel}, &kubeconfig)
 
-		utils.White_B.Println("\n🚀 Chaos newInfra connection successful!! 🎉")
+		utils.White_B.Println("\n🚀 Chaos new infrastructure connection successful!! 🎉")
 		utils.White_B.Println("👉 Litmus Chaos Infrastructure can be accessed here: " + fmt.Sprintf("%s/%s", credentials.Endpoint, utils.ChaosInfraPath))
 	},
 }

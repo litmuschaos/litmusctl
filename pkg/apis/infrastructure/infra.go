@@ -123,7 +123,7 @@ func ConnectInfra(infra types.Infra, cred types.Credentials) (InfraConnectionDat
 
 func CreateRegisterInfraRequest(infra types.Infra) (request models.RegisterInfraRequest) {
 	var mode models.InfrastructureType
-	if infra.InfraType == "external" {
+	if infra.InfraType == utils.InfraTypeExternal {
 		mode = models.InfrastructureTypeExternal
 	} else {
 		mode = models.InfrastructureTypeInternal

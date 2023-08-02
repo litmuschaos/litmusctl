@@ -80,7 +80,7 @@ var experimentCmd = &cobra.Command{
 			}
 		}
 		for _, member := range project.Members {
-			if (member.UserID == userDetails.Data.ID) && (member.Role == "Owner" || member.Role == "Editor") {
+			if (member.UserID == userDetails.Data.ID) && (member.Role == utils.MemberOwnerRole || member.Role == utils.MemberEditorRole) {
 				editAccess = true
 			}
 		}
@@ -92,12 +92,12 @@ var experimentCmd = &cobra.Command{
 		// Make API call
 		runExperiment, err := experiment.RunExperiment(pid, eid, credentials)
 		if err != nil {
-			if (runExperiment.Data == experiment.RunExperimentDetails{}) {
+			if (runExperiment.Data == experiment.RunExperimentData{}) {
 				if strings.Contains(err.Error(), "multiple run errors") {
 					utils.Red.Println("\n❌ Chaos Experiment already exists")
 					os.Exit(1)
 				} else {
-					utils.White_B.Print("\n❌ Chaos Experiment failed to be created: " + err.Error())
+					utils.White_B.Print("\n❌ Failed to run chaos experiment: " + err.Error())
 					os.Exit(1)
 				}
 			}

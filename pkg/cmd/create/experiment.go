@@ -18,20 +18,17 @@ package create
 import (
 	"fmt"
 	models "github.com/litmuschaos/litmus/chaoscenter/graphql/server/graph/model"
+	"github.com/litmuschaos/litmusctl/pkg/apis"
 	"github.com/litmuschaos/litmusctl/pkg/apis/experiment"
+	"github.com/litmuschaos/litmusctl/pkg/utils"
 	"os"
 	"strings"
-	//"time"
-
-	//"github.com/gorhill/cronexpr"
-	"github.com/litmuschaos/litmusctl/pkg/apis"
-	"github.com/litmuschaos/litmusctl/pkg/utils"
 
 	"github.com/spf13/cobra"
 )
 
-// workflowCmd represents the project command
-var workflowCmd = &cobra.Command{
+// experimentCmd represents the project command
+var experimentCmd = &cobra.Command{
 	Use: "chaos-experiment",
 	Short: `Create a Chaos Experiment
 	Example:
@@ -106,7 +103,7 @@ var workflowCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		// Parse workflow manifest and populate chaosWorkFlowInput
+		// Parse experiment manifest and populate chaosExperimentInput
 		err = utils.ParseExperimentManifest(workflowManifest, &chaosExperimentRequest)
 		if err != nil {
 			utils.Red.Println("❌ Error parsing Chaos Experiment manifest: " + err.Error())
@@ -117,7 +114,7 @@ var workflowCmd = &cobra.Command{
 		// Make API call
 		createExperiment, err := experiment.CreateExperiment(pid, chaosExperimentRequest, credentials)
 		if err != nil {
-			if (createExperiment.Data == experiment.RunExperimentDetails{}) {
+			if (createExperiment.Data == experiment.RunExperimentData{}) {
 				if strings.Contains(err.Error(), "multiple write errors") {
 					utils.Red.Println("\n❌ Chaos Experiment/" + chaosExperimentRequest.Name + " already exists")
 					os.Exit(1)
@@ -138,10 +135,10 @@ var workflowCmd = &cobra.Command{
 }
 
 func init() {
-	CreateCmd.AddCommand(workflowCmd)
+	CreateCmd.AddCommand(experimentCmd)
 
-	workflowCmd.Flags().String("project-id", "", "Set the project-id to create Chaos Experiment for the particular project. To see the projects, apply litmusctl get projects")
-	workflowCmd.Flags().String("chaos-infra-id", "", "Set the chaos-delegate-id to create Chaos Experiment for the particular Chaos Infrastructure. To see the Chaos Infrastructures, apply litmusctl get chaos-infra")
-	workflowCmd.Flags().StringP("file", "f", "", "The manifest file for the Chaos Experiment")
-	workflowCmd.Flags().StringP("description", "d", "", "The Description for the Chaos Experiment")
+	experimentCmd.Flags().String("project-id", "", "Set the project-id to create Chaos Experiment for the particular project. To see the projects, apply litmusctl get projects")
+	experimentCmd.Flags().String("chaos-infra-id", "", "Set the chaos-infra-id to create Chaos Experiment for the particular Chaos Infrastructure. To see the Chaos Infrastructures, apply litmusctl get chaos-infra")
+	experimentCmd.Flags().StringP("file", "f", "", "The manifest file for the Chaos Experiment")
+	experimentCmd.Flags().StringP("description", "d", "", "The Description for the Chaos Experiment")
 }

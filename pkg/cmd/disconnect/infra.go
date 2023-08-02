@@ -91,8 +91,6 @@ var infraCmd = &cobra.Command{
 		}
 
 		// Make API call
-		//var agentIDs []*string
-		//agentIDs = append(agentIDs, &infraID)
 		disconnectedInfra, err := infrastructure.DisconnectInfra(projectID, infraID, credentials)
 		if err != nil {
 			utils.Red.Println("\n❌ Error in disconnecting Chaos Infrastructure: ", err.Error())

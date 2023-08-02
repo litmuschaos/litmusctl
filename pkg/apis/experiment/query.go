@@ -13,21 +13,10 @@ const (
                           experimentManifest
                           cronSyntax
                           name
-                          description
-                          weightages {
-                            faultName
-                            weightage
-                          }
-                          isCustomExperiment
-                          updatedAt
-                          createdAt
                           infra {
-                            projectID
                             name
                             infraID
-                            infraType
                           }
-                          isRemoved
                           updatedBy{
                               username
                               email
@@ -45,25 +34,13 @@ const (
                           experimentName
                           infra {
                           name
-                          projectID
-                          infraID
-                          infraType
                           }
-                          isRemoved
                           updatedAt
                           updatedBy{
                               username
-                              email
                           }
                           phase
                           resiliencyScore
-                          faultsPassed
-                          faultsFailed
-                          faultsAwaited
-                          faultsStopped
-                          faultsNa
-                          totalFaults
-                          executionData
                         }
                       }
                     }`

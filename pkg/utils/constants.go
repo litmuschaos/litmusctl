@@ -43,7 +43,13 @@ const (
 	ChaosInfraLabel = "app=subscriber"
 
 	// infra type is "external" for infras connected via litmusctl
-	InfraType = "external"
+	InfraTypeExternal = "external"
+
+	// member owner role
+	MemberOwnerRole = "Owner"
+
+	// member editor role
+	MemberEditorRole = "Editor"
 
 	// Default namespace for infra installation
 	DefaultNs = "litmus"

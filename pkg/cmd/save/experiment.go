@@ -106,7 +106,7 @@ var experimentCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		// Parse experiment manifest and populate chaosexperimentInput
+		// Parse experiment manifest and populate chaosExperimentInput
 		err = utils.ParseExperimentManifest(experimentManifest, &chaosExperimentRequest)
 		if err != nil {
 			utils.Red.Println("❌ Error parsing Chaos Experiment manifest: " + err.Error())

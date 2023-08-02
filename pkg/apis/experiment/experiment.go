@@ -20,14 +20,14 @@ import (
 	"errors"
 	"github.com/litmuschaos/litmus/chaoscenter/graphql/server/graph/model"
 	"github.com/litmuschaos/litmusctl/pkg/apis"
-	types "github.com/litmuschaos/litmusctl/pkg/types"
+	"github.com/litmuschaos/litmusctl/pkg/types"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
 	"io/ioutil"
 	"net/http"
 )
 
 // CreateExperiment sends GraphQL API request for creating a Experiment
-func CreateExperiment(pid string, requestData model.SaveChaosExperimentRequest, cred types.Credentials) (RunExperimentData, error) {
+func CreateExperiment(pid string, requestData model.SaveChaosExperimentRequest, cred types.Credentials) (RunExperimentResponse, error) {
 
 	// Query to Save the Experiment
 	var gqlReq SaveChaosExperimentGraphQLRequest
@@ -38,7 +38,7 @@ func CreateExperiment(pid string, requestData model.SaveChaosExperimentRequest, 
 
 	query, err := json.Marshal(gqlReq)
 	if err != nil {
-		return RunExperimentData{}, err
+		return RunExperimentResponse{}, err
 	}
 
 	resp, err := apis.SendRequest(
@@ -50,14 +50,14 @@ func CreateExperiment(pid string, requestData model.SaveChaosExperimentRequest, 
 		string(types.Post),
 	)
 	if err != nil {
-		return RunExperimentData{}, err
+		return RunExperimentResponse{}, err
 	}
 
 	bodyBytes, err := ioutil.ReadAll(resp.Body)
 
 	defer resp.Body.Close()
 	if err != nil {
-		return RunExperimentData{}, errors.New("Error in creating Chaos Experiment: " + err.Error())
+		return RunExperimentResponse{}, errors.New("Error in saving Chaos Experiment: " + err.Error())
 	}
 
 	if resp.StatusCode == http.StatusOK {
@@ -66,16 +66,16 @@ func CreateExperiment(pid string, requestData model.SaveChaosExperimentRequest, 
 		err = json.Unmarshal(bodyBytes, &savedExperiment)
 
 		if err != nil {
-			return RunExperimentData{}, errors.New("Error in creating Chaos Experiment: " + err.Error())
+			return RunExperimentResponse{}, errors.New("Error in saving Chaos Experiment: " + err.Error())
 		}
 
 		// Errors present
 		if len(savedExperiment.Errors) > 0 {
-			return RunExperimentData{}, errors.New(savedExperiment.Errors[0].Message)
+			return RunExperimentResponse{}, errors.New(savedExperiment.Errors[0].Message)
 		}
 
 	} else {
-		return RunExperimentData{}, errors.New("graphql schema error")
+		return RunExperimentResponse{}, errors.New("error in saving Chaos Experiment")
 	}
 
 	// Query to Run the Chaos Experiment
@@ -83,28 +83,28 @@ func CreateExperiment(pid string, requestData model.SaveChaosExperimentRequest, 
 	resp, err = apis.SendRequest(apis.SendRequestParams{Endpoint: cred.Endpoint + utils.GQLAPIPath, Token: cred.Token}, []byte(runQuery), string(types.Post))
 
 	if err != nil {
-		return RunExperimentData{}, errors.New("Error in Running Chaos Experiment: " + err.Error())
+		return RunExperimentResponse{}, errors.New("Error in Running Chaos Experiment: " + err.Error())
 	}
 
 	bodyBytes, err = ioutil.ReadAll(resp.Body)
 	defer resp.Body.Close()
 	if err != nil {
-		return RunExperimentData{}, errors.New("Error in Running Chaos Experiment: " + err.Error())
+		return RunExperimentResponse{}, errors.New("Error in Running Chaos Experiment: " + err.Error())
 	}
 
 	if resp.StatusCode == http.StatusOK {
-		var runExperiment RunExperimentData
+		var runExperiment RunExperimentResponse
 		err = json.Unmarshal(bodyBytes, &runExperiment)
 		if err != nil {
-			return RunExperimentData{}, errors.New("Error in Running Chaos Experiment: " + err.Error())
+			return RunExperimentResponse{}, errors.New("Error in Running Chaos Experiment: " + err.Error())
 		}
 
 		if len(runExperiment.Errors) > 0 {
-			return RunExperimentData{}, errors.New(runExperiment.Errors[0].Message)
+			return RunExperimentResponse{}, errors.New(runExperiment.Errors[0].Message)
 		}
 		return runExperiment, nil
 	} else {
-		return RunExperimentData{}, err
+		return RunExperimentResponse{}, err
 	}
 }
 
@@ -138,7 +138,7 @@ func SaveExperiment(pid string, requestData model.SaveChaosExperimentRequest, cr
 
 	defer resp.Body.Close()
 	if err != nil {
-		return SaveExperimentData{}, errors.New("Error in creating Chaos Experiment: " + err.Error())
+		return SaveExperimentData{}, errors.New("Error in saving Chaos Experiment: " + err.Error())
 	}
 
 	if resp.StatusCode == http.StatusOK {
@@ -147,7 +147,7 @@ func SaveExperiment(pid string, requestData model.SaveChaosExperimentRequest, cr
 		err = json.Unmarshal(bodyBytes, &savedExperiment)
 
 		if err != nil {
-			return SaveExperimentData{}, errors.New("Error in creating Chaos Experiment: " + err.Error())
+			return SaveExperimentData{}, errors.New("Error in saving Chaos Experiment: " + err.Error())
 		}
 
 		// Errors present
@@ -157,40 +157,40 @@ func SaveExperiment(pid string, requestData model.SaveChaosExperimentRequest, cr
 		return savedExperiment, nil
 
 	} else {
-		return SaveExperimentData{}, errors.New("graphql schema error")
+		return SaveExperimentData{}, errors.New("error in saving Chaos Experiment")
 	}
 
 }
 
-func RunExperiment(pid string, eid string, cred types.Credentials) (RunExperimentData, error) {
+func RunExperiment(pid string, eid string, cred types.Credentials) (RunExperimentResponse, error) {
 	var err error
 	runQuery := `{"query":"mutation{ \n runChaosExperiment(experimentID:  \"` + eid + `\", projectID:  \"` + pid + `\"){\n notifyID \n}}"}`
 
 	resp, err := apis.SendRequest(apis.SendRequestParams{Endpoint: cred.Endpoint + utils.GQLAPIPath, Token: cred.Token}, []byte(runQuery), string(types.Post))
 
 	if err != nil {
-		return RunExperimentData{}, errors.New("Error in Running Chaos Experiment: " + err.Error())
+		return RunExperimentResponse{}, errors.New("Error in Running Chaos Experiment: " + err.Error())
 	}
 
 	bodyBytes, err := ioutil.ReadAll(resp.Body)
 	defer resp.Body.Close()
 	if err != nil {
-		return RunExperimentData{}, errors.New("Error in Running Chaos Experiment: " + err.Error())
+		return RunExperimentResponse{}, errors.New("Error in Running Chaos Experiment: " + err.Error())
 	}
 
 	if resp.StatusCode == http.StatusOK {
-		var runExperiment RunExperimentData
+		var runExperiment RunExperimentResponse
 		err = json.Unmarshal(bodyBytes, &runExperiment)
 		if err != nil {
-			return RunExperimentData{}, errors.New("Error in Running Chaos Experiment: " + err.Error())
+			return RunExperimentResponse{}, errors.New("Error in Running Chaos Experiment: " + err.Error())
 		}
 
 		if len(runExperiment.Errors) > 0 {
-			return RunExperimentData{}, errors.New(runExperiment.Errors[0].Message)
+			return RunExperimentResponse{}, errors.New(runExperiment.Errors[0].Message)
 		}
 		return runExperiment, nil
 	} else {
-		return RunExperimentData{}, err
+		return RunExperimentResponse{}, err
 	}
 }
 

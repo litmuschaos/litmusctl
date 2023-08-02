@@ -116,21 +116,10 @@ INFRA_NAME:
 	}
 
 	// Check if Chaos Infra with the given name already exists
-	Infra, err := infrastructure.GetInfraList(c, pid, model.ListInfraRequest{})
-	if err != nil {
-		return types.Infra{}, err
-	}
-
-	var isInfraExist = false
-	for i := range Infra.Data.ListInfraDetails.Infras {
-		if newInfra.InfraName == Infra.Data.ListInfraDetails.Infras[i].Name {
-			utils.White_B.Println(Infra.Data.ListInfraDetails.Infras[i].Name)
-			isInfraExist = true
-		}
-	}
+	isInfraExist, err, infra := ValidateInfraNameExists(newInfra.InfraName, pid, c)
 
 	if isInfraExist {
-		PrintExistingInfra(Infra)
+		PrintExistingInfra(infra)
 		goto INFRA_NAME
 	}
 
@@ -254,7 +243,7 @@ ENVIRONMENT:
 	// Get platform name as input
 	newInfra.PlatformName = GetPlatformName(kubeconfig)
 	// Set Infra type
-	newInfra.InfraType = utils.InfraType
+	newInfra.InfraType = utils.InfraTypeExternal
 	// Set project id
 	newInfra.ProjectId = pid
 	// Get namespace
@@ -291,6 +280,22 @@ func ValidateSAPermissions(namespace string, mode string, kubeconfig *string) {
 	}
 
 	utils.White_B.Println("\n🌟 Sufficient permissions. Installing the Chaos Infra...")
+}
+
+// ValidateInfraNameExists checks if an infrastructure already exists
+func ValidateInfraNameExists(infraName string, pid string, c types.Credentials) (bool, error, infrastructure.InfraData) {
+	infra, err := infrastructure.GetInfraList(c, pid, model.ListInfraRequest{})
+	if err != nil {
+		return false, err, infrastructure.InfraData{}
+	}
+
+	for i := range infra.Data.ListInfraDetails.Infras {
+		if infraName == infra.Data.ListInfraDetails.Infras[i].Name {
+			utils.White_B.Println(infra.Data.ListInfraDetails.Infras[i].Name)
+			return true, nil, infra
+		}
+	}
+	return false, nil, infrastructure.InfraData{}
 }
 
 // Summary display the Infra details based on input

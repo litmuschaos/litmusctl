@@ -73,15 +73,7 @@ var InfraCmd = &cobra.Command{
 				} else {
 					status = "INACTIVE"
 				}
-
-				//var isRegistered string
-				//if agent.IsRemoved {
-				//	isRegistered = "REGISTERED"
-				//} else {
-				//	isRegistered = "NOT REGISTERED"
-				//}
 				utils.White.Fprintln(writer, infra.InfraID+"\t"+infra.Name+"\t"+status+"\t"+infra.EnvironmentID+"\t")
-				//+isRegistered+"\t"
 			}
 			writer.Flush()
 		}

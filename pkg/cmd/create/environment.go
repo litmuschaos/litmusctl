@@ -145,7 +145,7 @@ var environmentCmd = &cobra.Command{
 		//	os.Exit(1)
 		//}
 
-		utils.White_B.Println("\n🚀 New Chaos Environment Created successful!! 🎉")
+		utils.White_B.Println("\n🚀 New Chaos Environment creation successful!! 🎉")
 		utils.White_B.Println("EnvironmentID: " + newEnv.Data.EnvironmentDetails.EnvironmentID)
 	},
 }
