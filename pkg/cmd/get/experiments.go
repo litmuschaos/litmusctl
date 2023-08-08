@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"github.com/litmuschaos/litmusctl/pkg/apis/experiment"
 	"os"
+	"strings"
 	"text/tabwriter"
 	"time"
 
@@ -64,7 +65,15 @@ var experimentsCmd = &cobra.Command{
 		listExperimentRequest.Filter.InfraName = &infraName
 
 		experiments, err := experiment.GetExperimentList(pid, listExperimentRequest, credentials)
-		utils.PrintError(err)
+		if err != nil {
+			if strings.Contains(err.Error(), "permission_denied") {
+				utils.Red.Println("❌ The specified Project ID doesn't exist.")
+				os.Exit(1)
+			} else {
+				utils.PrintError(err)
+				os.Exit(1)
+			}
+		}
 
 		output, err := cmd.Flags().GetString("output")
 		utils.PrintError(err)

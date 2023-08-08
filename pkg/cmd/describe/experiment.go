@@ -19,6 +19,7 @@ import (
 	"fmt"
 	"github.com/litmuschaos/litmusctl/pkg/apis/experiment"
 	"os"
+	"strings"
 
 	"github.com/litmuschaos/litmus/chaoscenter/graphql/server/graph/model"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
@@ -67,7 +68,15 @@ var experimentCmd = &cobra.Command{
 		describeExperimentRequest.ExperimentIDs = append(describeExperimentRequest.ExperimentIDs, &experimentID)
 
 		experiment, err := experiment.GetExperimentList(pid, describeExperimentRequest, credentials)
-		utils.PrintError(err)
+		if err != nil {
+			if strings.Contains(err.Error(), "permission_denied") {
+				utils.Red.Println("❌ The specified Project ID doesn't exist.")
+				os.Exit(1)
+			} else {
+				utils.PrintError(err)
+				os.Exit(1)
+			}
+		}
 
 		if len(experiment.Data.ListExperimentDetails.Experiments) == 0 {
 			utils.Red.Println("⛔ No chaos experiment found with ID: ", experimentID)

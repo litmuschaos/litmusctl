@@ -133,18 +133,17 @@ var environmentCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		newEnv, err := environment.ConnectEnvironment(pid, newEnvironment, credentials)
+		newEnv, err := environment.CreateEnvironment(pid, newEnvironment, credentials)
 		if err != nil {
 			utils.Red.Println("\n❌ Chaos Environment connection failed: " + err.Error() + "\n")
 			os.Exit(1)
 		}
-
+		//TODO: add the nil checker for the response(newEnv.Data)
 		//Print error message in case Data field is null in response
 		//if (newEnv.Data == environment.CreateEnvironmentData{}) {
 		//	utils.White_B.Print("\n🚫 Chaos newInfra connection failed: " + newEnv.Errors[0].Message + "\n")
 		//	os.Exit(1)
 		//}
-
 		utils.White_B.Println("\n🚀 New Chaos Environment creation successful!! 🎉")
 		utils.White_B.Println("EnvironmentID: " + newEnv.Data.EnvironmentDetails.EnvironmentID)
 	},

@@ -20,6 +20,7 @@ import (
 	models "github.com/litmuschaos/litmus/chaoscenter/graphql/server/graph/model"
 	"github.com/litmuschaos/litmusctl/pkg/apis/infrastructure"
 	"os"
+	"strings"
 	"text/tabwriter"
 
 	"github.com/litmuschaos/litmusctl/pkg/utils"
@@ -49,10 +50,17 @@ var InfraCmd = &cobra.Command{
 		}
 
 		infras, err := infrastructure.GetInfraList(credentials, projectID, models.ListInfraRequest{})
-		utils.PrintError(err)
+		if err != nil {
+			if strings.Contains(err.Error(), "permission_denied") {
+				utils.Red.Println("❌ The specified Project ID doesn't exist.")
+				os.Exit(1)
+			} else {
+				utils.PrintError(err)
+				os.Exit(1)
+			}
+		}
 
 		output, err := cmd.Flags().GetString("output")
-		utils.PrintError(err)
 
 		switch output {
 		case "json":

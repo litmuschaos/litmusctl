@@ -11,8 +11,8 @@ import (
 	"net/http"
 )
 
-// ConnectEnvironment connects the  Infra with the given details
-func ConnectEnvironment(pid string, request models.CreateEnvironmentRequest, cred types.Credentials) (CreateEnvironmentResponse, error) {
+// CreateEnvironment connects the  Infra with the given details
+func CreateEnvironment(pid string, request models.CreateEnvironmentRequest, cred types.Credentials) (CreateEnvironmentResponse, error) {
 	var gqlReq CreateEnvironmentGQLRequest
 	gqlReq.Query = CreateEnvironmentQuery
 	gqlReq.Variables.ProjectId = pid
@@ -21,20 +21,20 @@ func ConnectEnvironment(pid string, request models.CreateEnvironmentRequest, cre
 	query, err := json.Marshal(gqlReq)
 	resp, err := apis.SendRequest(apis.SendRequestParams{Endpoint: cred.Endpoint + utils.GQLAPIPath, Token: cred.Token}, query, string(types.Post))
 	if err != nil {
-		return CreateEnvironmentResponse{}, errors.New("Error in registering Chaos Infrastructure: " + err.Error())
+		return CreateEnvironmentResponse{}, errors.New("Error in Creating Chaos Infrastructure: " + err.Error())
 	}
 
 	bodyBytes, err := ioutil.ReadAll(resp.Body)
 	defer resp.Body.Close()
 	if err != nil {
-		return CreateEnvironmentResponse{}, errors.New("Error in registering Chaos Infrastructure: " + err.Error())
+		return CreateEnvironmentResponse{}, errors.New("Error in Creating Chaos Environment: " + err.Error())
 	}
 
 	if resp.StatusCode == http.StatusOK {
 		var connectEnvironment CreateEnvironmentResponse
 		err = json.Unmarshal(bodyBytes, &connectEnvironment)
 		if err != nil {
-			return CreateEnvironmentResponse{}, errors.New("Error in registering Chaos Infrastructure: " + err.Error())
+			return CreateEnvironmentResponse{}, errors.New("Error in Creating Chaos Environment: " + err.Error())
 		}
 
 		if len(connectEnvironment.Errors) > 0 {

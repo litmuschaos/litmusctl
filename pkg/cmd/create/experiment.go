@@ -119,6 +119,10 @@ var experimentCmd = &cobra.Command{
 					utils.Red.Println("\n❌ Chaos Experiment/" + chaosExperimentRequest.Name + " already exists")
 					os.Exit(1)
 				}
+				if strings.Contains(err.Error(), "no documents in result") {
+					utils.Red.Println("❌ The specified Project ID or Chaos Infrastructure ID doesn't exist.")
+					os.Exit(1)
+				}
 				if strings.Contains(err.Error(), "multiple run errors") {
 					utils.Red.Println("\n❌ Chaos Experiment already exists")
 					os.Exit(1)

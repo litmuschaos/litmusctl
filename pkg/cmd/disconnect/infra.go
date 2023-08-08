@@ -93,8 +93,13 @@ var infraCmd = &cobra.Command{
 		// Make API call
 		disconnectedInfra, err := infrastructure.DisconnectInfra(projectID, infraID, credentials)
 		if err != nil {
-			utils.Red.Println("\n❌ Error in disconnecting Chaos Infrastructure: ", err.Error())
-			os.Exit(1)
+			if strings.Contains(err.Error(), "no documents in result") {
+				utils.Red.Println("❌  The specified Project ID or Chaos Infrastructure ID doesn't exist.")
+				os.Exit(1)
+			} else {
+				utils.Red.Println("\n❌ Error in disconnecting Chaos Infrastructure: ", err.Error())
+				os.Exit(1)
+			}
 		}
 
 		if strings.Contains(disconnectedInfra.Data.Message, "infra deleted successfully") {

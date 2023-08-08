@@ -119,8 +119,13 @@ var experimentCmd = &cobra.Command{
 		saveExperiment, err := experiment.SaveExperiment(pid, chaosExperimentRequest, credentials)
 		if err != nil {
 			if (saveExperiment.Data == experiment.SavedExperimentDetails{}) {
+
 				if strings.Contains(err.Error(), "multiple write errors") {
 					utils.Red.Println("\n❌ Chaos Experiment/" + chaosExperimentRequest.Name + " already exists")
+					os.Exit(1)
+				}
+				if strings.Contains(err.Error(), "no documents in result") {
+					utils.Red.Println("❌ The specified Project ID or Chaos Infrastructure ID doesn't exist.")
 					os.Exit(1)
 				} else {
 					utils.White_B.Print("\n❌ Chaos Experiment/" + chaosExperimentRequest.Name + " failed to be created: " + err.Error())
