@@ -19,6 +19,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/litmuschaos/litmusctl/pkg/apis"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
@@ -26,9 +27,9 @@ import (
 )
 
 // createCmd represents the create command
-var agentCmd = &cobra.Command{
-	Use:   "chaos-delegate",
-	Short: `Upgrades the LitmusChaos agent plane.`,
+var infraCmd = &cobra.Command{
+	Use:   "chaos-infra",
+	Short: `Upgrades the LitmusChaos Execution plane.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		credentials, err := utils.GetCredentials(cmd)
 		utils.PrintError(err)
@@ -41,20 +42,24 @@ var agentCmd = &cobra.Command{
 			fmt.Scanln(&projectID)
 		}
 
-		cluster_id, err := cmd.Flags().GetString("chaos-delegate-id")
+		infraID, err := cmd.Flags().GetString("chaos-infra-id")
 		utils.PrintError(err)
 
-		if cluster_id == "" {
-			utils.White_B.Print("\nEnter the Chaos Delegate ID: ")
-			fmt.Scanln(&cluster_id)
+		if infraID == "" {
+			utils.White_B.Print("\nEnter the Chaos Infra ID: ")
+			fmt.Scanln(&infraID)
 		}
 
 		kubeconfig, err := cmd.Flags().GetString("kubeconfig")
 		utils.PrintError(err)
 
-		output, err := apis.UpgradeInfra(context.Background(), credentials, projectID, cluster_id, kubeconfig)
+		output, err := apis.UpgradeInfra(context.Background(), credentials, projectID, infraID, kubeconfig)
 		if err != nil {
-			utils.Red.Print("\n❌ Failed upgrading Chaos Delegate: \n" + err.Error() + "\n")
+			if strings.Contains(err.Error(), "no documents in result") {
+				utils.Red.Println("❌ The specified Project ID or Chaos Infrastructure ID doesn't exist.")
+				os.Exit(1)
+			}
+			utils.Red.Print("\n❌ Failed upgrading Chaos Infrastructure: \n" + err.Error() + "\n")
 			os.Exit(1)
 		}
 		utils.White_B.Print("\n", output)
@@ -62,8 +67,8 @@ var agentCmd = &cobra.Command{
 }
 
 func init() {
-	UpgradeCmd.AddCommand(agentCmd)
-	agentCmd.Flags().String("project-id", "", "Enter the project ID")
-	agentCmd.Flags().String("kubeconfig", "", "Enter the kubeconfig path(default: $HOME/.kube/config))")
-	agentCmd.Flags().String("chaos-delegate-id", "", "Enter the Chaos Delegate ID")
+	UpgradeCmd.AddCommand(infraCmd)
+	infraCmd.Flags().String("project-id", "", "Enter the project ID")
+	infraCmd.Flags().String("kubeconfig", "", "Enter the kubeconfig path(default: $HOME/.kube/config))")
+	infraCmd.Flags().String("chaos-infra-id", "", "Enter the Chaos Infrastructure ID")
 }
