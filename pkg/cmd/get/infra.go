@@ -5,7 +5,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+	http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,19 +17,21 @@ package get
 
 import (
 	"fmt"
+	models "github.com/litmuschaos/litmus/chaoscenter/graphql/server/graph/model"
+	"github.com/litmuschaos/litmusctl/pkg/apis/infrastructure"
 	"os"
+	"strings"
 	"text/tabwriter"
 
-	"github.com/litmuschaos/litmusctl/pkg/apis"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
 	"github.com/spf13/cobra"
 )
 
-// agentsCmd represents the agents command
-var agentsCmd = &cobra.Command{
-	Use:   "chaos-delegates",
-	Short: "Display list of Chaos Delegates within the project",
-	Long:  `Display list of Chaos Delegates within the project`,
+// InfraCmd represents the Infra command
+var InfraCmd = &cobra.Command{
+	Use:   "chaos-infra",
+	Short: "Display list of Chaos Infrastructures within the project",
+	Long:  `Display list of Chaos Infrastructures within the project`,
 	Run: func(cmd *cobra.Command, args []string) {
 		credentials, err := utils.GetCredentials(cmd)
 		utils.PrintError(err)
@@ -47,39 +49,39 @@ var agentsCmd = &cobra.Command{
 			}
 		}
 
-		agents, err := apis.GetAgentList(credentials, projectID)
-		utils.PrintError(err)
+		infras, err := infrastructure.GetInfraList(credentials, projectID, models.ListInfraRequest{})
+		if err != nil {
+			if strings.Contains(err.Error(), "permission_denied") {
+				utils.Red.Println("❌ The specified Project ID doesn't exist.")
+				os.Exit(1)
+			} else {
+				utils.PrintError(err)
+				os.Exit(1)
+			}
+		}
 
 		output, err := cmd.Flags().GetString("output")
-		utils.PrintError(err)
 
 		switch output {
 		case "json":
-			utils.PrintInJsonFormat(agents.Data)
+			utils.PrintInJsonFormat(infras.Data)
 
 		case "yaml":
-			utils.PrintInYamlFormat(agents.Data)
+			utils.PrintInYamlFormat(infras.Data)
 
 		case "":
 
 			writer := tabwriter.NewWriter(os.Stdout, 4, 8, 1, '\t', 0)
-			utils.White_B.Fprintln(writer, "CHAOS DELEGATE ID \tCHAOS DELEGATE NAME\tSTATUS\tREGISTRATION\t")
+			utils.White_B.Fprintln(writer, "CHAOS INFRASTRUCTURE ID \tCHAOS INFRASTRUCTURE NAME\tSTATUS\tCHAOS ENVIRONMENT ID\t")
 
-			for _, agent := range agents.Data.GetAgent {
+			for _, infra := range infras.Data.ListInfraDetails.Infras {
 				var status string
-				if agent.IsActive {
+				if infra.IsActive {
 					status = "ACTIVE"
 				} else {
 					status = "INACTIVE"
 				}
-
-				var isRegistered string
-				if agent.IsRegistered {
-					isRegistered = "REGISTERED"
-				} else {
-					isRegistered = "NOT REGISTERED"
-				}
-				utils.White.Fprintln(writer, agent.ClusterID+"\t"+agent.AgentName+"\t"+status+"\t"+isRegistered+"\t")
+				utils.White.Fprintln(writer, infra.InfraID+"\t"+infra.Name+"\t"+status+"\t"+infra.EnvironmentID+"\t")
 			}
 			writer.Flush()
 		}
@@ -87,9 +89,9 @@ var agentsCmd = &cobra.Command{
 }
 
 func init() {
-	GetCmd.AddCommand(agentsCmd)
+	GetCmd.AddCommand(InfraCmd)
 
-	agentsCmd.Flags().String("project-id", "", "Set the project-id. To retrieve projects. Apply `litmusctl get projects`")
+	InfraCmd.Flags().String("project-id", "", "Set the project-id. To retrieve projects. Apply `litmusctl get projects`")
 
-	agentsCmd.Flags().StringP("output", "o", "", "Output format. One of:\njson|yaml")
+	InfraCmd.Flags().StringP("output", "o", "", "Output format. One of:\njson|yaml")
 }

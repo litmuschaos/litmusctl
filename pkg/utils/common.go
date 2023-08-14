@@ -5,7 +5,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+	http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -24,6 +24,7 @@ import (
 	"fmt"
 	"math/big"
 	"os"
+	"regexp"
 	"strings"
 
 	"github.com/fatih/color"
@@ -148,4 +149,18 @@ func CheckKeyValueFormat(str string) bool {
 		}
 	}
 	return true
+}
+
+func GenerateNameID(in string) string {
+	// Replace spaces and special characters with underscore
+	reg := regexp.MustCompile(`[^a-zA-Z0-9]+`)
+	replaced := reg.ReplaceAllString(in, "_")
+
+	// Remove hyphens
+	noHyphens := strings.ReplaceAll(replaced, "-", "")
+
+	// Convert everything to lowercase
+	nameID := strings.ToLower(noHyphens)
+
+	return nameID
 }

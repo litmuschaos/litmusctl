@@ -5,7 +5,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+	http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -39,22 +39,28 @@ const (
 	// Default platform name
 	DefaultPlatform = "Others"
 
-	// Label of subscriber agent being deployed
-	ChaosAgentLabel = "app=subscriber"
+	// Label of subscriber infra being deployed
+	ChaosInfraLabel = "app=subscriber"
 
-	// Agent type is "external" for agents connected via litmusctl
-	AgentType = "external"
+	// infra type is "external" for infras connected via litmusctl
+	InfraTypeExternal = "external"
 
-	// Default namespace for agent installation
+	// member owner role
+	MemberOwnerRole = "Owner"
+
+	// member editor role
+	MemberEditorRole = "Editor"
+
+	// Default namespace for infra installation
 	DefaultNs = "litmus"
 
-	// Default service account used for agent installation
+	// Default service account used for infra installation
 	DefaultSA = "litmus"
 
-	// Chaos agent connection yaml path
-	ChaosYamlPath = "api/file"
+	// Chaos infra connection yaml path
+	ChaosYamlPath = "/api/file"
 
-	ChaosAgentPath = "targets"
+	ChaosInfraPath = "targets"
 
 	// Graphql server api path
 	GQLAPIPath = "/api/query"

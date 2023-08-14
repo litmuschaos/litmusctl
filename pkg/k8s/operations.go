@@ -5,7 +5,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+	http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -156,7 +156,7 @@ start:
 	}
 	if ok {
 		if podExists(podExistsParams{namespace, label}, kubeconfig) {
-			utils.Red.Println("\n🚫 There is a Chaos Delegate already present in this namespace. Please enter a different namespace")
+			utils.Red.Println("\n🚫 There is a Chaos Infra already present in this namespace. Please enter a different namespace")
 			goto start
 		} else {
 			nsExists = true
@@ -195,9 +195,9 @@ func WatchPod(params WatchPodParams, kubeconfig *string) {
 		if !ok {
 			log.Fatal("unexpected type")
 		}
-		utils.White_B.Println("💡 Connecting Chaos Delegate to ChaosCenter.")
+		utils.White_B.Println("💡 Connecting Chaos Infra to ChaosCenter.")
 		if p.Status.Phase == "Running" {
-			utils.White_B.Println("🏃 Chaos Delegate is running!!")
+			utils.White_B.Println("🏃 Chaos Infra is running!!")
 			watch.Stop()
 			break
 		}
@@ -283,7 +283,7 @@ type ApplyYamlPrams struct {
 func ApplyYaml(params ApplyYamlPrams, kubeconfig string, isLocal bool) (output string, err error) {
 	path := params.YamlPath
 	if !isLocal {
-		path = fmt.Sprintf("%s/%s/%s.yaml", params.Endpoint, params.YamlPath, params.Token)
+		path = fmt.Sprintf("%s%s/%s.yaml", params.Endpoint, params.YamlPath, params.Token)
 		req, err := http.NewRequest("GET", path, nil)
 		if err != nil {
 			return "", err
@@ -297,11 +297,11 @@ func ApplyYaml(params ApplyYamlPrams, kubeconfig string, isLocal bool) (output s
 		if err != nil {
 			return "", err
 		}
-		err = ioutil.WriteFile("chaos-delegate-manifest.yaml", resp_body, 0644)
+		err = ioutil.WriteFile("chaos-infra-manifest.yaml", resp_body, 0644)
 		if err != nil {
 			return "", err
 		}
-		path = "chaos-delegate-manifest.yaml"
+		path = "chaos-infra-manifest.yaml"
 	}
 
 	args := []string{"kubectl", "apply", "-f", path}

@@ -5,7 +5,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+	http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
@@ -19,6 +19,8 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
+	"github.com/litmuschaos/litmusctl/pkg/cmd/run"
+	"github.com/litmuschaos/litmusctl/pkg/cmd/save"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -70,6 +72,8 @@ func init() {
 	rootCmd.AddCommand(describe.DescribeCmd)
 	rootCmd.AddCommand(version.VersionCmd)
 	rootCmd.AddCommand(upgrade.UpgradeCmd)
+	rootCmd.AddCommand(save.SaveCmd)
+	rootCmd.AddCommand(run.RunCmd)
 
 	// Here you will define your flags and configuration settings.
 	// Cobra supports persistent flags, which, if defined here,

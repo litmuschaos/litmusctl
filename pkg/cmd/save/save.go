@@ -13,19 +13,20 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package delete
+package save
 
 import (
 	"github.com/spf13/cobra"
 )
 
-// deleteCmd represents the delete command
-var DeleteCmd = &cobra.Command{
-	Use: "delete",
-	Short: `Delete resources for LitmusChaos Execution plane.
+// createCmd represents the create command
+var SaveCmd = &cobra.Command{
+	Use: "save",
+	Short: `Save Experiment for LitmusChaos Execution plane.
 		Examples:
-		#delete a Chaos Experiment
-		litmusctl delete chaos-experiment c520650e-7cb6-474c-b0f0-4df07b2b025b --project-id=c520650e-7cb6-474c-b0f0-4df07b2b025b
+
+		#Save a Chaos Experiment from a file
+		litmusctl save chaos-experiment -f chaos-experiment.yaml --project-id="d861b650-1549-4574-b2ba-ab754058dd04" --chaos-infra-id="d861b650-1549-4574-b2ba-ab754058dd04"
 
 		Note: The default location of the config file is $HOME/.litmusconfig, and can be overridden by a --config flag
 	`,

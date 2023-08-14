@@ -29,28 +29,27 @@ type data struct {
 	GetManifest string `json:"getManifest"`
 }
 
-type ClusterData struct {
-	Data   GetAgentDetails `json:"data"`
+type InfrasData struct {
+	Data   GetInfraDetails `json:"data"`
 	Errors []struct {
 		Message string   `json:"message"`
 		Path    []string `json:"path"`
 	} `json:"errors"`
 }
 
-type GetAgentDetails struct {
-	GetAgentDetails ClusterDetails `json:"getAgentDetails"`
+type GetInfraDetails struct {
+	GetInfraDetails InfrasDetails `json:"getAgentDetails"`
 }
 
-type ClusterDetails struct {
-	ClusterID      string  `json:"clusterID"`
-	AccessKey      string  `json:"accessKey"`
-	AgentNamespace *string `json:"agentNamespace"`
+type InfrasDetails struct {
+	InfraID        string  `json:"infraID"`
+	InfraNamespace *string `json:"infraNamespace"`
 }
 
-func UpgradeAgent(c context.Context, cred types.Credentials, projectID string, clusterID string, kubeconfig string) (string, error) {
+func UpgradeInfra(c context.Context, cred types.Credentials, projectID string, infraID string, kubeconfig string) (string, error) {
 
 	// Query to fetch agent details from server
-	query := `{"query":"query {\n getAgentDetails(clusterID : \"` + clusterID + `\", \n projectID : \"` + projectID + `\"){\n agentNamespace accessKey clusterID \n}}"}`
+	query := `{"query":"query {\n getInfraDetails(infraID : \"` + infraID + `\", \n projectID : \"` + projectID + `\"){\n infraNamespace infraID \n}}"}`
 	resp, err := SendRequest(SendRequestParams{Endpoint: cred.Endpoint + utils.GQLAPIPath, Token: cred.Token}, []byte(query), string(types.Post))
 	if err != nil {
 		return "", err
@@ -62,22 +61,22 @@ func UpgradeAgent(c context.Context, cred types.Credentials, projectID string, c
 	}
 
 	defer resp.Body.Close()
-	var agent ClusterData
+	var infra InfrasData
 
 	if resp.StatusCode == http.StatusOK {
-		err = json.Unmarshal(bodyBytes, &agent)
+		err = json.Unmarshal(bodyBytes, &infra)
 		if err != nil {
 			return "", err
 		}
-		if len(agent.Errors) > 0 {
-			return "", errors.New(agent.Errors[0].Message)
+		if len(infra.Errors) > 0 {
+			return "", errors.New(infra.Errors[0].Message)
 		}
 	} else {
 		return "", errors.New(resp.Status)
 	}
 
 	// Query to fetch upgraded manifest from the server
-	query = `{"query":"query {\n getManifest(projectID : \"` + projectID + `\",\n clusterID : \"` + agent.Data.GetAgentDetails.ClusterID + `\",\n accessKey :\"` + agent.Data.GetAgentDetails.AccessKey + `\")}"}`
+	query = `{"query":"query {\n getInfraManifest(projectID : \"` + projectID + `\",\n infraID : \"` + infra.Data.GetInfraDetails.InfraID + `\", \n upgrade: true)}"}`
 	resp, err = SendRequest(SendRequestParams{Endpoint: cred.Endpoint + utils.GQLAPIPath, Token: cred.Token}, []byte(query), string(types.Post))
 	if err != nil {
 		return "", err
@@ -109,7 +108,7 @@ func UpgradeAgent(c context.Context, cred types.Credentials, projectID string, c
 		}
 
 		// Fetching agent-config from the subscriber
-		configData, err := k8s.GetConfigMap(c, "agent-config", *agent.Data.GetAgentDetails.AgentNamespace)
+		configData, err := k8s.GetConfigMap(c, "agent-config", *infra.Data.GetInfraDetails.InfraNamespace)
 		if err != nil {
 			return "", err
 		}
@@ -117,7 +116,7 @@ func UpgradeAgent(c context.Context, cred types.Credentials, projectID string, c
 
 		metadata := new(bytes.Buffer)
 		fmt.Fprintf(metadata, "\n%s: %s\n%s: %s\n%s: \n  %s: %s\n  %s: %s\n%s:\n", "apiVersion", "v1",
-			"kind", "ConfigMap", "metadata", "name", "agent-config", "namespace", *agent.Data.GetAgentDetails.AgentNamespace, "data")
+			"kind", "ConfigMap", "metadata", "name", "agent-config", "namespace", *infra.Data.GetInfraDetails.InfraNamespace, "data")
 
 		for k, v := range configData {
 			b := new(bytes.Buffer)
