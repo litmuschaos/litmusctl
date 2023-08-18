@@ -22,8 +22,8 @@ import (
 	"os"
 
 	"github.com/litmuschaos/litmusctl/pkg/apis"
+	"github.com/litmuschaos/litmusctl/pkg/infra_ops"
 	"github.com/litmuschaos/litmusctl/pkg/k8s"
-	"github.com/litmuschaos/litmusctl/pkg/ops"
 	"github.com/litmuschaos/litmusctl/pkg/types"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
 
@@ -79,7 +79,7 @@ var infraCmd = &cobra.Command{
 
 			if !projectExists {
 				utils.White_B.Print("Creating a random project...")
-				newInfra.ProjectId = ops.CreateRandomProject(credentials)
+				newInfra.ProjectId = infra_ops.CreateRandomProject(credentials)
 			}
 		}
 
@@ -166,14 +166,14 @@ var infraCmd = &cobra.Command{
 
 			// Check if user has sufficient permissions based on mode
 			utils.White_B.Print("\n🏃 Running prerequisites check....")
-			ops.ValidateSAPermissions(newInfra.Namespace, newInfra.Mode, &kubeconfig)
+			infra_ops.ValidateSAPermissions(newInfra.Namespace, newInfra.Mode, &kubeconfig)
 
 			// Check if infra already exists
-			isInfraExist, err, infraList := ops.ValidateInfraNameExists(newInfra.InfraName, newInfra.ProjectId, credentials)
+			isInfraExist, err, infraList := infra_ops.ValidateInfraNameExists(newInfra.InfraName, newInfra.ProjectId, credentials)
 			utils.PrintError(err)
 
 			if isInfraExist {
-				ops.PrintExistingInfra(infraList)
+				infra_ops.PrintExistingInfra(infraList)
 				os.Exit(1)
 			}
 			envIDs, err := environment.GetEnvironmentList(newInfra.ProjectId, credentials)
@@ -190,7 +190,7 @@ var infraCmd = &cobra.Command{
 			}
 			if !isEnvExist {
 				utils.Red.Println("\nChaos Environment with the given ID doesn't exists.")
-				ops.PrintExistingEnvironments(envIDs)
+				infra_ops.PrintExistingEnvironments(envIDs)
 				utils.White_B.Println("\n❗ Please enter a name from the List or Create a new environment using `litmusctl create chaos-environment`")
 				os.Exit(1)
 			}
@@ -201,25 +201,25 @@ var infraCmd = &cobra.Command{
 
 			if newInfra.ProjectId == "" {
 				// Fetch project id
-				newInfra.ProjectId = ops.GetProjectID(userDetails)
+				newInfra.ProjectId = infra_ops.GetProjectID(userDetails)
 			}
 
-			modeType := ops.GetModeType()
+			modeType := infra_ops.GetModeType()
 
 			// Check if user has sufficient permissions based on mode
 			utils.White_B.Print("\n🏃 Running prerequisites check....")
-			ops.ValidateSAPermissions(newInfra.Namespace, modeType, &kubeconfig)
-			newInfra, err = ops.GetInfraDetails(modeType, newInfra.ProjectId, credentials, &kubeconfig)
+			infra_ops.ValidateSAPermissions(newInfra.Namespace, modeType, &kubeconfig)
+			newInfra, err = infra_ops.GetInfraDetails(modeType, newInfra.ProjectId, credentials, &kubeconfig)
 			utils.PrintError(err)
 
 			newInfra.ServiceAccount, newInfra.SAExists = k8s.ValidSA(newInfra.Namespace, &kubeconfig)
 			newInfra.Mode = modeType
 		}
 
-		ops.Summary(newInfra, &kubeconfig)
+		infra_ops.Summary(newInfra, &kubeconfig)
 
 		if !nonInteractive {
-			ops.ConfirmInstallation()
+			infra_ops.ConfirmInstallation()
 		}
 
 		infra, err := infrastructure.ConnectInfra(newInfra, credentials)
