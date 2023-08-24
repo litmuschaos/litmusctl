@@ -38,7 +38,7 @@ jobs:
 
       - name: Get tag
         shell: bash
-        run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF##*/})"
+        run: echo "branch=$(echo ${GITHUB_REF##*/})" >> $GITHUB_OUTPUT
         id: tag
 
       - name: Building litmusctl
