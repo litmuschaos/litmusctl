@@ -17,9 +17,11 @@ package describe
 
 import (
 	"fmt"
-	"github.com/litmuschaos/litmusctl/pkg/apis/experiment"
 	"os"
 	"strings"
+
+	"github.com/litmuschaos/litmusctl/pkg/apis/experiment"
+	"github.com/litmuschaos/litmusctl/pkg/completion"
 
 	"github.com/litmuschaos/litmus/chaoscenter/graphql/server/graph/model"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
@@ -29,9 +31,11 @@ import (
 
 // experimentCmd represents the Chaos Experiment command
 var experimentCmd = &cobra.Command{
-	Use:   "chaos-experiment",
-	Short: "Describe a Chaos Experiment within the project",
-	Long:  `Describe a Chaos Experiment within the project`,
+	Use:               "chaos-experiment",
+	Short:             "Describe a Chaos Experiment within the project",
+	Long:              `Describe a Chaos Experiment within the project`,
+	ValidArgsFunction: completion.ExperimentIDCompletion,
+
 	Run: func(cmd *cobra.Command, args []string) {
 		credentials, err := utils.GetCredentials(cmd)
 		utils.PrintError(err)
@@ -96,4 +100,6 @@ func init() {
 	DescribeCmd.AddCommand(experimentCmd)
 
 	experimentCmd.Flags().String("project-id", "", "Set the project-id to list Chaos Experiments from the particular project. To see the projects, apply litmusctl get projects")
+	experimentCmd.RegisterFlagCompletionFunc("project-id", completion.ProjectIDFlagCompletion)
+
 }

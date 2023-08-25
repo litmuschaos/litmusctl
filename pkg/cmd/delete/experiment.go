@@ -17,8 +17,10 @@ package delete
 
 import (
 	"fmt"
-	"github.com/litmuschaos/litmusctl/pkg/apis/experiment"
 	"os"
+
+	"github.com/litmuschaos/litmusctl/pkg/apis/experiment"
+	"github.com/litmuschaos/litmusctl/pkg/completion"
 
 	"github.com/litmuschaos/litmusctl/pkg/apis"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
@@ -36,7 +38,7 @@ var experimentCmd = &cobra.Command{
 
 	Note: The default location of the config file is $HOME/.litmusconfig, and can be overridden by a --config flag
 	`,
-	Args: cobra.ExactArgs(1),
+	ValidArgsFunction: completion.ExperimentIDCompletion,
 	Run: func(cmd *cobra.Command, args []string) {
 
 		// Fetch user credentials
@@ -109,4 +111,6 @@ func init() {
 	DeleteCmd.AddCommand(experimentCmd)
 
 	experimentCmd.Flags().String("project-id", "", "Set the project-id to create Chaos Experiment for the particular project. To see the projects, apply litmusctl get projects")
+	experimentCmd.RegisterFlagCompletionFunc("project-id", completion.ProjectIDFlagCompletion)
+
 }

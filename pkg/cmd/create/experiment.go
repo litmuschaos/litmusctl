@@ -17,12 +17,14 @@ package create
 
 import (
 	"fmt"
+	"os"
+	"strings"
+
 	models "github.com/litmuschaos/litmus/chaoscenter/graphql/server/graph/model"
 	"github.com/litmuschaos/litmusctl/pkg/apis"
 	"github.com/litmuschaos/litmusctl/pkg/apis/experiment"
+	"github.com/litmuschaos/litmusctl/pkg/completion"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
-	"os"
-	"strings"
 
 	"github.com/spf13/cobra"
 )
@@ -145,4 +147,8 @@ func init() {
 	experimentCmd.Flags().String("chaos-infra-id", "", "Set the chaos-infra-id to create Chaos Experiment for the particular Chaos Infrastructure. To see the Chaos Infrastructures, apply litmusctl get chaos-infra")
 	experimentCmd.Flags().StringP("file", "f", "", "The manifest file for the Chaos Experiment")
 	experimentCmd.Flags().StringP("description", "d", "", "The Description for the Chaos Experiment")
+
+	experimentCmd.RegisterFlagCompletionFunc("project-id", completion.ProjectIDFlagCompletion)
+	experimentCmd.RegisterFlagCompletionFunc("chaos-infra-id", completion.ChaosInfraFlagCompletion)
+
 }

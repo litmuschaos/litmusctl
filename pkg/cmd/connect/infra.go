@@ -17,9 +17,11 @@ package connect
 
 import (
 	"fmt"
+	"os"
+
 	"github.com/litmuschaos/litmusctl/pkg/apis/environment"
 	"github.com/litmuschaos/litmusctl/pkg/apis/infrastructure"
-	"os"
+	"github.com/litmuschaos/litmusctl/pkg/completion"
 
 	"github.com/litmuschaos/litmusctl/pkg/apis"
 	"github.com/litmuschaos/litmusctl/pkg/k8s"
@@ -283,4 +285,9 @@ func init() {
 	infraCmd.Flags().Bool("skip-ssl", false, "Set whether Chaos infra will skip ssl/tls check (can be used for self-signed certs, if cert is not provided in portal)")
 	infraCmd.Flags().Bool("ns-exists", false, "Set the --ns-exists=false if the namespace mentioned in the --namespace flag is not existed else set it to --ns-exists=true | Note: Always set the boolean flag as --ns-exists=Boolean")
 	infraCmd.Flags().Bool("sa-exists", false, "Set the --sa-exists=false if the service-account mentioned in the --service-account flag is not existed else set it to --sa-exists=true | Note: Always set the boolean flag as --sa-exists=Boolean\"\n")
+
+	infraCmd.RegisterFlagCompletionFunc("project-id", completion.ProjectIDFlagCompletion)
+	infraCmd.RegisterFlagCompletionFunc("installation-mode", completion.InstallModeTypeFlagCompletion)
+	infraCmd.RegisterFlagCompletionFunc("platform-name", completion.PlatformNameFlagCompletion)
+	infraCmd.RegisterFlagCompletionFunc("chaos-infra-type", completion.ChaosInfraTypeFlagCompletion)
 }

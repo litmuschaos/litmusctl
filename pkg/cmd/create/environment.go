@@ -17,13 +17,15 @@ package create
 
 import (
 	"fmt"
+	"os"
+
 	models "github.com/litmuschaos/litmus/chaoscenter/graphql/server/graph/model"
 	"github.com/litmuschaos/litmusctl/pkg/apis"
 	"github.com/litmuschaos/litmusctl/pkg/apis/environment"
+	"github.com/litmuschaos/litmusctl/pkg/completion"
 	"github.com/litmuschaos/litmusctl/pkg/ops"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
 	"github.com/spf13/cobra"
-	"os"
 )
 
 // environmentCmd represents the Chaos infra command
@@ -155,4 +157,8 @@ func init() {
 	environmentCmd.Flags().String("type", "NON_PROD", "Set the installation mode for the kind of Chaos infra | Supported=cluster/namespace")
 	environmentCmd.Flags().String("name", "", "Set the Chaos infra name")
 	environmentCmd.Flags().String("description", "---", "Set the Chaos infra description")
+
+	environmentCmd.RegisterFlagCompletionFunc("project-id", completion.ProjectIDFlagCompletion)
+	environmentCmd.RegisterFlagCompletionFunc("type", completion.InstallModeTypeFlagCompletion)
+
 }

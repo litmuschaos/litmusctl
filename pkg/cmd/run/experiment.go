@@ -17,12 +17,14 @@ package run
 
 import (
 	"fmt"
-	"github.com/litmuschaos/litmusctl/pkg/apis"
-	"github.com/litmuschaos/litmusctl/pkg/apis/experiment"
-	"github.com/litmuschaos/litmusctl/pkg/utils"
-	"github.com/spf13/cobra"
 	"os"
 	"strings"
+
+	"github.com/litmuschaos/litmusctl/pkg/apis"
+	"github.com/litmuschaos/litmusctl/pkg/apis/experiment"
+	"github.com/litmuschaos/litmusctl/pkg/completion"
+	"github.com/litmuschaos/litmusctl/pkg/utils"
+	"github.com/spf13/cobra"
 )
 
 // experimentCmd represents the project command
@@ -118,4 +120,7 @@ func init() {
 
 	experimentCmd.Flags().String("project-id", "", "Set the project-id to create Chaos Experiment for the particular project. To see the projects, apply litmusctl get projects")
 	experimentCmd.Flags().String("experiment-id", "", "Set the environment-id to create Chaos Experiment for the particular Chaos Infrastructure. To see the Chaos Infrastructures, apply litmusctl get chaos-infra")
+
+	experimentCmd.RegisterFlagCompletionFunc("project-id", completion.ProjectIDFlagCompletion)
+	experimentCmd.RegisterFlagCompletionFunc("experiment-id", completion.ExperimentIDCompletion)
 }
