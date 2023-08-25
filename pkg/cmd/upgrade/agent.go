@@ -21,6 +21,7 @@ import (
 	"os"
 
 	"github.com/litmuschaos/litmusctl/pkg/apis"
+	"github.com/litmuschaos/litmusctl/pkg/completion"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
 	"github.com/spf13/cobra"
 )
@@ -66,4 +67,7 @@ func init() {
 	agentCmd.Flags().String("project-id", "", "Enter the project ID")
 	agentCmd.Flags().String("kubeconfig", "", "Enter the kubeconfig path(default: $HOME/.kube/config))")
 	agentCmd.Flags().String("chaos-delegate-id", "", "Enter the Chaos Delegate ID")
+
+	agentCmd.RegisterFlagCompletionFunc("project-id", completion.ProjectIDFlagCompletion)
+
 }

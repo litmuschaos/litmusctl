@@ -21,6 +21,7 @@ import (
 	"time"
 
 	"github.com/litmuschaos/litmusctl/pkg/apis"
+	"github.com/litmuschaos/litmusctl/pkg/completion"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
 	"github.com/spf13/cobra"
 )
@@ -66,4 +67,6 @@ func init() {
 	GetCmd.AddCommand(projectsCmd)
 
 	projectsCmd.Flags().StringP("output", "o", "", "Output format. One of:\njson|yaml")
+	projectsCmd.RegisterFlagCompletionFunc("output", completion.OutputFlagCompletion)
+
 }

@@ -17,9 +17,11 @@ package disconnect
 
 import (
 	"fmt"
-	"github.com/litmuschaos/litmusctl/pkg/apis/infrastructure"
 	"os"
 	"strings"
+
+	"github.com/litmuschaos/litmusctl/pkg/apis/infrastructure"
+	"github.com/litmuschaos/litmusctl/pkg/completion"
 
 	"github.com/litmuschaos/litmusctl/pkg/apis"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
@@ -114,4 +116,6 @@ func init() {
 	DisconnectCmd.AddCommand(infraCmd)
 
 	infraCmd.Flags().String("project-id", "", "Set the project-id to disconnect Chaos Infrastructure for the particular project. To see the projects, apply litmusctl get projects")
+	infraCmd.RegisterFlagCompletionFunc("project-id", completion.ProjectIDFlagCompletion)
+
 }

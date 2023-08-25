@@ -17,11 +17,13 @@ package get
 
 import (
 	"fmt"
-	"github.com/litmuschaos/litmusctl/pkg/apis/experiment"
 	"os"
 	"strings"
 	"text/tabwriter"
 	"time"
+
+	"github.com/litmuschaos/litmusctl/pkg/apis/experiment"
+	"github.com/litmuschaos/litmusctl/pkg/completion"
 
 	"github.com/gorhill/cronexpr"
 	"github.com/litmuschaos/litmus/chaoscenter/graphql/server/graph/model"
@@ -121,4 +123,9 @@ func init() {
 	experimentsCmd.Flags().StringP("chaos-infra", "A", "", "Set the Chaos Infrastructure name to display all Chaos experiments targeted towards that particular Chaos Infrastructure.")
 
 	experimentsCmd.Flags().StringP("output", "o", "", "Output format. One of:\njson|yaml")
+
+	experimentsCmd.RegisterFlagCompletionFunc("project-id", completion.ProjectIDFlagCompletion)
+	experimentsCmd.RegisterFlagCompletionFunc("chaos-infra", completion.ChaosInfraFlagCompletion)
+	experimentsCmd.RegisterFlagCompletionFunc("output", completion.OutputFlagCompletion)
+
 }
