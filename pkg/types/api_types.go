@@ -23,8 +23,8 @@ const (
 )
 
 type AuthResponse struct {
-	AccessToken string `json:"access_token"`
-	ExpiresIn   int64  `json:"expires_in"`
+	AccessToken string `json:"accessToken"`
+	ExpiresIn   int64  `json:"expiresIn"`
 	Type        string `json:"type"`
 }
 
