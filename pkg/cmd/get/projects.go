@@ -22,6 +22,7 @@ import (
 
 	"github.com/litmuschaos/litmusctl/pkg/apis"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
+	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
 )
 
@@ -33,31 +34,61 @@ var projectsCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		credentials, err := utils.GetCredentials(cmd)
 		utils.PrintError(err)
+
+		//promptui to ask the user for the output format
+		outputFormat := ""
+
 		projects, err := apis.ListProject(credentials)
 		utils.PrintError(err)
 
-		output, err := cmd.Flags().GetString("output")
-		utils.PrintError(err)
-
-		switch output {
-		case "json":
+		switch outputFormat {
+		case "JSON":
 			utils.PrintInJsonFormat(projects.Data)
 
-		case "yaml":
+		case "YAML":
 			utils.PrintInYamlFormat(projects.Data)
 
 		case "":
-			writer := tabwriter.NewWriter(os.Stdout, 8, 8, 8, '\t', tabwriter.AlignRight)
-			utils.White_B.Fprintln(writer, "PROJECT ID\tPROJECT NAME\tCREATED AT")
-			for _, project := range projects.Data {
-				intTime := project.CreatedAt
+
+			itemsPerPage := 5
+			page := 1
+			totalProjects := len(projects.Data)
+
+			for {
+				// calculating the start and end indices for the current page
+				start := (page - 1) * itemsPerPage
+				end := start + itemsPerPage
+				if end > totalProjects {
+					end = totalProjects
+
+				}
+
+				// displaying the projects for the current page
+				writer := tabwriter.NewWriter(os.Stdout, 8, 8, 8, '\t', tabwriter.AlignRight)
+				utils.White_B.Fprintln(writer, "PROJECT ID\tPROJECT NAME\tCREATED AT")
+				for _, project := range projects.Data[start:end] {
+					intTime := project.CreatedAt
+					humanTime := time.Unix(intTime, 0)
+					utils.White.Fprintln(writer, project.ID+"\t"+project.Name+"\t"+humanTime.String()+"\t")
+				}
+				writer.Flush()
+
+				// pagination prompt
+				paginationPrompt := promptui.Prompt{
+					Label:     "Press Enter to show the next page (or type 'q' to quit)",
+					AllowEdit: true,
+					Default:   "",
+				}
+
+				userInput, err := paginationPrompt.Run()
 				utils.PrintError(err)
 
-				humanTime := time.Unix(intTime, 0)
-
-				utils.White.Fprintln(writer, project.ID+"\t"+project.Name+"\t"+humanTime.String()+"\t")
+				if userInput == "q" {
+					break
+				} else {
+					page++
+				}
 			}
-			writer.Flush()
 		}
 	},
 }

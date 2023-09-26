@@ -17,11 +17,12 @@ package get
 
 import (
 	"fmt"
-	models "github.com/litmuschaos/litmus/chaoscenter/graphql/server/graph/model"
-	"github.com/litmuschaos/litmusctl/pkg/apis/infrastructure"
 	"os"
 	"strings"
 	"text/tabwriter"
+
+	models "github.com/litmuschaos/litmus/chaoscenter/graphql/server/graph/model"
+	"github.com/litmuschaos/litmusctl/pkg/apis/infrastructure"
 
 	"github.com/litmuschaos/litmusctl/pkg/utils"
 	"github.com/spf13/cobra"

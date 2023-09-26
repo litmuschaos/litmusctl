@@ -18,12 +18,13 @@ package experiment
 import (
 	"encoding/json"
 	"errors"
+	"io/ioutil"
+	"net/http"
+
 	"github.com/litmuschaos/litmus/chaoscenter/graphql/server/graph/model"
 	"github.com/litmuschaos/litmusctl/pkg/apis"
 	"github.com/litmuschaos/litmusctl/pkg/types"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
-	"io/ioutil"
-	"net/http"
 )
 
 // CreateExperiment sends GraphQL API request for creating a Experiment

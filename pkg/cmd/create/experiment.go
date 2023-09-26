@@ -17,12 +17,13 @@ package create
 
 import (
 	"fmt"
+	"os"
+	"strings"
+
 	models "github.com/litmuschaos/litmus/chaoscenter/graphql/server/graph/model"
 	"github.com/litmuschaos/litmusctl/pkg/apis"
 	"github.com/litmuschaos/litmusctl/pkg/apis/experiment"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
-	"os"
-	"strings"
 
 	"github.com/spf13/cobra"
 )
@@ -134,7 +135,7 @@ var experimentCmd = &cobra.Command{
 		}
 
 		//Successful creation
-		utils.White_B.Println("\n🚀 Chaos Experiment successfully created🎉")
+		utils.White_B.Println("\n🚀 Chaos Experiment successfully created and experiment-run is scheduled 🎉")
 	},
 }
 

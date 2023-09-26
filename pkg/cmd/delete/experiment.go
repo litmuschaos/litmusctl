@@ -16,13 +16,14 @@ limitations under the License.
 package delete
 
 import (
-	"fmt"
-	"github.com/litmuschaos/litmusctl/pkg/apis/experiment"
 	"os"
+
+	"github.com/litmuschaos/litmusctl/pkg/apis/experiment"
 
 	"github.com/litmuschaos/litmusctl/pkg/apis"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
 
+	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
 )
 
@@ -36,38 +37,49 @@ var experimentCmd = &cobra.Command{
 
 	Note: The default location of the config file is $HOME/.litmusconfig, and can be overridden by a --config flag
 	`,
-	Args: cobra.ExactArgs(1),
+	// Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 
 		// Fetch user credentials
 		credentials, err := utils.GetCredentials(cmd)
 		utils.PrintError(err)
 
+		experimentID := ""
 		projectID, err := cmd.Flags().GetString("project-id")
 		utils.PrintError(err)
 
 		// Handle blank input for project ID
-		if projectID == "" {
-			utils.White_B.Print("\nEnter the Project ID: ")
-			fmt.Scanln(&projectID)
 
-			if projectID == "" {
-				utils.Red.Println("⛔ Project ID can't be empty!!")
+		if projectID == "" {
+			prompt := promptui.Prompt{
+				Label: "Enter the Project ID",
+			}
+			result, err := prompt.Run()
+			if err != nil {
+				utils.Red.Println("⛔ Error:", err)
 				os.Exit(1)
 			}
+			projectID = result
 		}
 
-		experimentID := args[0]
+		if len(args) == 0 {
+			prompt := promptui.Prompt{
+				Label: "Enter the Chaos Experiment ID",
+			}
+			result, err := prompt.Run()
+			if err != nil {
+				utils.Red.Println("⛔ Error:", err)
+				os.Exit(1)
+			}
+			experimentID = result
+		} else {
+			experimentID = args[0]
+		}
 
 		// Handle blank input for Chaos Experiment ID
 		if experimentID == "" {
-			utils.White_B.Print("\nEnter the Chaos Experiment ID: ")
-			fmt.Scanln(&experimentID)
-
-			if experimentID == "" {
-				utils.Red.Println("⛔ Chaos Experiment ID can't be empty!!")
-				os.Exit(1)
-			}
+			utils.Red.Println("⛔ Chaos Experiment ID can't be empty!!")
+			os.Exit(1)
 		}
 
 		// Perform authorization
@@ -88,6 +100,23 @@ var experimentCmd = &cobra.Command{
 		if !editAccess {
 			utils.Red.Println("⛔ User doesn't have edit access to the project!!")
 			os.Exit(1)
+		}
+
+		// confirm before deletion
+
+		prompt := promptui.Prompt{
+			Label:     "Are you sure you want to delete this Chaos Experiment? (y/n)",
+			AllowEdit: true,
+		}
+		result, err := prompt.Run()
+		if err != nil {
+			utils.Red.Println("⛔ Error:", err)
+			os.Exit(1)
+		}
+
+		if result != "y" {
+			utils.White_B.Println("\n❌ Chaos Experiment was not deleted.")
+			os.Exit(0)
 		}
 
 		// Make API call

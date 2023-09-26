@@ -17,15 +17,17 @@ package get
 
 import (
 	"fmt"
-	"github.com/litmuschaos/litmusctl/pkg/apis/experiment"
 	"os"
 	"strings"
 	"text/tabwriter"
 	"time"
 
+	"github.com/litmuschaos/litmusctl/pkg/apis/experiment"
+
 	"github.com/gorhill/cronexpr"
 	"github.com/litmuschaos/litmus/chaoscenter/graphql/server/graph/model"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
+	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
 )
 
@@ -75,39 +77,63 @@ var experimentsCmd = &cobra.Command{
 			}
 		}
 
-		output, err := cmd.Flags().GetString("output")
+		outputFormat := ""
+		outputPrompt := promptui.Select{
+			Label: "Select output format",
+			Items: []string{"Table", "json", "yaml"},
+		}
+		_, outputFormat, err = outputPrompt.Run()
 		utils.PrintError(err)
 
-		switch output {
+		switch outputFormat {
 		case "json":
 			utils.PrintInJsonFormat(experiments.Data)
 
 		case "yaml":
 			utils.PrintInYamlFormat(experiments.Data)
 
-		case "":
+		case "Table":
+			itemsPerPage := 5
+			page := 1
+			totalExperiments := len(experiments.Data.ListExperimentDetails.Experiments)
 
-			writer := tabwriter.NewWriter(os.Stdout, 4, 8, 1, '\t', 0)
-			utils.White_B.Fprintln(writer, "CHAOS EXPERIMENT ID\tCHAOS EXPERIMENT NAME\tCHAOS EXPERIMENT TYPE\tNEXT SCHEDULE\tCHAOS INFRASTRUCTURE ID\tCHAOS INFRASTRUCTURE NAME\tLAST UPDATED By")
+			for {
+				// calculating the start and end indices for the current page
+				start := (page - 1) * itemsPerPage
+				end := start + itemsPerPage
+				if end > totalExperiments {
+					end = totalExperiments
+				}
+				writer := tabwriter.NewWriter(os.Stdout, 4, 8, 1, '\t', 0)
+				utils.White_B.Fprintln(writer, "CHAOS EXPERIMENT ID\tCHAOS EXPERIMENT NAME\tCHAOS EXPERIMENT TYPE\tNEXT SCHEDULE\tCHAOS INFRASTRUCTURE ID\tCHAOS INFRASTRUCTURE NAME\tLAST UPDATED By")
 
-			for _, experiment := range experiments.Data.ListExperimentDetails.Experiments {
-				if experiment.CronSyntax != "" {
-					utils.White.Fprintln(
-						writer,
-						experiment.ExperimentID+"\t"+experiment.Name+"\tCron Chaos Experiment\t"+cronexpr.MustParse(experiment.CronSyntax).Next(time.Now()).Format("January 2 2006, 03:04:05 pm")+"\t"+experiment.Infra.InfraID+"\t"+experiment.Infra.Name+"\t"+experiment.UpdatedBy.Username)
+				for _, experiment := range experiments.Data.ListExperimentDetails.Experiments[start:end] {
+					if experiment.CronSyntax != "" {
+						utils.White.Fprintln(
+							writer,
+							experiment.ExperimentID+"\t"+experiment.Name+"\tCron Chaos Experiment\t"+cronexpr.MustParse(experiment.CronSyntax).Next(time.Now()).Format("January 2 2006, 03:04:05 pm")+"\t"+experiment.Infra.InfraID+"\t"+experiment.Infra.Name+"\t"+experiment.UpdatedBy.Username)
+					} else {
+						utils.White.Fprintln(
+							writer,
+							experiment.ExperimentID+"\t"+experiment.Name+"\tNon Cron Chaos Experiment\tNone\t"+experiment.Infra.InfraID+"\t"+experiment.Infra.Name+"\t"+experiment.UpdatedBy.Username)
+					}
+				}
+				writer.Flush()
+				paginationPrompt := promptui.Prompt{
+					Label:     "Press Enter to show the next page (or type 'q' to quit)",
+					AllowEdit: true,
+					Default:   "",
+				}
+
+				userInput, err := paginationPrompt.Run()
+				utils.PrintError(err)
+
+				if userInput == "q" {
+					break
 				} else {
-					utils.White.Fprintln(
-						writer,
-						experiment.ExperimentID+"\t"+experiment.Name+"\tNon Cron Chaos Experiment\tNone\t"+experiment.Infra.InfraID+"\t"+experiment.Infra.Name+"\t"+experiment.UpdatedBy.Username)
+					page++
 				}
 			}
-
-			if listAllExperiments || (experiments.Data.ListExperimentDetails.TotalNoOfExperiments <= listExperimentRequest.Pagination.Limit) {
-				utils.White_B.Fprintln(writer, fmt.Sprintf("\nShowing %d of %d Chaos experiments", experiments.Data.ListExperimentDetails.TotalNoOfExperiments, experiments.Data.ListExperimentDetails.TotalNoOfExperiments))
-			} else {
-				utils.White_B.Fprintln(writer, fmt.Sprintf("\nShowing %d of %d Chaos experiments", listExperimentRequest.Pagination.Limit, experiments.Data.ListExperimentDetails.TotalNoOfExperiments))
-			}
-			writer.Flush()
 		}
 	},
 }

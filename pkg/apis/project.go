@@ -40,7 +40,7 @@ type createProjectResponse struct {
 }
 
 type createProjectPayload struct {
-	ProjectName string `json:"project_name"`
+	ProjectName string `json:"projectName"`
 }
 
 func CreateProjectRequest(projectName string, cred types.Credentials) (createProjectResponse, error) {
@@ -83,7 +83,7 @@ func CreateProjectRequest(projectName string, cred types.Credentials) (createPro
 
 type listProjectResponse struct {
 	Data []struct {
-		ID        string `json:"ID"`
+		ID        string `json:"ProjectID"`
 		Name      string `json:"Name"`
 		CreatedAt int64  `json:"CreatedAt"`
 	} `json:"data"`
@@ -144,9 +144,9 @@ type Member struct {
 }
 
 type Project struct {
-	ID        string   `json:"ID"`
+	ID        string   `json:"ProjectID"`
 	Name      string   `json:"Name"`
-	CreatedAt string   `json:"created_at"`
+	CreatedAt int64    `json:"CreatedAt"`
 	Members   []Member `json:"Members"`
 }
 
@@ -157,7 +157,7 @@ func GetProjectDetails(c types.Credentials) (ProjectDetails, error) {
 		return ProjectDetails{}, nil
 	}
 	Username, _ := token.Claims.(jwt.MapClaims)["username"].(string)
-	resp, err := SendRequest(SendRequestParams{Endpoint: c.Endpoint + utils.AuthAPIPath + "/get_user_with_project/" + Username, Token: "Bearer " + c.Token}, []byte{}, string(types.Get))
+	resp, err := SendRequest(SendRequestParams{Endpoint: "http://localhost:3000" + utils.AuthAPIPath + "/get_user_with_project/" + Username, Token: "Bearer " + c.Token}, []byte{}, string(types.Get))
 	if err != nil {
 		return ProjectDetails{}, err
 	}

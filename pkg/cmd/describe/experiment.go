@@ -1,28 +1,16 @@
-// /*
-// Copyright © 2021 The LitmusChaos Authors
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//	http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-// */
 package describe
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
-	"github.com/litmuschaos/litmusctl/pkg/apis/experiment"
 	"os"
 	"strings"
 
 	"github.com/litmuschaos/litmus/chaoscenter/graphql/server/graph/model"
+	"github.com/litmuschaos/litmusctl/pkg/apis/experiment"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
+	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
 	"sigs.k8s.io/yaml"
 )
@@ -42,19 +30,28 @@ var experimentCmd = &cobra.Command{
 		utils.PrintError(err)
 
 		if pid == "" {
-			utils.White_B.Print("\nEnter the Project ID: ")
-			fmt.Scanln(&pid)
-
-			for pid == "" {
-				utils.Red.Println("⛔ Project ID can't be empty!!")
+			prompt := promptui.Prompt{
+				Label: "Enter the Project ID",
+			}
+			result, err := prompt.Run()
+			if err != nil {
+				utils.PrintError(err)
 				os.Exit(1)
 			}
+			pid = result
 		}
 
 		var experimentID string
 		if len(args) == 0 {
-			utils.White_B.Print("\nEnter the Chaos Experiment ID: ")
-			fmt.Scanln(&experimentID)
+			prompt := promptui.Prompt{
+				Label: "Enter the Chaos Experiment ID",
+			}
+			result, err := prompt.Run()
+			if err != nil {
+				utils.PrintError(err)
+				os.Exit(1)
+			}
+			experimentID = result
 		} else {
 			experimentID = args[0]
 		}
@@ -88,7 +85,42 @@ var experimentCmd = &cobra.Command{
 			utils.Red.Println("❌ Error parsing Chaos Experiment manifest: " + err.Error())
 			os.Exit(1)
 		}
-		utils.PrintInYamlFormat(string(yamlManifest))
+
+		// Add an output format prompt
+		prompt := promptui.Select{
+			Label: "Select an output format",
+			Items: []string{"YAML", "JSON"},
+		}
+		i, _, err := prompt.Run()
+		if err != nil {
+			utils.PrintError(err)
+			os.Exit(1)
+		}
+
+		switch i {
+		case 0:
+			// Output as YAML (default)
+			utils.PrintInYamlFormat(string(yamlManifest))
+		case 1:
+			// Output as JSON
+			jsonData, err := yaml.YAMLToJSON(yamlManifest)
+			if err != nil {
+				utils.Red.Println("❌ Error converting YAML to JSON: " + err.Error())
+				os.Exit(1)
+			}
+
+			var prettyJSON bytes.Buffer
+			err = json.Indent(&prettyJSON, jsonData, "", "    ") // Adjust the indentation as needed
+			if err != nil {
+				utils.Red.Println("❌ Error formatting JSON: " + err.Error())
+				os.Exit(1)
+			}
+
+			fmt.Println(prettyJSON.String())
+		default:
+			utils.Red.Println("❌ Invalid output format selected")
+			os.Exit(1)
+		}
 	},
 }
 
