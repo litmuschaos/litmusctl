@@ -93,8 +93,6 @@ var setAccountCmd = &cobra.Command{
 		utils.PrintError(err)
 		authInput.Password = pass
 
-		// Ensure required fields are provided
-
 		if authInput.Endpoint != "" && authInput.Username != "" && authInput.Password != "" {
 			exists := config.FileExists(configFilePath)
 			var lgt int

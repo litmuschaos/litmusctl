@@ -157,7 +157,7 @@ func GetProjectDetails(c types.Credentials) (ProjectDetails, error) {
 		return ProjectDetails{}, nil
 	}
 	Username, _ := token.Claims.(jwt.MapClaims)["username"].(string)
-	resp, err := SendRequest(SendRequestParams{Endpoint: "http://localhost:3000" + utils.AuthAPIPath + "/get_user_with_project/" + Username, Token: "Bearer " + c.Token}, []byte{}, string(types.Get))
+	resp, err := SendRequest(SendRequestParams{Endpoint: c.Endpoint + utils.AuthAPIPath + "/get_user_with_project/" + Username, Token: "Bearer " + c.Token}, []byte{}, string(types.Get))
 	if err != nil {
 		return ProjectDetails{}, err
 	}
