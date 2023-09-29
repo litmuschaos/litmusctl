@@ -42,10 +42,10 @@ var projectsCmd = &cobra.Command{
 		utils.PrintError(err)
 
 		switch outputFormat {
-		case "JSON":
+		case "json":
 			utils.PrintInJsonFormat(projects.Data)
 
-		case "YAML":
+		case "yaml":
 			utils.PrintInYamlFormat(projects.Data)
 
 		case "":

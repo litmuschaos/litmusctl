@@ -80,7 +80,7 @@ var experimentsCmd = &cobra.Command{
 		outputFormat := ""
 		outputPrompt := promptui.Select{
 			Label: "Select output format",
-			Items: []string{"Table", "json", "yaml"},
+			Items: []string{"table", "json", "yaml"},
 		}
 		_, outputFormat, err = outputPrompt.Run()
 		utils.PrintError(err)
@@ -92,7 +92,7 @@ var experimentsCmd = &cobra.Command{
 		case "yaml":
 			utils.PrintInYamlFormat(experiments.Data)
 
-		case "Table":
+		case "table":
 			itemsPerPage := 5
 			page := 1
 			totalExperiments := len(experiments.Data.ListExperimentDetails.Experiments)

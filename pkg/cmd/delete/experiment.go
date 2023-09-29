@@ -37,7 +37,7 @@ var experimentCmd = &cobra.Command{
 
 	Note: The default location of the config file is $HOME/.litmusconfig, and can be overridden by a --config flag
 	`,
-	// Args: cobra.ExactArgs(1),
+
 	Run: func(cmd *cobra.Command, args []string) {
 
 		// Fetch user credentials

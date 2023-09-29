@@ -62,15 +62,6 @@ var projectCmd = &cobra.Command{
 			utils.White_B.Printf("Project '%s' created successfully!🎉\n", projectName)
 		}
 	},
-
-	// 	if projectName == "" {
-	// 		utils.White_B.Print("\nEnter a project name: ")
-	// 		fmt.Scanln(&projectName)
-	// 	}
-
-	// 	_, err = apis.CreateProjectRequest(projectName, credentials)
-	// 	utils.PrintError(err)
-	// },
 }
 
 func init() {
