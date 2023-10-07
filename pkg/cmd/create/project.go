@@ -16,6 +16,8 @@ limitations under the License.
 package create
 
 import (
+	"fmt"
+
 	"github.com/litmuschaos/litmusctl/pkg/apis"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
 
@@ -54,12 +56,14 @@ var projectCmd = &cobra.Command{
 
 			projectName = result
 		}
-
-		_, err = apis.CreateProjectRequest(projectName, credentials)
+		var response apis.CreateProjectResponse
+		response, err = apis.CreateProjectRequest(projectName, credentials)
 		if err != nil {
 			utils.Red.Printf("❌ Error creating project: %v\n", err)
 		} else {
-			utils.White_B.Printf("Project '%s' created successfully!🎉\n", projectName)
+			fmt.Printf("Response: %+v\n", response)
+			projectID := response.Data.ID
+			utils.White_B.Printf("Project '%s' created successfully with project ID - '%s'!🎉\n", projectName, projectID)
 		}
 	},
 }

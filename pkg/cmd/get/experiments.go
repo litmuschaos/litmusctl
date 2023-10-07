@@ -79,7 +79,7 @@ var experimentsCmd = &cobra.Command{
 
 		outputFormat := ""
 		outputPrompt := promptui.Select{
-			Label: "Select output format",
+			Label: "Select an output format",
 			Items: []string{"table", "json", "yaml"},
 		}
 		_, outputFormat, err = outputPrompt.Run()
