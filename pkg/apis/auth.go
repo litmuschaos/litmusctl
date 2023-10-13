@@ -1,6 +1,5 @@
 /*
 Copyright © 2021 The LitmusChaos Authors
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -26,12 +25,33 @@ import (
 	"github.com/litmuschaos/litmusctl/pkg/types"
 )
 
+// HTTPClient interface
+type HTTPClientInterface interface {
+	Do(req *http.Request) (*http.Response, error)
+}
+
+var (
+	Client HTTPClientInterface
+)
+
+func init() {
+	Client = &httpClient{http.Client{}}
+}
+
+type httpClient struct {
+	client http.Client
+}
+
+func (c *httpClient) Do(req *http.Request) (*http.Response, error) {
+	return c.client.Do(req)
+}
+
 type Payload struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
 }
 
-func Auth(input types.AuthInput) (types.AuthResponse, error) {
+func Auth(input types.AuthInput, httpClient HTTPClientInterface) (types.AuthResponse, error) {
 	payloadBytes, err := json.Marshal(Payload{
 		Username: input.Username,
 		Password: input.Password,
@@ -40,9 +60,18 @@ func Auth(input types.AuthInput) (types.AuthResponse, error) {
 	if err != nil {
 		return types.AuthResponse{}, err
 	}
+	// reqURL := input.Endpoint + utils.AuthAPIPath + "/login"
+	// url, err := url.Parse(reqURL)
 
 	// Sending token as empty because auth server doesn't need Authorization token to validate.
-	resp, err := SendRequest(SendRequestParams{input.Endpoint + utils.AuthAPIPath + "/login", ""}, payloadBytes, string(types.Post))
+	// resp, err := Client.Do(&http.Request{
+	// 	Method: http.MethodPost,
+	// 	URL:    url,
+	// 	Body:   ioutil.NopCloser(bytes.NewBuffer(payloadBytes)),
+	// })
+
+	resp, err := SendRequest(SendRequestParams{input.Endpoint + utils.AuthAPIPath + "/login", ""}, Client, payloadBytes, string(types.Post))
+
 	if err != nil {
 		return types.AuthResponse{}, err
 	}

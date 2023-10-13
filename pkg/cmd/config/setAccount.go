@@ -17,7 +17,6 @@ package config
 
 import (
 	"fmt"
-	"github.com/litmuschaos/litmusctl/pkg/apis/experiment"
 	"net/url"
 	"os"
 	"strings"
@@ -25,6 +24,7 @@ import (
 
 	"github.com/golang-jwt/jwt"
 	"github.com/litmuschaos/litmusctl/pkg/apis"
+	"github.com/litmuschaos/litmusctl/pkg/apis/experiment"
 	"github.com/litmuschaos/litmusctl/pkg/config"
 	"github.com/litmuschaos/litmusctl/pkg/types"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
@@ -102,7 +102,7 @@ var setAccountCmd = &cobra.Command{
 				utils.PrintError(err)
 			}
 
-			resp, err := apis.Auth(authInput)
+			resp, err := apis.Auth(authInput, apis.Client)
 			utils.PrintError(err)
 			// Decoding token
 			token, _ := jwt.Parse(resp.AccessToken, nil)

@@ -17,9 +17,10 @@ package connect
 
 import (
 	"fmt"
+	"os"
+
 	"github.com/litmuschaos/litmusctl/pkg/apis/environment"
 	"github.com/litmuschaos/litmusctl/pkg/apis/infrastructure"
-	"os"
 
 	"github.com/litmuschaos/litmusctl/pkg/apis"
 	"github.com/litmuschaos/litmusctl/pkg/infra_ops"
@@ -176,7 +177,7 @@ var infraCmd = &cobra.Command{
 				infra_ops.PrintExistingInfra(infraList)
 				os.Exit(1)
 			}
-			envIDs, err := environment.GetEnvironmentList(newInfra.ProjectId, credentials)
+			envIDs, err := environment.GetEnvironmentList(newInfra.ProjectId, credentials, apis.Client)
 			utils.PrintError(err)
 
 			// Check if Environment exists

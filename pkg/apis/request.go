@@ -1,6 +1,5 @@
 /*
 Copyright © 2021 The LitmusChaos Authors
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -25,7 +24,7 @@ type SendRequestParams struct {
 	Token    string
 }
 
-func SendRequest(params SendRequestParams, payload []byte, method string) (*http.Response, error) {
+func SendRequest(params SendRequestParams, httpClient HTTPClientInterface, payload []byte, method string) (*http.Response, error) {
 	req, err := http.NewRequest(method, params.Endpoint, bytes.NewBuffer(payload))
 	if err != nil {
 		return &http.Response{}, err
@@ -33,7 +32,7 @@ func SendRequest(params SendRequestParams, payload []byte, method string) (*http
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", params.Token)
 
-	resp, err := http.DefaultClient.Do(req)
+	resp, err := Client.Do(req)
 	if err != nil {
 		return &http.Response{}, err
 	}

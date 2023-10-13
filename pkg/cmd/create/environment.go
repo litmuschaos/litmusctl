@@ -17,13 +17,14 @@ package create
 
 import (
 	"fmt"
+	"os"
+
 	models "github.com/litmuschaos/litmus/chaoscenter/graphql/server/graph/model"
 	"github.com/litmuschaos/litmusctl/pkg/apis"
 	"github.com/litmuschaos/litmusctl/pkg/apis/environment"
 	"github.com/litmuschaos/litmusctl/pkg/infra_ops"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
 	"github.com/spf13/cobra"
-	"os"
 )
 
 // environmentCmd represents the Chaos infra command
@@ -91,7 +92,7 @@ var environmentCmd = &cobra.Command{
 		}
 		newEnvironment.Type = models.EnvironmentType(envType)
 
-		envs, err := environment.GetEnvironmentList(pid, credentials)
+		envs, err := environment.GetEnvironmentList(pid, credentials, apis.Client)
 		utils.PrintError(err)
 
 		// Generate EnvironmentID from Environment Name

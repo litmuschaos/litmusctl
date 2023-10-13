@@ -17,12 +17,13 @@ package infra_ops
 
 import (
 	"fmt"
-	"github.com/litmuschaos/litmus/chaoscenter/graphql/server/graph/model"
-	"github.com/litmuschaos/litmusctl/pkg/apis/environment"
-	"github.com/litmuschaos/litmusctl/pkg/apis/infrastructure"
 	"os"
 	"strconv"
 	"strings"
+
+	"github.com/litmuschaos/litmus/chaoscenter/graphql/server/graph/model"
+	"github.com/litmuschaos/litmusctl/pkg/apis/environment"
+	"github.com/litmuschaos/litmusctl/pkg/apis/infrastructure"
 
 	"github.com/litmuschaos/litmusctl/pkg/apis"
 	"github.com/litmuschaos/litmusctl/pkg/k8s"
@@ -137,7 +138,7 @@ ENVIRONMENT:
 	}
 
 	// Check if Chaos Environment with the given name exists
-	Env, err := environment.GetEnvironmentList(pid, c)
+	Env, err := environment.GetEnvironmentList(pid, c, apis.Client)
 	if err != nil {
 		return types.Infra{}, err
 	}

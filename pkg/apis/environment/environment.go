@@ -3,12 +3,13 @@ package environment
 import (
 	"encoding/json"
 	"errors"
+	"io/ioutil"
+	"net/http"
+
 	models "github.com/litmuschaos/litmus/chaoscenter/graphql/server/graph/model"
 	"github.com/litmuschaos/litmusctl/pkg/apis"
 	"github.com/litmuschaos/litmusctl/pkg/types"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
-	"io/ioutil"
-	"net/http"
 )
 
 // CreateEnvironment connects the  Infra with the given details
@@ -19,7 +20,7 @@ func CreateEnvironment(pid string, request models.CreateEnvironmentRequest, cred
 	gqlReq.Variables.Request = request
 
 	query, err := json.Marshal(gqlReq)
-	resp, err := apis.SendRequest(apis.SendRequestParams{Endpoint: cred.Endpoint + utils.GQLAPIPath, Token: cred.Token}, query, string(types.Post))
+	resp, err := apis.SendRequest(apis.SendRequestParams{Endpoint: cred.Endpoint + utils.GQLAPIPath, Token: cred.Token}, apis.Client, query, string(types.Post))
 	if err != nil {
 		return CreateEnvironmentResponse{}, errors.New("Error in Creating Chaos Infrastructure: " + err.Error())
 	}
@@ -46,7 +47,7 @@ func CreateEnvironment(pid string, request models.CreateEnvironmentRequest, cred
 	}
 }
 
-func GetEnvironmentList(pid string, cred types.Credentials) (ListEnvironmentData, error) {
+func GetEnvironmentList(pid string, cred types.Credentials, httpClient apis.HTTPClientInterface) (ListEnvironmentData, error) {
 	var err error
 	var gqlReq CreateEnvironmentListGQLRequest
 	gqlReq.Query = ListEnvironmentQuery
@@ -63,6 +64,7 @@ func GetEnvironmentList(pid string, cred types.Credentials) (ListEnvironmentData
 			Endpoint: cred.Endpoint + utils.GQLAPIPath,
 			Token:    cred.Token,
 		},
+		apis.Client,
 		query,
 		string(types.Post),
 	)

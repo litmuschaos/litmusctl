@@ -18,10 +18,11 @@ package infrastructure
 import (
 	"encoding/json"
 	"errors"
-	"github.com/litmuschaos/litmusctl/pkg/apis"
-	"github.com/litmuschaos/litmusctl/pkg/types"
 	"io/ioutil"
 	"net/http"
+
+	"github.com/litmuschaos/litmusctl/pkg/apis"
+	"github.com/litmuschaos/litmusctl/pkg/types"
 
 	models "github.com/litmuschaos/litmus/chaoscenter/graphql/server/graph/model"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
@@ -38,7 +39,7 @@ func GetInfraList(c types.Credentials, pid string, request models.ListInfraReque
 	if err != nil {
 		return InfraData{}, err
 	}
-	resp, err := apis.SendRequest(apis.SendRequestParams{Endpoint: c.Endpoint + utils.GQLAPIPath, Token: c.Token}, query, string(types.Post))
+	resp, err := apis.SendRequest(apis.SendRequestParams{Endpoint: c.Endpoint + utils.GQLAPIPath, Token: c.Token}, apis.Client, query, string(types.Post))
 	if err != nil {
 		return InfraData{}, err
 	}
@@ -94,7 +95,7 @@ func ConnectInfra(infra types.Infra, cred types.Credentials) (InfraConnectionDat
 	}
 
 	query, err := json.Marshal(gqlReq)
-	resp, err := apis.SendRequest(apis.SendRequestParams{Endpoint: cred.Endpoint + utils.GQLAPIPath, Token: cred.Token}, query, string(types.Post))
+	resp, err := apis.SendRequest(apis.SendRequestParams{Endpoint: cred.Endpoint + utils.GQLAPIPath, Token: cred.Token}, apis.Client, query, string(types.Post))
 	if err != nil {
 		return InfraConnectionData{}, errors.New("Error in registering Chaos Infrastructure: " + err.Error())
 	}
@@ -162,7 +163,7 @@ func DisconnectInfra(projectID string, infraID string, cred types.Credentials) (
 		apis.SendRequestParams{
 			Endpoint: cred.Endpoint + utils.GQLAPIPath,
 			Token:    cred.Token,
-		},
+		}, apis.Client,
 		query,
 		string(types.Post),
 	)
