@@ -83,7 +83,7 @@ func CreateProjectRequest(projectName string, cred types.Credentials) (createPro
 
 type listProjectResponse struct {
 	Data []struct {
-		ID        string `json:"ID"`
+		ID        string `json:"projectID"`
 		Name      string `json:"Name"`
 		CreatedAt int64  `json:"CreatedAt"`
 	} `json:"data"`
@@ -139,14 +139,14 @@ type Data struct {
 
 type Member struct {
 	Role     string `json:"Role"`
-	UserID   string `json:"UserID"`
-	UserName string `json:"UserName"`
+	UserID   string `json:"userID"`
+	UserName string `json:"username"`
 }
 
 type Project struct {
-	ID        string   `json:"ID"`
+	ID        string   `json:"projectID"`
 	Name      string   `json:"Name"`
-	CreatedAt string   `json:"created_at"`
+	CreatedAt int64    `json:"createdAt"`
 	Members   []Member `json:"Members"`
 }
 

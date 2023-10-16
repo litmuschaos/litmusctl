@@ -18,10 +18,12 @@ package infrastructure
 import (
 	"encoding/json"
 	"errors"
-	"github.com/litmuschaos/litmusctl/pkg/apis"
-	"github.com/litmuschaos/litmusctl/pkg/types"
+	"fmt"
 	"io/ioutil"
 	"net/http"
+
+	"github.com/litmuschaos/litmusctl/pkg/apis"
+	"github.com/litmuschaos/litmusctl/pkg/types"
 
 	models "github.com/litmuschaos/litmus/chaoscenter/graphql/server/graph/model"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
@@ -38,7 +40,7 @@ func GetInfraList(c types.Credentials, pid string, request models.ListInfraReque
 	if err != nil {
 		return InfraData{}, err
 	}
-	resp, err := apis.SendRequest(apis.SendRequestParams{Endpoint: c.Endpoint + utils.GQLAPIPath, Token: c.Token}, query, string(types.Post))
+	resp, err := apis.SendRequest(apis.SendRequestParams{Endpoint: c.ServerEndpoint + utils.GQLAPIPath, Token: c.Token}, query, string(types.Post))
 	if err != nil {
 		return InfraData{}, err
 	}
@@ -46,6 +48,7 @@ func GetInfraList(c types.Credentials, pid string, request models.ListInfraReque
 	bodyBytes, err := ioutil.ReadAll(resp.Body)
 	defer resp.Body.Close()
 	if err != nil {
+
 		return InfraData{}, err
 	}
 
@@ -62,7 +65,7 @@ func GetInfraList(c types.Credentials, pid string, request models.ListInfraReque
 
 		return Infra, nil
 	} else {
-		return InfraData{}, err
+		return InfraData{}, fmt.Errorf("error getting detais from server")
 	}
 }
 
@@ -94,7 +97,7 @@ func ConnectInfra(infra types.Infra, cred types.Credentials) (InfraConnectionDat
 	}
 
 	query, err := json.Marshal(gqlReq)
-	resp, err := apis.SendRequest(apis.SendRequestParams{Endpoint: cred.Endpoint + utils.GQLAPIPath, Token: cred.Token}, query, string(types.Post))
+	resp, err := apis.SendRequest(apis.SendRequestParams{Endpoint: cred.ServerEndpoint + utils.GQLAPIPath, Token: cred.Token}, query, string(types.Post))
 	if err != nil {
 		return InfraConnectionData{}, errors.New("Error in registering Chaos Infrastructure: " + err.Error())
 	}
@@ -160,7 +163,7 @@ func DisconnectInfra(projectID string, infraID string, cred types.Credentials) (
 
 	resp, err := apis.SendRequest(
 		apis.SendRequestParams{
-			Endpoint: cred.Endpoint + utils.GQLAPIPath,
+			Endpoint: cred.ServerEndpoint + utils.GQLAPIPath,
 			Token:    cred.Token,
 		},
 		query,

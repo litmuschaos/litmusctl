@@ -83,8 +83,10 @@ func GetCredentials(cmd *cobra.Command) (types.Credentials, error) {
 	}
 
 	var token string
+	var serverEndpoint string
 	for _, account := range obj.Accounts {
 		if account.Endpoint == obj.CurrentAccount {
+			serverEndpoint = account.ServerEndpoint
 			for _, user := range account.Users {
 				if user.Username == obj.CurrentUser {
 					token = user.Token
@@ -94,9 +96,10 @@ func GetCredentials(cmd *cobra.Command) (types.Credentials, error) {
 	}
 
 	return types.Credentials{
-		Username: obj.CurrentUser,
-		Token:    token,
-		Endpoint: obj.CurrentAccount,
+		Username:       obj.CurrentUser,
+		Token:          token,
+		Endpoint:       obj.CurrentAccount,
+		ServerEndpoint: serverEndpoint,
 	}, nil
 }
 
