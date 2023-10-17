@@ -17,13 +17,14 @@ package create
 
 import (
 	"fmt"
+
 	"os"
 
 	models "github.com/litmuschaos/litmus/chaoscenter/graphql/server/graph/model"
 	"github.com/litmuschaos/litmusctl/pkg/apis"
 	"github.com/litmuschaos/litmusctl/pkg/apis/environment"
 	"github.com/litmuschaos/litmusctl/pkg/completion"
-	"github.com/litmuschaos/litmusctl/pkg/ops"
+	"github.com/litmuschaos/litmusctl/pkg/infra_ops"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
 	"github.com/spf13/cobra"
 )
@@ -111,7 +112,7 @@ var environmentCmd = &cobra.Command{
 		}
 		if isEnvExist {
 			utils.Red.Println("\nChaos Environment with the given ID already exists, try with a different name")
-			ops.PrintExistingEnvironments(envs)
+			infra_ops.PrintExistingEnvironments(envs)
 			os.Exit(1)
 		}
 
