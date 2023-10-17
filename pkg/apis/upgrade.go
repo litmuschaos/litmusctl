@@ -26,29 +26,29 @@ type manifestData struct {
 }
 
 type data struct {
-	GetManifest string `json:"getManifest"`
+	GetManifest string `json:"getInfraManifest"`
 }
 
-type InfrasData struct {
-	Data   GetInfraDetails `json:"data"`
+type GetInfraResponse struct {
+	Data   GetInfraData `json:"data"`
 	Errors []struct {
 		Message string   `json:"message"`
 		Path    []string `json:"path"`
 	} `json:"errors"`
 }
 
-type GetInfraDetails struct {
-	GetInfraDetails InfrasDetails `json:"getAgentDetails"`
+type GetInfraData struct {
+	GetInfraDetails InfraDetails `json:"getInfraDetails"`
 }
 
-type InfrasDetails struct {
+type InfraDetails struct {
 	InfraID        string  `json:"infraID"`
 	InfraNamespace *string `json:"infraNamespace"`
 }
 
 func UpgradeInfra(c context.Context, cred types.Credentials, projectID string, infraID string, kubeconfig string) (string, error) {
 
-	// Query to fetch agent details from server
+	// Query to fetch Infra details from server
 	query := `{"query":"query {\n getInfraDetails(infraID : \"` + infraID + `\", \n projectID : \"` + projectID + `\"){\n infraNamespace infraID \n}}"}`
 	resp, err := SendRequest(SendRequestParams{Endpoint: cred.Endpoint + utils.GQLAPIPath, Token: cred.Token}, []byte(query), string(types.Post))
 	if err != nil {
@@ -61,7 +61,7 @@ func UpgradeInfra(c context.Context, cred types.Credentials, projectID string, i
 	}
 
 	defer resp.Body.Close()
-	var infra InfrasData
+	var infra GetInfraResponse
 
 	if resp.StatusCode == http.StatusOK {
 		err = json.Unmarshal(bodyBytes, &infra)
@@ -102,13 +102,13 @@ func UpgradeInfra(c context.Context, cred types.Credentials, projectID string, i
 		}
 
 		// To write the manifest data into a temporary file
-		err = ioutil.WriteFile("chaos-delegate-manifest.yaml", []byte(manifest.Data.GetManifest), 0644)
+		err = ioutil.WriteFile("chaos-infra-manifest.yaml", []byte(manifest.Data.GetManifest), 0644)
 		if err != nil {
 			return "", err
 		}
 
-		// Fetching agent-config from the subscriber
-		configData, err := k8s.GetConfigMap(c, "agent-config", *infra.Data.GetInfraDetails.InfraNamespace)
+		// Fetching subscriber-config from the subscriber
+		configData, err := k8s.GetConfigMap(c, "subscriber-config", *infra.Data.GetInfraDetails.InfraNamespace)
 		if err != nil {
 			return "", err
 		}
@@ -116,13 +116,13 @@ func UpgradeInfra(c context.Context, cred types.Credentials, projectID string, i
 
 		metadata := new(bytes.Buffer)
 		fmt.Fprintf(metadata, "\n%s: %s\n%s: %s\n%s: \n  %s: %s\n  %s: %s\n%s:\n", "apiVersion", "v1",
-			"kind", "ConfigMap", "metadata", "name", "agent-config", "namespace", *infra.Data.GetInfraDetails.InfraNamespace, "data")
+			"kind", "ConfigMap", "metadata", "name", "subscriber-config", "namespace", *infra.Data.GetInfraDetails.InfraNamespace, "data")
 
 		for k, v := range configData {
 			b := new(bytes.Buffer)
 			if k == "COMPONENTS" {
 				fmt.Fprintf(b, "  %s: |\n    %s", k, v)
-			} else if k == "START_TIME" || k == "IS_CLUSTER_CONFIRMED" {
+			} else if k == "START_TIME" || k == "IS_INFRA_CONFIRMED" {
 				fmt.Fprintf(b, "  %s: \"%s\"\n", k, v)
 			} else {
 				fmt.Fprintf(b, "  %s: %s\n", k, v)
@@ -134,7 +134,7 @@ func UpgradeInfra(c context.Context, cred types.Credentials, projectID string, i
 		yamlOutput, err := k8s.ApplyYaml(k8s.ApplyYamlPrams{
 			Token:    cred.Token,
 			Endpoint: cred.Endpoint,
-			YamlPath: "chaos-delegate-manifest.yaml",
+			YamlPath: "chaos-infra-manifest.yaml",
 		}, kubeconfig, true)
 
 		if err != nil {
@@ -142,22 +142,22 @@ func UpgradeInfra(c context.Context, cred types.Credentials, projectID string, i
 		}
 		utils.White.Print("\n", yamlOutput)
 
-		err = os.Remove("chaos-delegate-manifest.yaml")
+		err = os.Remove("chaos-infra-manifest.yaml")
 		if err != nil {
-			return "Error removing Chaos Delegate manifest: ", err
+			return "Error removing Chaos Infrastructure manifest: ", err
 		}
 
-		// Creating a backup for current agent-config in the SUBSCRIBER
+		// Creating a backup for current subscriber-config in the SUBSCRIBER
 		home, err := homedir.Dir()
 		cobra.CheckErr(err)
 
 		configMapString = metadata.String() + configMapString
-		err = ioutil.WriteFile(home+"/backupAgentConfig.yaml", []byte(configMapString), 0644)
+		err = ioutil.WriteFile(home+"/backupSubscriberConfig.yaml", []byte(configMapString), 0644)
 		if err != nil {
-			return "Error creating backup for agent config: ", err
+			return "Error creating backup for subscriber config: ", err
 		}
 
-		utils.White_B.Print("\n ** A backup of agent-config configmap has been saved in your system's home directory as backupAgentConfig.yaml **\n")
+		utils.White_B.Print("\n ** A backup of subscriber-config configmap has been saved in your system's home directory as backupSubscriberConfig.yaml **\n")
 
 		return "Manifest applied successfully", nil
 	} else {
