@@ -285,7 +285,7 @@ func ValidateSAPermissions(namespace string, mode string, kubeconfig *string) {
 
 // ValidateInfraNameExists checks if an infrastructure already exists
 func ValidateInfraNameExists(infraName string, pid string, c types.Credentials) (bool, error, infrastructure.InfraData) {
-	infra, err := infrastructure.GetInfraList(c, pid, model.ListInfraRequest{})
+	infra, err := infrastructure.GetInfraList(c, pid, model.ListInfraRequest{}, apis.Client)
 	if err != nil {
 		return false, err, infrastructure.InfraData{}
 	}

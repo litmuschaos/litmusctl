@@ -60,15 +60,6 @@ func Auth(input types.AuthInput, httpClient HTTPClientInterface) (types.AuthResp
 	if err != nil {
 		return types.AuthResponse{}, err
 	}
-	// reqURL := input.Endpoint + utils.AuthAPIPath + "/login"
-	// url, err := url.Parse(reqURL)
-
-	// Sending token as empty because auth server doesn't need Authorization token to validate.
-	// resp, err := Client.Do(&http.Request{
-	// 	Method: http.MethodPost,
-	// 	URL:    url,
-	// 	Body:   ioutil.NopCloser(bytes.NewBuffer(payloadBytes)),
-	// })
 
 	resp, err := SendRequest(SendRequestParams{input.Endpoint + utils.AuthAPIPath + "/login", ""}, Client, payloadBytes, string(types.Post))
 

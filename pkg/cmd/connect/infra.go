@@ -223,7 +223,7 @@ var infraCmd = &cobra.Command{
 			infra_ops.ConfirmInstallation()
 		}
 
-		infra, err := infrastructure.ConnectInfra(newInfra, credentials)
+		infra, err := infrastructure.ConnectInfra(newInfra, credentials, apis.Client)
 		if err != nil {
 			utils.Red.Println("\n❌ Chaos Infra connection failed: " + err.Error() + "\n")
 			os.Exit(1)

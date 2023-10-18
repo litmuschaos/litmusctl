@@ -1,26 +1,44 @@
 package tests
 
 import (
+	"bytes"
 	"fmt"
+	"io/ioutil"
+	"net/http"
 	"testing"
 
 	"github.com/litmuschaos/litmusctl/pkg/apis"
-	"github.com/litmuschaos/litmusctl/pkg/mocks"
 	"github.com/litmuschaos/litmusctl/pkg/types"
 )
 
 var originalClient = apis.Client
 
+type MockHTTPClientAuth struct {
+	mockResponse types.AuthResponse
+	mockError    error
+}
+
+func (c *MockHTTPClientAuth) Do(req *http.Request) (*http.Response, error) {
+	if c.mockError != nil {
+		return nil, c.mockError
+	}
+
+	return &http.Response{
+		StatusCode: http.StatusOK,
+		Body:       ioutil.NopCloser(bytes.NewReader([]byte(`{"AccessToken": "mocked_token"}`))),
+	}, nil
+}
+
 func TestAuthSuccess(t *testing.T) {
-	// Storing the original HTTP client and restoring it after the test.
+	// Store the original HTTP client and restore it after the test.
 	defer func() {
 		apis.Client = originalClient
 	}()
 
-	//  MockHTTPClient instance
-	mockClient := &mocks.MockHTTPClient{}
+	// Create an instance of the MockHTTPClient.
+	mockClient := &MockHTTPClientAuth{}
 
-	// Replacing the global HTTP client with the mock client for this test.
+	// Replace the global HTTP client with the mock client for this test.
 	apis.Client = mockClient
 
 	input := types.AuthInput{
@@ -29,9 +47,8 @@ func TestAuthSuccess(t *testing.T) {
 		Endpoint: "https://example.com",
 	}
 
-	// Calling Auth with test input.
+	// Call the Auth function with the test input.
 	authResponse, err := apis.Auth(input, mockClient)
-	fmt.Println("Response:", authResponse)
 
 	if err != nil {
 		t.Fatalf("Expected no error, but got %v", err)
@@ -47,8 +64,8 @@ func TestAuthFailed(t *testing.T) {
 	defer func() {
 		apis.Client = originalClient
 	}()
-	mockClient := &mocks.MockHTTPClient{
-		MockError: fmt.Errorf("mocked error"),
+	mockClient := &MockHTTPClientAuth{
+		mockError: fmt.Errorf("mocked error"),
 	}
 
 	apis.Client = mockClient
@@ -59,8 +76,8 @@ func TestAuthFailed(t *testing.T) {
 		Endpoint: "https://example.com",
 	}
 
-	res, err := apis.Auth(input, mockClient)
-	fmt.Println("Response:", res)
+	_, err := apis.Auth(input, mockClient)
+	// fmt.Println("Response:", res)
 	if err == nil {
 		t.Fatal("Expected an error, but got nil")
 	}

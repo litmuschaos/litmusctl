@@ -13,14 +13,15 @@ import (
 )
 
 // CreateEnvironment connects the  Infra with the given details
-func CreateEnvironment(pid string, request models.CreateEnvironmentRequest, cred types.Credentials) (CreateEnvironmentResponse, error) {
+func CreateEnvironment(pid string, request models.CreateEnvironmentRequest, cred types.Credentials, httpClient apis.HTTPClientInterface) (CreateEnvironmentResponse, error) {
 	var gqlReq CreateEnvironmentGQLRequest
 	gqlReq.Query = CreateEnvironmentQuery
 	gqlReq.Variables.ProjectId = pid
 	gqlReq.Variables.Request = request
 
-	query, err := json.Marshal(gqlReq)
-	resp, err := apis.SendRequest(apis.SendRequestParams{Endpoint: cred.Endpoint + utils.GQLAPIPath, Token: cred.Token}, apis.Client, query, string(types.Post))
+	query, _ := json.Marshal(gqlReq)
+	resp, err := apis.SendRequest(apis.SendRequestParams{Endpoint: cred.Endpoint + utils.GQLAPIPath, Token: cred.Token}, httpClient, query, string(types.Post))
+
 	if err != nil {
 		return CreateEnvironmentResponse{}, errors.New("Error in Creating Chaos Infrastructure: " + err.Error())
 	}
@@ -32,6 +33,7 @@ func CreateEnvironment(pid string, request models.CreateEnvironmentRequest, cred
 	}
 
 	if resp.StatusCode == http.StatusOK {
+
 		var connectEnvironment CreateEnvironmentResponse
 		err = json.Unmarshal(bodyBytes, &connectEnvironment)
 		if err != nil {
@@ -64,7 +66,7 @@ func GetEnvironmentList(pid string, cred types.Credentials, httpClient apis.HTTP
 			Endpoint: cred.Endpoint + utils.GQLAPIPath,
 			Token:    cred.Token,
 		},
-		apis.Client,
+		httpClient,
 		query,
 		string(types.Post),
 	)

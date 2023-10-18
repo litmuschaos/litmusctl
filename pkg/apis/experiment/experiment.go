@@ -30,7 +30,6 @@ import (
 // CreateExperiment sends GraphQL API request for creating a Experiment
 func CreateExperiment(pid string, requestData model.SaveChaosExperimentRequest, cred types.Credentials) (RunExperimentResponse, error) {
 
-	// Query to Save the Experiment
 	var gqlReq SaveChaosExperimentGraphQLRequest
 
 	gqlReq.Query = SaveExperimentQuery

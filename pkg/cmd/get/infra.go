@@ -17,11 +17,13 @@ package get
 
 import (
 	"fmt"
-	models "github.com/litmuschaos/litmus/chaoscenter/graphql/server/graph/model"
-	"github.com/litmuschaos/litmusctl/pkg/apis/infrastructure"
 	"os"
 	"strings"
 	"text/tabwriter"
+
+	models "github.com/litmuschaos/litmus/chaoscenter/graphql/server/graph/model"
+	"github.com/litmuschaos/litmusctl/pkg/apis"
+	"github.com/litmuschaos/litmusctl/pkg/apis/infrastructure"
 
 	"github.com/litmuschaos/litmusctl/pkg/utils"
 	"github.com/spf13/cobra"
@@ -49,7 +51,7 @@ var InfraCmd = &cobra.Command{
 			}
 		}
 
-		infras, err := infrastructure.GetInfraList(credentials, projectID, models.ListInfraRequest{})
+		infras, err := infrastructure.GetInfraList(credentials, projectID, models.ListInfraRequest{}, apis.Client)
 		if err != nil {
 			if strings.Contains(err.Error(), "permission_denied") {
 				utils.Red.Println("❌ The specified Project ID doesn't exist.")

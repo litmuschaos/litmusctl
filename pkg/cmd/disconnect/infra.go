@@ -17,9 +17,10 @@ package disconnect
 
 import (
 	"fmt"
-	"github.com/litmuschaos/litmusctl/pkg/apis/infrastructure"
 	"os"
 	"strings"
+
+	"github.com/litmuschaos/litmusctl/pkg/apis/infrastructure"
 
 	"github.com/litmuschaos/litmusctl/pkg/apis"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
@@ -91,7 +92,7 @@ var infraCmd = &cobra.Command{
 		}
 
 		// Make API call
-		disconnectedInfra, err := infrastructure.DisconnectInfra(projectID, infraID, credentials)
+		disconnectedInfra, err := infrastructure.DisconnectInfra(projectID, infraID, credentials, apis.Client)
 		if err != nil {
 			if strings.Contains(err.Error(), "no documents in result") {
 				utils.Red.Println("❌  The specified Project ID or Chaos Infrastructure ID doesn't exist.")

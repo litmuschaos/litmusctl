@@ -32,7 +32,7 @@ func SendRequest(params SendRequestParams, httpClient HTTPClientInterface, paylo
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", params.Token)
 
-	resp, err := Client.Do(req)
+	resp, err := httpClient.Do(req)
 	if err != nil {
 		return &http.Response{}, err
 	}

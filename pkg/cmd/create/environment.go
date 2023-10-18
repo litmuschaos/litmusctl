@@ -134,7 +134,7 @@ var environmentCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		newEnv, err := environment.CreateEnvironment(pid, newEnvironment, credentials)
+		newEnv, err := environment.CreateEnvironment(pid, newEnvironment, credentials, apis.Client)
 		if err != nil {
 			utils.Red.Println("\n❌ Chaos Environment connection failed: " + err.Error() + "\n")
 			os.Exit(1)
