@@ -17,11 +17,13 @@ package get
 
 import (
 	"fmt"
-	models "github.com/litmuschaos/litmus/chaoscenter/graphql/server/graph/model"
-	"github.com/litmuschaos/litmusctl/pkg/apis/infrastructure"
 	"os"
 	"strings"
 	"text/tabwriter"
+
+	models "github.com/litmuschaos/litmus/chaoscenter/graphql/server/graph/model"
+	"github.com/litmuschaos/litmusctl/pkg/apis/infrastructure"
+	"github.com/litmuschaos/litmusctl/pkg/completion"
 
 	"github.com/litmuschaos/litmusctl/pkg/utils"
 	"github.com/spf13/cobra"
@@ -94,4 +96,8 @@ func init() {
 	InfraCmd.Flags().String("project-id", "", "Set the project-id. To retrieve projects. Apply `litmusctl get projects`")
 
 	InfraCmd.Flags().StringP("output", "o", "", "Output format. One of:\njson|yaml")
+
+	InfraCmd.RegisterFlagCompletionFunc("project-id", completion.ProjectIDFlagCompletion)
+	InfraCmd.RegisterFlagCompletionFunc("output", completion.OutputFlagCompletion)
+
 }

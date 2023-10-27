@@ -17,12 +17,14 @@ package get
 
 import (
 	"fmt"
-	"github.com/litmuschaos/litmusctl/pkg/apis/experiment"
 	"os"
 	"strconv"
 	"strings"
 	"text/tabwriter"
 	"time"
+
+	"github.com/litmuschaos/litmusctl/pkg/apis/experiment"
+	"github.com/litmuschaos/litmusctl/pkg/completion"
 
 	"github.com/litmuschaos/litmus/chaoscenter/graphql/server/graph/model"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
@@ -120,4 +122,8 @@ func init() {
 	experimentRunsCmd.Flags().BoolP("all", "A", false, "Set to true to display all Chaos Experiments runs")
 
 	experimentRunsCmd.Flags().StringP("output", "o", "", "Output format. One of:\njson|yaml")
+
+	experimentRunsCmd.RegisterFlagCompletionFunc("project-id", completion.ProjectIDFlagCompletion)
+	experimentRunsCmd.RegisterFlagCompletionFunc("output", completion.OutputFlagCompletion)
+
 }

@@ -22,6 +22,7 @@ import (
 	"strings"
 
 	"github.com/litmuschaos/litmusctl/pkg/apis"
+	"github.com/litmuschaos/litmusctl/pkg/completion"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
 	"github.com/spf13/cobra"
 )
@@ -71,4 +72,6 @@ func init() {
 	infraCmd.Flags().String("project-id", "", "Enter the project ID")
 	infraCmd.Flags().String("kubeconfig", "", "Enter the kubeconfig path(default: $HOME/.kube/config))")
 	infraCmd.Flags().String("chaos-infra-id", "", "Enter the Chaos Infrastructure ID")
+	infraCmd.RegisterFlagCompletionFunc("project-id", completion.ProjectIDFlagCompletion)
+	infraCmd.RegisterFlagCompletionFunc("chaos-infra-id", completion.ChaosInfraFlagCompletion)
 }
