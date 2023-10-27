@@ -1,25 +1,20 @@
-package tests
+package infrastructure
 
 import (
 	"bytes"
 	"encoding/json"
 	"testing"
 
-	// "errors"
-	// "github.com/litmuschaos/litmusctl/pkg/apis"
 	"io/ioutil"
 	"net/http"
 
 	models "github.com/litmuschaos/litmus/chaoscenter/graphql/server/graph/model"
 	"github.com/litmuschaos/litmusctl/pkg/types"
 	"github.com/stretchr/testify/assert"
-
-	// "github.com/litmuschaos/litmusctl/pkg/utils"
-	"github.com/litmuschaos/litmusctl/pkg/apis/infrastructure"
 )
 
 type MockHTTPClientInfraGet struct {
-	mockResponse infrastructure.InfraData
+	mockResponse InfraData
 	mockError    error
 }
 
@@ -38,8 +33,8 @@ func (c *MockHTTPClientInfraGet) Do(req *http.Request) (*http.Response, error) {
 }
 
 func TestGetInfraListSuccess(t *testing.T) {
-	mockData := infrastructure.InfraData{
-		Data: infrastructure.InfraList{
+	mockData := InfraData{
+		Data: InfraList{
 			ListInfraDetails: models.ListInfraResponse{
 				TotalNoOfInfras: 2,
 				Infras: []*models.Infra{
@@ -145,24 +140,24 @@ func TestGetInfraListSuccess(t *testing.T) {
 			Limit: 10,
 		},
 		Filter: &models.InfraFilterInput{
-			Name:         nil, // You can specify a name if needed
-			InfraID:      nil, // You can specify an infra ID if needed
-			Description:  nil, // You can specify a description if needed
-			PlatformName: nil, // You can specify a platform name if needed
-			InfraScope:   nil, // Specify the desired InfraScope
-			IsActive:     nil, // You can specify if infra is active or not
+			Name:         nil,
+			InfraID:      nil,
+			Description:  nil,
+			PlatformName: nil,
+			InfraScope:   nil,
+			IsActive:     nil,
 			Tags:         []*string{&tag1, &tag2},
 		},
 	}
 
-	result, _ := infrastructure.GetInfraList(input, "testpid", mockRequest, mockClient)
+	result, _ := GetInfraList(input, "testpid", mockRequest, mockClient)
 	assert.Equal(t, result, mockData)
 
 }
 
 func TestGetInfraListFailed(t *testing.T) {
-	mockData := infrastructure.InfraData{
-		Data: infrastructure.InfraList{
+	mockData := InfraData{
+		Data: InfraList{
 			ListInfraDetails: models.ListInfraResponse{
 				TotalNoOfInfras: 2,
 				Infras: []*models.Infra{
@@ -276,22 +271,22 @@ func TestGetInfraListFailed(t *testing.T) {
 			Limit: 10,
 		},
 		Filter: &models.InfraFilterInput{
-			Name:         nil, // You can specify a name if needed
-			InfraID:      nil, // You can specify an infra ID if needed
-			Description:  nil, // You can specify a description if needed
-			PlatformName: nil, // You can specify a platform name if needed
-			InfraScope:   nil, // Specify the desired InfraScope
-			IsActive:     nil, // You can specify if infra is active or not
+			Name:         nil,
+			InfraID:      nil,
+			Description:  nil,
+			PlatformName: nil,
+			InfraScope:   nil,
+			IsActive:     nil,
 			Tags:         []*string{&tag1, &tag2},
 		},
 	}
 
-	result, _ := infrastructure.GetInfraList(input, "testpid", mockRequest, mockClient)
+	result, _ := GetInfraList(input, "testpid", mockRequest, mockClient)
 	assert.NotEqual(t, result, mockData)
 }
 
 type MockHTTPClientConnect struct {
-	mockResponse infrastructure.InfraConnectionData
+	mockResponse InfraConnectionData
 	mockError    error
 }
 
@@ -333,8 +328,8 @@ func TestConnectInfraSuccess(t *testing.T) {
 		Endpoint: "https://example.com",
 	}
 
-	mockData := infrastructure.InfraConnectionData{
-		Data: infrastructure.RegisterInfra{
+	mockData := InfraConnectionData{
+		Data: RegisterInfra{
 			RegisterInfraDetails: models.RegisterInfraResponse{
 				Token:    "dummyToken",
 				InfraID:  "dummyInfraID",
@@ -351,7 +346,7 @@ func TestConnectInfraSuccess(t *testing.T) {
 		mockError:    nil,
 		mockResponse: mockData,
 	}
-	result, _ := infrastructure.ConnectInfra(mockRequest, input, mockClient)
+	result, _ := ConnectInfra(mockRequest, input, mockClient)
 	assert.Equal(t, result, mockData)
 }
 
@@ -379,8 +374,8 @@ func TestConnectInfraFail(t *testing.T) {
 		Endpoint: "https://example.com",
 	}
 
-	mockData := infrastructure.InfraConnectionData{
-		Data: infrastructure.RegisterInfra{
+	mockData := InfraConnectionData{
+		Data: RegisterInfra{
 			RegisterInfraDetails: models.RegisterInfraResponse{
 				Token:    "dummyToken",
 				InfraID:  "dummyInfraID",
@@ -402,7 +397,7 @@ func TestConnectInfraFail(t *testing.T) {
 		mockError:    nil,
 		mockResponse: mockData,
 	}
-	result, _ := infrastructure.ConnectInfra(mockRequest, input, mockClient)
+	result, _ := ConnectInfra(mockRequest, input, mockClient)
 	assert.NotEqual(t, result, mockData)
 }
 func TestCreateRegisterInfraRequestSuccess(t *testing.T) {
@@ -441,7 +436,7 @@ func TestCreateRegisterInfraRequestSuccess(t *testing.T) {
 		Tags:               []string(nil),
 	}
 
-	result := infrastructure.CreateRegisterInfraRequest(mockRequest)
+	result := CreateRegisterInfraRequest(mockRequest)
 	assert.Equal(t, result, mockData)
 }
 
@@ -481,7 +476,7 @@ func TestCreateRegisterInfraRequestFail(t *testing.T) {
 		Tags:               []string{"tag1", "tag2"},
 	}
 
-	result := infrastructure.CreateRegisterInfraRequest(mockRequest)
+	result := CreateRegisterInfraRequest(mockRequest)
 	assert.NotEqual(t, result, mockData)
 }
 func stringPointer(s string) *string {
@@ -493,7 +488,7 @@ func boolPointer(b bool) *bool {
 }
 
 type MockHTTPClientDisconnect struct {
-	mockResponse infrastructure.DisconnectInfraData
+	mockResponse DisconnectInfraData
 	mockError    error
 }
 
@@ -522,7 +517,7 @@ func TestDisconnectInfraSuccess(t *testing.T) {
 		Endpoint: "https://example.com",
 	}
 
-	mockData := infrastructure.DisconnectInfraData{
+	mockData := DisconnectInfraData{
 		Errors: []struct {
 			Message string   `json:"message"`
 			Path    []string `json:"path"`
@@ -536,7 +531,7 @@ func TestDisconnectInfraSuccess(t *testing.T) {
 			// 	Path:    []string{"path", "to", "error2"},
 			// },
 		},
-		Data: infrastructure.DisconnectInfraDetails{
+		Data: DisconnectInfraDetails{
 			Message: "Infra deleted successfully",
 		},
 	}
@@ -545,7 +540,7 @@ func TestDisconnectInfraSuccess(t *testing.T) {
 		mockError:    nil,
 		mockResponse: mockData,
 	}
-	result, _ := infrastructure.DisconnectInfra(projectID, infraID, input, mockClient)
+	result, _ := DisconnectInfra(projectID, infraID, input, mockClient)
 	assert.Equal(t, result, mockData)
 }
 
@@ -560,7 +555,7 @@ func TestDisconnectInfraFail(t *testing.T) {
 		Endpoint: "https://example.com",
 	}
 
-	mockData := infrastructure.DisconnectInfraData{
+	mockData := DisconnectInfraData{
 		Errors: []struct {
 			Message string   `json:"message"`
 			Path    []string `json:"path"`
@@ -574,7 +569,7 @@ func TestDisconnectInfraFail(t *testing.T) {
 				Path:    []string{"path", "to", "error2"},
 			},
 		},
-		Data: infrastructure.DisconnectInfraDetails{
+		Data: DisconnectInfraDetails{
 			Message: "Infra deleted successfully",
 		},
 	}
@@ -583,6 +578,6 @@ func TestDisconnectInfraFail(t *testing.T) {
 		mockError:    nil,
 		mockResponse: mockData,
 	}
-	result, _ := infrastructure.DisconnectInfra(projectID, infraID, input, mockClient)
+	result, _ := DisconnectInfra(projectID, infraID, input, mockClient)
 	assert.NotEqual(t, result, mockData)
 }

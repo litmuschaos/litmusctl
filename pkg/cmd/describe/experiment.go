@@ -17,9 +17,11 @@ package describe
 
 import (
 	"fmt"
-	"github.com/litmuschaos/litmusctl/pkg/apis/experiment"
 	"os"
 	"strings"
+
+	"github.com/litmuschaos/litmusctl/pkg/apis"
+	"github.com/litmuschaos/litmusctl/pkg/apis/experiment"
 
 	"github.com/litmuschaos/litmus/chaoscenter/graphql/server/graph/model"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
@@ -67,7 +69,7 @@ var experimentCmd = &cobra.Command{
 
 		describeExperimentRequest.ExperimentIDs = append(describeExperimentRequest.ExperimentIDs, &experimentID)
 
-		experiment, err := experiment.GetExperimentList(pid, describeExperimentRequest, credentials)
+		experiment, err := experiment.GetExperimentList(pid, describeExperimentRequest, credentials, apis.Client)
 		if err != nil {
 			if strings.Contains(err.Error(), "permission_denied") {
 				utils.Red.Println("❌ The specified Project ID doesn't exist.")

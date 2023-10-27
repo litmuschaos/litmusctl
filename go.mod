@@ -20,10 +20,7 @@ require (
 	sigs.k8s.io/yaml v1.3.0
 )
 
-require (
-	github.com/evanphx/json-patch v5.6.0+incompatible // indirect
-	github.com/pmezard/go-difflib v1.0.0 // indirect
-)
+require github.com/pmezard/go-difflib v1.0.0 // indirect
 
 require (
 	cloud.google.com/go/compute v1.3.0 // indirect

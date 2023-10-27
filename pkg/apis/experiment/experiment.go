@@ -1,6 +1,5 @@
 /*
 Copyright © 2021 The LitmusChaos Authors
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -28,7 +27,7 @@ import (
 )
 
 // CreateExperiment sends GraphQL API request for creating a Experiment
-func CreateExperiment(pid string, requestData model.SaveChaosExperimentRequest, cred types.Credentials) (RunExperimentResponse, error) {
+func CreateExperiment(pid string, requestData model.SaveChaosExperimentRequest, cred types.Credentials, httpClient apis.HTTPClientInterface) (RunExperimentResponse, error) {
 
 	var gqlReq SaveChaosExperimentGraphQLRequest
 
@@ -45,7 +44,8 @@ func CreateExperiment(pid string, requestData model.SaveChaosExperimentRequest, 
 		apis.SendRequestParams{
 			Endpoint: cred.Endpoint + utils.GQLAPIPath,
 			Token:    cred.Token,
-		}, apis.Client,
+		},
+		httpClient,
 		query,
 		string(types.Post),
 	)
@@ -80,7 +80,7 @@ func CreateExperiment(pid string, requestData model.SaveChaosExperimentRequest, 
 
 	// Query to Run the Chaos Experiment
 	runQuery := `{"query":"mutation{ \n runChaosExperiment(experimentID:  \"` + requestData.ID + `\", projectID:  \"` + pid + `\"){\n notifyID \n}}"}`
-	resp, err = apis.SendRequest(apis.SendRequestParams{Endpoint: cred.Endpoint + utils.GQLAPIPath, Token: cred.Token}, apis.Client, []byte(runQuery), string(types.Post))
+	resp, err = apis.SendRequest(apis.SendRequestParams{Endpoint: cred.Endpoint + utils.GQLAPIPath, Token: cred.Token}, httpClient, []byte(runQuery), string(types.Post))
 
 	if err != nil {
 		return RunExperimentResponse{}, errors.New("Error in Running Chaos Experiment: " + err.Error())
@@ -108,7 +108,7 @@ func CreateExperiment(pid string, requestData model.SaveChaosExperimentRequest, 
 	}
 }
 
-func SaveExperiment(pid string, requestData model.SaveChaosExperimentRequest, cred types.Credentials) (SaveExperimentData, error) {
+func SaveExperiment(pid string, requestData model.SaveChaosExperimentRequest, cred types.Credentials, httpClient apis.HTTPClientInterface) (SaveExperimentData, error) {
 
 	// Query to Save the Experiment
 	var gqlReq SaveChaosExperimentGraphQLRequest
@@ -126,7 +126,8 @@ func SaveExperiment(pid string, requestData model.SaveChaosExperimentRequest, cr
 		apis.SendRequestParams{
 			Endpoint: cred.Endpoint + utils.GQLAPIPath,
 			Token:    cred.Token,
-		}, apis.Client,
+		},
+		httpClient,
 		query,
 		string(types.Post),
 	)
@@ -162,11 +163,11 @@ func SaveExperiment(pid string, requestData model.SaveChaosExperimentRequest, cr
 
 }
 
-func RunExperiment(pid string, eid string, cred types.Credentials) (RunExperimentResponse, error) {
+func RunExperiment(pid string, eid string, cred types.Credentials, httpClient apis.HTTPClientInterface) (RunExperimentResponse, error) {
 	var err error
 	runQuery := `{"query":"mutation{ \n runChaosExperiment(experimentID:  \"` + eid + `\", projectID:  \"` + pid + `\"){\n notifyID \n}}"}`
 
-	resp, err := apis.SendRequest(apis.SendRequestParams{Endpoint: cred.Endpoint + utils.GQLAPIPath, Token: cred.Token}, apis.Client, []byte(runQuery), string(types.Post))
+	resp, err := apis.SendRequest(apis.SendRequestParams{Endpoint: cred.Endpoint + utils.GQLAPIPath, Token: cred.Token}, httpClient, []byte(runQuery), string(types.Post))
 
 	if err != nil {
 		return RunExperimentResponse{}, errors.New("Error in Running Chaos Experiment: " + err.Error())
@@ -195,7 +196,7 @@ func RunExperiment(pid string, eid string, cred types.Credentials) (RunExperimen
 }
 
 // GetExperimentList sends GraphQL API request for fetching a list of experiments.
-func GetExperimentList(pid string, in model.ListExperimentRequest, cred types.Credentials) (ExperimentListData, error) {
+func GetExperimentList(pid string, in model.ListExperimentRequest, cred types.Credentials, httpClient apis.HTTPClientInterface) (ExperimentListData, error) {
 
 	var gqlReq GetChaosExperimentsGraphQLRequest
 	var err error
@@ -213,7 +214,7 @@ func GetExperimentList(pid string, in model.ListExperimentRequest, cred types.Cr
 		apis.SendRequestParams{
 			Endpoint: cred.Endpoint + utils.GQLAPIPath,
 			Token:    cred.Token,
-		}, apis.Client,
+		}, httpClient,
 		query,
 		string(types.Post),
 	)
@@ -245,7 +246,7 @@ func GetExperimentList(pid string, in model.ListExperimentRequest, cred types.Cr
 }
 
 // GetExperimentRunsList sends GraphQL API request for fetching a list of experiment runs.
-func GetExperimentRunsList(pid string, in model.ListExperimentRunRequest, cred types.Credentials) (ExperimentRunListData, error) {
+func GetExperimentRunsList(pid string, in model.ListExperimentRunRequest, cred types.Credentials, httpClient apis.HTTPClientInterface) (ExperimentRunListData, error) {
 
 	var gqlReq GetChaosExperimentRunGraphQLRequest
 	var err error
@@ -263,7 +264,7 @@ func GetExperimentRunsList(pid string, in model.ListExperimentRunRequest, cred t
 		apis.SendRequestParams{
 			Endpoint: cred.Endpoint + utils.GQLAPIPath,
 			Token:    cred.Token,
-		}, apis.Client,
+		}, httpClient,
 		query,
 		string(types.Post),
 	)
@@ -295,7 +296,7 @@ func GetExperimentRunsList(pid string, in model.ListExperimentRunRequest, cred t
 }
 
 // DeleteChaosExperiment sends GraphQL API request for deleting a given Chaos Experiment.
-func DeleteChaosExperiment(projectID string, experimentID *string, cred types.Credentials) (DeleteChaosExperimentData, error) {
+func DeleteChaosExperiment(projectID string, experimentID *string, cred types.Credentials, httpClient apis.HTTPClientInterface) (DeleteChaosExperimentData, error) {
 
 	var gqlReq DeleteChaosExperimentGraphQLRequest
 	var err error
@@ -315,7 +316,8 @@ func DeleteChaosExperiment(projectID string, experimentID *string, cred types.Cr
 		apis.SendRequestParams{
 			Endpoint: cred.Endpoint + utils.GQLAPIPath,
 			Token:    cred.Token,
-		}, apis.Client,
+		},
+		httpClient,
 		query,
 		string(types.Post),
 	)
@@ -347,12 +349,12 @@ func DeleteChaosExperiment(projectID string, experimentID *string, cred types.Cr
 }
 
 // GetServerVersion fetches the GQL server version
-func GetServerVersion(endpoint string) (ServerVersionResponse, error) {
+func GetServerVersion(endpoint string, httpClient apis.HTTPClientInterface) (ServerVersionResponse, error) {
 	query := `{"query":"query{\n getServerVersion{\n key value\n }\n}"}`
 	resp, err := apis.SendRequest(
 		apis.SendRequestParams{
 			Endpoint: endpoint + utils.GQLAPIPath,
-		}, apis.Client,
+		}, httpClient,
 		[]byte(query),
 		string(types.Post),
 	)

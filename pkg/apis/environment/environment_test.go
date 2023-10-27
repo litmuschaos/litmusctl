@@ -1,4 +1,4 @@
-package tests
+package environment
 
 import (
 	"bytes"
@@ -9,14 +9,13 @@ import (
 	"testing"
 
 	models "github.com/litmuschaos/litmus/chaoscenter/graphql/server/graph/model"
-	"github.com/litmuschaos/litmusctl/pkg/apis/environment"
 	"github.com/litmuschaos/litmusctl/pkg/types"
 	"github.com/stretchr/testify/assert"
 )
 
 type MockHTTPClientCreate struct {
 	mockError    error
-	mockResponse environment.CreateEnvironmentResponse
+	mockResponse CreateEnvironmentResponse
 }
 
 func (c *MockHTTPClientCreate) Do(req *http.Request) (*http.Response, error) {
@@ -35,7 +34,7 @@ func (c *MockHTTPClientCreate) Do(req *http.Request) (*http.Response, error) {
 }
 
 type MockHTTPClientGet struct {
-	mockResponse environment.ListEnvironmentData
+	mockResponse ListEnvironmentData
 	mockError    error
 }
 
@@ -70,12 +69,12 @@ func TestCreateEnvironmentSuccess(t *testing.T) {
 
 	//define the mock data response
 
-	mockData := environment.CreateEnvironmentResponse{
+	mockData := CreateEnvironmentResponse{
 		Errors: []struct {
 			Message string   `json:"message"`
 			Path    []string `json:"path"`
 		}(nil),
-		Data: environment.CreateEnvironmentData{
+		Data: CreateEnvironmentData{
 			EnvironmentDetails: models.Environment{
 				ProjectID:     "project123",
 				EnvironmentID: "env123",
@@ -106,7 +105,7 @@ func TestCreateEnvironmentSuccess(t *testing.T) {
 		mockError:    nil, // Set this to nil if you don't want to return an error.
 	}
 
-	result, err := environment.CreateEnvironment("testpid", mockRequest, input, mockClient)
+	result, err := CreateEnvironment("testpid", mockRequest, input, mockClient)
 
 	if err != nil {
 		fmt.Println(err)
@@ -131,7 +130,7 @@ func TestCreateEnvironmentFailed(t *testing.T) {
 
 	//define the mock data response
 
-	mockData := environment.CreateEnvironmentResponse{
+	mockData := CreateEnvironmentResponse{
 		Errors: []struct {
 			Message string   `json:"message"`
 			Path    []string `json:"path"`
@@ -141,7 +140,7 @@ func TestCreateEnvironmentFailed(t *testing.T) {
 				Path:    []string{"path1", "path2"},
 			},
 		},
-		Data: environment.CreateEnvironmentData{
+		Data: CreateEnvironmentData{
 			EnvironmentDetails: models.Environment{
 				ProjectID:     "project123",
 				EnvironmentID: "env123",
@@ -172,21 +171,21 @@ func TestCreateEnvironmentFailed(t *testing.T) {
 		mockError:    nil,
 	}
 
-	result, _ := environment.CreateEnvironment("testpid", mockRequest, input, mockClient)
+	result, _ := CreateEnvironment("testpid", mockRequest, input, mockClient)
 
 	assert.NotEqual(t, mockData, result)
 }
 
 func TestGetEnvironmentListSuccess(t *testing.T) {
 
-	mockData := environment.ListEnvironmentData{
+	mockData := ListEnvironmentData{
 		Errors: []struct {
 			Message string   `json:"message"`
 			Path    []string `json:"path"`
 		}{
 			//keeping the error empty for asserting
 		},
-		Data: environment.EnvironmentsList{
+		Data: EnvironmentsList{
 			ListEnvironmentDetails: models.ListEnvironmentResponse{
 				TotalNoOfEnvironments: 2,
 				Environments: []*models.Environment{
@@ -246,7 +245,7 @@ func TestGetEnvironmentListSuccess(t *testing.T) {
 		Endpoint: "https://example.com",
 	}
 
-	result, err := environment.GetEnvironmentList("testpid", input, mockClient)
+	result, err := GetEnvironmentList("testpid", input, mockClient)
 
 	if err != nil {
 		fmt.Println(err)
@@ -256,7 +255,7 @@ func TestGetEnvironmentListSuccess(t *testing.T) {
 
 func TestGetEnvironmentListFailed(t *testing.T) {
 
-	mockData := environment.ListEnvironmentData{
+	mockData := ListEnvironmentData{
 		Errors: []struct {
 			Message string   `json:"message"`
 			Path    []string `json:"path"`
@@ -266,7 +265,7 @@ func TestGetEnvironmentListFailed(t *testing.T) {
 				Path:    []string{"path1", "path2"},
 			},
 		},
-		Data: environment.EnvironmentsList{
+		Data: EnvironmentsList{
 			ListEnvironmentDetails: models.ListEnvironmentResponse{
 				TotalNoOfEnvironments: 2,
 				Environments: []*models.Environment{
@@ -326,7 +325,7 @@ func TestGetEnvironmentListFailed(t *testing.T) {
 		Endpoint: "https://example.com",
 	}
 
-	result, _ := environment.GetEnvironmentList("testpid", input, mockClient)
+	result, _ := GetEnvironmentList("testpid", input, mockClient)
 
 	assert.NotEqual(t, mockData, result)
 }

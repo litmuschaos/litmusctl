@@ -17,12 +17,13 @@ package run
 
 import (
 	"fmt"
+	"os"
+	"strings"
+
 	"github.com/litmuschaos/litmusctl/pkg/apis"
 	"github.com/litmuschaos/litmusctl/pkg/apis/experiment"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
 	"github.com/spf13/cobra"
-	"os"
-	"strings"
 )
 
 // experimentCmd represents the project command
@@ -90,7 +91,7 @@ var experimentCmd = &cobra.Command{
 		}
 
 		// Make API call
-		runExperiment, err := experiment.RunExperiment(pid, eid, credentials)
+		runExperiment, err := experiment.RunExperiment(pid, eid, credentials, apis.Client)
 		if err != nil {
 			if (runExperiment.Data == experiment.RunExperimentData{}) {
 				if strings.Contains(err.Error(), "multiple run errors") {

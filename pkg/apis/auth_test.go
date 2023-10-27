@@ -1,4 +1,4 @@
-package tests
+package apis
 
 import (
 	"bytes"
@@ -7,11 +7,10 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/litmuschaos/litmusctl/pkg/apis"
 	"github.com/litmuschaos/litmusctl/pkg/types"
 )
 
-var originalClient = apis.Client
+var originalClient = Client
 
 type MockHTTPClientAuth struct {
 	mockResponse types.AuthResponse
@@ -32,14 +31,14 @@ func (c *MockHTTPClientAuth) Do(req *http.Request) (*http.Response, error) {
 func TestAuthSuccess(t *testing.T) {
 	// Store the original HTTP client and restore it after the test.
 	defer func() {
-		apis.Client = originalClient
+		Client = originalClient
 	}()
 
 	// Create an instance of the MockHTTPClient.
 	mockClient := &MockHTTPClientAuth{}
 
 	// Replace the global HTTP client with the mock client for this test.
-	apis.Client = mockClient
+	Client = mockClient
 
 	input := types.AuthInput{
 		Username: "testuser",
@@ -48,7 +47,7 @@ func TestAuthSuccess(t *testing.T) {
 	}
 
 	// Call the Auth function with the test input.
-	authResponse, err := apis.Auth(input, mockClient)
+	authResponse, err := Auth(input, mockClient)
 
 	if err != nil {
 		t.Fatalf("Expected no error, but got %v", err)
@@ -62,13 +61,13 @@ func TestAuthSuccess(t *testing.T) {
 func TestAuthFailed(t *testing.T) {
 
 	defer func() {
-		apis.Client = originalClient
+		Client = originalClient
 	}()
 	mockClient := &MockHTTPClientAuth{
 		mockError: fmt.Errorf("mocked error"),
 	}
 
-	apis.Client = mockClient
+	Client = mockClient
 
 	input := types.AuthInput{
 		Username: "testuser",
@@ -76,7 +75,7 @@ func TestAuthFailed(t *testing.T) {
 		Endpoint: "https://example.com",
 	}
 
-	_, err := apis.Auth(input, mockClient)
+	_, err := Auth(input, mockClient)
 	// fmt.Println("Response:", res)
 	if err == nil {
 		t.Fatal("Expected an error, but got nil")

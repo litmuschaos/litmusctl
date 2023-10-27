@@ -17,11 +17,13 @@ package get
 
 import (
 	"fmt"
-	"github.com/litmuschaos/litmusctl/pkg/apis/experiment"
 	"os"
 	"strings"
 	"text/tabwriter"
 	"time"
+
+	"github.com/litmuschaos/litmusctl/pkg/apis"
+	"github.com/litmuschaos/litmusctl/pkg/apis/experiment"
 
 	"github.com/gorhill/cronexpr"
 	"github.com/litmuschaos/litmus/chaoscenter/graphql/server/graph/model"
@@ -64,7 +66,7 @@ var experimentsCmd = &cobra.Command{
 		utils.PrintError(err)
 		listExperimentRequest.Filter.InfraName = &infraName
 
-		experiments, err := experiment.GetExperimentList(pid, listExperimentRequest, credentials)
+		experiments, err := experiment.GetExperimentList(pid, listExperimentRequest, credentials, apis.Client)
 		if err != nil {
 			if strings.Contains(err.Error(), "permission_denied") {
 				utils.Red.Println("❌ The specified Project ID doesn't exist.")
