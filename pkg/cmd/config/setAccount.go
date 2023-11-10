@@ -17,11 +17,12 @@ package config
 
 import (
 	"fmt"
-	"github.com/litmuschaos/litmusctl/pkg/apis/experiment"
 	"net/url"
 	"os"
 	"strings"
 	"time"
+
+	"github.com/litmuschaos/litmusctl/pkg/apis/experiment"
 
 	"github.com/golang-jwt/jwt"
 	"github.com/litmuschaos/litmusctl/pkg/apis"
@@ -61,7 +62,7 @@ var setAccountCmd = &cobra.Command{
 			utils.White_B.Print("\nHost endpoint where litmus is installed: ")
 			fmt.Scanln(&authInput.Endpoint)
 
-			for authInput.Endpoint == "" {
+			if authInput.Endpoint == "" {
 				utils.Red.Println("\n⛔ Host URL can't be empty!!")
 				os.Exit(1)
 			}
@@ -121,8 +122,9 @@ var setAccountCmd = &cobra.Command{
 			users = append(users, user)
 
 			var account = types.Account{
-				Endpoint: authInput.Endpoint,
-				Users:    users,
+				Endpoint:       authInput.Endpoint,
+				Users:          users,
+				ServerEndpoint: authInput.Endpoint,
 			}
 
 			// If config file doesn't exist or length of the file is zero.
@@ -142,7 +144,6 @@ var setAccountCmd = &cobra.Command{
 				err := config.CreateNewLitmusCtlConfig(configFilePath, litmuCtlConfig)
 				utils.PrintError(err)
 
-				os.Exit(0)
 			} else {
 				// checking syntax
 				err = config.ConfigSyntaxCheck(configFilePath)
@@ -152,41 +153,41 @@ var setAccountCmd = &cobra.Command{
 					Account:        account,
 					CurrentAccount: authInput.Endpoint,
 					CurrentUser:    claims["username"].(string),
+					ServerEndpoint: authInput.Endpoint,
 				}
 
 				err = config.UpdateLitmusCtlConfig(updateLitmusCtlConfig, configFilePath)
 				utils.PrintError(err)
 			}
 			utils.White_B.Printf("\naccount.username/%s configured", claims["username"].(string))
+		} else {
+			utils.Red.Println("\nError: some flags are missing. Run 'litmusctl config set-account --help' for usage. ")
+		}
 
-			serverResp, err := experiment.GetServerVersion(authInput.Endpoint)
-			var isCompatible bool
-			if err != nil {
-				utils.Red.Println("\nError: ", err)
-			} else {
-				compatibilityArr := utils.CompatibilityMatrix[os.Getenv("CLIVersion")]
-				for _, v := range compatibilityArr {
-					if v == serverResp.Data.GetServerVersion.Value {
-						isCompatible = true
-						break
-					}
-				}
-
-				if !isCompatible {
-					utils.Red.Println("\n🚫 ChaosCenter version: " + serverResp.Data.GetServerVersion.Value + " is not compatible with the installed LitmusCTL version: " + os.Getenv("CLIVersion"))
-					utils.White_B.Println("Compatible ChaosCenter versions are: ")
-					utils.White_B.Print("[ ")
-					for _, v := range compatibilityArr {
-						utils.White_B.Print("'" + v + "' ")
-					}
-					utils.White_B.Print("]\n")
-				} else {
-					utils.White_B.Println("\n✅  Installed versions of ChaosCenter and LitmusCTL are compatible! ")
+		serverResp, err := experiment.GetServerVersion(authInput.Endpoint)
+		var isCompatible bool
+		if err != nil {
+			utils.Red.Println("\nError: ", err)
+		} else {
+			compatibilityArr := utils.CompatibilityMatrix[os.Getenv("CLIVersion")]
+			for _, v := range compatibilityArr {
+				if v == serverResp.Data.GetServerVersion.Value {
+					isCompatible = true
+					break
 				}
 			}
 
-		} else {
-			utils.Red.Println("\nError: some flags are missing. Run 'litmusctl config set-account --help' for usage. ")
+			if !isCompatible {
+				utils.Red.Println("\n🚫 ChaosCenter version: " + serverResp.Data.GetServerVersion.Value + " is not compatible with the installed LitmusCTL version: " + os.Getenv("CLIVersion"))
+				utils.White_B.Println("Compatible ChaosCenter versions are: ")
+				utils.White_B.Print("[ ")
+				for _, v := range compatibilityArr {
+					utils.White_B.Print("'" + v + "' ")
+				}
+				utils.White_B.Print("]\n")
+			} else {
+				utils.White_B.Println("\n✅  Installed versions of ChaosCenter and LitmusCTL are compatible! ")
+			}
 		}
 	},
 }

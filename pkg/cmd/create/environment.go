@@ -17,13 +17,14 @@ package create
 
 import (
 	"fmt"
+	"os"
+
 	models "github.com/litmuschaos/litmus/chaoscenter/graphql/server/graph/model"
 	"github.com/litmuschaos/litmusctl/pkg/apis"
 	"github.com/litmuschaos/litmusctl/pkg/apis/environment"
 	"github.com/litmuschaos/litmusctl/pkg/infra_ops"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
 	"github.com/spf13/cobra"
-	"os"
 )
 
 // environmentCmd represents the Chaos infra command
@@ -77,7 +78,9 @@ var environmentCmd = &cobra.Command{
 		newEnvironment.Description = &description
 
 		envType, err := cmd.Flags().GetString("type")
-		utils.PrintError(err)
+		if err != nil {
+			utils.PrintError(err)
+		}
 
 		// Handle blank input for project ID
 		if envType == "" {
@@ -92,7 +95,9 @@ var environmentCmd = &cobra.Command{
 		newEnvironment.Type = models.EnvironmentType(envType)
 
 		envs, err := environment.GetEnvironmentList(pid, credentials)
-		utils.PrintError(err)
+		if err != nil {
+			utils.PrintError(err)
+		}
 
 		// Generate EnvironmentID from Environment Name
 		envID := utils.GenerateNameID(newEnvironment.Name)
@@ -115,7 +120,9 @@ var environmentCmd = &cobra.Command{
 
 		// Perform authorization
 		userDetails, err := apis.GetProjectDetails(credentials)
-		utils.PrintError(err)
+		if err != nil {
+			utils.PrintError(err)
+		}
 		var editAccess = false
 		var project apis.Project
 		for _, p := range userDetails.Data.Projects {

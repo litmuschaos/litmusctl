@@ -22,8 +22,9 @@ type User struct {
 }
 
 type Account struct {
-	Users    []User `yaml:"users" json:"users"`
-	Endpoint string `yaml:"endpoint" json:"endpoint"`
+	Users          []User `yaml:"users" json:"users"`
+	Endpoint       string `yaml:"endpoint" json:"endpoint"`
+	ServerEndpoint string `yaml:"serverEndpoint" json:"serverEndpoint"`
 }
 
 type LitmuCtlConfig struct {
@@ -43,4 +44,5 @@ type UpdateLitmusCtlConfig struct {
 	CurrentAccount string  `yaml:"current-account" json:"current-account"`
 	CurrentUser    string  `yaml:"current-user" json:"current-user"`
 	Account        Account `yaml:"account" json:"account"`
+	ServerEndpoint string  `yaml:"serverEndpoint" json:"serverEndpoint"`
 }
