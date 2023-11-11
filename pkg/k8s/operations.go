@@ -24,17 +24,26 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"os/exec"
 	"path/filepath"
 
+	"k8s.io/client-go/discovery/cached/memory"
+	"k8s.io/client-go/dynamic"
+	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
+	"k8s.io/client-go/restmapper"
+	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/util/homedir"
 
 	"github.com/litmuschaos/litmusctl/pkg/utils"
+	"github.com/sirupsen/logrus"
 	authorizationv1 "k8s.io/api/authorization/v1"
 	v1 "k8s.io/api/core/v1"
 	k8serror "k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/apimachinery/pkg/util/yaml"
 	"k8s.io/client-go/discovery"
 	authorizationv1client "k8s.io/client-go/kubernetes/typed/authorization/v1"
 )
@@ -274,63 +283,132 @@ func ValidSA(namespace string, kubeconfig *string) (string, bool) {
 // Token: Authorization token
 // EndPoint: Endpoint in .litmusconfig
 // YamlPath: Path of yaml file
-type ApplyYamlPrams struct {
+type ApplyYamlParams struct {
 	Token    string
 	Endpoint string
 	YamlPath string
 }
 
-func ApplyYaml(params ApplyYamlPrams, kubeconfig string, isLocal bool) (output string, err error) {
-	path := params.YamlPath
-	if !isLocal {
-		path = fmt.Sprintf("%s%s/%s.yaml", params.Endpoint, params.YamlPath, params.Token)
+func ApplyYaml(params ApplyYamlParams, kubeconfig string, isLocal bool) (output string, err error) {
+	// Setting up configuration and dynamic client for interacting with the Kubernetes API server
+	var config *rest.Config
+	var dynamicClient dynamic.Interface
+
+	if kubeconfig != "" {
+		// Use the provided kubeconfig
+		config, err = clientcmd.BuildConfigFromFlags("", kubeconfig)
+		if err != nil {
+			return "", fmt.Errorf("error in building config from flags: %w", err)
+		}
+		dynamicClient, err = dynamic.NewForConfig(config)
+		if err != nil {
+			return "", fmt.Errorf("error in creating dynamic client: %w", err)
+		}
+	} else {
+		// Using the default kubeconfig file at $HOME/.kube/config
+		home := homedir.HomeDir()
+		defaultKubeconfig := filepath.Join(home, ".kube", "config")
+		if _, err := os.Stat(defaultKubeconfig); !os.IsNotExist(err) {
+			config, err = clientcmd.BuildConfigFromFlags("", defaultKubeconfig)
+			if err != nil {
+				return "", fmt.Errorf("error in building config from flags: %w", err)
+			}
+			dynamicClient, err = dynamic.NewForConfig(config)
+			if err != nil {
+				return "", fmt.Errorf("error in creating dynamic client: %w", err)
+			}
+		}
+	}
+
+	kubeClient, err := kubernetes.NewForConfig(config)
+	if err != nil {
+		return "", fmt.Errorf("error in creating kube client: %w", err)
+	}
+
+	dynamicClient, err = dynamic.NewForConfig(config)
+	if err != nil {
+		return "", fmt.Errorf("error in creating dynamic client: %w", err)
+	}
+
+	var manifest []byte
+	if isLocal {
+		// Read the content from the existing file in your home directory
+		home := homedir.HomeDir()
+		chaosInfraManifest := filepath.Join(home, "chaos-infra-manifest.yaml")
+		manifest, err = ioutil.ReadFile(chaosInfraManifest)
+		if err != nil {
+			return "", fmt.Errorf("error in reading chaos infra manifest: %w", err)
+		}
+	} else {
+		// Fetch the content from the remote location
+		path := fmt.Sprintf("%s%s/%s.yaml", params.Endpoint, params.YamlPath, params.Token)
 		req, err := http.NewRequest("GET", path, nil)
 		if err != nil {
-			return "", err
+			return "", fmt.Errorf("error in creating new request: %w", err)
 		}
 		resp, err := http.DefaultClient.Do(req)
 		if err != nil {
-			return "", err
+			return "", fmt.Errorf("error in fetching chaos infra manifest: %w", err)
 		}
 		defer resp.Body.Close()
-		resp_body, err := ioutil.ReadAll(resp.Body)
+		respBody, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
-			return "", err
+			return "", fmt.Errorf("error in reading chaos infra manifest: %w", err)
 		}
-		err = ioutil.WriteFile("chaos-infra-manifest.yaml", resp_body, 0644)
+		manifest = respBody
+	}
+
+	decoder := yaml.NewYAMLOrJSONDecoder(bytes.NewReader(manifest), len(manifest))
+
+	// Split the resource file into separate YAML documents.
+	resources := []*unstructured.Unstructured{}
+	for {
+		resourcestr := &unstructured.Unstructured{}
+		if err := decoder.Decode(resourcestr); err != nil {
+			if err.Error() == "EOF" {
+				break
+			}
+			return "", fmt.Errorf("error in decoding resource: %w", err)
+		}
+		resources = append(resources, resourcestr)
+	}
+
+	// Apply resources
+
+	for _, resource := range resources {
+		logrus.Infof("Applying resource: %s , kind: %s", resource.GetName(), resource.GetKind())
+
+		gvk := resource.GroupVersionKind()
+		mapper := restmapper.NewDeferredDiscoveryRESTMapper(memory.NewMemCacheClient(kubeClient.Discovery()))
+		mapping, err := mapper.RESTMapping(gvk.GroupKind(), gvk.Version)
 		if err != nil {
-			return "", err
-		}
-		path = "chaos-infra-manifest.yaml"
-	}
-
-	args := []string{"kubectl", "apply", "-f", path}
-	if kubeconfig != "" {
-		args = append(args, []string{"--kubeconfig", kubeconfig}...)
-	} else {
-		args = []string{"kubectl", "apply", "-f", path}
-	}
-
-	cmd := exec.Command(args[0], args[1:]...)
-	var stdout, stderr bytes.Buffer
-	cmd.Stdout = &stdout
-	cmd.Stderr = &stderr
-	err = cmd.Run()
-	outStr, errStr := stdout.String(), stderr.String()
-
-	// err, can have exit status 1
-	if err != nil {
-		// if we get standard error then, return the same
-		if errStr != "" {
-			return "", fmt.Errorf(errStr)
+			fmt.Println("Error in mapping", err)
+			return "", fmt.Errorf("error in mapping: %w", err)
 		}
 
-		// if not standard error found, return error
-		return "", err
+		var dr dynamic.ResourceInterface
+		if mapping.Scope.Name() == meta.RESTScopeNameNamespace {
+			// Namespaced resources should specify the namespace
+			dr = dynamicClient.Resource(mapping.Resource).Namespace(resource.GetNamespace())
+		} else {
+			// for cluster-wide resources
+			dr = dynamicClient.Resource(mapping.Resource)
+		}
+
+		_, err = dr.Apply(context.TODO(), resource.GetName(), resource, metav1.ApplyOptions{
+			Force:        true,
+			FieldManager: "application/apply-patch",
+		})
+		if err != nil {
+			return "", fmt.Errorf("error in applying resource: %w", err)
+		}
+
+		logrus.Info("Resource applied successfully")
 	}
 
-	// If no error found, return standard output
-	return outStr, nil
+	fmt.Println("🚀 Successfully Upgraded Chaos Infra")
+
+	return "Success", nil
 }
 
 // GetConfigMap returns config map for a given name and namespace
