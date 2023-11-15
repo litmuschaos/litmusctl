@@ -29,13 +29,15 @@ type AuthResponse struct {
 }
 
 type AuthInput struct {
-	Endpoint string
-	Username string
-	Password string
+	Endpoint       string
+	Username       string
+	Password       string
+	ServerEndpoint string
 }
 
 type Credentials struct {
-	Username string
-	Token    string
-	Endpoint string
+	Username       string
+	Token          string
+	Endpoint       string
+	ServerEndpoint string
 }

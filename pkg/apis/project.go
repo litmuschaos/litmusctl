@@ -139,8 +139,8 @@ type Data struct {
 
 type Member struct {
 	Role     string `json:"Role"`
-	UserID   string `json:"UserID"`
-	UserName string `json:"UserName"`
+	UserID   string `json:"userID"`
+	UserName string `json:"username"`
 }
 
 type Project struct {
