@@ -29,8 +29,8 @@ import (
 	"github.com/litmuschaos/litmusctl/pkg/config"
 	"github.com/litmuschaos/litmusctl/pkg/types"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
+	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
-	"golang.org/x/term"
 )
 
 // setAccountCmd represents the setAccount command
@@ -49,14 +49,18 @@ var setAccountCmd = &cobra.Command{
 			err       error
 		)
 
-		authInput.Endpoint, err = cmd.Flags().GetString("endpoint")
+		// prompts for account details
+		promptEndpoint := promptui.Prompt{
+			Label: "Host endpoint where litmus is installed",
+		}
+		authInput.Endpoint, err = promptEndpoint.Run()
 		utils.PrintError(err)
 
-		authInput.Username, err = cmd.Flags().GetString("username")
+		// Validate and format the endpoint URL
+		ep := strings.TrimRight(authInput.Endpoint, "/")
+		newURL, err := url.Parse(ep)
 		utils.PrintError(err)
-
-		authInput.Password, err = cmd.Flags().GetString("password")
-		utils.PrintError(err)
+		authInput.Endpoint = newURL.String()
 
 		if authInput.Endpoint == "" {
 			utils.White_B.Print("\nHost endpoint where litmus is installed: ")
@@ -74,26 +78,20 @@ var setAccountCmd = &cobra.Command{
 			authInput.Endpoint = newUrl.String()
 		}
 
-		if authInput.Username == "" {
-			utils.White_B.Print("\nUsername [Default: ", utils.DefaultUsername, "]: ")
-			fmt.Scanln(&authInput.Username)
-			if authInput.Username == "" {
-				authInput.Username = utils.DefaultUsername
-			}
+		promptUsername := promptui.Prompt{
+			Label:   "Username [Default: " + utils.DefaultUsername + "]",
+			Default: utils.DefaultUsername,
 		}
+		authInput.Username, err = promptUsername.Run()
+		utils.PrintError(err)
 
-		if authInput.Password == "" {
-			utils.White_B.Print("\nPassword: ")
-			pass, err := term.ReadPassword(0)
-			utils.PrintError(err)
-
-			if pass == nil {
-				utils.Red.Println("\n⛔ Password cannot be empty!")
-				os.Exit(1)
-			}
-
-			authInput.Password = string(pass)
+		promptPassword := promptui.Prompt{
+			Label: "Password",
+			Mask:  '*',
 		}
+		pass, err := promptPassword.Run()
+		utils.PrintError(err)
+		authInput.Password = pass
 
 		if authInput.Endpoint != "" && authInput.Username != "" && authInput.Password != "" {
 			exists := config.FileExists(configFilePath)

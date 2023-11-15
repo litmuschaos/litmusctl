@@ -79,7 +79,9 @@ var useAccountCmd = &cobra.Command{
 					CurrentAccount: endpoint,
 					CurrentUser:    username,
 				}, configFilePath)
+
 				utils.PrintError(err)
+				fmt.Printf("\n✅ Successfully set the current account to '%s' at '%s'\n", username, endpoint)
 			} else {
 				utils.Red.Println("\n⛔ Account not exists")
 				os.Exit(1)

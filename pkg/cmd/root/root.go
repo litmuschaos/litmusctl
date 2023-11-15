@@ -19,11 +19,12 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
-	"github.com/litmuschaos/litmusctl/pkg/cmd/run"
-	"github.com/litmuschaos/litmusctl/pkg/cmd/save"
 	"io/ioutil"
 	"net/http"
 	"os"
+
+	"github.com/litmuschaos/litmusctl/pkg/cmd/run"
+	"github.com/litmuschaos/litmusctl/pkg/cmd/save"
 
 	"github.com/litmuschaos/litmusctl/pkg/cmd/connect"
 	"github.com/litmuschaos/litmusctl/pkg/cmd/delete"

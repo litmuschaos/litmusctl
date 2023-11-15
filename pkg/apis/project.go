@@ -28,10 +28,10 @@ import (
 	"github.com/litmuschaos/litmusctl/pkg/types"
 )
 
-type createProjectResponse struct {
+type CreateProjectResponse struct {
 	Data struct {
 		Name string `json:"name"`
-		ID   string `json:"id"`
+		ID   string `json:"projectID"`
 	} `json:"data"`
 	Errors []struct {
 		Message string   `json:"message"`
@@ -40,50 +40,50 @@ type createProjectResponse struct {
 }
 
 type createProjectPayload struct {
-	ProjectName string `json:"project_name"`
+	ProjectName string `json:"projectName"`
 }
 
-func CreateProjectRequest(projectName string, cred types.Credentials) (createProjectResponse, error) {
+func CreateProjectRequest(projectName string, cred types.Credentials) (CreateProjectResponse, error) {
 	payloadBytes, err := json.Marshal(createProjectPayload{
 		ProjectName: projectName,
 	})
 
 	if err != nil {
-		return createProjectResponse{}, err
+		return CreateProjectResponse{}, err
 	}
 	resp, err := SendRequest(SendRequestParams{cred.Endpoint + utils.AuthAPIPath + "/create_project", "Bearer " + cred.Token}, payloadBytes, string(types.Post))
 	if err != nil {
-		return createProjectResponse{}, err
+		return CreateProjectResponse{}, err
 	}
 
 	bodyBytes, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return createProjectResponse{}, err
+		return CreateProjectResponse{}, err
 	}
 
 	defer resp.Body.Close()
 
 	if resp.StatusCode == http.StatusOK {
-		var project createProjectResponse
+		var project CreateProjectResponse
 		err = json.Unmarshal(bodyBytes, &project)
 		if err != nil {
-			return createProjectResponse{}, err
+			return CreateProjectResponse{}, err
 		}
 
 		if len(project.Errors) > 0 {
-			return createProjectResponse{}, errors.New(project.Errors[0].Message)
+			return CreateProjectResponse{}, errors.New(project.Errors[0].Message)
 		}
 
 		utils.White_B.Println("project/" + project.Data.Name + " created")
 		return project, nil
 	} else {
-		return createProjectResponse{}, errors.New("Unmatched status code:" + string(bodyBytes))
+		return CreateProjectResponse{}, errors.New("Unmatched status code:" + string(bodyBytes))
 	}
 }
 
 type listProjectResponse struct {
 	Data []struct {
-		ID        string `json:"projectID"`
+		ID        string `json:"ProjectID"`
 		Name      string `json:"Name"`
 		CreatedAt int64  `json:"CreatedAt"`
 	} `json:"data"`
@@ -144,9 +144,9 @@ type Member struct {
 }
 
 type Project struct {
-	ID        string   `json:"projectID"`
+	ID        string   `json:"ProjectID"`
 	Name      string   `json:"Name"`
-	CreatedAt int64    `json:"createdAt"`
+	CreatedAt int64    `json:"CreatedAt"`
 	Members   []Member `json:"Members"`
 }
 

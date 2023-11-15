@@ -17,12 +17,13 @@ package get
 
 import (
 	"fmt"
-	"github.com/litmuschaos/litmusctl/pkg/apis/experiment"
 	"os"
 	"strconv"
 	"strings"
 	"text/tabwriter"
 	"time"
+
+	"github.com/litmuschaos/litmusctl/pkg/apis/experiment"
 
 	"github.com/litmuschaos/litmus/chaoscenter/graphql/server/graph/model"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
@@ -52,6 +53,22 @@ var experimentRunsCmd = &cobra.Command{
 				utils.Red.Println("⛔ Project ID can't be empty!!")
 				os.Exit(1)
 			}
+		}
+
+		//  experiment ID flag
+		experimentID, err := cmd.Flags().GetString("experiment-id")
+		utils.PrintError(err)
+		if experimentID != "" {
+			listExperimentRunsRequest.ExperimentIDs = []*string{&experimentID}
+
+		}
+
+		// experiment run ID flag
+		experimentRunID, err := cmd.Flags().GetString("experiment-run-id")
+		utils.PrintError(err)
+		if experimentRunID != "" {
+			listExperimentRunsRequest.ExperimentRunIDs = []*string{&experimentRunID}
+
 		}
 
 		listAllExperimentRuns, _ := cmd.Flags().GetBool("all")
@@ -118,6 +135,9 @@ func init() {
 	experimentRunsCmd.Flags().String("project-id", "", "Set the project-id to list Chaos Experiments from the particular project. To see the projects, apply litmusctl get projects")
 	experimentRunsCmd.Flags().Int("count", 30, "Set the count of Chaos Experiments runs to display. Default value is 30")
 	experimentRunsCmd.Flags().BoolP("all", "A", false, "Set to true to display all Chaos Experiments runs")
+
+	experimentRunsCmd.Flags().String("experiment-id", "", "Set the experiment ID to list experiment runs within a specific experiment")
+	experimentRunsCmd.Flags().String("experiment-run-id", "", "Set the experiment run ID to list a specific experiment run")
 
 	experimentRunsCmd.Flags().StringP("output", "o", "", "Output format. One of:\njson|yaml")
 }
