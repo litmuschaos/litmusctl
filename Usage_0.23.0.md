@@ -258,6 +258,7 @@ accounts:
     token: eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MjY5NDQ2MDIsInJvbGUiOiJ1c2VyIiwidWlkIjoiNjFmMDY4M2YtZWY0OC00MGE1LWIzMjgtZTU2ZDA2NjM1MTE4IiwidXNlcm5hbWUiOiJyYWoifQ.pks7xjkFdJD649RjCBwQuPF1_QMoryDWixSKx4tPAqXI75ns4sc-yGhMdbEvIZ3AJSvDaqTa47XTC6c8R
     username: litmus-user
   endpoint: https://preview.litmuschaos.io
+  serverEndpoint: https://preview.litmuschaos.io
 apiVersion: v1
 current-account: https://preview.litmuschaos.io
 current-user: litmus-user
