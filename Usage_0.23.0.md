@@ -385,19 +385,19 @@ Showing 1 of 1 Chaos Experiments
 - To list all the Chaos Experiment runs within a project, issue the following command.
 
 ```shell
-litmusctl get chaos-experiments-runs  --project-id=""
+litmusctl get chaos-experiment-runs  --project-id=""
 ```
 
 - To list all the Chaos Experiment runs within a specific experiment, issue the following command.
 
 ```shell
-litmusctl get chaos-experiments-runs  --project-id="" --experiment-id=""
+litmusctl get chaos-experiment-runs  --project-id="" --experiment-id=""
 ```
 
 - To list the Chaos Experiment run with a specific experiment-run-id , issue the following command.
 
 ```shell
-litmusctl get chaos-experiments-runs  --project-id="" --experiment-run-id=""
+litmusctl get chaos-experiment-runs  --project-id="" --experiment-run-id=""
 ```
 
 **Output:**
