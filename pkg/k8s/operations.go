@@ -18,6 +18,7 @@ package k8s
 import (
 	"bytes"
 	"context"
+	"errors"
 	"flag"
 	"fmt"
 	"io/ioutil"
@@ -290,74 +291,95 @@ type ApplyYamlParams struct {
 }
 
 func ApplyYaml(params ApplyYamlParams, kubeconfig string, isLocal bool) (output string, err error) {
-	// Setting up configuration and dynamic client for interacting with the Kubernetes API server
+	_, kubeClient, dynamicClient, err := getClientAndConfig(kubeconfig)
+	if err != nil {
+		return "", err
+	}
+
+	manifest, err := getManifest(isLocal, params, kubeClient)
+	if err != nil {
+		return "", err
+	}
+
+	resources, err := decodeManifest(manifest)
+	if err != nil {
+		return "", err
+	}
+
+	err = applyResources(resources, dynamicClient, kubeClient)
+	if err != nil {
+		return "", err
+	}
+
+	logrus.Println("🚀 Successfully Upgraded Chaos Infra")
+
+	return "Success", nil
+}
+
+func getClientAndConfig(kubeconfig string) (*rest.Config, *kubernetes.Clientset, dynamic.Interface, error) {
 	var config *rest.Config
 	var dynamicClient dynamic.Interface
 
 	if kubeconfig != "" {
-		// Use the provided kubeconfig
+		var err error
 		config, err = clientcmd.BuildConfigFromFlags("", kubeconfig)
 		if err != nil {
-			return "", fmt.Errorf("error in building config from flags: %w", err)
+			return nil, nil, nil, fmt.Errorf("failed to build config from flags: %w", err)
 		}
 		dynamicClient, err = dynamic.NewForConfig(config)
 		if err != nil {
-			return "", fmt.Errorf("error in creating dynamic client: %w", err)
+			return nil, nil, nil, fmt.Errorf("failed to create dynamic client: %w", err)
 		}
 	} else {
 		// Using the default kubeconfig file at $HOME/.kube/config
 		home := homedir.HomeDir()
 		defaultKubeconfig := filepath.Join(home, ".kube", "config")
 		if _, err := os.Stat(defaultKubeconfig); !os.IsNotExist(err) {
+			var err error
 			config, err = clientcmd.BuildConfigFromFlags("", defaultKubeconfig)
 			if err != nil {
-				return "", fmt.Errorf("error in building config from flags: %w", err)
+				return nil, nil, nil, fmt.Errorf("failed to build config from flags: %w", err)
 			}
 			dynamicClient, err = dynamic.NewForConfig(config)
 			if err != nil {
-				return "", fmt.Errorf("error in creating dynamic client: %w", err)
+				return nil, nil, nil, fmt.Errorf("failed to create dynamic client: %w", err)
 			}
+		} else {
+			// Return an error if kubeconfig is not provided and the default file doesn't exist
+			return nil, nil, nil, errors.New("kubeconfig not provided, and default kubeconfig not found")
 		}
 	}
 
 	kubeClient, err := kubernetes.NewForConfig(config)
 	if err != nil {
-		return "", fmt.Errorf("error in creating kube client: %w", err)
+		return nil, nil, nil, fmt.Errorf("failed to create kube client: %w", err)
 	}
 
-	dynamicClient, err = dynamic.NewForConfig(config)
-	if err != nil {
-		return "", fmt.Errorf("error in creating dynamic client: %w", err)
-	}
+	return config, kubeClient, dynamicClient, nil
+}
 
-	var manifest []byte
+func getManifest(isLocal bool, params ApplyYamlParams, kubeClient *kubernetes.Clientset) ([]byte, error) {
 	if isLocal {
-		// Read the content from the existing file in your home directory
 		home := homedir.HomeDir()
 		chaosInfraManifest := filepath.Join(home, "chaos-infra-manifest.yaml")
-		manifest, err = ioutil.ReadFile(chaosInfraManifest)
-		if err != nil {
-			return "", fmt.Errorf("error in reading chaos infra manifest: %w", err)
-		}
-	} else {
-		// Fetch the content from the remote location
-		path := fmt.Sprintf("%s%s/%s.yaml", params.Endpoint, params.YamlPath, params.Token)
-		req, err := http.NewRequest("GET", path, nil)
-		if err != nil {
-			return "", fmt.Errorf("error in creating new request: %w", err)
-		}
-		resp, err := http.DefaultClient.Do(req)
-		if err != nil {
-			return "", fmt.Errorf("error in fetching chaos infra manifest: %w", err)
-		}
-		defer resp.Body.Close()
-		respBody, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			return "", fmt.Errorf("error in reading chaos infra manifest: %w", err)
-		}
-		manifest = respBody
+		return ioutil.ReadFile(chaosInfraManifest)
 	}
 
+	path := fmt.Sprintf("%s%s/%s.yaml", params.Endpoint, params.YamlPath, params.Token)
+	req, err := http.NewRequest("GET", path, nil)
+	if err != nil {
+		return nil, fmt.Errorf("error in creating new request: %w", err)
+	}
+	resp, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("error in fetching chaos infra manifest: %w", err)
+	}
+	defer resp.Body.Close()
+
+	return ioutil.ReadAll(resp.Body)
+}
+
+func decodeManifest(manifest []byte) ([]*unstructured.Unstructured, error) {
 	decoder := yaml.NewYAMLOrJSONDecoder(bytes.NewReader(manifest), len(manifest))
 
 	// Split the resource file into separate YAML documents.
@@ -368,13 +390,15 @@ func ApplyYaml(params ApplyYamlParams, kubeconfig string, isLocal bool) (output 
 			if err.Error() == "EOF" {
 				break
 			}
-			return "", fmt.Errorf("error in decoding resource: %w", err)
+			return nil, fmt.Errorf("error in decoding resource: %w", err)
 		}
 		resources = append(resources, resourcestr)
 	}
 
-	// Apply resources
+	return resources, nil
+}
 
+func applyResources(resources []*unstructured.Unstructured, dynamicClient dynamic.Interface, kubeClient *kubernetes.Clientset) error {
 	for _, resource := range resources {
 		logrus.Infof("Applying resource: %s , kind: %s", resource.GetName(), resource.GetKind())
 
@@ -382,8 +406,7 @@ func ApplyYaml(params ApplyYamlParams, kubeconfig string, isLocal bool) (output 
 		mapper := restmapper.NewDeferredDiscoveryRESTMapper(memory.NewMemCacheClient(kubeClient.Discovery()))
 		mapping, err := mapper.RESTMapping(gvk.GroupKind(), gvk.Version)
 		if err != nil {
-			fmt.Println("Error in mapping", err)
-			return "", fmt.Errorf("error in mapping: %w", err)
+			return fmt.Errorf("error in mapping: %w", err)
 		}
 
 		var dr dynamic.ResourceInterface
@@ -391,7 +414,7 @@ func ApplyYaml(params ApplyYamlParams, kubeconfig string, isLocal bool) (output 
 			// Namespaced resources should specify the namespace
 			dr = dynamicClient.Resource(mapping.Resource).Namespace(resource.GetNamespace())
 		} else {
-			// for cluster-wide resources
+			// For cluster-wide resources
 			dr = dynamicClient.Resource(mapping.Resource)
 		}
 
@@ -400,15 +423,13 @@ func ApplyYaml(params ApplyYamlParams, kubeconfig string, isLocal bool) (output 
 			FieldManager: "application/apply-patch",
 		})
 		if err != nil {
-			return "", fmt.Errorf("error in applying resource: %w", err)
+			return fmt.Errorf("error in applying resource: %w", err)
 		}
 
 		logrus.Info("Resource applied successfully")
 	}
 
-	fmt.Println("🚀 Successfully Upgraded Chaos Infra")
-
-	return "Success", nil
+	return nil
 }
 
 // GetConfigMap returns config map for a given name and namespace
