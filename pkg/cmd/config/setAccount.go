@@ -17,19 +17,20 @@ package config
 
 import (
 	"fmt"
-	"github.com/litmuschaos/litmusctl/pkg/apis/experiment"
 	"net/url"
 	"os"
 	"strings"
 	"time"
+
+	"github.com/litmuschaos/litmusctl/pkg/apis/experiment"
 
 	"github.com/golang-jwt/jwt"
 	"github.com/litmuschaos/litmusctl/pkg/apis"
 	"github.com/litmuschaos/litmusctl/pkg/config"
 	"github.com/litmuschaos/litmusctl/pkg/types"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
+	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
-	"golang.org/x/term"
 )
 
 // setAccountCmd represents the setAccount command
@@ -48,20 +49,24 @@ var setAccountCmd = &cobra.Command{
 			err       error
 		)
 
-		authInput.Endpoint, err = cmd.Flags().GetString("endpoint")
+		// prompts for account details
+		promptEndpoint := promptui.Prompt{
+			Label: "Host endpoint where litmus is installed",
+		}
+		authInput.Endpoint, err = promptEndpoint.Run()
 		utils.PrintError(err)
 
-		authInput.Username, err = cmd.Flags().GetString("username")
+		// Validate and format the endpoint URL
+		ep := strings.TrimRight(authInput.Endpoint, "/")
+		newURL, err := url.Parse(ep)
 		utils.PrintError(err)
-
-		authInput.Password, err = cmd.Flags().GetString("password")
-		utils.PrintError(err)
+		authInput.Endpoint = newURL.String()
 
 		if authInput.Endpoint == "" {
 			utils.White_B.Print("\nHost endpoint where litmus is installed: ")
 			fmt.Scanln(&authInput.Endpoint)
 
-			for authInput.Endpoint == "" {
+			if authInput.Endpoint == "" {
 				utils.Red.Println("\n⛔ Host URL can't be empty!!")
 				os.Exit(1)
 			}
@@ -73,26 +78,20 @@ var setAccountCmd = &cobra.Command{
 			authInput.Endpoint = newUrl.String()
 		}
 
-		if authInput.Username == "" {
-			utils.White_B.Print("\nUsername [Default: ", utils.DefaultUsername, "]: ")
-			fmt.Scanln(&authInput.Username)
-			if authInput.Username == "" {
-				authInput.Username = utils.DefaultUsername
-			}
+		promptUsername := promptui.Prompt{
+			Label:   "Username [Default: " + utils.DefaultUsername + "]",
+			Default: utils.DefaultUsername,
 		}
+		authInput.Username, err = promptUsername.Run()
+		utils.PrintError(err)
 
-		if authInput.Password == "" {
-			utils.White_B.Print("\nPassword: ")
-			pass, err := term.ReadPassword(0)
-			utils.PrintError(err)
-
-			if pass == nil {
-				utils.Red.Println("\n⛔ Password cannot be empty!")
-				os.Exit(1)
-			}
-
-			authInput.Password = string(pass)
+		promptPassword := promptui.Prompt{
+			Label: "Password",
+			Mask:  '*',
 		}
+		pass, err := promptPassword.Run()
+		utils.PrintError(err)
+		authInput.Password = pass
 
 		if authInput.Endpoint != "" && authInput.Username != "" && authInput.Password != "" {
 			exists := config.FileExists(configFilePath)
@@ -121,8 +120,9 @@ var setAccountCmd = &cobra.Command{
 			users = append(users, user)
 
 			var account = types.Account{
-				Endpoint: authInput.Endpoint,
-				Users:    users,
+				Endpoint:       authInput.Endpoint,
+				Users:          users,
+				ServerEndpoint: authInput.Endpoint,
 			}
 
 			// If config file doesn't exist or length of the file is zero.
@@ -142,7 +142,6 @@ var setAccountCmd = &cobra.Command{
 				err := config.CreateNewLitmusCtlConfig(configFilePath, litmuCtlConfig)
 				utils.PrintError(err)
 
-				os.Exit(0)
 			} else {
 				// checking syntax
 				err = config.ConfigSyntaxCheck(configFilePath)
@@ -152,41 +151,41 @@ var setAccountCmd = &cobra.Command{
 					Account:        account,
 					CurrentAccount: authInput.Endpoint,
 					CurrentUser:    claims["username"].(string),
+					ServerEndpoint: authInput.Endpoint,
 				}
 
 				err = config.UpdateLitmusCtlConfig(updateLitmusCtlConfig, configFilePath)
 				utils.PrintError(err)
 			}
 			utils.White_B.Printf("\naccount.username/%s configured", claims["username"].(string))
+		} else {
+			utils.Red.Println("\nError: some flags are missing. Run 'litmusctl config set-account --help' for usage. ")
+		}
 
-			serverResp, err := experiment.GetServerVersion(authInput.Endpoint)
-			var isCompatible bool
-			if err != nil {
-				utils.Red.Println("\nError: ", err)
-			} else {
-				compatibilityArr := utils.CompatibilityMatrix[os.Getenv("CLIVersion")]
-				for _, v := range compatibilityArr {
-					if v == serverResp.Data.GetServerVersion.Value {
-						isCompatible = true
-						break
-					}
-				}
-
-				if !isCompatible {
-					utils.Red.Println("\n🚫 ChaosCenter version: " + serverResp.Data.GetServerVersion.Value + " is not compatible with the installed LitmusCTL version: " + os.Getenv("CLIVersion"))
-					utils.White_B.Println("Compatible ChaosCenter versions are: ")
-					utils.White_B.Print("[ ")
-					for _, v := range compatibilityArr {
-						utils.White_B.Print("'" + v + "' ")
-					}
-					utils.White_B.Print("]\n")
-				} else {
-					utils.White_B.Println("\n✅  Installed versions of ChaosCenter and LitmusCTL are compatible! ")
+		serverResp, err := experiment.GetServerVersion(authInput.Endpoint)
+		var isCompatible bool
+		if err != nil {
+			utils.Red.Println("\nError: ", err)
+		} else {
+			compatibilityArr := utils.CompatibilityMatrix[os.Getenv("CLIVersion")]
+			for _, v := range compatibilityArr {
+				if v == serverResp.Data.GetServerVersion.Value {
+					isCompatible = true
+					break
 				}
 			}
 
-		} else {
-			utils.Red.Println("\nError: some flags are missing. Run 'litmusctl config set-account --help' for usage. ")
+			if !isCompatible {
+				utils.Red.Println("\n🚫 ChaosCenter version: " + serverResp.Data.GetServerVersion.Value + " is not compatible with the installed LitmusCTL version: " + os.Getenv("CLIVersion"))
+				utils.White_B.Println("Compatible ChaosCenter versions are: ")
+				utils.White_B.Print("[ ")
+				for _, v := range compatibilityArr {
+					utils.White_B.Print("'" + v + "' ")
+				}
+				utils.White_B.Print("]\n")
+			} else {
+				utils.White_B.Println("\n✅  Installed versions of ChaosCenter and LitmusCTL are compatible! ")
+			}
 		}
 	},
 }

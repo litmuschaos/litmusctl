@@ -21,6 +21,7 @@ import (
 	"github.com/litmuschaos/litmusctl/pkg/apis"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
 
+	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
 )
 
@@ -40,14 +41,30 @@ var projectCmd = &cobra.Command{
 
 		projectName, err := cmd.Flags().GetString("name")
 		utils.PrintError(err)
-
 		if projectName == "" {
-			utils.White_B.Print("\nEnter a project name: ")
-			fmt.Scanln(&projectName)
-		}
+			// prompt to ask project name
+			prompt := promptui.Prompt{
+				Label:     "Enter a project name",
+				AllowEdit: true,
+			}
 
-		_, err = apis.CreateProjectRequest(projectName, credentials)
-		utils.PrintError(err)
+			result, err := prompt.Run()
+			if err != nil {
+				utils.Red.Printf("Error: %v\n", err)
+				return
+			}
+
+			projectName = result
+		}
+		var response apis.CreateProjectResponse
+		response, err = apis.CreateProjectRequest(projectName, credentials)
+		if err != nil {
+			utils.Red.Printf("❌ Error creating project: %v\n", err)
+		} else {
+			fmt.Printf("Response: %+v\n", response)
+			projectID := response.Data.ID
+			utils.White_B.Printf("Project '%s' created successfully with project ID - '%s'!🎉\n", projectName, projectID)
+		}
 	},
 }
 
