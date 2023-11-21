@@ -25,6 +25,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"os/exec"
 	"path/filepath"
 
 	"k8s.io/client-go/discovery/cached/memory"
@@ -291,12 +292,61 @@ type ApplyYamlParams struct {
 }
 
 func ApplyYaml(params ApplyYamlParams, kubeconfig string, isLocal bool) (output string, err error) {
-	_, kubeClient, dynamicClient, err := getClientAndConfig(kubeconfig)
+	path := params.YamlPath
+	if !isLocal {
+		path = fmt.Sprintf("%s%s/%s.yaml", params.Endpoint, params.YamlPath, params.Token)
+		req, err := http.NewRequest("GET", path, nil)
+		if err != nil {
+			return "", err
+		}
+		resp, err := http.DefaultClient.Do(req)
+		if err != nil {
+			return "", err
+		}
+		defer resp.Body.Close()
+		resp_body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return "", err
+		}
+		err = ioutil.WriteFile("chaos-infra-manifest.yaml", resp_body, 0644)
+		if err != nil {
+			return "", err
+		}
+		path = "chaos-infra-manifest.yaml"
+	}
+
+	args := []string{"kubectl", "apply", "-f", path}
+	if kubeconfig != "" {
+		args = append(args, []string{"--kubeconfig", kubeconfig}...)
+	} else {
+		args = []string{"kubectl", "apply", "-f", path}
+	}
+
+	cmd := exec.Command(args[0], args[1:]...)
+	var stdout, stderr bytes.Buffer
+	cmd.Stdout = &stdout
+	cmd.Stderr = &stderr
+	err = cmd.Run()
+	outStr, errStr := stdout.String(), stderr.String()
+
+	// err, can have exit status 1
 	if err != nil {
+		// if we get standard error then, return the same
+		if errStr != "" {
+			return "", fmt.Errorf(errStr)
+		}
+
+		// if not standard error found, return error
 		return "", err
 	}
 
-	manifest, err := getManifest(isLocal, params, kubeClient)
+	// If no error found, return standard output
+	return outStr, nil
+}
+
+func UpgradeInfra(manifest []byte, kubeconfig string) (string, error) {
+
+	_, kubeClient, dynamicClient, err := getClientAndConfig(kubeconfig)
 	if err != nil {
 		return "", err
 	}
@@ -314,6 +364,7 @@ func ApplyYaml(params ApplyYamlParams, kubeconfig string, isLocal bool) (output 
 	logrus.Println("🚀 Successfully Upgraded Chaos Infra")
 
 	return "Success", nil
+
 }
 
 func getClientAndConfig(kubeconfig string) (*rest.Config, *kubernetes.Clientset, dynamic.Interface, error) {
@@ -358,29 +409,9 @@ func getClientAndConfig(kubeconfig string) (*rest.Config, *kubernetes.Clientset,
 	return config, kubeClient, dynamicClient, nil
 }
 
-func getManifest(isLocal bool, params ApplyYamlParams, kubeClient *kubernetes.Clientset) ([]byte, error) {
-	if isLocal {
-		home := homedir.HomeDir()
-		chaosInfraManifest := filepath.Join(home, "chaos-infra-manifest.yaml")
-		return ioutil.ReadFile(chaosInfraManifest)
-	}
-
-	path := fmt.Sprintf("%s%s/%s.yaml", params.Endpoint, params.YamlPath, params.Token)
-	req, err := http.NewRequest("GET", path, nil)
-	if err != nil {
-		return nil, fmt.Errorf("error in creating new request: %w", err)
-	}
-	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("error in fetching chaos infra manifest: %w", err)
-	}
-	defer resp.Body.Close()
-
-	return ioutil.ReadAll(resp.Body)
-}
-
 func decodeManifest(manifest []byte) ([]*unstructured.Unstructured, error) {
 	decoder := yaml.NewYAMLOrJSONDecoder(bytes.NewReader(manifest), len(manifest))
+	// fmt.Println(string(manifest))
 
 	// Split the resource file into separate YAML documents.
 	resources := []*unstructured.Unstructured{}
@@ -392,6 +423,7 @@ func decodeManifest(manifest []byte) ([]*unstructured.Unstructured, error) {
 			}
 			return nil, fmt.Errorf("error in decoding resource: %w", err)
 		}
+		fmt.Println("resource", resourcestr)
 		resources = append(resources, resourcestr)
 	}
 
