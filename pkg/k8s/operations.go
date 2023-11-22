@@ -344,6 +344,8 @@ func ApplyYaml(params ApplyYamlParams, kubeconfig string, isLocal bool) (output 
 	return outStr, nil
 }
 
+// UpgradeInfra upgrades the Chaos Infrastructure using the provided manifest and kubeconfig with the help of client-go library.
+
 func UpgradeInfra(manifest []byte, kubeconfig string) (string, error) {
 
 	// Get Kubernetes and dynamic clients along with the configuration.
