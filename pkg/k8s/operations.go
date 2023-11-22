@@ -346,15 +346,21 @@ func ApplyYaml(params ApplyYamlParams, kubeconfig string, isLocal bool) (output 
 
 func UpgradeInfra(manifest []byte, kubeconfig string) (string, error) {
 
+	// Get Kubernetes and dynamic clients along with the configuration.
+
 	_, kubeClient, dynamicClient, err := getClientAndConfig(kubeconfig)
 	if err != nil {
 		return "", err
 	}
 
+	// Decode the manifest into a list of Unstructured resources.
+
 	resources, err := decodeManifest(manifest)
 	if err != nil {
 		return "", err
 	}
+
+	// Apply the decoded resources using the dynamic client and Kubernetes client.
 
 	err = applyResources(resources, dynamicClient, kubeClient)
 	if err != nil {
@@ -367,9 +373,13 @@ func UpgradeInfra(manifest []byte, kubeconfig string) (string, error) {
 
 }
 
+// retrieves the Kubernetes and dynamic clients along with the configuration.
+
 func getClientAndConfig(kubeconfig string) (*rest.Config, *kubernetes.Clientset, dynamic.Interface, error) {
 	var config *rest.Config
 	var dynamicClient dynamic.Interface
+
+	// If kubeconfig is provided, use it to create the configuration and dynamic client.
 
 	if kubeconfig != "" {
 		var err error
@@ -382,7 +392,9 @@ func getClientAndConfig(kubeconfig string) (*rest.Config, *kubernetes.Clientset,
 			return nil, nil, nil, fmt.Errorf("failed to create dynamic client: %w", err)
 		}
 	} else {
-		// Using the default kubeconfig file at $HOME/.kube/config
+
+		// Use the default kubeconfig file at $HOME/.kube/config.
+
 		home := homedir.HomeDir()
 		defaultKubeconfig := filepath.Join(home, ".kube", "config")
 		if _, err := os.Stat(defaultKubeconfig); !os.IsNotExist(err) {
@@ -401,6 +413,8 @@ func getClientAndConfig(kubeconfig string) (*rest.Config, *kubernetes.Clientset,
 		}
 	}
 
+	// Create a Kubernetes client using the configuration.
+
 	kubeClient, err := kubernetes.NewForConfig(config)
 	if err != nil {
 		return nil, nil, nil, fmt.Errorf("failed to create kube client: %w", err)
@@ -409,9 +423,10 @@ func getClientAndConfig(kubeconfig string) (*rest.Config, *kubernetes.Clientset,
 	return config, kubeClient, dynamicClient, nil
 }
 
+// decodes the manifest byte slice into a list of Unstructured resources.
+
 func decodeManifest(manifest []byte) ([]*unstructured.Unstructured, error) {
 	decoder := yaml.NewYAMLOrJSONDecoder(bytes.NewReader(manifest), len(manifest))
-	// fmt.Println(string(manifest))
 
 	// Split the resource file into separate YAML documents.
 	resources := []*unstructured.Unstructured{}
@@ -423,19 +438,22 @@ func decodeManifest(manifest []byte) ([]*unstructured.Unstructured, error) {
 			}
 			return nil, fmt.Errorf("error in decoding resource: %w", err)
 		}
-		fmt.Println("resource", resourcestr)
 		resources = append(resources, resourcestr)
 	}
 
 	return resources, nil
 }
 
+// applies the decoded resources using the dynamic client and Kubernetes client.
+
 func applyResources(resources []*unstructured.Unstructured, dynamicClient dynamic.Interface, kubeClient *kubernetes.Clientset) error {
 	for _, resource := range resources {
 		logrus.Infof("Applying resource: %s , kind: %s", resource.GetName(), resource.GetKind())
 
 		gvk := resource.GroupVersionKind()
+		// a mapper for REST mapping.
 		mapper := restmapper.NewDeferredDiscoveryRESTMapper(memory.NewMemCacheClient(kubeClient.Discovery()))
+		// Map GVK to GVR using the REST mapper.
 		mapping, err := mapper.RESTMapping(gvk.GroupKind(), gvk.Version)
 		if err != nil {
 			return fmt.Errorf("error in mapping: %w", err)
@@ -449,6 +467,8 @@ func applyResources(resources []*unstructured.Unstructured, dynamicClient dynami
 			// For cluster-wide resources
 			dr = dynamicClient.Resource(mapping.Resource)
 		}
+
+		// Apply the resource using the dynamic client.
 
 		_, err = dr.Apply(context.TODO(), resource.GetName(), resource, metav1.ApplyOptions{
 			Force:        true,
