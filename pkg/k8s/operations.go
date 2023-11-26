@@ -345,25 +345,21 @@ func ApplyYaml(params ApplyYamlParams, kubeconfig string, isLocal bool) (output 
 }
 
 // UpgradeInfra upgrades the Chaos Infrastructure using the provided manifest and kubeconfig with the help of client-go library.
-
 func UpgradeInfra(manifest []byte, kubeconfig string) (string, error) {
 
 	// Get Kubernetes and dynamic clients along with the configuration.
-
 	_, kubeClient, dynamicClient, err := getClientAndConfig(kubeconfig)
 	if err != nil {
 		return "", err
 	}
 
 	// Decode the manifest into a list of Unstructured resources.
-
 	resources, err := decodeManifest(manifest)
 	if err != nil {
 		return "", err
 	}
 
 	// Apply the decoded resources using the dynamic client and Kubernetes client.
-
 	err = applyResources(resources, dynamicClient, kubeClient)
 	if err != nil {
 		return "", err
@@ -376,27 +372,19 @@ func UpgradeInfra(manifest []byte, kubeconfig string) (string, error) {
 }
 
 // retrieves the Kubernetes and dynamic clients along with the configuration.
-
 func getClientAndConfig(kubeconfig string) (*rest.Config, *kubernetes.Clientset, dynamic.Interface, error) {
 	var config *rest.Config
 	var dynamicClient dynamic.Interface
 
 	// If kubeconfig is provided, use it to create the configuration and dynamic client.
-
 	if kubeconfig != "" {
 		var err error
 		config, err = clientcmd.BuildConfigFromFlags("", kubeconfig)
 		if err != nil {
 			return nil, nil, nil, fmt.Errorf("failed to build config from flags: %w", err)
 		}
-		dynamicClient, err = dynamic.NewForConfig(config)
-		if err != nil {
-			return nil, nil, nil, fmt.Errorf("failed to create dynamic client: %w", err)
-		}
 	} else {
-
 		// Use the default kubeconfig file at $HOME/.kube/config.
-
 		home := homedir.HomeDir()
 		defaultKubeconfig := filepath.Join(home, ".kube", "config")
 		if _, err := os.Stat(defaultKubeconfig); !os.IsNotExist(err) {
@@ -405,18 +393,19 @@ func getClientAndConfig(kubeconfig string) (*rest.Config, *kubernetes.Clientset,
 			if err != nil {
 				return nil, nil, nil, fmt.Errorf("failed to build config from flags: %w", err)
 			}
-			dynamicClient, err = dynamic.NewForConfig(config)
-			if err != nil {
-				return nil, nil, nil, fmt.Errorf("failed to create dynamic client: %w", err)
-			}
 		} else {
 			// Return an error if kubeconfig is not provided and the default file doesn't exist
 			return nil, nil, nil, errors.New("kubeconfig not provided, and default kubeconfig not found")
 		}
 	}
 
-	// Create a Kubernetes client using the configuration.
+	// Create the dynamic client using the configuration.
+	dynamicClient, err := dynamic.NewForConfig(config)
+	if err != nil {
+		return nil, nil, nil, fmt.Errorf("failed to create dynamic client: %w", err)
+	}
 
+	// Create a Kubernetes client using the configuration.
 	kubeClient, err := kubernetes.NewForConfig(config)
 	if err != nil {
 		return nil, nil, nil, fmt.Errorf("failed to create kube client: %w", err)
@@ -426,7 +415,6 @@ func getClientAndConfig(kubeconfig string) (*rest.Config, *kubernetes.Clientset,
 }
 
 // decodes the manifest byte slice into a list of Unstructured resources.
-
 func decodeManifest(manifest []byte) ([]*unstructured.Unstructured, error) {
 	decoder := yaml.NewYAMLOrJSONDecoder(bytes.NewReader(manifest), len(manifest))
 
@@ -447,7 +435,6 @@ func decodeManifest(manifest []byte) ([]*unstructured.Unstructured, error) {
 }
 
 // applies the decoded resources using the dynamic client and Kubernetes client.
-
 func applyResources(resources []*unstructured.Unstructured, dynamicClient dynamic.Interface, kubeClient *kubernetes.Clientset) error {
 	for _, resource := range resources {
 		logrus.Infof("Applying resource: %s , kind: %s", resource.GetName(), resource.GetKind())
@@ -458,7 +445,7 @@ func applyResources(resources []*unstructured.Unstructured, dynamicClient dynami
 		// Map GVK to GVR using the REST mapper.
 		mapping, err := mapper.RESTMapping(gvk.GroupKind(), gvk.Version)
 		if err != nil {
-			return fmt.Errorf("error in mapping: %w", err)
+			return fmt.Errorf("error in resource gvk to gvr mapping: %w", err)
 		}
 
 		var dr dynamic.ResourceInterface
@@ -471,7 +458,6 @@ func applyResources(resources []*unstructured.Unstructured, dynamicClient dynami
 		}
 
 		// Apply the resource using the dynamic client.
-
 		_, err = dr.Apply(context.TODO(), resource.GetName(), resource, metav1.ApplyOptions{
 			Force:        true,
 			FieldManager: "application/apply-patch",
