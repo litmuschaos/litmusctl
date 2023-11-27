@@ -231,6 +231,6 @@ litmusctl version
 
 ## Development Guide
 
-You can find the local setup guide for **`litmusctl`** [here](https://github.com/litmuschaos/litmusctl/blob/master/DEVELOPMENT.md).
+You can find the local setup guide for **`litmusctl`** [here](DEVELOPMENT.md).
 
 ---
