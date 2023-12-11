@@ -37,6 +37,7 @@ import (
 	"github.com/litmuschaos/litmusctl/pkg/cmd/config"
 	"github.com/litmuschaos/litmusctl/pkg/cmd/create"
 	"github.com/litmuschaos/litmusctl/pkg/cmd/get"
+	"github.com/litmuschaos/litmusctl/pkg/cmd/list"
 	config2 "github.com/litmuschaos/litmusctl/pkg/config"
 	"github.com/spf13/cobra"
 
@@ -75,6 +76,7 @@ func init() {
 	rootCmd.AddCommand(upgrade.UpgradeCmd)
 	rootCmd.AddCommand(save.SaveCmd)
 	rootCmd.AddCommand(run.RunCmd)
+	rootCmd.AddCommand(list.ListCmd)
 
 	// Here you will define your flags and configuration settings.
 	// Cobra supports persistent flags, which, if defined here,
