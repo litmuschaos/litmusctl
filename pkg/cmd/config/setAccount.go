@@ -49,12 +49,42 @@ var setAccountCmd = &cobra.Command{
 			err       error
 		)
 
-		// prompts for account details
-		promptEndpoint := promptui.Prompt{
-			Label: "Host endpoint where litmus is installed",
-		}
-		authInput.Endpoint, err = promptEndpoint.Run()
+		nonInteractive, err := cmd.Flags().GetBool("non-interactive")
 		utils.PrintError(err)
+
+		if nonInteractive {
+			authInput.Endpoint, err = cmd.Flags().GetString("endpoint")
+			utils.PrintError(err)
+
+			authInput.Username, err = cmd.Flags().GetString("username")
+			utils.PrintError(err)
+
+			authInput.Password, err = cmd.Flags().GetString("password")
+			utils.PrintError(err)
+
+		} else {
+			// prompts for account details
+			promptEndpoint := promptui.Prompt{
+				Label: "Host endpoint where litmus is installed",
+			}
+			authInput.Endpoint, err = promptEndpoint.Run()
+			utils.PrintError(err)
+
+			promptUsername := promptui.Prompt{
+				Label:   "Username [Default: " + utils.DefaultUsername + "]",
+				Default: utils.DefaultUsername,
+			}
+			authInput.Username, err = promptUsername.Run()
+			utils.PrintError(err)
+
+			promptPassword := promptui.Prompt{
+				Label: "Password",
+				Mask:  '*',
+			}
+			pass, err := promptPassword.Run()
+			utils.PrintError(err)
+			authInput.Password = pass
+		}
 
 		// Validate and format the endpoint URL
 		ep := strings.TrimRight(authInput.Endpoint, "/")
@@ -77,21 +107,6 @@ var setAccountCmd = &cobra.Command{
 
 			authInput.Endpoint = newUrl.String()
 		}
-
-		promptUsername := promptui.Prompt{
-			Label:   "Username [Default: " + utils.DefaultUsername + "]",
-			Default: utils.DefaultUsername,
-		}
-		authInput.Username, err = promptUsername.Run()
-		utils.PrintError(err)
-
-		promptPassword := promptui.Prompt{
-			Label: "Password",
-			Mask:  '*',
-		}
-		pass, err := promptPassword.Run()
-		utils.PrintError(err)
-		authInput.Password = pass
 
 		if authInput.Endpoint != "" && authInput.Username != "" && authInput.Password != "" {
 			exists := config.FileExists(configFilePath)
@@ -192,7 +207,7 @@ var setAccountCmd = &cobra.Command{
 
 func init() {
 	ConfigCmd.AddCommand(setAccountCmd)
-
+	setAccountCmd.Flags().BoolP("non-interactive", "n", false, "Set it to true for non interactive mode | Note: Always set the boolean flag as --non-interactive=Boolean")
 	setAccountCmd.Flags().StringP("endpoint", "e", "", "Account endpoint. Mandatory")
 	setAccountCmd.Flags().StringP("username", "u", "", "Account username. Mandatory")
 	setAccountCmd.Flags().StringP("password", "p", "", "Account password. Mandatory")
