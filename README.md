@@ -30,6 +30,11 @@ To check compatibility of litmusctl with Chaos Center
   <th>litmusctl version</th>
   <th>Lowest Chaos Center supported version</th>
   <th>Highest Chaos Center supported version</th>
+  <tr>
+    <td>1.0.0</td>
+    <td>3.0.0</td>
+    <td>3.1.0</td>
+  </tr>
  <tr>
     <td>1.0.0</td>
     <td>3.0.0</td>
@@ -62,11 +67,6 @@ To check compatibility of litmusctl with Chaos Center
   </tr>
   <tr>
     <td>0.19.0</td>
-    <td>2.9.0</td>
-    <td>3.0.0-beta8</td>
-  </tr>
-  <tr>
-    <td>0.18.0</td>
     <td>2.9.0</td>
     <td>3.0.0-beta8</td>
   </tr>
