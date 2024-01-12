@@ -43,7 +43,7 @@ var ChaosEnvironmentCmd = &cobra.Command{
 			utils.White_B.Print("\nEnter the Project ID: ")
 			fmt.Scanln(&projectID)
 
-			for projectID == "" {
+			if(projectID == ""){
 				utils.Red.Println("⛔ Project ID can't be empty!!")
 				os.Exit(1)
 			}
@@ -56,7 +56,7 @@ var ChaosEnvironmentCmd = &cobra.Command{
 			utils.White_B.Print("\nEnter the Environment ID: ")
 			fmt.Scanln(&environmentID)
 
-			for environmentID == "" {
+			if(environmentID == ""){
 				utils.Red.Println("⛔ Environment ID can't be empty!!")
 				os.Exit(1)
 			}
@@ -79,13 +79,13 @@ var ChaosEnvironmentCmd = &cobra.Command{
 			if environmentListData[i].EnvironmentID == environmentID {
 				intUpdateTime, err := strconv.ParseInt(environmentListData[i].UpdatedAt, 10, 64)
 				if err != nil {
-					fmt.Println("Error converting UpdatedAt to int64:", err)
+					utils.Red.Println("Error converting UpdatedAt to int64:", err)
 					continue
 				}
 				updatedTime := time.Unix(intUpdateTime, 0).String()
 				intCreatedTime, err := strconv.ParseInt(environmentListData[i].CreatedAt, 10, 64)
 				if err != nil {
-					fmt.Println("Error converting CreatedAt to int64:", err)
+					utils.Red.Println("Error converting CreatedAt to int64:", err)
 					continue
 				}
 				createdTime := time.Unix(intCreatedTime, 0).String()
