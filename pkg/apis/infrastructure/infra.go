@@ -125,19 +125,13 @@ func ConnectInfra(infra types.Infra, cred types.Credentials) (InfraConnectionDat
 }
 
 func CreateRegisterInfraRequest(infra types.Infra) (request models.RegisterInfraRequest) {
-	var mode models.InfrastructureType
-	if infra.InfraType == utils.InfraTypeExternal {
-		mode = models.InfrastructureTypeExternal
-	} else {
-		mode = models.InfrastructureTypeInternal
-	}
 	return models.RegisterInfraRequest{
 		Name:               infra.InfraName,
 		InfraScope:         infra.Mode,
 		Description:        &infra.Description,
 		PlatformName:       infra.PlatformName,
 		EnvironmentID:      infra.EnvironmentID,
-		InfrastructureType: mode,
+		InfrastructureType: models.InfrastructureTypeKubernetes,
 		InfraNamespace:     &infra.Namespace,
 		ServiceAccount:     &infra.ServiceAccount,
 		InfraNsExists:      &infra.NsExists,
