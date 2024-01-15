@@ -3,13 +3,12 @@ package environment
 import (
 	"encoding/json"
 	"errors"
-	"io/ioutil"
-	"net/http"
-
 	models "github.com/litmuschaos/litmus/chaoscenter/graphql/server/graph/model"
 	"github.com/litmuschaos/litmusctl/pkg/apis"
 	"github.com/litmuschaos/litmusctl/pkg/types"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
+	"io/ioutil"
+	"net/http"
 )
 
 // CreateEnvironment connects the  Infra with the given details
@@ -58,7 +57,6 @@ func GetEnvironmentList(pid string, cred types.Credentials) (ListEnvironmentData
 	if err != nil {
 		return ListEnvironmentData{}, err
 	}
-
 	resp, err := apis.SendRequest(
 		apis.SendRequestParams{
 			Endpoint: cred.ServerEndpoint + utils.GQLAPIPath,
@@ -67,11 +65,9 @@ func GetEnvironmentList(pid string, cred types.Credentials) (ListEnvironmentData
 		query,
 		string(types.Post),
 	)
-
 	if err != nil {
 		return ListEnvironmentData{}, errors.New("Error in Getting Chaos Environment List: " + err.Error())
 	}
-
 	bodyBytes, err := ioutil.ReadAll(resp.Body)
 	defer resp.Body.Close()
 	if err != nil {

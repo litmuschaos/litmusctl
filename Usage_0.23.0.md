@@ -470,6 +470,60 @@ Are you sure you want to delete this Chaos Experiment? (y/n): y
 🚀 Chaos Experiment successfully deleted.
 ```
 
+- To get the Chaos Environment, issue the following command.
+
+Using Flag :
+
+```shell
+litmusctl get chaos-environment --project-id="" --environment-id=""
+```
+
+Using UI :
+
+```shell
+litmusctl get chaos-environment
+Enter the Project ID: "project-id"
+Enter the Environment ID: "chaos-experiment-id"
+```
+
+**Output:**
+
+```
+CHAOS ENVIRONMENT ID	 shivamenv
+CHAOS ENVIRONMENT NAME	 shivamenv
+CHAOS ENVIRONMENT Type	 NON_PROD
+CREATED AT		 55908-04-03 16:42:51 +0530 IST
+CREATED BY		 admin
+UPDATED AT		 55908-04-03 16:42:51 +0530 IST
+UPDATED BY		 admin
+CHAOS INFRA IDs	 d99c7d14-56ef-4836-8537-423f28ceac4e
+```
+
+- To list the Chaos Environments, issue the following command.
+
+Using Flag :
+
+```shell
+litmusctl list chaos-environments --project-id=""
+```
+
+Using UI :
+
+```shell
+litmusctl list chaos-environment
+Enter the Project ID: "project-id"
+```
+
+**Output:**
+
+```
+CHAOS ENVIRONMENT ID	CHAOS ENVIRONMENT NAME		CREATED AT			                  CREATED BY
+testenv			        testenv				        55985-01-15 01:42:33 +0530 IST	      admin
+shivamnewenv		    shivamnewenv			    55962-10-01 15:05:45 +0530 IST	      admin
+newenvironmenttest	    newenvironmenttest		    55912-12-01 10:55:23 +0530 IST	      admin
+shivamenv		        shivamenv			        55908-04-03 16:42:51 +0530 IST	      admin
+
+```
 ---
 
 ## Flag details

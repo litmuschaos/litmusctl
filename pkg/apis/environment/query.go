@@ -15,6 +15,17 @@ const (
 	                 listEnvironments(projectID: $projectID,request: $request){
 						environments {
 							environmentID
+							name
+							createdAt
+							updatedAt
+							createdBy{
+								username
+							  }
+							updatedBy{
+								username
+							}
+							infraIDs
+							type
 						}
 					}
 	               }`
