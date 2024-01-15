@@ -43,7 +43,7 @@ var ChaosEnvironmentCmd = &cobra.Command{
 			utils.White_B.Print("\nEnter the Project ID: ")
 			fmt.Scanln(&projectID)
 
-			if(projectID == ""){
+			if projectID == "" {
 				utils.Red.Println("⛔ Project ID can't be empty!!")
 				os.Exit(1)
 			}
@@ -56,7 +56,7 @@ var ChaosEnvironmentCmd = &cobra.Command{
 			utils.White_B.Print("\nEnter the Environment ID: ")
 			fmt.Scanln(&environmentID)
 
-			if(environmentID == ""){
+			if environmentID == "" {
 				utils.Red.Println("⛔ Environment ID can't be empty!!")
 				os.Exit(1)
 			}
