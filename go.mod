@@ -7,15 +7,15 @@ require (
 	github.com/fatih/color v1.13.0
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/gorhill/cronexpr v0.0.0-20180427100037-88b0669f7d75
-	github.com/litmuschaos/chaos-operator v0.0.0-20230109130222-de7c74a937a9
-	github.com/litmuschaos/litmus/chaoscenter/graphql/server v0.0.0-20230720053327-bca5e97f553f
+	github.com/litmuschaos/chaos-operator v0.0.0-20230718113617-6819a4be12e4
+	github.com/litmuschaos/litmus/chaoscenter/graphql/server v0.0.0-20240115142759-7a29dc1eb1d8
 	github.com/manifoldco/promptui v0.9.0
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/spf13/cobra v1.3.0
 	github.com/spf13/viper v1.10.1
 	gopkg.in/yaml.v2 v2.4.0
-	k8s.io/api v0.23.3
-	k8s.io/apimachinery v0.23.3
+	k8s.io/api v0.26.0
+	k8s.io/apimachinery v0.26.0
 	k8s.io/client-go v12.0.0+incompatible
 	sigs.k8s.io/yaml v1.3.0
 )
@@ -35,7 +35,7 @@ require (
 	github.com/emicklei/go-restful v2.16.0+incompatible // indirect
 	github.com/form3tech-oss/jwt-go v3.2.3+incompatible // indirect
 	github.com/fsnotify/fsnotify v1.5.1 // indirect
-	github.com/go-logr/logr v1.2.2 // indirect
+	github.com/go-logr/logr v1.2.3 // indirect
 	github.com/go-openapi/jsonpointer v0.19.5 // indirect
 	github.com/go-openapi/jsonreference v0.19.6 // indirect
 	github.com/go-openapi/swag v0.19.15 // indirect
@@ -78,11 +78,11 @@ require (
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/ini.v1 v1.66.3 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	k8s.io/klog/v2 v2.40.1 // indirect
+	k8s.io/klog/v2 v2.80.1 // indirect
 	k8s.io/kube-openapi v0.0.0-20220124234850-424119656bbf // indirect
-	k8s.io/utils v0.0.0-20220210201930-3a6ce19ff2f9 // indirect
+	k8s.io/utils v0.0.0-20221107191617-1a15be271d1d // indirect
 	sigs.k8s.io/controller-runtime v0.11.1 // indirect
-	sigs.k8s.io/structured-merge-diff/v4 v4.2.1 // indirect
+	sigs.k8s.io/structured-merge-diff/v4 v4.2.3 // indirect
 )
 
 // Pinned to kubernetes-1.21.2
