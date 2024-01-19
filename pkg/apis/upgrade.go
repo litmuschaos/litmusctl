@@ -65,7 +65,6 @@ func UpgradeInfra(c context.Context, cred types.Credentials, projectID string, i
 	if resp.StatusCode == http.StatusOK {
 		err = json.Unmarshal(bodyBytes, &infra)
 		if err != nil {
-			fmt.Println("Error in unmarshalling infra")
 			return "", err
 		}
 		if len(infra.Errors) > 0 {
@@ -94,7 +93,6 @@ func UpgradeInfra(c context.Context, cred types.Credentials, projectID string, i
 		var manifest manifestData
 		err = json.Unmarshal(bodyBytes, &manifest)
 		if err != nil {
-			fmt.Println("Error in unmarshalling manifest")
 			return "", err
 		}
 
