@@ -13,31 +13,19 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
-package types
+package list
 
-type Method string
-
-const (
-	Post Method = "POST"
-	Get  Method = "GET"
+import (
+	"github.com/spf13/cobra"
 )
 
-type AuthResponse struct {
-	AccessToken string `json:"accessToken"`
-	ExpiresIn   int64  `json:"expiresIn"`
-	Type        string `json:"type"`
-}
+// getCmd represents the get command
+var ListCmd = &cobra.Command{
+	Use: "list",
+	Short: `Examples:
+		#get list of chaos Chaos Environments
+		litmusctl list chaos-environment --project-id=""
 
-type AuthInput struct {
-	Endpoint       string
-	Username       string
-	Password       string
-	ServerEndpoint string
-}
-
-type Credentials struct {
-	Username       string
-	Token          string
-	Endpoint       string
-	ServerEndpoint string
+		Note: The default location of the config file is $HOME/.litmusconfig, and can be overridden by a --config flag
+	`,
 }

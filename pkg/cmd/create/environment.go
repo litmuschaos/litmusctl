@@ -78,7 +78,9 @@ var environmentCmd = &cobra.Command{
 		newEnvironment.Description = &description
 
 		envType, err := cmd.Flags().GetString("type")
-		utils.PrintError(err)
+		if err != nil {
+			utils.PrintError(err)
+		}
 
 		// Handle blank input for project ID
 		if envType == "" {
@@ -116,7 +118,9 @@ var environmentCmd = &cobra.Command{
 
 		// Perform authorization
 		userDetails, err := apis.GetProjectDetails(credentials)
-		utils.PrintError(err)
+		if err != nil {
+			utils.PrintError(err)
+		}
 		var editAccess = false
 		var project apis.Project
 		for _, p := range userDetails.Data.Projects {

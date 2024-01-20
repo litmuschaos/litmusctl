@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"os"
 
 	"github.com/litmuschaos/litmusctl/pkg/k8s"
 	"github.com/litmuschaos/litmusctl/pkg/types"
@@ -101,12 +100,6 @@ func UpgradeInfra(c context.Context, cred types.Credentials, projectID string, i
 			return "", errors.New(manifest.Errors[0].Message)
 		}
 
-		// To write the manifest data into a temporary file
-		err = ioutil.WriteFile("chaos-infra-manifest.yaml", []byte(manifest.Data.GetManifest), 0644)
-		if err != nil {
-			return "", err
-		}
-
 		// Fetching subscriber-config from the subscriber
 		configData, err := k8s.GetConfigMap(c, "subscriber-config", *infra.Data.GetInfraDetails.InfraNamespace)
 		if err != nil {
@@ -131,21 +124,12 @@ func UpgradeInfra(c context.Context, cred types.Credentials, projectID string, i
 
 		}
 
-		yamlOutput, err := k8s.ApplyYaml(k8s.ApplyYamlPrams{
-			Token:    cred.Token,
-			Endpoint: cred.Endpoint,
-			YamlPath: "chaos-infra-manifest.yaml",
-		}, kubeconfig, true)
+		yamlOutput, err := k8s.UpgradeInfra([]byte(manifest.Data.GetManifest), kubeconfig)
 
 		if err != nil {
 			return "", err
 		}
 		utils.White.Print("\n", yamlOutput)
-
-		err = os.Remove("chaos-infra-manifest.yaml")
-		if err != nil {
-			return "Error removing Chaos Infrastructure manifest: ", err
-		}
 
 		// Creating a backup for current subscriber-config in the SUBSCRIBER
 		home, err := homedir.Dir()

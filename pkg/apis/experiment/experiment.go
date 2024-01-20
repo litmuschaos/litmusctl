@@ -42,7 +42,7 @@ func CreateExperiment(pid string, requestData model.SaveChaosExperimentRequest, 
 
 	resp, err := apis.SendRequest(
 		apis.SendRequestParams{
-			Endpoint: cred.Endpoint + utils.GQLAPIPath,
+			Endpoint: cred.ServerEndpoint + utils.GQLAPIPath,
 			Token:    cred.Token,
 		},
 		httpClient,
@@ -80,7 +80,8 @@ func CreateExperiment(pid string, requestData model.SaveChaosExperimentRequest, 
 
 	// Query to Run the Chaos Experiment
 	runQuery := `{"query":"mutation{ \n runChaosExperiment(experimentID:  \"` + requestData.ID + `\", projectID:  \"` + pid + `\"){\n notifyID \n}}"}`
-	resp, err = apis.SendRequest(apis.SendRequestParams{Endpoint: cred.Endpoint + utils.GQLAPIPath, Token: cred.Token}, httpClient, []byte(runQuery), string(types.Post))
+	
+  resp, err = apis.SendRequest(apis.SendRequestParams{Endpoint: cred.Endpoint + utils.GQLAPIPath, Token: cred.Token}, httpClient, []byte(runQuery), string(types.Post))
 
 	if err != nil {
 		return RunExperimentResponse{}, errors.New("Error in Running Chaos Experiment: " + err.Error())
@@ -124,7 +125,7 @@ func SaveExperiment(pid string, requestData model.SaveChaosExperimentRequest, cr
 
 	resp, err := apis.SendRequest(
 		apis.SendRequestParams{
-			Endpoint: cred.Endpoint + utils.GQLAPIPath,
+			Endpoint: cred.ServerEndpoint + utils.GQLAPIPath,
 			Token:    cred.Token,
 		},
 		httpClient,
@@ -212,7 +213,7 @@ func GetExperimentList(pid string, in model.ListExperimentRequest, cred types.Cr
 
 	resp, err := apis.SendRequest(
 		apis.SendRequestParams{
-			Endpoint: cred.Endpoint + utils.GQLAPIPath,
+			Endpoint: cred.ServerEndpoint + utils.GQLAPIPath,
 			Token:    cred.Token,
 		}, httpClient,
 		query,
@@ -262,7 +263,7 @@ func GetExperimentRunsList(pid string, in model.ListExperimentRunRequest, cred t
 
 	resp, err := apis.SendRequest(
 		apis.SendRequestParams{
-			Endpoint: cred.Endpoint + utils.GQLAPIPath,
+			Endpoint: cred.ServerEndpoint + utils.GQLAPIPath,
 			Token:    cred.Token,
 		}, httpClient,
 		query,
@@ -314,7 +315,7 @@ func DeleteChaosExperiment(projectID string, experimentID *string, cred types.Cr
 
 	resp, err := apis.SendRequest(
 		apis.SendRequestParams{
-			Endpoint: cred.Endpoint + utils.GQLAPIPath,
+			Endpoint: cred.ServerEndpoint + utils.GQLAPIPath,
 			Token:    cred.Token,
 		},
 		httpClient,

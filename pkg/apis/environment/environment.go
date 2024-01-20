@@ -60,21 +60,18 @@ func GetEnvironmentList(pid string, cred types.Credentials, httpClient apis.HTTP
 	if err != nil {
 		return ListEnvironmentData{}, err
 	}
-
 	resp, err := apis.SendRequest(
 		apis.SendRequestParams{
-			Endpoint: cred.Endpoint + utils.GQLAPIPath,
+			Endpoint: cred.ServerEndpoint + utils.GQLAPIPath,
 			Token:    cred.Token,
 		},
 		httpClient,
 		query,
 		string(types.Post),
 	)
-
 	if err != nil {
 		return ListEnvironmentData{}, errors.New("Error in Getting Chaos Environment List: " + err.Error())
 	}
-
 	bodyBytes, err := ioutil.ReadAll(resp.Body)
 	defer resp.Body.Close()
 	if err != nil {

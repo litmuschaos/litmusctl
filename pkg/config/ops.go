@@ -106,6 +106,7 @@ func UpdateLitmusCtlConfig(litmusconfig types.UpdateLitmusCtlConfig, filename st
 	for i, act := range obj.Accounts {
 		if act.Endpoint == litmusconfig.Account.Endpoint {
 			var innerflag = false
+			obj.Accounts[i].ServerEndpoint = litmusconfig.ServerEndpoint
 			for j, user := range act.Users {
 				if user.Username == litmusconfig.Account.Users[0].Username {
 					obj.Accounts[i].Users[j].Username = litmusconfig.Account.Users[0].Username

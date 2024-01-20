@@ -17,6 +17,7 @@ package infrastructure
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 
@@ -38,14 +39,17 @@ func GetInfraList(c types.Credentials, pid string, request models.ListInfraReque
 	if err != nil {
 		return InfraData{}, err
 	}
+  
 	resp, err := apis.SendRequest(apis.SendRequestParams{Endpoint: c.Endpoint + utils.GQLAPIPath, Token: c.Token}, httpClient, query, string(types.Post))
-	if err != nil {
+
+  if err != nil {
 		return InfraData{}, err
 	}
 
 	bodyBytes, err := ioutil.ReadAll(resp.Body)
 	defer resp.Body.Close()
 	if err != nil {
+
 		return InfraData{}, err
 	}
 
@@ -62,7 +66,7 @@ func GetInfraList(c types.Credentials, pid string, request models.ListInfraReque
 
 		return Infra, nil
 	} else {
-		return InfraData{}, err
+		return InfraData{}, fmt.Errorf("error getting detais from server")
 	}
 }
 
@@ -94,7 +98,9 @@ func ConnectInfra(infra types.Infra, cred types.Credentials, httpClient apis.HTT
 	}
 
 	query, err := json.Marshal(gqlReq)
+  
 	resp, err := apis.SendRequest(apis.SendRequestParams{Endpoint: cred.Endpoint + utils.GQLAPIPath, Token: cred.Token}, httpClient, query, string(types.Post))
+
 	if err != nil {
 		return InfraConnectionData{}, errors.New("Error in registering Chaos Infrastructure: " + err.Error())
 	}
@@ -122,19 +128,13 @@ func ConnectInfra(infra types.Infra, cred types.Credentials, httpClient apis.HTT
 }
 
 func CreateRegisterInfraRequest(infra types.Infra) (request models.RegisterInfraRequest) {
-	var mode models.InfrastructureType
-	if infra.InfraType == utils.InfraTypeExternal {
-		mode = models.InfrastructureTypeExternal
-	} else {
-		mode = models.InfrastructureTypeInternal
-	}
 	return models.RegisterInfraRequest{
 		Name:               infra.InfraName,
 		InfraScope:         infra.Mode,
 		Description:        &infra.Description,
 		PlatformName:       infra.PlatformName,
 		EnvironmentID:      infra.EnvironmentID,
-		InfrastructureType: mode,
+		InfrastructureType: models.InfrastructureTypeKubernetes,
 		InfraNamespace:     &infra.Namespace,
 		ServiceAccount:     &infra.ServiceAccount,
 		InfraNsExists:      &infra.NsExists,
@@ -160,7 +160,7 @@ func DisconnectInfra(projectID string, infraID string, cred types.Credentials, h
 
 	resp, err := apis.SendRequest(
 		apis.SendRequestParams{
-			Endpoint: cred.Endpoint + utils.GQLAPIPath,
+			Endpoint: cred.ServerEndpoint + utils.GQLAPIPath,
 			Token:    cred.Token,
 		},
 		httpClient,

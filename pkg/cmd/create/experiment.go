@@ -135,7 +135,7 @@ var experimentCmd = &cobra.Command{
 		}
 
 		//Successful creation
-		utils.White_B.Println("\n🚀 Chaos Experiment successfully created🎉")
+		utils.White_B.Println("\n🚀 Chaos Experiment successfully created and experiment run is scheduled 🎉")
 	},
 }
 

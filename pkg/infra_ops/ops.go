@@ -244,7 +244,7 @@ ENVIRONMENT:
 	// Get platform name as input
 	newInfra.PlatformName = GetPlatformName(kubeconfig)
 	// Set Infra type
-	newInfra.InfraType = utils.InfraTypeExternal
+	newInfra.InfraType = utils.InfraTypeKubernetes
 	// Set project id
 	newInfra.ProjectId = pid
 	// Get namespace
