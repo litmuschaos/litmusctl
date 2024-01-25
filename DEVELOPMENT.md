@@ -54,19 +54,6 @@ GQLAPIPath = "/query"
 AuthAPIPath = ""
 ```
 
-Inside pkg/apis/upgrade.go change this
-
-```go
-resp, err := SendRequest(SendRequestParams{Endpoint: cred.Endpoint + utils.GQLAPIPath, Token: cred.Token}, []byte(query), string(types.Post))
-```
-
-To this
-
-```go
-// Query to fetch Infra details from server
-	resp, err := SendRequest(SendRequestParams{Endpoint: "http://localhost:8080/query", Token: cred.Token}, []byte(query), string(types.Post))
-```
-
 ## **Running `litmusctl`**
 
 Execute the following command to run **`litmusctl`** locally:
