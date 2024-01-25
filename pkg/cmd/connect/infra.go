@@ -17,9 +17,10 @@ package connect
 
 import (
 	"fmt"
+	"os"
+
 	"github.com/litmuschaos/litmusctl/pkg/apis/environment"
 	"github.com/litmuschaos/litmusctl/pkg/apis/infrastructure"
-	"os"
 
 	"github.com/litmuschaos/litmusctl/pkg/apis"
 	"github.com/litmuschaos/litmusctl/pkg/infra_ops"
@@ -243,7 +244,7 @@ var infraCmd = &cobra.Command{
 		}
 
 		//Apply infra connection yaml
-		yamlOutput, err := k8s.ApplyYaml(k8s.ApplyYamlPrams{
+		yamlOutput, err := k8s.ApplyYaml(k8s.ApplyYamlParams{
 			Token:    infra.Data.RegisterInfraDetails.Token,
 			Endpoint: credentials.Endpoint,
 			YamlPath: utils.ChaosYamlPath,
@@ -276,7 +277,7 @@ func init() {
 	infraCmd.Flags().String("name", "", "Set the Chaos infra name")
 	infraCmd.Flags().String("description", "---", "Set the Chaos infra description")
 	infraCmd.Flags().String("platform-name", "Others", "Set the platform name. Supported- AWS/GKE/Openshift/Rancher/Others")
-	infraCmd.Flags().String("chaos-infra-type", "external", "Set the chaos-infra-type to external for external Chaos infras | Supported=external/internal")
+	infraCmd.Flags().String("chaos-infra-type", "Kubernetes", "Set the chaos-infra-type to external for external Chaos infras | Supported=external/internal")
 	infraCmd.Flags().String("node-selector", "", "Set the node-selector for Chaos infra components | Format: \"key1=value1,key2=value2\")")
 	infraCmd.Flags().String("namespace", "litmus", "Set the namespace for the Chaos infra installation")
 	infraCmd.Flags().String("service-account", "litmus", "Set the service account to be used by the Chaos infra")

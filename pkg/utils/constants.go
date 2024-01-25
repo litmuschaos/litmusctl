@@ -43,7 +43,7 @@ const (
 	ChaosInfraLabel = "app=subscriber"
 
 	// infra type is "external" for infras connected via litmusctl
-	InfraTypeExternal = "external"
+	InfraTypeKubernetes = "Kubernetes"
 
 	// member owner role
 	MemberOwnerRole = "Owner"
