@@ -39,10 +39,10 @@ func GetInfraList(c types.Credentials, pid string, request models.ListInfraReque
 	if err != nil {
 		return InfraData{}, err
 	}
-  
+
 	resp, err := apis.SendRequest(apis.SendRequestParams{Endpoint: c.Endpoint + utils.GQLAPIPath, Token: c.Token}, httpClient, query, string(types.Post))
 
-  if err != nil {
+	if err != nil {
 		return InfraData{}, err
 	}
 
@@ -98,7 +98,7 @@ func ConnectInfra(infra types.Infra, cred types.Credentials, httpClient apis.HTT
 	}
 
 	query, err := json.Marshal(gqlReq)
-  
+
 	resp, err := apis.SendRequest(apis.SendRequestParams{Endpoint: cred.Endpoint + utils.GQLAPIPath, Token: cred.Token}, httpClient, query, string(types.Post))
 
 	if err != nil {

@@ -80,8 +80,8 @@ func CreateExperiment(pid string, requestData model.SaveChaosExperimentRequest, 
 
 	// Query to Run the Chaos Experiment
 	runQuery := `{"query":"mutation{ \n runChaosExperiment(experimentID:  \"` + requestData.ID + `\", projectID:  \"` + pid + `\"){\n notifyID \n}}"}`
-	
-  resp, err = apis.SendRequest(apis.SendRequestParams{Endpoint: cred.Endpoint + utils.GQLAPIPath, Token: cred.Token}, httpClient, []byte(runQuery), string(types.Post))
+
+	resp, err = apis.SendRequest(apis.SendRequestParams{Endpoint: cred.Endpoint + utils.GQLAPIPath, Token: cred.Token}, httpClient, []byte(runQuery), string(types.Post))
 
 	if err != nil {
 		return RunExperimentResponse{}, errors.New("Error in Running Chaos Experiment: " + err.Error())
