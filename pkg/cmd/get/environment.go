@@ -18,14 +18,16 @@ package get
 
 import (
 	"fmt"
-	"github.com/litmuschaos/litmusctl/pkg/apis/environment"
-	"github.com/litmuschaos/litmusctl/pkg/utils"
-	"github.com/spf13/cobra"
 	"os"
 	"strconv"
 	"strings"
 	"text/tabwriter"
 	"time"
+
+	"github.com/litmuschaos/litmusctl/pkg/apis"
+	"github.com/litmuschaos/litmusctl/pkg/apis/environment"
+	"github.com/litmuschaos/litmusctl/pkg/utils"
+	"github.com/spf13/cobra"
 )
 
 var ChaosEnvironmentCmd = &cobra.Command{
@@ -62,7 +64,7 @@ var ChaosEnvironmentCmd = &cobra.Command{
 			}
 		}
 
-		environmentList, err := environment.GetEnvironmentList(projectID, credentials)
+		environmentList, err := environment.GetEnvironmentList(projectID, credentials, apis.Client)
 		if err != nil {
 			if strings.Contains(err.Error(), "permission_denied") {
 				utils.Red.Println("❌ You don't have enough permissions to access this resource.")

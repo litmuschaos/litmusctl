@@ -27,7 +27,6 @@ import (
 	"github.com/litmuschaos/litmusctl/pkg/apis/experiment"
 
 	"github.com/litmuschaos/litmus/chaoscenter/graphql/server/graph/model"
-	"github.com/litmuschaos/litmusctl/pkg/apis/experiment"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
 	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"

@@ -26,7 +26,7 @@ import (
 
 	"github.com/golang-jwt/jwt"
 	"github.com/litmuschaos/litmusctl/pkg/apis"
-	"github.com/litmuschaos/litmusctl/pkg/apis/experiment"
+
 	"github.com/litmuschaos/litmusctl/pkg/config"
 	"github.com/litmuschaos/litmusctl/pkg/types"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
@@ -178,17 +178,16 @@ var setAccountCmd = &cobra.Command{
 			utils.Red.Println("\nError: some flags are missing. Run 'litmusctl config set-account --help' for usage. ")
 		}
 
-			serverResp, err := experiment.GetServerVersion(authInput.Endpoint, apis.Client)
-			var isCompatible bool
-			if err != nil {
-				utils.Red.Println("\nError: ", err)
-			} else {
-				compatibilityArr := utils.CompatibilityMatrix[os.Getenv("CLIVersion")]
-				for _, v := range compatibilityArr {
-					if v == serverResp.Data.GetServerVersion.Value {
-						isCompatible = true
-						break
-					}
+		serverResp, err := experiment.GetServerVersion(authInput.Endpoint, apis.Client)
+		var isCompatible bool
+		if err != nil {
+			utils.Red.Println("\nError: ", err)
+		} else {
+			compatibilityArr := utils.CompatibilityMatrix[os.Getenv("CLIVersion")]
+			for _, v := range compatibilityArr {
+				if v == serverResp.Data.GetServerVersion.Value {
+					isCompatible = true
+					break
 				}
 			}
 
