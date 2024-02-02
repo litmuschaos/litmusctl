@@ -3,11 +3,12 @@ package config
 import (
 	"io/ioutil"
 	"os"
+
 	"testing"
 
 	"github.com/litmuschaos/litmusctl/pkg/types"
 	"github.com/stretchr/testify/assert"
-	"gopkg.in/yaml.v2"
+	yaml "gopkg.in/yaml.v2"
 )
 
 func TestCreateNewLitmusCtlConfig(t *testing.T) {
