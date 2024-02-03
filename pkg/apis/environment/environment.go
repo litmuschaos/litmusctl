@@ -93,3 +93,49 @@ func GetEnvironmentList(pid string, cred types.Credentials) (ListEnvironmentData
 		return ListEnvironmentData{}, err
 	}
 }
+
+func DeleteEnvironment(pid string, envid string, cred types.Credentials) (DeleteChaosEnvironmentData, error) {
+	var err error
+	var gqlReq CreateEnvironmentDeleteGQLRequest
+	gqlReq.Query = DeleteEnvironmentQuery
+
+	gqlReq.Variables.EnvironmentID = envid
+	gqlReq.Variables.ProjectID = pid
+	query, err := json.Marshal(gqlReq)
+	if err != nil {
+		return DeleteChaosEnvironmentData{}, err
+	}
+	resp, err := apis.SendRequest(
+		apis.SendRequestParams{
+			Endpoint: cred.ServerEndpoint + utils.GQLAPIPath,
+			Token:    cred.Token,
+		},
+		query,
+		string(types.Post),
+	)
+	if err != nil {
+		return DeleteChaosEnvironmentData{}, errors.New("Error in Deleting Chaos Environment: " + err.Error())
+	}
+
+	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	defer resp.Body.Close()
+	if err != nil {
+		return DeleteChaosEnvironmentData{}, errors.New("Error in Deleting Chaos Environment: " + err.Error())
+	}
+
+	if resp.StatusCode == http.StatusOK {
+		var deletedEnvironment DeleteChaosEnvironmentData
+		err = json.Unmarshal(bodyBytes, &deletedEnvironment)
+		if err != nil {
+			return DeleteChaosEnvironmentData{}, err
+		}
+
+		if len(deletedEnvironment.Errors) > 0 {
+			return DeleteChaosEnvironmentData{}, errors.New(deletedEnvironment.Errors[0].Message)
+		}
+
+		return deletedEnvironment, nil
+	} else {
+		return DeleteChaosEnvironmentData{}, errors.New("Error while deleting the Chaos Environment")
+	}
+}

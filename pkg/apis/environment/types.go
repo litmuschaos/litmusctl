@@ -41,3 +41,23 @@ type CreateEnvironmentListGQLRequest struct {
 		Request   model.ListEnvironmentRequest `json:"request"`
 	}
 }
+
+type CreateEnvironmentDeleteGQLRequest struct {
+	Query     string `json:"query"`
+	Variables struct {
+		ProjectID     string `json:"projectID"`
+		EnvironmentID string `json:"environmentID"`
+	}
+}
+
+type DeleteChaosEnvironmentData struct {
+	Errors []struct {
+		Message string   `json:"message"`
+		Path    []string `json:"path"`
+	} `json:"errors"`
+	Data DeleteChaosEnvironmentDetails `json:"data"`
+}
+
+type DeleteChaosEnvironmentDetails struct {
+	DeleteChaosEnvironment string `json:"deleteChaosExperiment"`
+}
