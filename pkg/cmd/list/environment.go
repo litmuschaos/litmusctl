@@ -18,15 +18,16 @@ package list
 
 import (
 	"fmt"
-	"github.com/litmuschaos/litmusctl/pkg/apis/environment"
-	"github.com/litmuschaos/litmusctl/pkg/utils"
-	"github.com/manifoldco/promptui"
-	"github.com/spf13/cobra"
 	"os"
 	"strconv"
 	"strings"
 	"text/tabwriter"
 	"time"
+
+	"github.com/litmuschaos/litmusctl/pkg/apis/environment"
+	"github.com/litmuschaos/litmusctl/pkg/utils"
+	"github.com/manifoldco/promptui"
+	"github.com/spf13/cobra"
 )
 
 var ListChaosEnvironmentCmd = &cobra.Command{

@@ -19,9 +19,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"math/rand"
 	"net/url"
+	"os"
 	"regexp"
 	"strconv"
 	"strings"
@@ -44,7 +44,7 @@ func ParseExperimentManifest(file string, chaosWorkFlowRequest *model.SaveChaosE
 	// Read the manifest file.
 	parsedURL, ok := url.ParseRequestURI(file)
 	if ok != nil || !(parsedURL.Scheme == "http" || parsedURL.Scheme == "https") {
-		body, err = ioutil.ReadFile(file)
+		body, err = os.ReadFile(file)
 	} else {
 		body, err = ReadRemoteFile(file)
 	}
@@ -133,23 +133,14 @@ func ParseExperimentManifest(file string, chaosWorkFlowRequest *model.SaveChaosE
 	return nil
 }
 
-// Helper function to check the presence of a string in a slice
-func sliceContains(s []string, e string) bool {
-	for _, a := range s {
-		if a == e {
-			return true
-		}
-	}
-	return false
-}
-
 // Helper function to generate a random 8 char string - used for workflow name postfix
 func generateRandomString() string {
-	rand.Seed(time.Now().UnixNano())
+	source := rand.NewSource(time.Now().UnixNano())
+	randomGenerator := rand.New(source)
 	var letters = []rune("abcdefghijklmnopqrstuvxyz0123456789")
 	b := make([]rune, 5)
 	for i := range b {
-		b[i] = letters[rand.Intn(len(letters))]
+		b[i] = letters[randomGenerator.Intn(len(letters))]
 	}
 	return string(b)
 }

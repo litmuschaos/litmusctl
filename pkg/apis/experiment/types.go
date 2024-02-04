@@ -94,20 +94,3 @@ type DeleteChaosExperimentGraphQLRequest struct {
 		ExperimentRunID *string `json:"experimentRunID"`
 	} `json:"variables"`
 }
-
-type ServerVersionResponse struct {
-	Data   ServerVersionData `json:"data"`
-	Errors []struct {
-		Message string   `json:"message"`
-		Path    []string `json:"path"`
-	} `json:"errors"`
-}
-
-type ServerVersionData struct {
-	GetServerVersion GetServerVersionData `json:"getServerVersion"`
-}
-
-type GetServerVersionData struct {
-	Key   string `json:"key"`
-	Value string `json:"value"`
-}

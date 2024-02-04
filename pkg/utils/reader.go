@@ -17,7 +17,7 @@ package utils
 
 import (
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/http"
 
 	"sigs.k8s.io/yaml"
@@ -45,7 +45,7 @@ func ReadRemoteFile(url string) ([]byte, error) {
 	resp, err := http.Get(url)
 	var body []byte
 	if err == nil {
-		body, err = ioutil.ReadAll(resp.Body)
+		body, err = io.ReadAll(resp.Body)
 		resp.Body.Close()
 	}
 	return body, err

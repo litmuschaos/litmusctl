@@ -6,8 +6,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
+	"os"
 
 	"github.com/litmuschaos/litmusctl/pkg/k8s"
 	"github.com/litmuschaos/litmusctl/pkg/types"
@@ -54,7 +55,7 @@ func UpgradeInfra(c context.Context, cred types.Credentials, projectID string, i
 		return "", err
 	}
 
-	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	bodyBytes, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return "", err
 	}
@@ -81,7 +82,7 @@ func UpgradeInfra(c context.Context, cred types.Credentials, projectID string, i
 		return "", err
 	}
 
-	bodyBytes, err = ioutil.ReadAll(resp.Body)
+	bodyBytes, err = io.ReadAll(resp.Body)
 	if err != nil {
 		return "", err
 	}
@@ -136,7 +137,7 @@ func UpgradeInfra(c context.Context, cred types.Credentials, projectID string, i
 		cobra.CheckErr(err)
 
 		configMapString = metadata.String() + configMapString
-		err = ioutil.WriteFile(home+"/backupSubscriberConfig.yaml", []byte(configMapString), 0644)
+		err = os.WriteFile(home+"/backupSubscriberConfig.yaml", []byte(configMapString), 0644)
 		if err != nil {
 			return "Error creating backup for subscriber config: ", err
 		}

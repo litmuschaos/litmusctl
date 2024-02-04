@@ -61,7 +61,7 @@ var InfraCmd = &cobra.Command{
 			}
 		}
 
-		output, err := cmd.Flags().GetString("output")
+		output, _ := cmd.Flags().GetString("output")
 
 		switch output {
 		case "json":

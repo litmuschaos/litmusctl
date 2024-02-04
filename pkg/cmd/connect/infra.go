@@ -105,7 +105,7 @@ var infraCmd = &cobra.Command{
 				os.Exit(1)
 			}
 
-			newInfra.EnvironmentID, err = cmd.Flags().GetString("environmentID")
+			newInfra.EnvironmentID, _ = cmd.Flags().GetString("environmentID")
 			if newInfra.EnvironmentID == "" {
 				utils.Red.Print("Error: --environment flag is empty")
 				os.Exit(1)
