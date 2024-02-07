@@ -30,4 +30,11 @@ const (
 						}
 					}
 					}`
+
+	ServerVersionQuery = `query getServerVersion{
+						getServerVersion{
+						key
+						value
+						}
+						}`
 )
