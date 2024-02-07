@@ -22,9 +22,9 @@ import (
 
 	"github.com/litmuschaos/litmusctl/pkg/apis"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
-
 	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
+	"strings"
 )
 
 // experimentCmd represents the Chaos Experiment command
@@ -102,11 +102,33 @@ Note: The default location of the config file is $HOME/.litmusconfig, and can be
 			os.Exit(1)
 		}
 
+		environmentList, err := environment.GetEnvironmentList(projectID, credentials)
+		if err != nil {
+			if strings.Contains(err.Error(), "permission_denied") {
+				utils.Red.Println("❌ You don't have enough permissions to access this resource.")
+				os.Exit(1)
+			} else {
+				utils.PrintError(err)
+				os.Exit(1)
+			}
+		}
+		environmentListData := environmentList.Data.ListEnvironmentDetails.Environments
+		for i := 0; i < len(environmentListData); i++ {
+			if environmentListData[i].EnvironmentID == environmentID {
+				if(len(environmentListData[i].InfraIDs) > 0){
+					utils.Red.Println("Chaos Infras present in the Chaos Environment")
+					utils.Red.Println("Delete the Chaos Infras first to delete the Environment")
+					os.Exit(1)
+				}
+			}
+		}
+		
 		// confirm before deletion
 		prompt := promptui.Prompt{
 			Label:     "Are you sure you want to delete this Chaos Environment? (y/n)",
 			AllowEdit: true,
 		}
+
 		result, err := prompt.Run()
 		if err != nil {
 			utils.Red.Println("⛔ Error:", err)
@@ -119,7 +141,7 @@ Note: The default location of the config file is $HOME/.litmusconfig, and can be
 		}
 
 		// Make API call
-		deleteEnvironment, err := environment.DeleteEnvironment(projectID, environmentID, credentials)
+		_, err = environment.DeleteEnvironment(projectID, environmentID, credentials)
 		if err != nil {
 			utils.Red.Println("\n❌ Error in deleting Chaos Environment: ", err.Error())
 			os.Exit(1)
@@ -133,6 +155,6 @@ Note: The default location of the config file is $HOME/.litmusconfig, and can be
 func init() {
 	DeleteCmd.AddCommand(environmentCmd)
 
-	environmentCmd.Flags().String("project-id", "", "Set the project-id to delete Chaos Envuronment for the particular project. To see the projects, apply litmusctl get projects")
+	environmentCmd.Flags().String("project-id", "", "Set the project-id to delete Chaos Environment for the particular project. To see the projects, apply litmusctl get projects")
 	environmentCmd.Flags().String("environment-id", "", "Set the environment-id to delete the particular Chaos Environment.")
 }
