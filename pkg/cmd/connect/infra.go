@@ -178,7 +178,7 @@ var infraCmd = &cobra.Command{
 				infra_ops.PrintExistingInfra(infraList)
 				os.Exit(1)
 			}
-			envIDs, err := environment.GetEnvironmentList(newInfra.ProjectId, credentials)
+			envIDs, err := environment.ListEnvironment(newInfra.ProjectId, credentials)
 			utils.PrintError(err)
 
 			// Check if Environment exists

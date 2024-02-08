@@ -138,7 +138,7 @@ ENVIRONMENT:
 	}
 
 	// Check if Chaos Environment with the given name exists
-	Env, err := environment.GetEnvironmentList(pid, c)
+	Env, err := environment.ListEnvironment(pid, c)
 	if err != nil {
 		return types.Infra{}, err
 	}

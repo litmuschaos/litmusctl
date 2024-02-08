@@ -51,7 +51,7 @@ func CreateEnvironment(pid string, request models.CreateEnvironmentRequest, cred
 	}
 }
 
-func GetEnvironmentList(pid string, cred types.Credentials) (ListEnvironmentData, error) {
+func ListEnvironment(pid string, cred types.Credentials) (ListEnvironmentData, error) {
 	var err error
 	var gqlReq CreateEnvironmentListGQLRequest
 	gqlReq.Query = ListEnvironmentQuery

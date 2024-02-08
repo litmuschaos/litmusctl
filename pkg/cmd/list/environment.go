@@ -51,7 +51,7 @@ var ListChaosEnvironmentCmd = &cobra.Command{
 			}
 		}
 
-		environmentList, err := environment.GetEnvironmentList(projectID, credentials)
+		environmentList, err := environment.ListEnvironment(projectID, credentials)
 		if err != nil {
 			if strings.Contains(err.Error(), "permission_denied") {
 				utils.Red.Println("❌ You don't have enough permissions to access this resource.")
