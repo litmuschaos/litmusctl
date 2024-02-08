@@ -32,7 +32,7 @@ import (
 var ChaosEnvironmentCmd = &cobra.Command{
 	Use:   "chaos-environment",
 	Short: "Get Chaos Environment within the project",
-	Long:  `Display the Chaos Environments within the project with the targeted id `,
+	Long:  `Display the Chaos Environment within the project with the targeted id `,
 	Run: func(cmd *cobra.Command, args []string) {
 		credentials, err := utils.GetCredentials(cmd)
 		utils.PrintError(err)
@@ -63,7 +63,7 @@ var ChaosEnvironmentCmd = &cobra.Command{
 			}
 		}
 
-		environmentList, err := environment.ListEnvironment(projectID, credentials)
+		environmentGet, err := environment.GetChaosEnvironment(projectID, environmentID, credentials)
 		if err != nil {
 			if strings.Contains(err.Error(), "permission_denied") {
 				utils.Red.Println("❌ You don't have enough permissions to access this resource.")
@@ -73,36 +73,31 @@ var ChaosEnvironmentCmd = &cobra.Command{
 				os.Exit(1)
 			}
 		}
-		environmentListData := environmentList.Data.ListEnvironmentDetails.Environments
+		environmentGetData := environmentGet.Data.EnvironmentDetails
+
 		writer := tabwriter.NewWriter(os.Stdout, 30, 8, 0, '\t', tabwriter.AlignRight)
 		writer.Flush()
-		for i := 0; i < len(environmentListData); i++ {
-			if environmentListData[i].EnvironmentID == environmentID {
-				intUpdateTime, err := strconv.ParseInt(environmentListData[i].UpdatedAt, 10, 64)
-				if err != nil {
-					utils.Red.Println("Error converting UpdatedAt to int64:", err)
-					continue
-				}
-				updatedTime := time.Unix(intUpdateTime, 0).String()
-				intCreatedTime, err := strconv.ParseInt(environmentListData[i].CreatedAt, 10, 64)
-				if err != nil {
-					utils.Red.Println("Error converting CreatedAt to int64:", err)
-					continue
-				}
-				createdTime := time.Unix(intCreatedTime, 0).String()
-				writer.Flush()
-				utils.White_B.Fprintln(writer, "CHAOS ENVIRONMENT DETAILS")
-				utils.White.Fprintln(writer, "CHAOS ENVIRONMENT ID\t", environmentListData[i].EnvironmentID)
-				utils.White.Fprintln(writer, "CHAOS ENVIRONMENT NAME\t", environmentListData[i].Name)
-				utils.White.Fprintln(writer, "CHAOS ENVIRONMENT Type\t", environmentListData[i].Type)
-				utils.White.Fprintln(writer, "CREATED AT\t", createdTime)
-				utils.White.Fprintln(writer, "CREATED BY\t", environmentListData[i].CreatedBy.Username)
-				utils.White.Fprintln(writer, "UPDATED AT\t", updatedTime)
-				utils.White.Fprintln(writer, "UPDATED BY\t", environmentListData[i].UpdatedBy.Username)
-				utils.White.Fprintln(writer, "CHAOS INFRA IDs\t", strings.Join(environmentListData[i].InfraIDs, ", "))
-				break
-			}
+		intUpdateTime, err := strconv.ParseInt(environmentGetData.UpdatedAt, 10, 64)
+		if err != nil {
+			utils.Red.Println("Error converting UpdatedAt to int64:", err)
 		}
+		updatedTime := time.Unix(intUpdateTime, 0).String()
+		intCreatedTime, err := strconv.ParseInt(environmentGetData.CreatedAt, 10, 64)
+		if err != nil {
+			utils.Red.Println("Error converting CreatedAt to int64:", err)
+		}
+		createdTime := time.Unix(intCreatedTime, 0).String()
+		writer.Flush()
+		utils.White_B.Fprintln(writer, "CHAOS ENVIRONMENT DETAILS")
+		utils.White.Fprintln(writer, "CHAOS ENVIRONMENT ID\t", environmentGetData.EnvironmentID)
+		utils.White.Fprintln(writer, "CHAOS ENVIRONMENT NAME\t", environmentGetData.Name)
+		utils.White.Fprintln(writer, "CHAOS ENVIRONMENT Type\t", environmentGetData.Type)
+		utils.White.Fprintln(writer, "CREATED AT\t", createdTime)
+		utils.White.Fprintln(writer, "CREATED BY\t", environmentGetData.CreatedBy.Username)
+		utils.White.Fprintln(writer, "UPDATED AT\t", updatedTime)
+		utils.White.Fprintln(writer, "UPDATED BY\t", environmentGetData.UpdatedBy.Username)
+		utils.White.Fprintln(writer, "CHAOS INFRA IDs\t", strings.Join(environmentGetData.InfraIDs, ", "))
+		utils.White.Fprintln(writer, "TAGS\t", strings.Join(environmentGetData.Tags, ", "))
 		writer.Flush()
 
 	},

@@ -36,4 +36,22 @@ const (
 					environmentID: $environmentID
 					)
 				}`
+
+	GetEnvironmentQuery = `query getEnvironment($projectID: ID!, $environmentID : ID!) {
+	                 getEnvironment(projectID: $projectID,environmentID: $environmentID){
+							environmentID
+							name
+							createdAt
+							updatedAt
+							createdBy{
+								username
+							  }
+							updatedBy{
+								username
+							}
+							infraIDs
+							type
+							tags
+						}
+	               }`
 )
