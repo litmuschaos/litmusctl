@@ -57,8 +57,8 @@ type GetEnvironment struct {
 type CreateEnvironmentGetGQLRequest struct {
 	Query     string `json:"query"`
 	Variables struct {
-		ProjectID string       `json:"projectID"`
-		EnvironmentID string   `json:"environmentID"`
+		ProjectID     string `json:"projectID"`
+		EnvironmentID string `json:"environmentID"`
 	}
 }
 
