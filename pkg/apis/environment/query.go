@@ -21,11 +21,6 @@ const (
 							createdBy{
 								username
 							  }
-							updatedBy{
-								username
-							}
-							infraIDs
-							type
 						}
 					}
 	               }`
