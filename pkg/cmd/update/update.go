@@ -8,6 +8,7 @@ import (
 	"runtime"
 
 	"github.com/litmuschaos/litmusctl/pkg/utils"
+	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 )
 
@@ -18,7 +19,10 @@ var UpdateCmd = &cobra.Command{
 	Long:  ``,
 	Run: func(cmd *cobra.Command, args []string) {
 		updateVersion := args[0]
-		var homeDir = "/usr/local/bin/"
+		homeDir, err := homedir.Dir()
+		if err != nil {
+			utils.PrintError(err)
+		}
 
 		var assetURL string = "https://litmusctl-production-bucket.s3.amazonaws.com/"
 		var binaryName string = "litmusctl"
