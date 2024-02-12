@@ -60,6 +60,11 @@ var projectsCmd = &cobra.Command{
 					end = totalProjects
 
 				}
+				// check if there are no more projects to display
+				if start >= totalProjects {
+					utils.Red.Println("No more projects to display")
+					break
+				}
 
 				// displaying the projects for the current page
 				writer := tabwriter.NewWriter(os.Stdout, 8, 8, 8, '\t', tabwriter.AlignRight)
