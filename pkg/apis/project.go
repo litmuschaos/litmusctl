@@ -1,6 +1,5 @@
 /*
 Copyright © 2021 The LitmusChaos Authors
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -51,7 +50,7 @@ func CreateProjectRequest(projectName string, cred types.Credentials) (CreatePro
 	if err != nil {
 		return CreateProjectResponse{}, err
 	}
-	resp, err := SendRequest(SendRequestParams{cred.Endpoint + utils.AuthAPIPath + "/create_project", "Bearer " + cred.Token}, payloadBytes, string(types.Post))
+	resp, err := SendRequest(SendRequestParams{cred.Endpoint + utils.AuthAPIPath + "/create_project", "Bearer " + cred.Token}, Client, payloadBytes, string(types.Post))
 	if err != nil {
 		return CreateProjectResponse{}, err
 	}
@@ -95,7 +94,7 @@ type listProjectResponse struct {
 
 func ListProject(cred types.Credentials) (listProjectResponse, error) {
 
-	resp, err := SendRequest(SendRequestParams{Endpoint: cred.Endpoint + utils.AuthAPIPath + "/list_projects", Token: "Bearer " + cred.Token}, []byte{}, string(types.Get))
+	resp, err := SendRequest(SendRequestParams{Endpoint: cred.Endpoint + utils.AuthAPIPath + "/list_projects", Token: "Bearer " + cred.Token}, Client, []byte{}, string(types.Get))
 	if err != nil {
 		return listProjectResponse{}, err
 	}
@@ -157,7 +156,7 @@ func GetProjectDetails(c types.Credentials) (ProjectDetails, error) {
 		return ProjectDetails{}, nil
 	}
 	Username, _ := token.Claims.(jwt.MapClaims)["username"].(string)
-	resp, err := SendRequest(SendRequestParams{Endpoint: c.Endpoint + utils.AuthAPIPath + "/get_user_with_project/" + Username, Token: "Bearer " + c.Token}, []byte{}, string(types.Get))
+	resp, err := SendRequest(SendRequestParams{Endpoint: "http://localhost:3000" + utils.AuthAPIPath + "/get_user_with_project/" + Username, Token: "Bearer " + c.Token}, Client, []byte{}, string(types.Get))
 	if err != nil {
 		return ProjectDetails{}, err
 	}

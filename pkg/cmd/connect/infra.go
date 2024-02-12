@@ -177,7 +177,7 @@ var infraCmd = &cobra.Command{
 				infra_ops.PrintExistingInfra(infraList)
 				os.Exit(1)
 			}
-			envIDs, err := environment.GetEnvironmentList(newInfra.ProjectId, credentials)
+			envIDs, err := environment.GetEnvironmentList(newInfra.ProjectId, credentials, apis.Client)
 			utils.PrintError(err)
 
 			// Check if Environment exists
@@ -223,7 +223,7 @@ var infraCmd = &cobra.Command{
 			infra_ops.ConfirmInstallation()
 		}
 
-		infra, err := infrastructure.ConnectInfra(newInfra, credentials)
+		infra, err := infrastructure.ConnectInfra(newInfra, credentials, apis.Client)
 		if err != nil {
 			utils.Red.Println("\n❌ Chaos Infra connection failed: " + err.Error() + "\n")
 			os.Exit(1)

@@ -113,7 +113,7 @@ var experimentCmd = &cobra.Command{
 		// Generate ExperimentID from ExperimentName
 		chaosExperimentRequest.ID = utils.GenerateNameID(chaosExperimentRequest.Name)
 		// Make API call
-		createExperiment, err := experiment.CreateExperiment(pid, chaosExperimentRequest, credentials)
+		createExperiment, err := experiment.CreateExperiment(pid, chaosExperimentRequest, credentials, apis.Client)
 		if err != nil {
 			if (createExperiment.Data == experiment.RunExperimentData{}) {
 				if strings.Contains(err.Error(), "multiple write errors") {

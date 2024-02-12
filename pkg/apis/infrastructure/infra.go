@@ -1,6 +1,5 @@
 /*
 Copyright © 2021 The LitmusChaos Authors
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a1 copy of the License at
@@ -30,7 +29,7 @@ import (
 )
 
 // GetInfraList lists the Chaos Infrastructure connected to the specified project
-func GetInfraList(c types.Credentials, pid string, request models.ListInfraRequest) (InfraData, error) {
+func GetInfraList(c types.Credentials, pid string, request models.ListInfraRequest, httpClient apis.HTTPClientInterface) (InfraData, error) {
 	var gplReq ListInfraGraphQLRequest
 	gplReq.Query = ListInfraQuery
 	gplReq.Variables.ProjectID = pid
@@ -40,7 +39,9 @@ func GetInfraList(c types.Credentials, pid string, request models.ListInfraReque
 	if err != nil {
 		return InfraData{}, err
 	}
-	resp, err := apis.SendRequest(apis.SendRequestParams{Endpoint: c.ServerEndpoint + utils.GQLAPIPath, Token: c.Token}, query, string(types.Post))
+
+	resp, err := apis.SendRequest(apis.SendRequestParams{Endpoint: c.Endpoint + utils.GQLAPIPath, Token: c.Token}, httpClient, query, string(types.Post))
+
 	if err != nil {
 		return InfraData{}, err
 	}
@@ -70,7 +71,7 @@ func GetInfraList(c types.Credentials, pid string, request models.ListInfraReque
 }
 
 // ConnectInfra connects the  Infra with the given details
-func ConnectInfra(infra types.Infra, cred types.Credentials) (InfraConnectionData, error) {
+func ConnectInfra(infra types.Infra, cred types.Credentials, httpClient apis.HTTPClientInterface) (InfraConnectionData, error) {
 	var gqlReq RegisterInfraGqlRequest
 	gqlReq.Query = RegisterInfraQuery
 	gqlReq.Variables.ProjectId = infra.ProjectId
@@ -97,7 +98,9 @@ func ConnectInfra(infra types.Infra, cred types.Credentials) (InfraConnectionDat
 	}
 
 	query, err := json.Marshal(gqlReq)
-	resp, err := apis.SendRequest(apis.SendRequestParams{Endpoint: cred.ServerEndpoint + utils.GQLAPIPath, Token: cred.Token}, query, string(types.Post))
+
+	resp, err := apis.SendRequest(apis.SendRequestParams{Endpoint: cred.Endpoint + utils.GQLAPIPath, Token: cred.Token}, httpClient, query, string(types.Post))
+
 	if err != nil {
 		return InfraConnectionData{}, errors.New("Error in registering Chaos Infrastructure: " + err.Error())
 	}
@@ -141,7 +144,7 @@ func CreateRegisterInfraRequest(infra types.Infra) (request models.RegisterInfra
 }
 
 // DisconnectInfra sends GraphQL API request for disconnecting Chaos Infra(s).
-func DisconnectInfra(projectID string, infraID string, cred types.Credentials) (DisconnectInfraData, error) {
+func DisconnectInfra(projectID string, infraID string, cred types.Credentials, httpClient apis.HTTPClientInterface) (DisconnectInfraData, error) {
 
 	var gqlReq DisconnectInfraGraphQLRequest
 	var err error
@@ -160,6 +163,7 @@ func DisconnectInfra(projectID string, infraID string, cred types.Credentials) (
 			Endpoint: cred.ServerEndpoint + utils.GQLAPIPath,
 			Token:    cred.Token,
 		},
+		httpClient,
 		query,
 		string(types.Post),
 	)

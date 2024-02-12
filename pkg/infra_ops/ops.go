@@ -17,12 +17,13 @@ package infra_ops
 
 import (
 	"fmt"
-	"github.com/litmuschaos/litmus/chaoscenter/graphql/server/graph/model"
-	"github.com/litmuschaos/litmusctl/pkg/apis/environment"
-	"github.com/litmuschaos/litmusctl/pkg/apis/infrastructure"
 	"os"
 	"strconv"
 	"strings"
+
+	"github.com/litmuschaos/litmus/chaoscenter/graphql/server/graph/model"
+	"github.com/litmuschaos/litmusctl/pkg/apis/environment"
+	"github.com/litmuschaos/litmusctl/pkg/apis/infrastructure"
 
 	"github.com/litmuschaos/litmusctl/pkg/apis"
 	"github.com/litmuschaos/litmusctl/pkg/k8s"
@@ -137,7 +138,7 @@ ENVIRONMENT:
 	}
 
 	// Check if Chaos Environment with the given name exists
-	Env, err := environment.GetEnvironmentList(pid, c)
+	Env, err := environment.GetEnvironmentList(pid, c, apis.Client)
 	if err != nil {
 		return types.Infra{}, err
 	}
@@ -284,7 +285,7 @@ func ValidateSAPermissions(namespace string, mode string, kubeconfig *string) {
 
 // ValidateInfraNameExists checks if an infrastructure already exists
 func ValidateInfraNameExists(infraName string, pid string, c types.Credentials) (bool, error, infrastructure.InfraData) {
-	infra, err := infrastructure.GetInfraList(c, pid, model.ListInfraRequest{})
+	infra, err := infrastructure.GetInfraList(c, pid, model.ListInfraRequest{}, apis.Client)
 	if err != nil {
 		return false, err, infrastructure.InfraData{}
 	}

@@ -26,6 +26,7 @@ import (
 
 	"github.com/golang-jwt/jwt"
 	"github.com/litmuschaos/litmusctl/pkg/apis"
+
 	"github.com/litmuschaos/litmusctl/pkg/config"
 	"github.com/litmuschaos/litmusctl/pkg/types"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
@@ -116,7 +117,7 @@ var setAccountCmd = &cobra.Command{
 				utils.PrintError(err)
 			}
 
-			resp, err := apis.Auth(authInput)
+			resp, err := apis.Auth(authInput, apis.Client)
 			utils.PrintError(err)
 			// Decoding token
 			token, _ := jwt.Parse(resp.AccessToken, nil)
@@ -177,7 +178,7 @@ var setAccountCmd = &cobra.Command{
 			utils.Red.Println("\nError: some flags are missing. Run 'litmusctl config set-account --help' for usage. ")
 		}
 
-		serverResp, err := experiment.GetServerVersion(authInput.Endpoint)
+		serverResp, err := experiment.GetServerVersion(authInput.Endpoint, apis.Client)
 		var isCompatible bool
 		if err != nil {
 			utils.Red.Println("\nError: ", err)

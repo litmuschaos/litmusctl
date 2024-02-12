@@ -120,7 +120,7 @@ var experimentCmd = &cobra.Command{
 		}
 
 		// Make API call
-		deleteExperiment, err := experiment.DeleteChaosExperiment(projectID, &experimentID, credentials)
+		deleteExperiment, err := experiment.DeleteChaosExperiment(projectID, &experimentID, credentials, apis.Client)
 		if err != nil {
 			utils.Red.Println("\n❌ Error in deleting Chaos Experiment: ", err.Error())
 			os.Exit(1)
