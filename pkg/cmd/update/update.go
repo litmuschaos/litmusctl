@@ -8,7 +8,7 @@ import (
 	"runtime"
 
 	"github.com/litmuschaos/litmusctl/pkg/utils"
-	"github.com/mitchellh/go-homedir"
+	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
 )
 
