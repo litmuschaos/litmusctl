@@ -104,7 +104,7 @@ var infraCmd = &cobra.Command{
 				os.Exit(1)
 			}
 
-			newInfra.EnvironmentID, err = cmd.Flags().GetString("environmentID")
+			newInfra.EnvironmentID, _ = cmd.Flags().GetString("environment-id")
 			if newInfra.EnvironmentID == "" {
 				utils.Red.Print("Error: --environment flag is empty")
 				os.Exit(1)
@@ -270,7 +270,7 @@ func init() {
 	infraCmd.Flags().BoolP("non-interactive", "n", false, "Set it to true for non interactive mode | Note: Always set the boolean flag as --non-interactive=Boolean")
 	infraCmd.Flags().StringP("kubeconfig", "k", "", "Set to pass kubeconfig file if it is not in the default location ($HOME/.kube/config)")
 	infraCmd.Flags().String("tolerations", "", "Set the tolerations for Chaos infra components | Format: '[{\"key\":\"key1\",\"value\":\"value1\",\"operator\":\"Exist\",\"effect\":\"NoSchedule\",\"tolerationSeconds\":30}]'")
-
+	infraCmd.Flags().String("environment-id", "", "Set the environmentID for the Chaos infra installation")
 	infraCmd.Flags().String("project-id", "", "Set the project-id to install Chaos infra for the particular project. To see the projects, apply litmusctl get projects")
 	infraCmd.Flags().String("installation-mode", "cluster", "Set the installation mode for the kind of Chaos infra | Supported=cluster/namespace")
 	infraCmd.Flags().String("name", "", "Set the Chaos infra name")
