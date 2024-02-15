@@ -346,36 +346,3 @@ func DeleteChaosExperiment(projectID string, experimentID *string, cred types.Cr
 		return DeleteChaosExperimentData{}, errors.New("Error while deleting the Chaos Experiment")
 	}
 }
-
-// GetServerVersion fetches the GQL server version
-func GetServerVersion(endpoint string) (ServerVersionResponse, error) {
-	query := `{"query":"query{\n getServerVersion{\n key value\n }\n}"}`
-	resp, err := apis.SendRequest(
-		apis.SendRequestParams{
-			Endpoint: endpoint + utils.GQLAPIPath,
-		},
-		[]byte(query),
-		string(types.Post),
-	)
-	if err != nil {
-		return ServerVersionResponse{}, err
-	}
-	bodyBytes, err := ioutil.ReadAll(resp.Body)
-	defer resp.Body.Close()
-	if err != nil {
-		return ServerVersionResponse{}, err
-	}
-	if resp.StatusCode == http.StatusOK {
-		var version ServerVersionResponse
-		err = json.Unmarshal(bodyBytes, &version)
-		if err != nil {
-			return ServerVersionResponse{}, err
-		}
-		if len(version.Errors) > 0 {
-			return ServerVersionResponse{}, errors.New(version.Errors[0].Message)
-		}
-		return version, nil
-	} else {
-		return ServerVersionResponse{}, errors.New(resp.Status)
-	}
-}
