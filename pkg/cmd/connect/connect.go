@@ -28,7 +28,7 @@ var ConnectCmd = &cobra.Command{
 		litmusctl connect chaos-infra --name="new-chaos-infra" --non-interactive
 
 		#connect a chaos-infrastructure within a project
-		litmusctl connect chaos-infra --name="new-chaos-infra" --project-id="d861b650-1549-4574-b2ba-ab754058dd04" --non-interactive
+		litmusctl connect chaos-infra --name="new-chaos-infra" --environment-id="my-environment-id" --project-id="d861b650-1549-4574-b2ba-ab754058dd04" --non-interactive
 		Note: The default location of the config file is $HOME/.litmusconfig, and can be overridden by a --config flag
 	`,
 }
