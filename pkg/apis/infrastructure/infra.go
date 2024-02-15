@@ -214,7 +214,7 @@ func GetServerVersion(endpoint string) (ServerVersionResponse, error) {
 	if err != nil {
 		return ServerVersionResponse{}, err
 	}
-	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	bodyBytes, err := io.ReadAll(resp.Body)
 	defer resp.Body.Close()
 	if err != nil {
 		return ServerVersionResponse{}, err

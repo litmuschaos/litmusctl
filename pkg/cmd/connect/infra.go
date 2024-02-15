@@ -230,7 +230,7 @@ var infraCmd = &cobra.Command{
 		}
 
 		if infra.Data.RegisterInfraDetails.Token == "" {
-			utils.Red.Println("\n❌ failed to get the Infra registration token: " + "\n")
+			utils.Red.Println("\n❌ failed to get the Infra registration token: ")
 			os.Exit(1)
 		}
 
