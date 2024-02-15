@@ -21,7 +21,7 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -304,11 +304,11 @@ func ApplyYaml(params ApplyYamlParams, kubeconfig string, isLocal bool) (output 
 			return "", err
 		}
 		defer resp.Body.Close()
-		resp_body, err := ioutil.ReadAll(resp.Body)
+		resp_body, err := io.ReadAll(resp.Body)
 		if err != nil {
 			return "", err
 		}
-		err = ioutil.WriteFile("chaos-infra-manifest.yaml", resp_body, 0644)
+		err = os.WriteFile("chaos-infra-manifest.yaml", resp_body, 0644)
 		if err != nil {
 			return "", err
 		}

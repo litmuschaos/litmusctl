@@ -18,7 +18,7 @@ package experiment
 import (
 	"encoding/json"
 	"errors"
-	"io/ioutil"
+	"io"
 	"net/http"
 
 	"github.com/litmuschaos/litmus/chaoscenter/graphql/server/graph/model"
@@ -54,7 +54,7 @@ func CreateExperiment(pid string, requestData model.SaveChaosExperimentRequest, 
 		return RunExperimentResponse{}, err
 	}
 
-	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	bodyBytes, err := io.ReadAll(resp.Body)
 
 	defer resp.Body.Close()
 	if err != nil {
@@ -87,7 +87,7 @@ func CreateExperiment(pid string, requestData model.SaveChaosExperimentRequest, 
 		return RunExperimentResponse{}, errors.New("Error in Running Chaos Experiment: " + err.Error())
 	}
 
-	bodyBytes, err = ioutil.ReadAll(resp.Body)
+	bodyBytes, err = io.ReadAll(resp.Body)
 	defer resp.Body.Close()
 	if err != nil {
 		return RunExperimentResponse{}, errors.New("Error in Running Chaos Experiment: " + err.Error())
@@ -135,7 +135,7 @@ func SaveExperiment(pid string, requestData model.SaveChaosExperimentRequest, cr
 		return SaveExperimentData{}, err
 	}
 
-	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	bodyBytes, err := io.ReadAll(resp.Body)
 
 	defer resp.Body.Close()
 	if err != nil {
@@ -173,7 +173,7 @@ func RunExperiment(pid string, eid string, cred types.Credentials) (RunExperimen
 		return RunExperimentResponse{}, errors.New("Error in Running Chaos Experiment: " + err.Error())
 	}
 
-	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	bodyBytes, err := io.ReadAll(resp.Body)
 	defer resp.Body.Close()
 	if err != nil {
 		return RunExperimentResponse{}, errors.New("Error in Running Chaos Experiment: " + err.Error())
@@ -222,7 +222,7 @@ func GetExperimentList(pid string, in model.ListExperimentRequest, cred types.Cr
 		return ExperimentListData{}, err
 	}
 
-	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	bodyBytes, err := io.ReadAll(resp.Body)
 	defer resp.Body.Close()
 	if err != nil {
 		return ExperimentListData{}, err
@@ -272,7 +272,7 @@ func GetExperimentRunsList(pid string, in model.ListExperimentRunRequest, cred t
 		return ExperimentRunListData{}, err
 	}
 
-	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	bodyBytes, err := io.ReadAll(resp.Body)
 	defer resp.Body.Close()
 	if err != nil {
 		return ExperimentRunListData{}, err
@@ -324,7 +324,7 @@ func DeleteChaosExperiment(projectID string, experimentID *string, cred types.Cr
 		return DeleteChaosExperimentData{}, err
 	}
 
-	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	bodyBytes, err := io.ReadAll(resp.Body)
 	defer resp.Body.Close()
 	if err != nil {
 		return DeleteChaosExperimentData{}, err

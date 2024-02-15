@@ -18,7 +18,7 @@ package apis
 import (
 	"encoding/json"
 	"errors"
-	"io/ioutil"
+	"io"
 	"net/http"
 
 	"github.com/litmuschaos/litmusctl/pkg/utils"
@@ -47,7 +47,7 @@ func Auth(input types.AuthInput) (types.AuthResponse, error) {
 		return types.AuthResponse{}, err
 	}
 
-	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	bodyBytes, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return types.AuthResponse{}, err
 	}

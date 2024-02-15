@@ -19,7 +19,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 
 	"github.com/litmuschaos/litmusctl/pkg/apis"
@@ -45,7 +45,7 @@ func GetInfraList(c types.Credentials, pid string, request models.ListInfraReque
 		return InfraData{}, err
 	}
 
-	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	bodyBytes, err := io.ReadAll(resp.Body)
 	defer resp.Body.Close()
 	if err != nil {
 
@@ -97,12 +97,16 @@ func ConnectInfra(infra types.Infra, cred types.Credentials) (InfraConnectionDat
 	}
 
 	query, err := json.Marshal(gqlReq)
+	if err != nil {
+		return InfraConnectionData{}, errors.New("Error in registering Chaos Infrastructure: " + err.Error())
+	}
+
 	resp, err := apis.SendRequest(apis.SendRequestParams{Endpoint: cred.ServerEndpoint + utils.GQLAPIPath, Token: cred.Token}, query, string(types.Post))
 	if err != nil {
 		return InfraConnectionData{}, errors.New("Error in registering Chaos Infrastructure: " + err.Error())
 	}
 
-	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	bodyBytes, err := io.ReadAll(resp.Body)
 	defer resp.Body.Close()
 	if err != nil {
 		return InfraConnectionData{}, errors.New("Error in registering Chaos Infrastructure: " + err.Error())
@@ -167,7 +171,7 @@ func DisconnectInfra(projectID string, infraID string, cred types.Credentials) (
 		return DisconnectInfraData{}, err
 	}
 
-	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	bodyBytes, err := io.ReadAll(resp.Body)
 	defer resp.Body.Close()
 	if err != nil {
 		return DisconnectInfraData{}, err
@@ -190,7 +194,6 @@ func DisconnectInfra(projectID string, infraID string, cred types.Credentials) (
 	}
 }
 
-// GetServerVersion fetches the GQL server version
 func GetServerVersion(endpoint string) (ServerVersionResponse, error) {
 	var gqlReq ServerVersionRequest
 	var err error
@@ -210,7 +213,7 @@ func GetServerVersion(endpoint string) (ServerVersionResponse, error) {
 	if err != nil {
 		return ServerVersionResponse{}, err
 	}
-	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	bodyBytes, err := io.ReadAll(resp.Body)
 	defer resp.Body.Close()
 	if err != nil {
 		return ServerVersionResponse{}, err

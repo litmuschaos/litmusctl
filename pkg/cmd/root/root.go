@@ -19,7 +19,6 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"os"
 
@@ -110,7 +109,7 @@ func initConfig() {
 	if config2.SkipSSLVerify {
 		http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 	} else if config2.CACert != "" {
-		caCert, err := ioutil.ReadFile(config2.CACert)
+		caCert, err := os.ReadFile(config2.CACert)
 		cobra.CheckErr(err)
 		caCertPool := x509.NewCertPool()
 		caCertPool.AppendCertsFromPEM(caCert)

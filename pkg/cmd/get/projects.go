@@ -16,13 +16,14 @@ limitations under the License.
 package get
 
 import (
+	"os"
+	"text/tabwriter"
+	"time"
+
 	"github.com/litmuschaos/litmusctl/pkg/apis"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
 	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
-	"os"
-	"text/tabwriter"
-	"time"
 )
 
 // projectCmd represents the project command

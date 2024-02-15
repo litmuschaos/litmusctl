@@ -105,7 +105,7 @@ var infraCmd = &cobra.Command{
 				os.Exit(1)
 			}
 
-			newInfra.EnvironmentID, err = cmd.Flags().GetString("environmentID")
+			newInfra.EnvironmentID, _ = cmd.Flags().GetString("environmentID")
 			if newInfra.EnvironmentID == "" {
 				utils.Red.Print("Error: --environment flag is empty")
 				os.Exit(1)
@@ -230,7 +230,7 @@ var infraCmd = &cobra.Command{
 		}
 
 		if infra.Data.RegisterInfraDetails.Token == "" {
-			utils.Red.Println("\n❌ failed to get the Infra registration token: " + "\n")
+			utils.Red.Println("\n❌ failed to get the Infra registration token: ")
 			os.Exit(1)
 		}
 
