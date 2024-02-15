@@ -23,7 +23,6 @@ import (
 	"os"
 	"text/tabwriter"
 	"time"
-	// "fmt"
 )
 
 // projectCmd represents the project command
