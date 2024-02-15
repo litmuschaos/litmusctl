@@ -39,7 +39,7 @@ var projectsCmd = &cobra.Command{
 
 		projects, err := apis.ListProject(credentials)
 		utils.PrintError(err)
-		
+
 		switch outputFormat {
 		case "json":
 			utils.PrintInJsonFormat(projects.Data)
