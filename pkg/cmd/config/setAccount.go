@@ -22,7 +22,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/litmuschaos/litmusctl/pkg/apis/experiment"
+	infra "github.com/litmuschaos/litmusctl/pkg/apis/infrastructure"
 
 	"github.com/golang-jwt/jwt"
 	"github.com/litmuschaos/litmusctl/pkg/apis"
@@ -177,7 +177,7 @@ var setAccountCmd = &cobra.Command{
 			utils.Red.Println("\nError: some flags are missing. Run 'litmusctl config set-account --help' for usage. ")
 		}
 
-		serverResp, err := experiment.GetServerVersion(authInput.Endpoint)
+		serverResp, err := infra.GetServerVersion(authInput.Endpoint)
 		var isCompatible bool
 		if err != nil {
 			utils.Red.Println("\nError: ", err)

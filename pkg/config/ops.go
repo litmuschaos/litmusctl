@@ -17,7 +17,6 @@ package config
 
 import (
 	"errors"
-	"io/ioutil"
 	"os"
 
 	"github.com/litmuschaos/litmusctl/pkg/types"
@@ -41,7 +40,7 @@ func CreateNewLitmusCtlConfig(filename string, config types.LitmuCtlConfig) erro
 		return err
 	}
 
-	err = ioutil.WriteFile(filename, configByte, 0644)
+	err = os.WriteFile(filename, configByte, 0644)
 	if err != nil {
 		return err
 	}
@@ -59,7 +58,7 @@ func FileExists(filename string) bool {
 }
 
 func GetFileLength(filename string) (int, error) {
-	data, err := ioutil.ReadFile(filename)
+	data, err := os.ReadFile(filename)
 	if err != nil {
 		return -1, err
 	}
@@ -68,7 +67,7 @@ func GetFileLength(filename string) (int, error) {
 }
 
 func YamltoObject(filename string) (types.LitmuCtlConfig, error) {
-	data, err := ioutil.ReadFile(filename)
+	data, err := os.ReadFile(filename)
 	if err != nil {
 		return types.LitmuCtlConfig{}, errors.New("File reading error " + err.Error())
 	}
@@ -166,7 +165,7 @@ func writeObjToFile(obj types.LitmuCtlConfig, filename string) error {
 		return err
 	}
 
-	err = ioutil.WriteFile(filename, byteObj, 0644)
+	err = os.WriteFile(filename, byteObj, 0644)
 	if err != nil {
 		return err
 	}

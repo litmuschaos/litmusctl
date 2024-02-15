@@ -17,12 +17,13 @@ package infra_ops
 
 import (
 	"fmt"
-	"github.com/litmuschaos/litmus/chaoscenter/graphql/server/graph/model"
-	"github.com/litmuschaos/litmusctl/pkg/apis/environment"
-	"github.com/litmuschaos/litmusctl/pkg/apis/infrastructure"
 	"os"
 	"strconv"
 	"strings"
+
+	"github.com/litmuschaos/litmus/chaoscenter/graphql/server/graph/model"
+	"github.com/litmuschaos/litmusctl/pkg/apis/environment"
+	"github.com/litmuschaos/litmusctl/pkg/apis/infrastructure"
 
 	"github.com/litmuschaos/litmusctl/pkg/apis"
 	"github.com/litmuschaos/litmusctl/pkg/k8s"
@@ -116,7 +117,7 @@ INFRA_NAME:
 	}
 
 	// Check if Chaos Infra with the given name already exists
-	isInfraExist, err, infra := ValidateInfraNameExists(newInfra.InfraName, pid, c)
+	isInfraExist, _, infra := ValidateInfraNameExists(newInfra.InfraName, pid, c)
 
 	if isInfraExist {
 		PrintExistingInfra(infra)

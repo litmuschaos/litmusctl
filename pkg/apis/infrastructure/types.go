@@ -66,3 +66,19 @@ type DisconnectInfraGraphQLRequest struct {
 		InfraID   string `json:"infraID"`
 	} `json:"variables"`
 }
+
+type ServerVersionRequest struct {
+	Query string `json:"query"`
+}
+
+type ServerVersionResponse struct {
+	Data   ServerVersionData `json:"data"`
+	Errors []struct {
+		Message string   `json:"message"`
+		Path    []string `json:"path"`
+	} `json:"errors"`
+}
+
+type ServerVersionData struct {
+	GetServerVersion models.ServerVersionResponse `json:"getServerVersion"`
+}

@@ -17,9 +17,10 @@ package connect
 
 import (
 	"fmt"
+	"os"
+
 	"github.com/litmuschaos/litmusctl/pkg/apis/environment"
 	"github.com/litmuschaos/litmusctl/pkg/apis/infrastructure"
-	"os"
 
 	"github.com/litmuschaos/litmusctl/pkg/apis"
 	"github.com/litmuschaos/litmusctl/pkg/infra_ops"
@@ -105,6 +106,7 @@ var infraCmd = &cobra.Command{
 			}
 
 			newInfra.EnvironmentID, _ = cmd.Flags().GetString("environment-id")
+
 			if newInfra.EnvironmentID == "" {
 				utils.Red.Print("Error: --environment flag is empty")
 				os.Exit(1)
@@ -229,7 +231,7 @@ var infraCmd = &cobra.Command{
 		}
 
 		if infra.Data.RegisterInfraDetails.Token == "" {
-			utils.Red.Println("\n❌ failed to get the Infra registration token: " + "\n")
+			utils.Red.Println("\n❌ failed to get the Infra registration token: ")
 			os.Exit(1)
 		}
 
@@ -243,7 +245,7 @@ var infraCmd = &cobra.Command{
 		}
 
 		//Apply infra connection yaml
-		yamlOutput, err := k8s.ApplyYaml(k8s.ApplyYamlPrams{
+		yamlOutput, err := k8s.ApplyYaml(k8s.ApplyYamlParams{
 			Token:    infra.Data.RegisterInfraDetails.Token,
 			Endpoint: credentials.Endpoint,
 			YamlPath: utils.ChaosYamlPath,

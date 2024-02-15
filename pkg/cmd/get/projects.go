@@ -16,13 +16,14 @@ limitations under the License.
 package get
 
 import (
+	"os"
+	"text/tabwriter"
+	"time"
+
 	"github.com/litmuschaos/litmusctl/pkg/apis"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
 	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
-	"os"
-	"text/tabwriter"
-	"time"
 )
 
 // projectCmd represents the project command
@@ -34,8 +35,7 @@ var projectsCmd = &cobra.Command{
 		credentials, err := utils.GetCredentials(cmd)
 		utils.PrintError(err)
 
-		//promptui to ask the user for the output format
-		outputFormat := ""
+		outputFormat, _ := cmd.Flags().GetString("output")
 
 		projects, err := apis.ListProject(credentials)
 		utils.PrintError(err)
@@ -59,6 +59,11 @@ var projectsCmd = &cobra.Command{
 				if end > totalProjects {
 					end = totalProjects
 
+				}
+				// check if there are no more projects to display
+				if start >= totalProjects {
+					utils.Red.Println("No more projects to display")
+					break
 				}
 
 				// displaying the projects for the current page

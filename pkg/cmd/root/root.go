@@ -19,12 +19,12 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"os"
 
 	"github.com/litmuschaos/litmusctl/pkg/cmd/run"
 	"github.com/litmuschaos/litmusctl/pkg/cmd/save"
+	"github.com/litmuschaos/litmusctl/pkg/cmd/update"
 
 	"github.com/litmuschaos/litmusctl/pkg/cmd/connect"
 	"github.com/litmuschaos/litmusctl/pkg/cmd/delete"
@@ -77,6 +77,7 @@ func init() {
 	rootCmd.AddCommand(save.SaveCmd)
 	rootCmd.AddCommand(run.RunCmd)
 	rootCmd.AddCommand(list.ListCmd)
+	rootCmd.AddCommand(update.UpdateCmd)
 
 	// Here you will define your flags and configuration settings.
 	// Cobra supports persistent flags, which, if defined here,
@@ -108,7 +109,7 @@ func initConfig() {
 	if config2.SkipSSLVerify {
 		http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 	} else if config2.CACert != "" {
-		caCert, err := ioutil.ReadFile(config2.CACert)
+		caCert, err := os.ReadFile(config2.CACert)
 		cobra.CheckErr(err)
 		caCertPool := x509.NewCertPool()
 		caCertPool.AppendCertsFromPEM(caCert)

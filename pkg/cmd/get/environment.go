@@ -18,14 +18,15 @@ package get
 
 import (
 	"fmt"
-	"github.com/litmuschaos/litmusctl/pkg/apis/environment"
-	"github.com/litmuschaos/litmusctl/pkg/utils"
-	"github.com/spf13/cobra"
 	"os"
 	"strconv"
 	"strings"
 	"text/tabwriter"
 	"time"
+
+	"github.com/litmuschaos/litmusctl/pkg/apis/environment"
+	"github.com/litmuschaos/litmusctl/pkg/utils"
+	"github.com/spf13/cobra"
 )
 
 var ChaosEnvironmentCmd = &cobra.Command{
