@@ -17,12 +17,13 @@ package run
 
 import (
 	"fmt"
+	"os"
+	"strings"
+
 	"github.com/litmuschaos/litmusctl/pkg/apis"
 	"github.com/litmuschaos/litmusctl/pkg/apis/experiment"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
 	"github.com/spf13/cobra"
-	"os"
-	"strings"
 )
 
 // experimentCmd represents the project command

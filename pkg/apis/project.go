@@ -18,7 +18,7 @@ package apis
 import (
 	"encoding/json"
 	"errors"
-	"io/ioutil"
+	"io"
 	"net/http"
 
 	"github.com/golang-jwt/jwt"
@@ -56,7 +56,7 @@ func CreateProjectRequest(projectName string, cred types.Credentials) (CreatePro
 		return CreateProjectResponse{}, err
 	}
 
-	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	bodyBytes, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return CreateProjectResponse{}, err
 	}
@@ -100,7 +100,7 @@ func ListProject(cred types.Credentials) (listProjectResponse, error) {
 		return listProjectResponse{}, err
 	}
 
-	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	bodyBytes, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return listProjectResponse{}, err
 	}
@@ -162,7 +162,7 @@ func GetProjectDetails(c types.Credentials) (ProjectDetails, error) {
 		return ProjectDetails{}, err
 	}
 
-	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	bodyBytes, err := io.ReadAll(resp.Body)
 	defer resp.Body.Close()
 	if err != nil {
 		return ProjectDetails{}, err

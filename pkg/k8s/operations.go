@@ -18,23 +18,34 @@ package k8s
 import (
 	"bytes"
 	"context"
+	"errors"
 	"flag"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
 
+	"k8s.io/client-go/discovery/cached/memory"
+	"k8s.io/client-go/dynamic"
+	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
+	"k8s.io/client-go/restmapper"
+	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/util/homedir"
 
 	"github.com/litmuschaos/litmusctl/pkg/utils"
+	"github.com/sirupsen/logrus"
 	authorizationv1 "k8s.io/api/authorization/v1"
 	v1 "k8s.io/api/core/v1"
 	k8serror "k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/api/meta"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/apimachinery/pkg/util/yaml"
 	"k8s.io/client-go/discovery"
 	authorizationv1client "k8s.io/client-go/kubernetes/typed/authorization/v1"
 )
@@ -274,13 +285,13 @@ func ValidSA(namespace string, kubeconfig *string) (string, bool) {
 // Token: Authorization token
 // EndPoint: Endpoint in .litmusconfig
 // YamlPath: Path of yaml file
-type ApplyYamlPrams struct {
+type ApplyYamlParams struct {
 	Token    string
 	Endpoint string
 	YamlPath string
 }
 
-func ApplyYaml(params ApplyYamlPrams, kubeconfig string, isLocal bool) (output string, err error) {
+func ApplyYaml(params ApplyYamlParams, kubeconfig string, isLocal bool) (output string, err error) {
 	path := params.YamlPath
 	if !isLocal {
 		path = fmt.Sprintf("%s%s/%s.yaml", params.Endpoint, params.YamlPath, params.Token)
@@ -293,11 +304,11 @@ func ApplyYaml(params ApplyYamlPrams, kubeconfig string, isLocal bool) (output s
 			return "", err
 		}
 		defer resp.Body.Close()
-		resp_body, err := ioutil.ReadAll(resp.Body)
+		resp_body, err := io.ReadAll(resp.Body)
 		if err != nil {
 			return "", err
 		}
-		err = ioutil.WriteFile("chaos-infra-manifest.yaml", resp_body, 0644)
+		err = os.WriteFile("chaos-infra-manifest.yaml", resp_body, 0644)
 		if err != nil {
 			return "", err
 		}
@@ -331,6 +342,134 @@ func ApplyYaml(params ApplyYamlPrams, kubeconfig string, isLocal bool) (output s
 
 	// If no error found, return standard output
 	return outStr, nil
+}
+
+// UpgradeInfra upgrades the Chaos Infrastructure using the provided manifest and kubeconfig with the help of client-go library.
+func UpgradeInfra(manifest []byte, kubeconfig string) (string, error) {
+
+	// Get Kubernetes and dynamic clients along with the configuration.
+	_, kubeClient, dynamicClient, err := getClientAndConfig(kubeconfig)
+	if err != nil {
+		return "", err
+	}
+
+	// Decode the manifest into a list of Unstructured resources.
+	resources, err := decodeManifest(manifest)
+	if err != nil {
+		return "", err
+	}
+
+	// Apply the decoded resources using the dynamic client and Kubernetes client.
+	err = applyResources(resources, dynamicClient, kubeClient)
+	if err != nil {
+		return "", err
+	}
+
+	logrus.Println("🚀 Successfully Upgraded Chaos Infra")
+
+	return "Success", nil
+
+}
+
+// retrieves the Kubernetes and dynamic clients along with the configuration.
+func getClientAndConfig(kubeconfig string) (*rest.Config, *kubernetes.Clientset, dynamic.Interface, error) {
+	var config *rest.Config
+	var dynamicClient dynamic.Interface
+
+	// If kubeconfig is provided, use it to create the configuration and dynamic client.
+	if kubeconfig != "" {
+		var err error
+		config, err = clientcmd.BuildConfigFromFlags("", kubeconfig)
+		if err != nil {
+			return nil, nil, nil, fmt.Errorf("failed to build config from flags: %w", err)
+		}
+	} else {
+		// Use the default kubeconfig file at $HOME/.kube/config.
+		home := homedir.HomeDir()
+		defaultKubeconfig := filepath.Join(home, ".kube", "config")
+		if _, err := os.Stat(defaultKubeconfig); !os.IsNotExist(err) {
+			var err error
+			config, err = clientcmd.BuildConfigFromFlags("", defaultKubeconfig)
+			if err != nil {
+				return nil, nil, nil, fmt.Errorf("failed to build config from flags: %w", err)
+			}
+		} else {
+			// Return an error if kubeconfig is not provided and the default file doesn't exist
+			return nil, nil, nil, errors.New("kubeconfig not provided, and default kubeconfig not found")
+		}
+	}
+
+	// Create the dynamic client using the configuration.
+	dynamicClient, err := dynamic.NewForConfig(config)
+	if err != nil {
+		return nil, nil, nil, fmt.Errorf("failed to create dynamic client: %w", err)
+	}
+
+	// Create a Kubernetes client using the configuration.
+	kubeClient, err := kubernetes.NewForConfig(config)
+	if err != nil {
+		return nil, nil, nil, fmt.Errorf("failed to create kube client: %w", err)
+	}
+
+	return config, kubeClient, dynamicClient, nil
+}
+
+// decodes the manifest byte slice into a list of Unstructured resources.
+func decodeManifest(manifest []byte) ([]*unstructured.Unstructured, error) {
+	decoder := yaml.NewYAMLOrJSONDecoder(bytes.NewReader(manifest), len(manifest))
+
+	// Split the resource file into separate YAML documents.
+	resources := []*unstructured.Unstructured{}
+	for {
+		resourcestr := &unstructured.Unstructured{}
+		if err := decoder.Decode(resourcestr); err != nil {
+			if err.Error() == "EOF" {
+				break
+			}
+			return nil, fmt.Errorf("error in decoding resource: %w", err)
+		}
+		resources = append(resources, resourcestr)
+	}
+
+	return resources, nil
+}
+
+// applies the decoded resources using the dynamic client and Kubernetes client.
+func applyResources(resources []*unstructured.Unstructured, dynamicClient dynamic.Interface, kubeClient *kubernetes.Clientset) error {
+	for _, resource := range resources {
+		logrus.Infof("Applying resource: %s , kind: %s", resource.GetName(), resource.GetKind())
+
+		gvk := resource.GroupVersionKind()
+		// a mapper for REST mapping.
+		mapper := restmapper.NewDeferredDiscoveryRESTMapper(memory.NewMemCacheClient(kubeClient.Discovery()))
+		// Map GVK to GVR using the REST mapper.
+		mapping, err := mapper.RESTMapping(gvk.GroupKind(), gvk.Version)
+		if err != nil {
+			return fmt.Errorf("error in resource gvk to gvr mapping: %w", err)
+		}
+
+		var dr dynamic.ResourceInterface
+		if mapping.Scope.Name() == meta.RESTScopeNameNamespace {
+			// Namespaced resources should specify the namespace
+			dr = dynamicClient.Resource(mapping.Resource).Namespace(resource.GetNamespace())
+		} else {
+			// For cluster-wide resources
+			dr = dynamicClient.Resource(mapping.Resource)
+		}
+
+		// Apply the resource using the dynamic client.
+		_, err = dr.Apply(context.TODO(), resource.GetName(), resource, metav1.ApplyOptions{
+			Force:        true,
+			FieldManager: "application/apply-patch",
+		})
+		if err != nil {
+			return fmt.Errorf("error in applying resource: %w", err)
+		}
+
+		logrus.Info("Resource applied successfully")
+	}
+
+	return nil
 }
 
 // GetConfigMap returns config map for a given name and namespace

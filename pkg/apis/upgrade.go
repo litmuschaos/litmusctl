@@ -6,7 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"os"
 
@@ -55,7 +55,7 @@ func UpgradeInfra(c context.Context, cred types.Credentials, projectID string, i
 		return "", err
 	}
 
-	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	bodyBytes, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return "", err
 	}
@@ -82,7 +82,7 @@ func UpgradeInfra(c context.Context, cred types.Credentials, projectID string, i
 		return "", err
 	}
 
-	bodyBytes, err = ioutil.ReadAll(resp.Body)
+	bodyBytes, err = io.ReadAll(resp.Body)
 	if err != nil {
 		return "", err
 	}
@@ -99,12 +99,6 @@ func UpgradeInfra(c context.Context, cred types.Credentials, projectID string, i
 
 		if len(manifest.Errors) > 0 {
 			return "", errors.New(manifest.Errors[0].Message)
-		}
-
-		// To write the manifest data into a temporary file
-		err = ioutil.WriteFile("chaos-infra-manifest.yaml", []byte(manifest.Data.GetManifest), 0644)
-		if err != nil {
-			return "", err
 		}
 
 		// Fetching subscriber-config from the subscriber
@@ -131,28 +125,19 @@ func UpgradeInfra(c context.Context, cred types.Credentials, projectID string, i
 
 		}
 
-		yamlOutput, err := k8s.ApplyYaml(k8s.ApplyYamlPrams{
-			Token:    cred.Token,
-			Endpoint: cred.Endpoint,
-			YamlPath: "chaos-infra-manifest.yaml",
-		}, kubeconfig, true)
+		yamlOutput, err := k8s.UpgradeInfra([]byte(manifest.Data.GetManifest), kubeconfig)
 
 		if err != nil {
 			return "", err
 		}
 		utils.White.Print("\n", yamlOutput)
 
-		err = os.Remove("chaos-infra-manifest.yaml")
-		if err != nil {
-			return "Error removing Chaos Infrastructure manifest: ", err
-		}
-
 		// Creating a backup for current subscriber-config in the SUBSCRIBER
 		home, err := homedir.Dir()
 		cobra.CheckErr(err)
 
 		configMapString = metadata.String() + configMapString
-		err = ioutil.WriteFile(home+"/backupSubscriberConfig.yaml", []byte(configMapString), 0644)
+		err = os.WriteFile(home+"/backupSubscriberConfig.yaml", []byte(configMapString), 0644)
 		if err != nil {
 			return "Error creating backup for subscriber config: ", err
 		}

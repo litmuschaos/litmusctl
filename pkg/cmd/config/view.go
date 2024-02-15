@@ -17,7 +17,6 @@ package config
 
 import (
 	"fmt"
-	"io/ioutil"
 
 	"github.com/litmuschaos/litmusctl/pkg/utils"
 
@@ -41,7 +40,7 @@ var viewCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		data, err := ioutil.ReadFile(configFilePath)
+		data, err := os.ReadFile(configFilePath)
 		utils.PrintError(err)
 
 		//Printing the config map
