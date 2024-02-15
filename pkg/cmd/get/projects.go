@@ -23,6 +23,7 @@ import (
 	"os"
 	"text/tabwriter"
 	"time"
+	// "fmt"
 )
 
 // projectCmd represents the project command
@@ -34,12 +35,11 @@ var projectsCmd = &cobra.Command{
 		credentials, err := utils.GetCredentials(cmd)
 		utils.PrintError(err)
 
-		//promptui to ask the user for the output format
-		outputFormat := ""
+		outputFormat, _ := cmd.Flags().GetString("output")
 
 		projects, err := apis.ListProject(credentials)
 		utils.PrintError(err)
-
+		
 		switch outputFormat {
 		case "json":
 			utils.PrintInJsonFormat(projects.Data)
