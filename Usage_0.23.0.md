@@ -313,6 +313,20 @@ Enter the Environment Name: test2
 🚀 New Chaos Environment creation successful!! 🎉
 ```
 
+- To delete an Environment, apply the following command :
+
+```shell
+litmusctl delete chaos-environment
+
+Enter the Project ID: eb7fc0a0-5878-4454-a9db-b67d283713bc
+
+Enter the Environment ID: testenv
+
+Are you sure you want to delete this Chaos Environment? (y/n):y
+
+🚀 Chaos Environment successfully deleted.
+```
+
 - To view all the projects with the user, use the `get projects` command.
 
 ```shell
