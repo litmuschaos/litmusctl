@@ -105,7 +105,7 @@ Note: The default location of the config file is $HOME/.litmusconfig, and can be
 		environmentList, err := environment.GetEnvironmentList(projectID, credentials)
 		if err != nil {
 			if strings.Contains(err.Error(), "permission_denied") {
-				utils.Red.Println("❌ You don't have enough permissions to access this resource.")
+				utils.Red.Println("❌ You don't have enough permissions to delete an environment.")
 				os.Exit(1)
 			} else {
 				utils.PrintError(err)
@@ -116,8 +116,8 @@ Note: The default location of the config file is $HOME/.litmusconfig, and can be
 		for i := 0; i < len(environmentListData); i++ {
 			if environmentListData[i].EnvironmentID == environmentID {
 				if len(environmentListData[i].InfraIDs) > 0 {
-					utils.Red.Println("Chaos Infras present in the Chaos Environment")
-					utils.Red.Println("Delete the Chaos Infras first to delete the Environment")
+					utils.Red.Println("Chaos Infras present in the Chaos Environment" +
+						"delete the Chaos Infras first to delete the Environment")
 					os.Exit(1)
 				}
 			}

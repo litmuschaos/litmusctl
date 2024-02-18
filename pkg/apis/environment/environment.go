@@ -117,7 +117,7 @@ func DeleteEnvironment(pid string, envid string, cred types.Credentials) (Delete
 		return DeleteChaosEnvironmentData{}, errors.New("Error in Deleting Chaos Environment: " + err.Error())
 	}
 
-	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	bodyBytes, err := io.ReadAll(resp.Body)
 	defer resp.Body.Close()
 	if err != nil {
 		return DeleteChaosEnvironmentData{}, errors.New("Error in Deleting Chaos Environment: " + err.Error())
