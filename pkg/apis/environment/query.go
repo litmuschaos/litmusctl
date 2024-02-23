@@ -29,4 +29,11 @@ const (
 						}
 					}
 	               }`
+
+	DeleteEnvironmentQuery = `mutation deleteEnvironment($projectID: ID!, $environmentID: ID!) {
+					deleteEnvironment(
+					projectID: $projectID
+					environmentID: $environmentID
+					)
+				}`
 )
