@@ -324,7 +324,7 @@ Enter the Environment ID: testenv
 
 Are you sure you want to delete this Chaos Environment? (y/n):y
 
-🚀 Chaos Environment successfully deleted.
+🚀 Chaos Environment deleted successfully.
 ```
 
 - To view all the projects with the user, use the `get projects` command.
