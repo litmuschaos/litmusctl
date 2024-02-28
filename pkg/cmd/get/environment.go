@@ -52,7 +52,6 @@ var ChaosEnvironmentCmd = &cobra.Command{
 
 		environmentID, err := cmd.Flags().GetString("environment-id")
 		utils.PrintError(err)
-
 		if environmentID == "" {
 			utils.White_B.Print("\nEnter the Environment ID: ")
 			fmt.Scanln(&environmentID)

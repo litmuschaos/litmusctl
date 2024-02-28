@@ -1,0 +1,31 @@
+#!/usr/bin/env python3
+
+"""Extract steps containing special env variable COMMIT_HOOKS from Github workflow"""
+import yaml
+import argparse
+
+# Parse command-line arguments
+parser = argparse.ArgumentParser()
+parser.add_argument("workflow_file",
+                    help="Path to the GitHub Actions workflow file")
+
+args = parser.parse_args()
+
+# Load the GitHub Actions workflow file as YAML
+with open(args.workflow_file, "r") as file:
+    data = yaml.safe_load(file)
+
+print("#!/bin/bash")
+# Loop over all jobs
+for job_name, job in data["jobs"].items():
+    # Loop over all steps in the job
+    for step in job["steps"]:
+        # Check if the step has a KCIDB_HOOKS environment variable
+        if "env" in step and step["env"].get("COMMIT_HOOKS") == "pre-commit":
+            # Print the name of the step
+            print(f"\n# {step['name']}")
+            # Extract the command(s) from the step
+            command = step.get("run", [])
+            # Print the command(s)
+            for line in command if isinstance(command, list) else [command]:
+                print(line)
