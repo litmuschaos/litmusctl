@@ -163,7 +163,7 @@ func GetChaosEnvironment(pid string, envid string, cred types.Credentials) (GetE
 	if err != nil {
 		return GetEnvironmentData{}, errors.New("Error in Getting Chaos Environment: " + err.Error())
 	}
-	bodyBytes, err := ioutil.ReadAll(resp.Body)
+	bodyBytes, err := io.ReadAll(resp.Body)
 	defer resp.Body.Close()
 	if err != nil {
 		return GetEnvironmentData{}, errors.New("Error in Getting Chaos Environment: " + err.Error())
