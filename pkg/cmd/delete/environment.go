@@ -116,7 +116,7 @@ Note: The default location of the config file is $HOME/.litmusconfig, and can be
 		if len(environmentGetData.InfraIDs) > 0 {
 			utils.Red.Println("Chaos Infras present in the Chaos Environment" +
 				", delete the Chaos Infras first to delete the Environment")
-		    os.Exit(1)
+			os.Exit(1)
 		}
 
 		// confirm before deletion

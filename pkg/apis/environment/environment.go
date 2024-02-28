@@ -140,7 +140,6 @@ func DeleteEnvironment(pid string, envid string, cred types.Credentials) (Delete
 	}
 }
 
-
 func GetChaosEnvironment(pid string, envid string, cred types.Credentials) (GetEnvironmentData, error) {
 	var err error
 	var gqlReq CreateEnvironmentGetGQLRequest
