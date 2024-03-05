@@ -6,14 +6,13 @@ import (
 	"io"
 	"net/http"
 
-
 	models "github.com/litmuschaos/litmus/chaoscenter/graphql/server/graph/model"
 	"github.com/litmuschaos/litmusctl/pkg/apis"
 	"github.com/litmuschaos/litmusctl/pkg/types"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
 )
 
-func ListProbeRequest(pid string, probetypes []* models.ProbeType, cred types.Credentials) (ListProbeResponse, error) {
+func ListProbeRequest(pid string, probetypes []*models.ProbeType, cred types.Credentials) (ListProbeResponse, error) {
 	var gqlReq ListProbeGQLRequest
 	gqlReq.Query = ListProbeQuery
 	gqlReq.Variables.ProjectID = pid

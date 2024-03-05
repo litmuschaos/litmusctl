@@ -5,10 +5,10 @@ import model "github.com/litmuschaos/litmus/chaoscenter/graphql/server/graph/mod
 type ListProbeGQLRequest struct {
 	Query     string `json:"query"`
 	Variables struct {
-		ProjectID 			string `json:"projectID"`
-		InfrastructureType  *model.InfrastructureType `json:"infrastructureType"`
-		ProbeNames 		    []string `json:"probeNames"`
-		Filter				model.ProbeFilterInput `json:"probeFilterInput"`
+		ProjectID          string                    `json:"projectID"`
+		InfrastructureType *model.InfrastructureType `json:"infrastructureType"`
+		ProbeNames         []string                  `json:"probeNames"`
+		Filter             model.ProbeFilterInput    `json:"probeFilterInput"`
 	} `json:"variables"`
 }
 

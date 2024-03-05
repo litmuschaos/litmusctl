@@ -3,7 +3,9 @@ Copyright © 2021 The LitmusChaos Authors
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
+
 	http://www.apache.org/licenses/LICENSE-2.0
+
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,11 +21,11 @@ import (
 	"text/tabwriter"
 	"time"
 
-	apis "github.com/litmuschaos/litmusctl/pkg/apis/probe"
 	models "github.com/litmuschaos/litmus/chaoscenter/graphql/server/graph/model"
+	apis "github.com/litmuschaos/litmusctl/pkg/apis/probe"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
-	"github.com/spf13/cobra"
 	"github.com/manifoldco/promptui"
+	"github.com/spf13/cobra"
 )
 
 var probesCmd = &cobra.Command{
@@ -58,9 +60,9 @@ var probesCmd = &cobra.Command{
 			return
 		}
 		fmt.Printf("You chose %q\n", option)
-		var selectedItems []* models.ProbeType
+		var selectedItems []*models.ProbeType
 		if option == "Yes" {
-			items := [] models.ProbeType{"httpProbe", "cmdProbe", "promProbe", "k8sProbe", "done"}
+			items := []models.ProbeType{"httpProbe", "cmdProbe", "promProbe", "k8sProbe", "done"}
 			for {
 				prompt := promptui.Select{
 					Label: "Select ProbeType",
@@ -77,30 +79,30 @@ var probesCmd = &cobra.Command{
 					fmt.Printf("Prompt failed %v\n", err)
 					os.Exit(1)
 				}
-		
+
 				if items[selectedIndex] == "done" {
 					break
 				}
-				
+
 				final := models.ProbeType(result)
 				selectedItems = append(selectedItems, &final)
 				items = append(items[:selectedIndex], items[selectedIndex+1:]...)
 
 			}
-		
+
 			fmt.Printf("Selected Probe Types: %v\n", selectedItems)
-			}
-			
+		}
+
 		probes_get, _ := apis.ListProbeRequest(projectID, selectedItems, credentials)
 		probes_data := probes_get.Data.Probes
 
 		itemsPerPage := 5
 		page := 1
 		totalProbes := len(probes_data)
-		
+
 		writer := tabwriter.NewWriter(os.Stdout, 8, 8, 8, '\t', tabwriter.AlignRight)
 		utils.White_B.Fprintln(writer, "PROBE ID\t PROBE TYPE\t CREATED AT\t CREATED BY")
-		
+
 		for {
 			writer.Flush()
 			// calculating the start and end indices for the current page
@@ -141,7 +143,7 @@ var probesCmd = &cobra.Command{
 			// Move to the next page
 			page++
 		}
-},
+	},
 }
 
 func init() {
