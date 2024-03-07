@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package list
+package get
 
 import (
 	"fmt"
@@ -30,7 +30,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var ListChaosEnvironmentCmd = &cobra.Command{
+var GetChaosEnvironmentsCmd = &cobra.Command{
 	Use:   "chaos-environments",
 	Short: "Get Chaos Environments within the project",
 	Long:  `Display the Chaos Environments within the project with the targeted id `,
@@ -116,6 +116,6 @@ var ListChaosEnvironmentCmd = &cobra.Command{
 }
 
 func init() {
-	ListCmd.AddCommand(ListChaosEnvironmentCmd)
-	ListChaosEnvironmentCmd.Flags().String("project-id", "", "Set the project-id to list Chaos Environments from a particular project.")
+	GetCmd.AddCommand(GetChaosEnvironmentsCmd)
+	GetChaosEnvironmentsCmd.Flags().String("project-id", "", "Set the project-id to list Chaos Environments from a particular project.")
 }
