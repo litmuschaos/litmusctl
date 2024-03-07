@@ -18,6 +18,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
 	"text/tabwriter"
 	"time"
 
@@ -50,47 +51,61 @@ var probesCmd = &cobra.Command{
 			}
 		}
 
-		prompt := promptui.Select{
-			Label: "Do you want to enable advance filter probes?",
-			Items: []string{"Yes", "No"},
-		}
-		_, option, err := prompt.Run()
-		if err != nil {
-			fmt.Printf("Prompt failed %v\n", err)
-			return
-		}
-		fmt.Printf("You chose %q\n", option)
+		interactiveMode, err := cmd.Flags().GetBool("non-interactive")
+
 		var selectedItems []*models.ProbeType
-		if option == "Yes" {
-			items := []models.ProbeType{"httpProbe", "cmdProbe", "promProbe", "k8sProbe", "done"}
-			for {
-				prompt := promptui.Select{
-					Label: "Select ProbeType",
-					Items: items,
-					Templates: &promptui.SelectTemplates{
-						Active:   `▸ {{ . | cyan }}`,
-						Inactive: `  {{ . | white }}`,
-						Selected: `{{ "✔" | green }} {{ . | bold }}`,
-					},
-				}
 
-				selectedIndex, result, err := prompt.Run()
-				if err != nil {
-					fmt.Printf("Prompt failed %v\n", err)
-					os.Exit(1)
-				}
-
-				if items[selectedIndex] == "done" {
-					break
-				}
-
-				final := models.ProbeType(result)
-				selectedItems = append(selectedItems, &final)
-				items = append(items[:selectedIndex], items[selectedIndex+1:]...)
-
+		if interactiveMode == true {
+			prompt := promptui.Select{
+				Label: "Do you want to enable advance filter probes?",
+				Items: []string{"Yes", "No"},
 			}
+			_, option, err := prompt.Run()
+			if err != nil {
+				fmt.Printf("Prompt failed %v\n", err)
+				return
+			}
+			fmt.Printf("You chose %q\n", option)
 
-			fmt.Printf("Selected Probe Types: %v\n", selectedItems)
+			if option == "Yes" {
+				items := []models.ProbeType{"httpProbe", "cmdProbe", "promProbe", "k8sProbe", "done"}
+				for {
+					prompt := promptui.Select{
+						Label: "Select ProbeType",
+						Items: items,
+						Templates: &promptui.SelectTemplates{
+							Active:   `▸ {{ . | cyan }}`,
+							Inactive: `  {{ . | white }}`,
+							Selected: `{{ "✔" | green }} {{ . | bold }}`,
+						},
+					}
+
+					selectedIndex, result, err := prompt.Run()
+					if err != nil {
+						fmt.Printf("Prompt failed %v\n", err)
+						os.Exit(1)
+					}
+
+					if items[selectedIndex] == "done" {
+						break
+					}
+
+					final := models.ProbeType(result)
+					selectedItems = append(selectedItems, &final)
+					items = append(items[:selectedIndex], items[selectedIndex+1:]...)
+
+				}
+
+				fmt.Printf("Selected Probe Types: %v\n", selectedItems)
+			}
+		} else {
+			var probeTypes string
+			probeTypes, err = cmd.Flags().GetString("probe-types")
+			values := strings.Split(probeTypes, ",")
+			for _, value := range values {
+				probeType := models.ProbeType(value)
+				selectedItems = append(selectedItems, &probeType)
+			}
 		}
 
 		probes_get, _ := apis.ListProbeRequest(projectID, selectedItems, credentials)
@@ -129,7 +144,7 @@ var probesCmd = &cobra.Command{
 
 			// Check if it's the last item or if user wants to see more
 			paginationPrompt := promptui.Prompt{
-				Label:     "Press Enter to show more environments (or type 'q' to quit)",
+				Label:     "Press Enter to show more probes (or type 'q' to quit)",
 				AllowEdit: true,
 				Default:   "",
 			}
@@ -150,6 +165,6 @@ func init() {
 	GetCmd.AddCommand(probesCmd)
 
 	probesCmd.Flags().String("project-id", "", "Set the project-id to get Probe from a particular project.")
-	probesCmd.Flags().String("non-intereactive-mode", "", "Set the non-intereactive-mode to true to false to pass probetype value as a flag")
+	probesCmd.Flags().BoolP("non-interactive", "n", false, "Set it to true for non interactive mode | Note: Always set the boolean flag as --non-interactive=Boolean")
 	probesCmd.Flags().String("probe-types", "", "Set the probe-types as comma separated values to filter the probes")
 }

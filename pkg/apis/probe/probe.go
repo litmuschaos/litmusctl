@@ -20,7 +20,6 @@ func ListProbeRequest(pid string, probetypes []*models.ProbeType, cred types.Cre
 	gqlReq.Variables.Filter = models.ProbeFilterInput{
 		Type: probetypes,
 	}
-
 	query, err := json.Marshal(gqlReq)
 	if err != nil {
 		return ListProbeResponse{}, errors.New("Error in listing probes" + err.Error())
