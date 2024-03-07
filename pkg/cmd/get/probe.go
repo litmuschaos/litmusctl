@@ -51,11 +51,11 @@ var probesCmd = &cobra.Command{
 			}
 		}
 
-		interactiveMode, err := cmd.Flags().GetBool("non-interactive")
+		NoninteractiveMode, err := cmd.Flags().GetBool("non-interactive")
 
 		var selectedItems []*models.ProbeType
 
-		if interactiveMode == true {
+		if NoninteractiveMode == false {
 			prompt := promptui.Select{
 				Label: "Do you want to enable advance filter probes?",
 				Items: []string{"Yes", "No"},
