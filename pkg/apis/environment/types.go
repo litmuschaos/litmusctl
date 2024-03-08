@@ -22,6 +22,26 @@ type CreateEnvironmentData struct {
 	EnvironmentDetails model.Environment `json:"createEnvironment"`
 }
 
+type GetEnvironmentData struct {
+	Errors []struct {
+		Message string   `json:"message"`
+		Path    []string `json:"path"`
+	} `json:"errors"`
+	Data GetEnvironment `json:"data"`
+}
+
+type GetEnvironment struct {
+	EnvironmentDetails model.Environment `json:"getEnvironment"`
+}
+
+type CreateEnvironmentGetGQLRequest struct {
+	Query     string `json:"query"`
+	Variables struct {
+		ProjectID     string `json:"projectID"`
+		EnvironmentID string `json:"environmentID"`
+	}
+}
+
 type ListEnvironmentData struct {
 	Errors []struct {
 		Message string   `json:"message"`
