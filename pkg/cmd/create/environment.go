@@ -94,7 +94,7 @@ var environmentCmd = &cobra.Command{
 		}
 		newEnvironment.Type = models.EnvironmentType(envType)
 
-		envs, err := environment.GetEnvironmentList(pid, credentials)
+		envs, err := environment.ListChaosEnvironments(pid, credentials)
 		if err != nil {
 			utils.PrintError(err)
 		}

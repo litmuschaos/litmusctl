@@ -51,7 +51,7 @@ var GetChaosEnvironmentsCmd = &cobra.Command{
 			}
 		}
 
-		environmentList, err := environment.GetEnvironmentList(projectID, credentials)
+		environmentList, err := environment.ListChaosEnvironments(projectID, credentials)
 		if err != nil {
 			if strings.Contains(err.Error(), "permission_denied") {
 				utils.Red.Println("❌ You don't have enough permissions to access this resource.")
@@ -61,61 +61,104 @@ var GetChaosEnvironmentsCmd = &cobra.Command{
 				os.Exit(1)
 			}
 		}
-		environmentListData := environmentList.Data.ListEnvironmentDetails.Environments
+		environmentID, err := cmd.Flags().GetString("environment-id")
+		utils.PrintError(err)
 
-		itemsPerPage := 5
-		page := 1
-		totalEnvironments := len(environmentListData)
+		if environmentID == "" {
+			environmentListData := environmentList.Data.ListEnvironmentDetails.Environments
 
-		writer := tabwriter.NewWriter(os.Stdout, 30, 8, 0, '\t', tabwriter.AlignRight)
-		utils.White_B.Fprintln(writer, "CHAOS ENVIRONMENT ID\tCHAOS ENVIRONMENT NAME\tCREATED AT\tCREATED BY")
-		for {
-			writer.Flush()
-			// calculating the start and end indices for the current page
-			start := (page - 1) * itemsPerPage
-			if start >= totalEnvironments {
+			itemsPerPage := 5
+			page := 1
+			totalEnvironments := len(environmentListData)
+
+			writer := tabwriter.NewWriter(os.Stdout, 30, 8, 0, '\t', tabwriter.AlignRight)
+			utils.White_B.Fprintln(writer, "CHAOS ENVIRONMENT ID\tCHAOS ENVIRONMENT NAME\tCREATED AT\tCREATED BY")
+			for {
 				writer.Flush()
-				utils.Red.Println("No more environments to display")
-				break
-			}
-			end := start + itemsPerPage
-			if end > totalEnvironments {
-				end = totalEnvironments
-
-			}
-			for _, environment := range environmentListData[start:end] {
-				intTime, err := strconv.ParseInt(environment.CreatedAt, 10, 64)
-				if err != nil {
-					fmt.Println("Error converting CreatedAt to int64:", err)
-					continue
+				// calculating the start and end indices for the current page
+				start := (page - 1) * itemsPerPage
+				if start >= totalEnvironments {
+					writer.Flush()
+					utils.Red.Println("No more environments to display")
+					break
 				}
-				humanTime := time.Unix(intTime, 0)
-				utils.White.Fprintln(
-					writer,
-					environment.EnvironmentID+"\t"+environment.Name+"\t"+humanTime.String()+"\t"+environment.CreatedBy.Username,
-				)
+				end := start + itemsPerPage
+				if end > totalEnvironments {
+					end = totalEnvironments
+
+				}
+				for _, environment := range environmentListData[start:end] {
+					intTime, err := strconv.ParseInt(environment.CreatedAt, 10, 64)
+					if err != nil {
+						fmt.Println("Error converting CreatedAt to int64:", err)
+						continue
+					}
+					humanTime := time.Unix(intTime, 0)
+					utils.White.Fprintln(
+						writer,
+						environment.EnvironmentID+"\t"+environment.Name+"\t"+humanTime.String()+"\t"+environment.CreatedBy.Username,
+					)
+				}
+				writer.Flush()
+				// Check if it's the last item or if user wants to see more
+				paginationPrompt := promptui.Prompt{
+					Label:     "Press Enter to show more environments (or type 'q' to quit)",
+					AllowEdit: true,
+					Default:   "",
+				}
+
+				userInput, err := paginationPrompt.Run()
+				utils.PrintError(err)
+
+				if userInput == "q" {
+					break
+				}
+				// Move to the next page
+				page++
 			}
+		} else {
+			environmentGet, err := environment.GetChaosEnvironment(projectID, environmentID, credentials)
+			if err != nil {
+				if strings.Contains(err.Error(), "permission_denied") {
+					utils.Red.Println("❌ You don't have enough permissions to access this resource.")
+					os.Exit(1)
+				} else {
+					utils.PrintError(err)
+					os.Exit(1)
+				}
+			}
+			environmentGetData := environmentGet.Data.EnvironmentDetails
+			writer := tabwriter.NewWriter(os.Stdout, 30, 8, 0, '\t', tabwriter.AlignRight)
 			writer.Flush()
-			// Check if it's the last item or if user wants to see more
-			paginationPrompt := promptui.Prompt{
-				Label:     "Press Enter to show more environments (or type 'q' to quit)",
-				AllowEdit: true,
-				Default:   "",
+			intUpdateTime, err := strconv.ParseInt(environmentGetData.UpdatedAt, 10, 64)
+			if err != nil {
+				utils.Red.Println("Error converting UpdatedAt to int64:", err)
 			}
-
-			userInput, err := paginationPrompt.Run()
-			utils.PrintError(err)
-
-			if userInput == "q" {
-				break
+			updatedTime := time.Unix(intUpdateTime, 0).String()
+			intCreatedTime, err := strconv.ParseInt(environmentGetData.CreatedAt, 10, 64)
+			if err != nil {
+				utils.Red.Println("Error converting CreatedAt to int64:", err)
 			}
-			// Move to the next page
-			page++
+			createdTime := time.Unix(intCreatedTime, 0).String()
+			writer.Flush()
+			utils.White_B.Fprintln(writer, "CHAOS ENVIRONMENT DETAILS")
+			utils.White.Fprintln(writer, "CHAOS ENVIRONMENT ID\t", environmentGetData.EnvironmentID)
+			utils.White.Fprintln(writer, "CHAOS ENVIRONMENT NAME\t", environmentGetData.Name)
+			utils.White.Fprintln(writer, "CHAOS ENVIRONMENT Type\t", environmentGetData.Type)
+			utils.White.Fprintln(writer, "CREATED AT\t", createdTime)
+			utils.White.Fprintln(writer, "CREATED BY\t", environmentGetData.CreatedBy.Username)
+			utils.White.Fprintln(writer, "UPDATED AT\t", updatedTime)
+			utils.White.Fprintln(writer, "UPDATED BY\t", environmentGetData.UpdatedBy.Username)
+			utils.White.Fprintln(writer, "CHAOS INFRA IDs\t", strings.Join(environmentGetData.InfraIDs, ", "))
+			utils.White.Fprintln(writer, "TAGS\t", strings.Join(environmentGetData.Tags, ", "))
+			writer.Flush()
 		}
+
 	},
 }
 
 func init() {
 	GetCmd.AddCommand(GetChaosEnvironmentsCmd)
 	GetChaosEnvironmentsCmd.Flags().String("project-id", "", "Set the project-id to list Chaos Environments from a particular project.")
+	GetChaosEnvironmentsCmd.Flags().String("environment-id", "", "Set the environment-id to get details about a Chaos Environment.")
 }
