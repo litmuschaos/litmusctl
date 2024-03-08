@@ -13,4 +13,22 @@ const (
 		}
 	  }
 	`
+	GetProbeQuery = `query getProbe($projectID: ID!, $probeName: ID!) {
+		getProbe(projectID: $projectID, probeName: $probeName) {
+		  name
+		  description
+		  type
+		  infrastructureType
+		  createdAt
+		  createdBy{
+			username
+		  }
+		  updatedAt
+		  updatedBy{
+			username
+		  }
+		  tags
+		}
+	  }
+	`
 )
