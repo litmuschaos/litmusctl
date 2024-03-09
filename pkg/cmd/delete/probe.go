@@ -16,10 +16,10 @@ limitations under the License.
 package delete
 
 import (
-	"os"
-	"github.com/litmuschaos/litmusctl/pkg/apis/probe"
 	"github.com/litmuschaos/litmusctl/pkg/apis"
+	"github.com/litmuschaos/litmusctl/pkg/apis/probe"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
+	"os"
 
 	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
@@ -107,7 +107,7 @@ var probeCmd = &cobra.Command{
 			utils.White_B.Println("\n❌ Probe was not deleted.")
 			os.Exit(0)
 		}
-		
+
 		// Make API call
 		deleteProbe, err := probe.DeleteProbeRequest(projectID, probeID, credentials)
 		if err != nil {

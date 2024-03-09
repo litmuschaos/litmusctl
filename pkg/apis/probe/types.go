@@ -63,4 +63,3 @@ type DeleteProbeResponse struct {
 type DeleteProbeResponseData struct {
 	IsDeleted bool `json:"IsDeleted"`
 }
-
