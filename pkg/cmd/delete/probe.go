@@ -17,9 +17,7 @@ package delete
 
 import (
 	"os"
-
 	"github.com/litmuschaos/litmusctl/pkg/apis/probe"
-
 	"github.com/litmuschaos/litmusctl/pkg/apis"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
 
@@ -109,23 +107,19 @@ var probeCmd = &cobra.Command{
 			utils.White_B.Println("\n❌ Probe was not deleted.")
 			os.Exit(0)
 		}
-		utils.Red.Println(probeID)
-		utils.Red.Println(projectID)
-		utils.Red.Println(credentials)
-
-
+		
 		// Make API call
-		// deleteProbe, err := experiment.DeleteProbeRequest(projectID, probeID, credentials)
-		// if err != nil {
-		// 	utils.Red.Println("\n❌ Error in deleting Probe: ", err.Error())
-		// 	os.Exit(1)
-		// }
+		deleteProbe, err := probe.DeleteProbeRequest(projectID, probeID, credentials)
+		if err != nil {
+			utils.Red.Println("\n❌ Error in deleting Probe: ", err.Error())
+			os.Exit(1)
+		}
 
-		// if deleteExperiment.Data.IsDeleted {
-		// 	utils.White_B.Println("\n🚀 Probe was successfully deleted.")
-		// } else {
-		// 	utils.White_B.Println("\n❌ Failed to delete Probe. Please check if the ID is correct or not.")
-		// }
+		if deleteProbe.Data.IsDeleted {
+			utils.White_B.Println("\n🚀 Probe was successfully deleted.")
+		} else {
+			utils.White_B.Println("\n❌ Failed to delete Probe. Please check if the ID is correct or not.")
+		}
 	},
 }
 

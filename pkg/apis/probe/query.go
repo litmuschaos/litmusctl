@@ -31,8 +31,7 @@ const (
 	  }
 	`
 	DeleteProbeQuery = `mutation deleteProbe($probeName: ID!, $projectID: ID!) {
-		deleteProbe(probeName: $probeName, projectID: $projectID) {
-		}
+		deleteProbe(probeName: $probeName, projectID: $projectID) 
 	  }
 	`
 )
