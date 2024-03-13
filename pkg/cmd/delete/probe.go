@@ -61,7 +61,7 @@ var probeCmd = &cobra.Command{
 		// Handle blank input for Probe ID
 		if probeID == "" {
 			prompt := promptui.Prompt{
-				Label: "Enter the Project ID",
+				Label: "Enter the Probe ID",
 			}
 			IDinput, err := prompt.Run()
 			if err != nil {
@@ -115,7 +115,7 @@ var probeCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		if deleteProbe.Data.IsDeleted {
+		if deleteProbe.Data.DeleteProbe {
 			utils.White_B.Println("\n🚀 Probe was successfully deleted.")
 		} else {
 			utils.White_B.Println("\n❌ Failed to delete Probe. Please check if the ID is correct or not.")
