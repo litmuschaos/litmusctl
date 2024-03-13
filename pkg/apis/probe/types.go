@@ -26,9 +26,7 @@ type ListProbeGQLRequest struct {
 	Query     string `json:"query"`
 	Variables struct {
 		ProjectID          string                    `json:"projectID"`
-		InfrastructureType *model.InfrastructureType `json:"infrastructureType"`
-		ProbeNames         []string                  `json:"probeNames"`
-		Filter             model.ProbeFilterInput    `json:"probeFilterInput"`
+		Filter             model.ProbeFilterInput    `json:"filter"`
 	} `json:"variables"`
 }
 

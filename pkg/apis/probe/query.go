@@ -1,8 +1,8 @@
 package probe
 
 const (
-	ListProbeQuery = `query ListProbes($projectID: ID!, $infrastructureType: InfrastructureType, $probeNames: [ID!], $filter: ProbeFilterInput) {
-		listProbes(projectID: $projectID, infrastructureType: $infrastructureType, probeNames: $probeNames, filter: $filter) {
+	ListProbeQuery = `query ListProbes($projectID: ID!, $probeNames: [ID!], $filter: ProbeFilterInput) {
+		listProbes(projectID: $projectID, probeNames: $probeNames, filter: $filter) {
 		  name
 		  type
 		  createdAt
@@ -28,6 +28,10 @@ const (
 		  }
 		  tags
 		}
+	  }
+	`
+	DeleteProbeQuery = `mutation deleteProbe($probeName: ID!, $projectID: ID!) {
+		deleteProbe(probeName: $probeName, projectID: $projectID)
 	  }
 	`
 )
