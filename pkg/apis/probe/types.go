@@ -25,8 +25,8 @@ type GetProbeResponseData struct {
 type ListProbeGQLRequest struct {
 	Query     string `json:"query"`
 	Variables struct {
-		ProjectID          string                    `json:"projectID"`
-		Filter             model.ProbeFilterInput    `json:"filter"`
+		ProjectID string                 `json:"projectID"`
+		Filter    model.ProbeFilterInput `json:"filter"`
 	} `json:"variables"`
 }
 
