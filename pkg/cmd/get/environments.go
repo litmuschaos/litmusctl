@@ -51,20 +51,20 @@ var GetChaosEnvironmentsCmd = &cobra.Command{
 			}
 		}
 
-		environmentList, err := environment.ListChaosEnvironments(projectID, credentials)
-		if err != nil {
-			if strings.Contains(err.Error(), "permission_denied") {
-				utils.Red.Println("❌ You don't have enough permissions to access this resource.")
-				os.Exit(1)
-			} else {
-				utils.PrintError(err)
-				os.Exit(1)
-			}
-		}
 		environmentID, err := cmd.Flags().GetString("environment-id")
 		utils.PrintError(err)
 
 		if environmentID == "" {
+			environmentList, err := environment.ListChaosEnvironments(projectID, credentials)
+			if err != nil {
+				if strings.Contains(err.Error(), "permission_denied") {
+					utils.Red.Println("❌ You don't have enough permissions to access this resource.")
+					os.Exit(1)
+				} else {
+					utils.PrintError(err)
+					os.Exit(1)
+				}
+			}
 			environmentListData := environmentList.Data.ListEnvironmentDetails.Environments
 
 			itemsPerPage := 5
