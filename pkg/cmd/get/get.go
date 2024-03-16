@@ -36,7 +36,7 @@ var GetCmd = &cobra.Command{
 		litmusctl get chaos-experiment-runs --project-id=""
 
 		#get list of Probes in a Project
-		litmusctl list probes --project-id=""
+		litmusctl get probes --project-id=""
 
 		Note: The default location of the config file is $HOME/.litmusconfig, and can be overridden by a --config flag
 	`,
