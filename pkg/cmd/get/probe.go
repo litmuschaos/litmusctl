@@ -138,7 +138,7 @@ func getProbeList(projectID string, cmd *cobra.Command, credentials types.Creden
 	totalProbes := len(probes_data)
 
 	writer := tabwriter.NewWriter(os.Stdout, 8, 8, 8, '\t', tabwriter.AlignRight)
-	utils.White_B.Fprintln(writer, "PROBE ID\t PROBE TYPE\t CREATED AT\t CREATED BY")
+	utils.White_B.Fprintln(writer, "PROBE ID\t PROBE TYPE\t CREATED BY\t CREATED AT")
 
 	for {
 		writer.Flush()
