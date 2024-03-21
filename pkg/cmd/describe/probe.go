@@ -17,10 +17,9 @@
 package describe
 
 import (
-
 	"fmt"
 	"os"
-	
+
 	"github.com/litmuschaos/litmus/chaoscenter/graphql/server/graph/model"
 	apis "github.com/litmuschaos/litmusctl/pkg/apis/probe"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
@@ -36,7 +35,7 @@ var probeCmd = &cobra.Command{
 		credentials, err := utils.GetCredentials(cmd)
 		utils.PrintError(err)
 
-		var getProbeYAMLRequest model.GetProbeYAMLRequest 
+		var getProbeYAMLRequest model.GetProbeYAMLRequest
 
 		pid, err := cmd.Flags().GetString("project-id")
 		utils.PrintError(err)
@@ -77,9 +76,8 @@ var probeCmd = &cobra.Command{
 			os.Exit(1)
 		}
 		utils.PrintInYamlFormat(getProbeYAMLData.Data)
-	},	
+	},
 }
-
 
 func init() {
 	DescribeCmd.AddCommand(probeCmd)

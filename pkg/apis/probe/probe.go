@@ -143,8 +143,8 @@ func GetProbeYAMLRequest(pid string, request models.GetProbeYAMLRequest, cred ty
 			return GetProbeYAMLResponse{}, errors.New(getProbeYAMLResponse.Errors[0].Message)
 		}
 		return getProbeYAMLResponse, nil
-		
-		} else {
+
+	} else {
 		return GetProbeYAMLResponse{}, errors.New("Unmatched status code:" + string(bodyBytes))
 	}
 }

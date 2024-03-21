@@ -45,8 +45,8 @@ type ListProbeResponseData struct {
 type GetProbeYAMLGQLRequest struct {
 	Query     string `json:"query"`
 	Variables struct {
-		ProjectID string                 `json:"projectID"`
-		Request   model.GetProbeYAMLRequest  `json:"request"`
+		ProjectID string                    `json:"projectID"`
+		Request   model.GetProbeYAMLRequest `json:"request"`
 	} `json:"variables"`
 }
 
