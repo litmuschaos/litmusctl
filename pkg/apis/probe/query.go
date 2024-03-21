@@ -70,6 +70,11 @@ const (
 		}
 	  }
 	`
+	GetProbeYAMLQuery = `query getProbeYAML($projectID: ID!, $request: GetProbeYAMLRequest!) {
+		getProbeYAML(projectID: $projectID, request: $request)
+	  }
+	`
+
 	DeleteProbeQuery = `mutation deleteProbe($probeName: ID!, $projectID: ID!) {
 		deleteProbe(probeName: $probeName, projectID: $projectID)
 	  }
