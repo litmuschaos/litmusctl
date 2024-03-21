@@ -104,5 +104,4 @@ func ListProbeRequest(pid string, probetypes []*models.ProbeType, cred types.Cre
 	} else {
 		return ListProbeResponse{}, errors.New("Unmatched status code:" + string(bodyBytes))
 	}
-
 }
