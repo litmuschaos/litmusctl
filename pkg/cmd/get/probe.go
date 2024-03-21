@@ -145,7 +145,6 @@ func getProbeList(projectID string, cmd *cobra.Command, credentials types.Creden
 		start := (page - 1) * itemsPerPage
 		if start >= totalProbes {
 			utils.Red.Println("No more probes to display")
-			writer.Flush()
 			break
 		}
 		end := start + itemsPerPage
