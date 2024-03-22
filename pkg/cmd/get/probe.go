@@ -140,7 +140,7 @@ func getProbeList(projectID string, cmd *cobra.Command, credentials types.Creden
 	totalProbes := len(probes_data)
 
 	writer := tabwriter.NewWriter(os.Stdout, 8, 8, 8, '\t', tabwriter.AlignRight)
-	utils.White_B.Fprintln(writer, "PROBE ID\t PROBE TYPE\t CREATED BY\t CREATED AT")
+	utils.White_B.Fprintln(writer, "PROBE ID\t PROBE TYPE\t REFERENCED BY\t CREATED BY\t CREATED AT")
 
 	for {
 		writer.Flush()
@@ -160,7 +160,12 @@ func getProbeList(projectID string, cmd *cobra.Command, credentials types.Creden
 				continue
 			}
 			humanTime := time.Unix(intTime, 0)
-			utils.White.Fprintln(writer, probe.Name+"\t"+fmt.Sprintf("%v", probe.Type)+"\t"+probe.CreatedBy.Username+"\t"+humanTime.String())
+			var probeReferencedBy int
+			if probe.ReferencedBy != nil {
+				probeReferencedBy = *probe.ReferencedBy
+			}
+
+			utils.White.Fprintln(writer, probe.Name+"\t"+fmt.Sprintf("%v", probe.Type)+"\t"+fmt.Sprintf("%d", probeReferencedBy)+"\t"+probe.CreatedBy.Username+"\t"+humanTime.String())
 		}
 		writer.Flush()
 
@@ -226,6 +231,9 @@ func getProbeDetails(projectID, ProbeID string, credentials types.Credentials) {
 	utils.White.Fprintln(writer, "UPDATED AT\t", updatedTime)
 	utils.White.Fprintln(writer, "UPDATED BY\t", probeGetData.UpdatedBy.Username)
 	utils.White.Fprintln(writer, "TAGS\t", strings.Join(probeGetData.Tags, ", "))
+	if probeGetData.ReferencedBy != nil {
+		utils.White.Fprintln(writer, "REFERENCED BY\t", *probeGetData.ReferencedBy)
+	}
 	writer.Flush()
 }
 
