@@ -73,6 +73,8 @@ func init() {
 }
 
 func getProbeList(projectID string, cmd *cobra.Command, credentials types.Credentials) {
+
+	// calls the probeList endpoint for the list of probes
 	var selectedItems []*models.ProbeType
 	NoninteractiveMode, err := cmd.Flags().GetBool("non-interactive")
 	utils.PrintError(err)
@@ -208,90 +210,15 @@ func getProbeDetails(projectID, ProbeID string, credentials types.Credentials) {
 	utils.White.Fprintln(writer, "PROBE TYPE \t", probeGetData.Type)
 	utils.White.Fprintln(writer, "PROBE INFRASTRUCTURE TYPE \t", probeGetData.InfrastructureType)
 
-	if probeGetData.Type == "httpProbe" {
-		utils.White.Fprintln(writer, "TIMEOUT \t", probeGetData.KubernetesHTTPProperties.ProbeTimeout)
-		utils.White.Fprintln(writer, "INTERVAL \t", probeGetData.KubernetesHTTPProperties.Interval)
-		if probeGetData.KubernetesHTTPProperties.Attempt != nil {
-			utils.White.Fprintln(writer, "ATTEMPT \t", *probeGetData.KubernetesHTTPProperties.Attempt)
-		}
-		if probeGetData.KubernetesHTTPProperties.Retry != nil {
-			utils.White.Fprintln(writer, "RETRY \t", *probeGetData.KubernetesHTTPProperties.Retry)
-		}
-		if probeGetData.KubernetesHTTPProperties.ProbePollingInterval != nil {
-			utils.White.Fprintln(writer, "POLLING INTERVAL \t", *probeGetData.KubernetesHTTPProperties.ProbePollingInterval)
-		}
-		if probeGetData.KubernetesHTTPProperties.InitialDelay != nil {
-			utils.White.Fprintln(writer, "INITIAL DELAY \t", *probeGetData.KubernetesHTTPProperties.InitialDelay)
-		}
-		if probeGetData.KubernetesHTTPProperties.EvaluationTimeout != nil {
-			utils.White.Fprintln(writer, "EVALUATION TIMEOUT \t", *probeGetData.KubernetesHTTPProperties.EvaluationTimeout)
-		}
-		if probeGetData.KubernetesHTTPProperties.StopOnFailure != nil {
-			utils.White.Fprintln(writer, "STOP ON FAILURE \t", *probeGetData.KubernetesHTTPProperties.StopOnFailure)
-		}
-	} else if probeGetData.Type == "cmdProbe" {
-		utils.White.Fprintln(writer, "TIMEOUT \t", probeGetData.KubernetesCMDProperties.ProbeTimeout)
-		utils.White.Fprintln(writer, "INTERVAL \t", probeGetData.KubernetesCMDProperties.Interval)
-		if probeGetData.KubernetesCMDProperties.Attempt != nil {
-			utils.White.Fprintln(writer, "ATTEMPT \t", *probeGetData.KubernetesCMDProperties.Attempt)
-		}
-		if probeGetData.KubernetesCMDProperties.Retry != nil {
-			utils.White.Fprintln(writer, "RETRY \t", *probeGetData.KubernetesCMDProperties.Retry)
-		}
-		if probeGetData.KubernetesCMDProperties.ProbePollingInterval != nil {
-			utils.White.Fprintln(writer, "POLLING INTERVAL \t", *probeGetData.KubernetesCMDProperties.ProbePollingInterval)
-		}
-		if probeGetData.KubernetesCMDProperties.InitialDelay != nil {
-			utils.White.Fprintln(writer, "INITIAL DELAY \t", *probeGetData.KubernetesCMDProperties.InitialDelay)
-		}
-		if probeGetData.KubernetesCMDProperties.EvaluationTimeout != nil {
-			utils.White.Fprintln(writer, "EVALUATION TIMEOUT \t", *probeGetData.KubernetesCMDProperties.EvaluationTimeout)
-		}
-		if probeGetData.KubernetesCMDProperties.StopOnFailure != nil {
-			utils.White.Fprintln(writer, "STOP ON FAILURE \t", *probeGetData.KubernetesCMDProperties.StopOnFailure)
-		}
-	} else if probeGetData.Type == "k8sProbe" {
-		utils.White.Fprintln(writer, "TIMEOUT \t", probeGetData.K8sProperties.ProbeTimeout)
-		utils.White.Fprintln(writer, "INTERVAL \t", probeGetData.K8sProperties.Interval)
-		if probeGetData.K8sProperties.Attempt != nil {
-			utils.White.Fprintln(writer, "ATTEMPT \t", *probeGetData.K8sProperties.Attempt)
-		}
-		if probeGetData.K8sProperties.Retry != nil {
-			utils.White.Fprintln(writer, "RETRY \t", *probeGetData.K8sProperties.Retry)
-		}
-		if probeGetData.K8sProperties.ProbePollingInterval != nil {
-			utils.White.Fprintln(writer, "POLLING INTERVAL \t", *probeGetData.K8sProperties.ProbePollingInterval)
-		}
-		if probeGetData.K8sProperties.InitialDelay != nil {
-			utils.White.Fprintln(writer, "INITIAL DELAY \t", *probeGetData.K8sProperties.InitialDelay)
-		}
-		if probeGetData.K8sProperties.EvaluationTimeout != nil {
-			utils.White.Fprintln(writer, "EVALUATION TIMEOUT \t", *probeGetData.K8sProperties.EvaluationTimeout)
-		}
-		if probeGetData.K8sProperties.StopOnFailure != nil {
-			utils.White.Fprintln(writer, "STOP ON FAILURE \t", *probeGetData.K8sProperties.StopOnFailure)
-		}
-	} else if probeGetData.Type == "promProbe" {
-		utils.White.Fprintln(writer, "TIMEOUT \t", probeGetData.PromProperties.ProbeTimeout)
-		utils.White.Fprintln(writer, "INTERVAL \t", probeGetData.PromProperties.Interval)
-		if probeGetData.PromProperties.Attempt != nil {
-			utils.White.Fprintln(writer, "ATTEMPT \t", *probeGetData.PromProperties.Attempt)
-		}
-		if probeGetData.PromProperties.Retry != nil {
-			utils.White.Fprintln(writer, "RETRY \t", *probeGetData.PromProperties.Retry)
-		}
-		if probeGetData.PromProperties.ProbePollingInterval != nil {
-			utils.White.Fprintln(writer, "POLLING INTERVAL \t", *probeGetData.PromProperties.ProbePollingInterval)
-		}
-		if probeGetData.PromProperties.InitialDelay != nil {
-			utils.White.Fprintln(writer, "INITIAL DELAY \t", *probeGetData.PromProperties.InitialDelay)
-		}
-		if probeGetData.PromProperties.EvaluationTimeout != nil {
-			utils.White.Fprintln(writer, "EVALUATION TIMEOUT \t", *probeGetData.PromProperties.EvaluationTimeout)
-		}
-		if probeGetData.PromProperties.StopOnFailure != nil {
-			utils.White.Fprintln(writer, "STOP ON FAILURE \t", *probeGetData.PromProperties.StopOnFailure)
-		}
+	switch probeGetData.Type {
+	case "httpProbe":
+		printHTTPProbeDetails(writer, probeGetData)
+	case "cmdProbe":
+		printCmdProbeDetails(writer, probeGetData)
+	case "k8sProbe":
+		printK8sProbeDetails(writer, probeGetData)
+	case "promProbe":
+		printPromProbeDetails(writer, probeGetData)
 	}
 
 	utils.White.Fprintln(writer, "CREATED AT\t", createdTime)
@@ -300,4 +227,60 @@ func getProbeDetails(projectID, ProbeID string, credentials types.Credentials) {
 	utils.White.Fprintln(writer, "UPDATED BY\t", probeGetData.UpdatedBy.Username)
 	utils.White.Fprintln(writer, "TAGS\t", strings.Join(probeGetData.Tags, ", "))
 	writer.Flush()
+}
+
+func printHTTPProbeDetails(writer *tabwriter.Writer, probeData models.Probe) {
+	utils.White.Fprintln(writer, "TIMEOUT \t", probeData.KubernetesHTTPProperties.ProbeTimeout)
+	utils.White.Fprintln(writer, "INTERVAL \t", probeData.KubernetesHTTPProperties.Interval)
+	printOptionalIntProperty(writer, "ATTEMPT", probeData.KubernetesHTTPProperties.Attempt)
+	printOptionalIntProperty(writer, "RETRY", probeData.KubernetesHTTPProperties.Retry)
+	printOptionalProperty(writer, "POLLING INTERVAL", probeData.KubernetesHTTPProperties.ProbePollingInterval)
+	printOptionalProperty(writer, "INITIAL DELAY", probeData.KubernetesHTTPProperties.InitialDelay)
+	printOptionalProperty(writer, "EVALUATION TIMEOUT", probeData.KubernetesHTTPProperties.EvaluationTimeout)
+	printOptionalBoolProperty(writer, "STOP ON FAILURE", probeData.KubernetesHTTPProperties.StopOnFailure)
+}
+func printCmdProbeDetails(writer *tabwriter.Writer, probeData models.Probe) {
+	utils.White.Fprintln(writer, "TIMEOUT \t", probeData.KubernetesCMDProperties.ProbeTimeout)
+	utils.White.Fprintln(writer, "INTERVAL \t", probeData.KubernetesCMDProperties.Interval)
+	printOptionalIntProperty(writer, "ATTEMPT", probeData.KubernetesCMDProperties.Attempt)
+	printOptionalIntProperty(writer, "RETRY", probeData.KubernetesCMDProperties.Retry)
+	printOptionalProperty(writer, "POLLING INTERVAL", probeData.KubernetesCMDProperties.ProbePollingInterval)
+	printOptionalProperty(writer, "INITIAL DELAY", probeData.KubernetesCMDProperties.InitialDelay)
+	printOptionalProperty(writer, "EVALUATION TIMEOUT", probeData.KubernetesCMDProperties.EvaluationTimeout)
+	printOptionalBoolProperty(writer, "STOP ON FAILURE", probeData.KubernetesCMDProperties.StopOnFailure)
+}
+func printK8sProbeDetails(writer *tabwriter.Writer, probeData models.Probe) {
+	utils.White.Fprintln(writer, "TIMEOUT \t", probeData.K8sProperties.ProbeTimeout)
+	utils.White.Fprintln(writer, "INTERVAL \t", probeData.K8sProperties.Interval)
+	printOptionalIntProperty(writer, "ATTEMPT", probeData.K8sProperties.Attempt)
+	printOptionalIntProperty(writer, "RETRY", probeData.K8sProperties.Retry)
+	printOptionalProperty(writer, "POLLING INTERVAL", probeData.K8sProperties.ProbePollingInterval)
+	printOptionalProperty(writer, "INITIAL DELAY", probeData.K8sProperties.InitialDelay)
+	printOptionalProperty(writer, "EVALUATION TIMEOUT", probeData.K8sProperties.EvaluationTimeout)
+	printOptionalBoolProperty(writer, "STOP ON FAILURE", probeData.K8sProperties.StopOnFailure)
+}
+func printPromProbeDetails(writer *tabwriter.Writer, probeData models.Probe) {
+	utils.White.Fprintln(writer, "TIMEOUT \t", probeData.PromProperties.ProbeTimeout)
+	utils.White.Fprintln(writer, "INTERVAL \t", probeData.PromProperties.Interval)
+	printOptionalIntProperty(writer, "ATTEMPT", probeData.PromProperties.Attempt)
+	printOptionalIntProperty(writer, "RETRY", probeData.PromProperties.Retry)
+	printOptionalProperty(writer, "POLLING INTERVAL", probeData.PromProperties.ProbePollingInterval)
+	printOptionalProperty(writer, "INITIAL DELAY", probeData.PromProperties.InitialDelay)
+	printOptionalProperty(writer, "EVALUATION TIMEOUT", probeData.PromProperties.EvaluationTimeout)
+	printOptionalBoolProperty(writer, "STOP ON FAILURE", probeData.PromProperties.StopOnFailure)
+}
+func printOptionalProperty(writer *tabwriter.Writer, name string, value *string) {
+	if value != nil {
+		utils.White.Fprintln(writer, name+"\t", *value)
+	}
+}
+func printOptionalIntProperty(writer *tabwriter.Writer, name string, value *int) {
+	if value != nil {
+		utils.White.Fprintln(writer, name+"\t", *value)
+	}
+}
+func printOptionalBoolProperty(writer *tabwriter.Writer, name string, value *bool) {
+	if value != nil {
+		utils.White.Fprintln(writer, name+"\t", *value)
+	}
 }
