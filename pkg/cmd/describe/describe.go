@@ -27,6 +27,9 @@ var DescribeCmd = &cobra.Command{
 		#describe a Chaos Experiment
 		litmusctl describe chaos-experiment d861b650-1549-4574-b2ba-ab754058dd04 --project-id="d861b650-1549-4574-b2ba-ab754058dd04"
 
+		#describe a Probe 
+		litmusctl describe probe --project-id="d861b650-1549-4574-b2ba-ab754058dd04" --probe-id="exampleProbe"
+
 		Note: The default location of the config file is $HOME/.litmusconfig, and can be overridden by a --config flag
 	`,
 }
