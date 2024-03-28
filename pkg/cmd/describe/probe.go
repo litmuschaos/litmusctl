@@ -19,12 +19,15 @@ package describe
 import (
 	"fmt"
 	"os"
+	// "strings"
+	// "encoding/json"
 
 	"github.com/litmuschaos/litmus/chaoscenter/graphql/server/graph/model"
 	apis "github.com/litmuschaos/litmusctl/pkg/apis/probe"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
 	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
+	// "gopkg.in/yaml.v2"
 )
 
 var probeCmd = &cobra.Command{
@@ -58,30 +61,47 @@ var probeCmd = &cobra.Command{
 		// Handle blank input for Probe ID
 
 		if probeID == "" {
-			utils.White_B.Print("\nEnter the Project ID: ")
+			utils.White_B.Print("\nEnter the Probe ID: ")
 			fmt.Scanln(&probeID)
 
 			if probeID == "" {
-				utils.Red.Println("⛔ Project ID can't be empty!!")
+				utils.Red.Println("⛔ Probe ID can't be empty!!")
 				os.Exit(1)
 			}
 		}
 		getProbeYAMLRequest.ProbeName = probeID
-		getProbeYAMLRequest.Mode = model.Mode("Continuous")
 
-		getProbeYAMLData, err := apis.GetProbeYAMLRequest(pid, getProbeYAMLRequest, credentials)
+		probeMode, err := cmd.Flags().GetString("mode")
+		utils.PrintError(err)
 
+		if probeMode == "" {
+			prompt := promptui.Select{
+				Label: "Please select the probe mode ?",
+				Items: []string{"SOT", "EOT", "Edge", "Continuous", "OnChaos"},
+			}
+			_, option, err := prompt.Run()
+			if err != nil {
+				fmt.Printf("Prompt failed %v\n", err)
+				return
+			}
+			probeMode = option
+			fmt.Printf("You chose %q\n", option)
+		}
+		getProbeYAMLRequest.Mode = model.Mode(probeMode)
+		getProbeYAML, err := apis.GetProbeYAMLRequest(pid, getProbeYAMLRequest, credentials)
 		if err != nil {
 			utils.Red.Println(err)
 			os.Exit(1)
 		}
-		utils.PrintInYamlFormat(getProbeYAMLData.Data)
+		getProbeYAMLData := getProbeYAML.Data.GetProbeYAML
+		utils.White_B.Println(getProbeYAMLData)
+
 	},
 }
 
 func init() {
 	DescribeCmd.AddCommand(probeCmd)
-
 	probeCmd.Flags().String("project-id", "", "Set the project-id to get Probe details from the particular project. To see the projects, apply litmusctl get projects")
 	probeCmd.Flags().String("probe-id", "", "Set the probe-id to get the Probe details in Yaml format")
+	probeCmd.Flags().String("mode", "", "Set the mode for the probes from SOT/EOT/Edge/Continuous/OnChaos ")
 }
