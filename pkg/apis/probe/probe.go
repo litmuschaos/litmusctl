@@ -151,3 +151,47 @@ func DeleteProbeRequest(pid string, probeid string, cred types.Credentials) (Del
 	}
 
 }
+
+func GetProbeYAMLRequest(pid string, request models.GetProbeYAMLRequest, cred types.Credentials) (GetProbeYAMLResponse, error) {
+	var gqlReq GetProbeYAMLGQLRequest
+	gqlReq.Query = GetProbeYAMLQuery
+	gqlReq.Variables.ProjectID = pid
+	gqlReq.Variables.Request = request
+
+	query, err := json.Marshal(gqlReq)
+	if err != nil {
+		return GetProbeYAMLResponse{}, errors.New("Error in getting probe details" + err.Error())
+	}
+	resp, err := apis.SendRequest(
+		apis.SendRequestParams{
+			Endpoint: cred.ServerEndpoint + utils.GQLAPIPath,
+			Token:    cred.Token,
+		},
+		query,
+		string(types.Post),
+	)
+	if err != nil {
+		return GetProbeYAMLResponse{}, errors.New("Error in getting probe details" + err.Error())
+	}
+
+	bodyBytes, err := io.ReadAll(resp.Body)
+	defer resp.Body.Close()
+	if err != nil {
+		return GetProbeYAMLResponse{}, errors.New("Error in getting probe details" + err.Error())
+	}
+
+	if resp.StatusCode == http.StatusOK {
+		var getProbeYAMLResponse GetProbeYAMLResponse
+		err = json.Unmarshal(bodyBytes, &getProbeYAMLResponse)
+		if err != nil {
+			return GetProbeYAMLResponse{}, errors.New("Error in getting probes details" + err.Error())
+		}
+		if len(getProbeYAMLResponse.Errors) > 0 {
+			return GetProbeYAMLResponse{}, errors.New(getProbeYAMLResponse.Errors[0].Message)
+		}
+		return getProbeYAMLResponse, nil
+
+	} else {
+		return GetProbeYAMLResponse{}, errors.New("Unmatched status code:" + string(bodyBytes))
+	}
+}
