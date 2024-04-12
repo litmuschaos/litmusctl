@@ -41,3 +41,22 @@ type ListProbeResponse struct {
 type ListProbeResponseData struct {
 	Probes []model.Probe `json:"listProbes"`
 }
+type DeleteProbeGQLRequest struct {
+	Query     string `json:"query"`
+	Variables struct {
+		ProbeName string `json:"probeName"`
+		ProjectID string `json:"projectID"`
+	} `json:"variables"`
+}
+
+type DeleteProbeResponse struct {
+	Errors []struct {
+		Message string   `json:"message"`
+		Path    []string `json:"path"`
+	} `json:"errors"`
+	Data DeleteProbeResponseData `json:"data"`
+}
+
+type DeleteProbeResponseData struct {
+	DeleteProbe bool `json:"deleteProbe"`
+}
