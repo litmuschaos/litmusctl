@@ -17,6 +17,8 @@
 package describe
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"os"
 
@@ -25,6 +27,7 @@ import (
 	"github.com/litmuschaos/litmusctl/pkg/utils"
 	"github.com/manifoldco/promptui"
 	"github.com/spf13/cobra"
+	"sigs.k8s.io/yaml"
 )
 
 var probeCmd = &cobra.Command{
@@ -91,7 +94,28 @@ var probeCmd = &cobra.Command{
 			os.Exit(1)
 		}
 		getProbeYAMLData := getProbeYAML.Data.GetProbeYAML
-		utils.White_B.Println(getProbeYAMLData)
+
+		probeOutput, err := cmd.Flags().GetString("output")
+		utils.PrintError(err)
+
+		switch probeOutput{
+		case "json":
+			jsonData, _ := yaml.YAMLToJSON([]byte(getProbeYAMLData))
+			// utils.PrintInJsonFormat(string(jsonData))
+			var prettyJSON bytes.Buffer
+			err = json.Indent(&prettyJSON, jsonData, "", "    ") // Adjust the indentation as needed
+			if err != nil {
+				utils.Red.Println("❌ Error formatting JSON: " + err.Error())
+				os.Exit(1)
+			}
+	
+			fmt.Println(prettyJSON.String())
+			
+			default: 
+				utils.PrintInYamlFormat(getProbeYAMLData)
+		}
+
+
 
 	},
 }
@@ -101,4 +125,5 @@ func init() {
 	probeCmd.Flags().String("project-id", "", "Set the project-id to get Probe details from the particular project. To see the projects, apply litmusctl get projects")
 	probeCmd.Flags().String("probe-id", "", "Set the probe-id to get the Probe details in Yaml format")
 	probeCmd.Flags().String("mode", "", "Set the mode for the probes from SOT/EOT/Edge/Continuous/OnChaos ")
+	probeCmd.Flags().String("output", "", "Set the output format for the probe")
 }
