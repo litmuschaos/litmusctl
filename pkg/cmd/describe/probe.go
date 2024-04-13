@@ -98,7 +98,7 @@ var probeCmd = &cobra.Command{
 		probeOutput, err := cmd.Flags().GetString("output")
 		utils.PrintError(err)
 
-		switch probeOutput{
+		switch probeOutput {
 		case "json":
 			jsonData, _ := yaml.YAMLToJSON([]byte(getProbeYAMLData))
 			// utils.PrintInJsonFormat(string(jsonData))
@@ -108,14 +108,12 @@ var probeCmd = &cobra.Command{
 				utils.Red.Println("❌ Error formatting JSON: " + err.Error())
 				os.Exit(1)
 			}
-	
+
 			fmt.Println(prettyJSON.String())
-			
-			default: 
-				utils.PrintInYamlFormat(getProbeYAMLData)
+
+		default:
+			utils.PrintInYamlFormat(getProbeYAMLData)
 		}
-
-
 
 	},
 }

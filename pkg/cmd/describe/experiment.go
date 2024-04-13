@@ -101,16 +101,16 @@ var experimentCmd = &cobra.Command{
 			utils.Red.Println("❌ Error parsing Chaos Experiment manifest: " + err.Error())
 			os.Exit(1)
 		}
-		
-		expOutput,err := cmd.Flags().GetString("output")
+
+		expOutput, err := cmd.Flags().GetString("output")
 		utils.PrintError(err)
 		// Add an output format prompt
-		if expOutput=="" {
+		if expOutput == "" {
 			prompt := promptui.Select{
 				Label: "Select an output format",
 				Items: []string{"yaml", "json"},
 			}
-			_,value, err := prompt.Run()
+			_, value, err := prompt.Run()
 			expOutput = value
 			if err != nil {
 				utils.PrintError(err)
