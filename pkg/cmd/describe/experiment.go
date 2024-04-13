@@ -101,23 +101,28 @@ var experimentCmd = &cobra.Command{
 			utils.Red.Println("❌ Error parsing Chaos Experiment manifest: " + err.Error())
 			os.Exit(1)
 		}
-
+		
+		expOutput,err := cmd.Flags().GetString("output")
+		utils.PrintError(err)
 		// Add an output format prompt
-		prompt := promptui.Select{
-			Label: "Select an output format",
-			Items: []string{"YAML", "JSON"},
-		}
-		i, _, err := prompt.Run()
-		if err != nil {
-			utils.PrintError(err)
-			os.Exit(1)
+		if expOutput=="" {
+			prompt := promptui.Select{
+				Label: "Select an output format",
+				Items: []string{"yaml", "json"},
+			}
+			_,value, err := prompt.Run()
+			expOutput = value
+			if err != nil {
+				utils.PrintError(err)
+				os.Exit(1)
+			}
 		}
 
-		switch i {
-		case 0:
+		switch expOutput {
+		case "yaml":
 			// Output as YAML (default)
 			utils.PrintInYamlFormat(string(yamlManifest))
-		case 1:
+		case "json":
 			// Output as JSON
 			jsonData, err := yaml.YAMLToJSON(yamlManifest)
 			if err != nil {
@@ -144,4 +149,5 @@ func init() {
 	DescribeCmd.AddCommand(experimentCmd)
 
 	experimentCmd.Flags().String("project-id", "", "Set the project-id to list Chaos Experiments from the particular project. To see the projects, apply litmusctl get projects")
+	experimentCmd.Flags().String("output", "", "Set the output format for the experiment")
 }
