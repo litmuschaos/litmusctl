@@ -105,3 +105,49 @@ func ListProbeRequest(pid string, probetypes []*models.ProbeType, cred types.Cre
 		return ListProbeResponse{}, errors.New("Unmatched status code:" + string(bodyBytes))
 	}
 }
+
+func DeleteProbeRequest(pid string, probeid string, cred types.Credentials) (DeleteProbeResponse, error) {
+	var gqlReq DeleteProbeGQLRequest
+	gqlReq.Query = DeleteProbeQuery
+	gqlReq.Variables.ProjectID = pid
+	gqlReq.Variables.ProbeName = probeid
+
+	query, err := json.Marshal(gqlReq)
+	if err != nil {
+		return DeleteProbeResponse{}, errors.New("Error in deleting probe" + err.Error())
+	}
+	resp, err := apis.SendRequest(
+		apis.SendRequestParams{
+			Endpoint: cred.ServerEndpoint + utils.GQLAPIPath,
+			Token:    cred.Token,
+		},
+		query,
+		string(types.Post),
+	)
+
+	if err != nil {
+		return DeleteProbeResponse{}, errors.New("Error in deleting probe" + err.Error())
+	}
+
+	bodyBytes, err := io.ReadAll(resp.Body)
+	defer resp.Body.Close()
+	if err != nil {
+		return DeleteProbeResponse{}, errors.New("Error in deleting probe" + err.Error())
+	}
+
+	if resp.StatusCode == http.StatusOK {
+		var deleteProbeResponse DeleteProbeResponse
+		err = json.Unmarshal(bodyBytes, &deleteProbeResponse)
+		if err != nil {
+			return DeleteProbeResponse{}, errors.New("Error in deleting probe" + err.Error())
+		}
+		if len(deleteProbeResponse.Errors) > 0 {
+			return DeleteProbeResponse{}, errors.New(deleteProbeResponse.Errors[0].Message)
+		}
+		return deleteProbeResponse, nil
+
+	} else {
+		return DeleteProbeResponse{}, errors.New("Unmatched status code:" + string(bodyBytes))
+	}
+
+}

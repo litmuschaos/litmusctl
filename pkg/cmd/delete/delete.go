@@ -30,6 +30,9 @@ var DeleteCmd = &cobra.Command{
 		#delete a Chaos Environment
 		litmusctl delete chaos-environment --project-id=8adf62d5-64f8-4c66-ab53-63729db9dd9a --environment-id=environmentexample
 
+		#delete a Probe 
+		litmusctl delete probe --project-id=8adf62d5-64f8-4c66-ab53-63729db9dd9a --probe-id=exampleprobe
+
 		Note: The default location of the config file is $HOME/.litmusconfig, and can be overridden by a --config flag
 	`,
 }
