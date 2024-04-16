@@ -8,7 +8,7 @@ You may obtain a copy of the License at
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.W
 See the License for the specific language governing permissions and
 limitations under the License.
 */
@@ -92,7 +92,7 @@ var probeCmd = &cobra.Command{
 		// confirm before deletion
 
 		prompt := promptui.Prompt{
-			Label:     "Are you sure you want to delete this Probe? (y/n)",
+			Label:     "Are you sure you want to delete this probe and all the associations with experiment runs from the chaos control plane (y/n)",
 			AllowEdit: true,
 		}
 		result, err := prompt.Run()
