@@ -22,6 +22,26 @@ type CreateEnvironmentData struct {
 	EnvironmentDetails model.Environment `json:"createEnvironment"`
 }
 
+type GetEnvironmentData struct {
+	Errors []struct {
+		Message string   `json:"message"`
+		Path    []string `json:"path"`
+	} `json:"errors"`
+	Data GetEnvironment `json:"data"`
+}
+
+type GetEnvironment struct {
+	EnvironmentDetails model.Environment `json:"getEnvironment"`
+}
+
+type CreateEnvironmentGetGQLRequest struct {
+	Query     string `json:"query"`
+	Variables struct {
+		ProjectID     string `json:"projectID"`
+		EnvironmentID string `json:"environmentID"`
+	}
+}
+
 type ListEnvironmentData struct {
 	Errors []struct {
 		Message string   `json:"message"`
@@ -40,4 +60,24 @@ type CreateEnvironmentListGQLRequest struct {
 		ProjectID string                       `json:"projectID"`
 		Request   model.ListEnvironmentRequest `json:"request"`
 	}
+}
+
+type CreateEnvironmentDeleteGQLRequest struct {
+	Query     string `json:"query"`
+	Variables struct {
+		ProjectID     string `json:"projectID"`
+		EnvironmentID string `json:"environmentID"`
+	}
+}
+
+type DeleteChaosEnvironmentData struct {
+	Errors []struct {
+		Message string   `json:"message"`
+		Path    []string `json:"path"`
+	} `json:"errors"`
+	Data DeleteChaosEnvironmentDetails `json:"data"`
+}
+
+type DeleteChaosEnvironmentDetails struct {
+	DeleteChaosEnvironment string `json:"deleteChaosExperiment"`
 }

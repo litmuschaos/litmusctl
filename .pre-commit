@@ -1,0 +1,7 @@
+#!/bin/bash
+
+ # If there are whitespace errors, print the offending file names and fail.
+# git diff-index --check --cached $against --
+
+# Execute steps extracted from GitHub Actions
+. <(./.github-workflow-script .github/workflows/build.yml)

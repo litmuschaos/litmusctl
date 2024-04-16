@@ -123,6 +123,9 @@ func PrintInYamlFormat(inf interface{}) {
 }
 
 func GenerateRandomString(n int) (string, error) {
+	if n <= 0 {
+		return "", fmt.Errorf("length should not be negative")
+	}
 	const letters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-"
 	ret := make([]byte, n)
 	for i := 0; i < n; i++ {

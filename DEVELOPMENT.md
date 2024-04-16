@@ -70,6 +70,16 @@ To run tests, use the following command:
 go test ./...
 ```
 
+## **Contributing Prerequisites**
+
+Setting up pre-commit:
+
+Execute the following command to create a symbolic link named `pre-commit` in the `.git/hooks` directory that points to the `.pre-commit`.
+
+```bash
+ln -s ../../.pre-commit .git/hooks/pre-commit
+```
+
 ## **Contributing Guidelines**
 
 If you wish to contribute to **`litmusctl`**, please follow our [contributing guidelines](https://github.com/litmuschaos/litmus/blob/master/CONTRIBUTING.md). Your contributions are valuable, and adhering to these guidelines ensures a smooth and collaborative development process.
