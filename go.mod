@@ -2,7 +2,6 @@ module github.com/litmuschaos/litmusctl
 
 go 1.21
 
-
 require (
 	github.com/argoproj/argo-workflows/v3 v3.5.5
 	github.com/fatih/color v1.14.1
@@ -62,7 +61,7 @@ require (
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.9.0 // indirect
 	golang.org/x/exp v0.0.0-20230905200255-921286631fa9 // indirect
-	golang.org/x/net v0.22.0 // indirect
+	golang.org/x/net v0.23.0 // indirect
 	golang.org/x/oauth2 v0.18.0 // indirect
 	golang.org/x/sys v0.18.0 // indirect
 	golang.org/x/term v0.18.0 // indirect
