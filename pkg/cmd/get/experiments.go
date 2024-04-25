@@ -76,14 +76,27 @@ var experimentsCmd = &cobra.Command{
 				os.Exit(1)
 			}
 		}
-
-		outputFormat := ""
-		outputPrompt := promptui.Select{
-			Label: "Select an output format",
-			Items: []string{"table", "json", "yaml"},
-		}
-		_, outputFormat, err = outputPrompt.Run()
+		
+		outputFormat, err := cmd.Flags().GetString("output")
 		utils.PrintError(err)
+		
+		if outputFormat == "" {
+			outputPrompt := promptui.Select{
+				Label: "Select an output format",
+				Items: []string{"table", "json", "yaml"},
+			}
+			_, outputFormat, err = outputPrompt.Run()
+			utils.PrintError(err)
+		}
+		
+		if outputFormat != "table" && outputFormat != "json" && outputFormat != "yaml" {
+			outputPrompt := promptui.Select{
+				Label: "Invalid output format '"+outputFormat+"'. Select a valid output format",
+				Items: []string{"table", "json", "yaml"},
+			}
+			_, outputFormat, err = outputPrompt.Run()
+			utils.PrintError(err)
+		}
 
 		switch outputFormat {
 		case "json":
@@ -146,5 +159,5 @@ func init() {
 	experimentsCmd.Flags().Bool("all", false, "Set to true to display all Chaos experiments")
 	experimentsCmd.Flags().StringP("chaos-infra", "A", "", "Set the Chaos Infrastructure name to display all Chaos experiments targeted towards that particular Chaos Infrastructure.")
 
-	experimentsCmd.Flags().StringP("output", "o", "", "Output format. One of:\njson|yaml")
+	experimentsCmd.Flags().StringP("output", "o", "", "Output format. One of:\ntable|json|yaml")
 }
