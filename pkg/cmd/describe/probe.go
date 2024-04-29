@@ -101,9 +101,8 @@ var probeCmd = &cobra.Command{
 		switch probeOutput {
 		case "json":
 			jsonData, _ := yaml.YAMLToJSON([]byte(getProbeYAMLData))
-			// utils.PrintInJsonFormat(string(jsonData))
 			var prettyJSON bytes.Buffer
-			err = json.Indent(&prettyJSON, jsonData, "", "    ") // Adjust the indentation as needed
+			err = json.Indent(&prettyJSON, jsonData, "", "    ")
 			if err != nil {
 				utils.Red.Println("❌ Error formatting JSON: " + err.Error())
 				os.Exit(1)
