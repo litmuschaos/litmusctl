@@ -60,3 +60,23 @@ type DeleteProbeResponse struct {
 type DeleteProbeResponseData struct {
 	DeleteProbe bool `json:"deleteProbe"`
 }
+
+type GetProbeYAMLGQLRequest struct {
+	Query     string `json:"query"`
+	Variables struct {
+		ProjectID string                    `json:"projectID"`
+		Request   model.GetProbeYAMLRequest `json:"request"`
+	} `json:"variables"`
+}
+
+type GetProbeYAMLResponse struct {
+	Errors []struct {
+		Message string   `json:"message"`
+		Path    []string `json:"path"`
+	} `json:"errors"`
+	Data GetProbeYAMLResponseData `json:"data"`
+}
+
+type GetProbeYAMLResponseData struct {
+	GetProbeYAML string `json:"getProbeYAML"`
+}
