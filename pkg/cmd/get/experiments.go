@@ -77,14 +77,16 @@ var experimentsCmd = &cobra.Command{
 			}
 		}
 
-		outputFormat := ""
-		outputPrompt := promptui.Select{
-			Label: "Select an output format",
-			Items: []string{"table", "json", "yaml"},
-		}
-		_, outputFormat, err = outputPrompt.Run()
+		outputFormat, err := cmd.Flags().GetString("output")
 		utils.PrintError(err)
-
+		if outputFormat == "" {
+			outputPrompt := promptui.Select{
+				Label: "Select an output format",
+				Items: []string{"table", "json", "yaml"},
+			}
+			_, outputFormat, err = outputPrompt.Run()
+			utils.PrintError(err)
+		}
 		switch outputFormat {
 		case "json":
 			utils.PrintInJsonFormat(experiments.Data)
