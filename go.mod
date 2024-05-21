@@ -2,7 +2,6 @@ module github.com/litmuschaos/litmusctl
 
 go 1.21
 
-
 require (
 	github.com/argoproj/argo-workflows/v3 v3.5.5
 	github.com/fatih/color v1.14.1
@@ -13,7 +12,7 @@ require (
 	github.com/manifoldco/promptui v0.9.0
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/sirupsen/logrus v1.9.3
-	github.com/spf13/cobra v1.7.0
+	github.com/spf13/cobra v1.8.0
 	github.com/spf13/viper v1.17.0
 	gopkg.in/yaml.v2 v2.4.0
 	k8s.io/api v0.29.2
