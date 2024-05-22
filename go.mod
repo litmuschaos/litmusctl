@@ -4,7 +4,7 @@ go 1.21
 
 require (
 	github.com/argoproj/argo-workflows/v3 v3.5.5
-	github.com/fatih/color v1.14.1
+	github.com/fatih/color v1.17.0
 	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/gorhill/cronexpr v0.0.0-20180427100037-88b0669f7d75
 	github.com/litmuschaos/chaos-operator v0.0.0-20230718113617-6819a4be12e4
@@ -45,7 +45,7 @@ require (
 	github.com/magiconair/properties v1.8.7 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
-	github.com/mattn/go-isatty v0.0.17 // indirect
+	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
