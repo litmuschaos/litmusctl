@@ -93,6 +93,7 @@ To install the latest version of litmusctl follow the below steps:
 
 <table>
   <th>Platforms</th>
+  <th>1.7.0</th>
   <th>1.6.0</th>
   <th>1.5.0</th>
   <th>1.4.0</th>
@@ -100,7 +101,6 @@ To install the latest version of litmusctl follow the below steps:
   <th>1.2.0</th>
   <th>1.1.0</th>
   <th>1.0.0</th>
-  <th>0.24.0</th>
   <th>master(Unreleased)</th>
   <tr>
     <td>litmusctl-darwin-amd64 (MacOS)</td>
