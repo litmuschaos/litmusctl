@@ -33,7 +33,7 @@ To check compatibility of litmusctl with Chaos Center
  <tr>
     <td>1.8.0</td>
     <td>3.0.0</td>
-    <td>3.9.0</td>
+    <td>3.9.1</td>
  </tr>
  <tr>
     <td>1.7.0</td>
