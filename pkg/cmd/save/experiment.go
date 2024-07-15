@@ -23,9 +23,6 @@ import (
 	models "github.com/litmuschaos/litmus/chaoscenter/graphql/server/graph/model"
 	"github.com/litmuschaos/litmusctl/pkg/apis/experiment"
 
-	//"time"
-
-	//"github.com/gorhill/cronexpr"
 	"github.com/litmuschaos/litmusctl/pkg/apis"
 	"github.com/litmuschaos/litmusctl/pkg/utils"
 
@@ -123,21 +120,22 @@ var experimentCmd = &cobra.Command{
 			if (saveExperiment.Data == experiment.SavedExperimentDetails{}) {
 
 				if strings.Contains(err.Error(), "multiple write errors") {
-					utils.Red.Println("\n❌ Chaos Experiment/" + chaosExperimentRequest.Name + " already exists")
+					utils.Red.Println("\n❌ Chaos Experiment " + chaosExperimentRequest.Name + " already exists")
 					os.Exit(1)
 				}
 				if strings.Contains(err.Error(), "no documents in result") {
 					utils.Red.Println("❌ The specified Project ID or Chaos Infrastructure ID doesn't exist.")
 					os.Exit(1)
 				} else {
-					utils.White_B.Print("\n❌ Chaos Experiment/" + chaosExperimentRequest.Name + " failed to be created: " + err.Error())
+					utils.White_B.Print("\n❌ Chaos Experiment " + chaosExperimentRequest.Name + " failed to be created: " + err.Error())
 					os.Exit(1)
 				}
 			}
 		}
 
 		//Successful creation
-		utils.White_B.Println("\n🚀 Chaos Experiment/" + chaosExperimentRequest.Name + " successfully saved 🎉")
+		utils.White_B.Println("\n🚀 Chaos Experiment " + chaosExperimentRequest.Name + " successfully saved 🎉")
+		utils.White_B.Println("\nChaos Experiment ID: " + chaosExperimentRequest.ID)
 	},
 }
 
