@@ -1,9 +1,6 @@
 on:
-  workflow_dispatch:
-    inputs:
-      tag-name:
-        description: 'The git tag name to bump the formula to'
-        required: true
+  release:
+   types: [ released ]
 
 jobs:
   homebrew:
