@@ -17,7 +17,7 @@ jobs:
       - uses: mislav/bump-homebrew-formula-action@v3
         with:
           formula-name: litmusctl
-          tag-name: ${{ github.event.inputs.tag-name }}
+          tag-name: ${{ steps.extract-version.outputs.tag-name  }}
           download-url: https://github.com/litmuschaos/litmusctl/archive/refs/tags/${{ steps.extract-version.outputs.tag-name  }}.tar.gz
         env:
           COMMITTER_TOKEN: ${{ secrets.COMMITTER_TOKEN }}
