@@ -82,10 +82,13 @@ func CreateProjectRequest(projectName string, cred types.Credentials) (CreatePro
 }
 
 type listProjectResponse struct {
-	Data []struct {
-		ID        string `json:"ProjectID"`
-		Name      string `json:"Name"`
-		CreatedAt int64  `json:"CreatedAt"`
+	Data struct {
+		Projects []struct {
+			ID        string `json:"projectID"` // Adjusted field name
+			Name      string `json:"name"`
+			CreatedAt int64  `json:"createdAt"`
+		} `json:"projects"`
+		TotalNumberOfProjects int `json:"totalNumberOfProjects"`
 	} `json:"data"`
 	Errors []struct {
 		Message string   `json:"message"`
@@ -104,7 +107,6 @@ func ListProject(cred types.Credentials) (listProjectResponse, error) {
 	if err != nil {
 		return listProjectResponse{}, err
 	}
-
 	defer resp.Body.Close()
 
 	if resp.StatusCode == http.StatusOK {
@@ -112,6 +114,7 @@ func ListProject(cred types.Credentials) (listProjectResponse, error) {
 		err = json.Unmarshal(bodyBytes, &data)
 		if err != nil {
 			return listProjectResponse{}, err
+
 		}
 
 		if len(data.Errors) > 0 {

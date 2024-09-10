@@ -45,12 +45,12 @@ var projectsCmd = &cobra.Command{
 			utils.PrintInJsonFormat(projects.Data)
 
 		case "yaml":
-			utils.PrintInYamlFormat(projects.Data)
+			utils.PrintInYamlFormat(projects.Data.Projects)
 
 		case "":
 			itemsPerPage := 5
 			page := 1
-			totalProjects := len(projects.Data)
+			totalProjects := len(projects.Data.Projects)
 
 			for {
 				// calculating the start and end indices for the current page
@@ -69,9 +69,9 @@ var projectsCmd = &cobra.Command{
 				// displaying the projects for the current page
 				writer := tabwriter.NewWriter(os.Stdout, 8, 8, 8, '\t', tabwriter.AlignRight)
 				utils.White_B.Fprintln(writer, "PROJECT ID\tPROJECT NAME\tCREATED AT")
-				for _, project := range projects.Data[start:end] {
+				for _, project := range projects.Data.Projects[start:end] {
 					intTime := project.CreatedAt
-					humanTime := time.Unix(intTime, 0)
+					humanTime := time.Unix(intTime/1000, 0) // Convert milliseconds to second
 					utils.White.Fprintln(writer, project.ID+"\t"+project.Name+"\t"+humanTime.String()+"\t")
 				}
 				writer.Flush()
