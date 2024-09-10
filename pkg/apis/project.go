@@ -81,18 +81,6 @@ func CreateProjectRequest(projectName string, cred types.Credentials) (CreatePro
 	}
 }
 
-// type listProjectResponse struct {
-// 	Data []struct {
-// 		ID        string `json:"ProjectID"`
-// 		Name      string `json:"Name"`
-// 		CreatedAt int64  `json:"CreatedAt"`
-// 	} `json:"data"`
-// 	Errors []struct {
-// 		Message string   `json:"message"`
-// 		Path    []string `json:"path"`
-// 	} `json:"errors"`
-// }
-
 type listProjectResponse struct {
 	Data struct {
 		Projects []struct {
@@ -125,13 +113,11 @@ func ListProject(cred types.Credentials) (listProjectResponse, error) {
 		var data listProjectResponse
 		err = json.Unmarshal(bodyBytes, &data)
 		if err != nil {
-			utils.Red.Println("here1")
 			return listProjectResponse{}, err
 			
 		}
 		
 		if len(data.Errors) > 0 {
-			utils.Red.Println("here12")
 			return listProjectResponse{}, errors.New(data.Errors[0].Message)
 		}
 		
