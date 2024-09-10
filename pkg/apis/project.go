@@ -84,7 +84,7 @@ func CreateProjectRequest(projectName string, cred types.Credentials) (CreatePro
 type listProjectResponse struct {
 	Data struct {
 		Projects []struct {
-			ID        string `json:"projectID"`  // Adjusted field name
+			ID        string `json:"projectID"` // Adjusted field name
 			Name      string `json:"name"`
 			CreatedAt int64  `json:"createdAt"`
 		} `json:"projects"`
@@ -114,13 +114,13 @@ func ListProject(cred types.Credentials) (listProjectResponse, error) {
 		err = json.Unmarshal(bodyBytes, &data)
 		if err != nil {
 			return listProjectResponse{}, err
-			
+
 		}
-		
+
 		if len(data.Errors) > 0 {
 			return listProjectResponse{}, errors.New(data.Errors[0].Message)
 		}
-		
+
 		return data, nil
 	} else {
 		return listProjectResponse{}, errors.New("Unmatched status code:" + string(bodyBytes))
