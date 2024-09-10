@@ -81,11 +81,26 @@ func CreateProjectRequest(projectName string, cred types.Credentials) (CreatePro
 	}
 }
 
+// type listProjectResponse struct {
+// 	Data []struct {
+// 		ID        string `json:"ProjectID"`
+// 		Name      string `json:"Name"`
+// 		CreatedAt int64  `json:"CreatedAt"`
+// 	} `json:"data"`
+// 	Errors []struct {
+// 		Message string   `json:"message"`
+// 		Path    []string `json:"path"`
+// 	} `json:"errors"`
+// }
+
 type listProjectResponse struct {
-	Data []struct {
-		ID        string `json:"ProjectID"`
-		Name      string `json:"Name"`
-		CreatedAt int64  `json:"CreatedAt"`
+	Data struct {
+		Projects []struct {
+			ID        string `json:"projectID"`  // Adjusted field name
+			Name      string `json:"name"`
+			CreatedAt int64  `json:"createdAt"`
+		} `json:"projects"`
+		TotalNumberOfProjects int `json:"totalNumberOfProjects"`
 	} `json:"data"`
 	Errors []struct {
 		Message string   `json:"message"`
@@ -104,20 +119,22 @@ func ListProject(cred types.Credentials) (listProjectResponse, error) {
 	if err != nil {
 		return listProjectResponse{}, err
 	}
-
 	defer resp.Body.Close()
 
 	if resp.StatusCode == http.StatusOK {
 		var data listProjectResponse
 		err = json.Unmarshal(bodyBytes, &data)
 		if err != nil {
+			utils.Red.Println("here1")
 			return listProjectResponse{}, err
+			
 		}
-
+		
 		if len(data.Errors) > 0 {
+			utils.Red.Println("here12")
 			return listProjectResponse{}, errors.New(data.Errors[0].Message)
 		}
-
+		
 		return data, nil
 	} else {
 		return listProjectResponse{}, errors.New("Unmatched status code:" + string(bodyBytes))
