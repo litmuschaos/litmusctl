@@ -16,8 +16,9 @@ limitations under the License.
 package connect
 
 import (
-	"fmt"
 	"os"
+
+	"github.com/sirupsen/logrus"
 
 	"github.com/litmuschaos/litmusctl/pkg/apis/environment"
 	"github.com/litmuschaos/litmusctl/pkg/apis/infrastructure"
@@ -235,34 +236,25 @@ var infraCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		path := fmt.Sprintf("%s%s/%s.yaml", credentials.Endpoint, utils.ChaosYamlPath, infra.Data.RegisterInfraDetails.Token)
-		utils.White_B.Print("Applying YAML:\n", path)
-
 		// Print error message in case Data field is null in response
 		if (infra.Data == infrastructure.RegisterInfra{}) {
 			utils.White_B.Print("\n🚫 Chaos new infrastructure connection failed: " + infra.Errors[0].Message + "\n")
 			os.Exit(1)
 		}
 
-		//Apply infra connection yaml
-		yamlOutput, err := k8s.ApplyYaml(k8s.ApplyYamlParams{
-			Token:    infra.Data.RegisterInfraDetails.Token,
-			Endpoint: credentials.Endpoint,
-			YamlPath: utils.ChaosYamlPath,
-		}, kubeconfig, false)
+		yamlOutput, err := k8s.ApplyManifest([]byte(infra.Data.RegisterInfraDetails.Manifest), kubeconfig)
 		if err != nil {
-			utils.Red.Print("\n❌ Failed to apply connection yaml: \n" + err.Error() + "\n")
-			utils.White_B.Print("\n Error:  \n" + err.Error())
+			utils.Red.Println("\n❌ failed to apply infra manifest, error: " + err.Error())
 			os.Exit(1)
 		}
+		logrus.Println("🚀 Successfully Connected Chaos Infrastructure")
 
-		utils.White_B.Print("\n", yamlOutput)
+		utils.White.Print("\n", yamlOutput)
 
 		// Watch subscriber pod status
 		k8s.WatchPod(k8s.WatchPodParams{Namespace: newInfra.Namespace, Label: utils.ChaosInfraLabel}, &kubeconfig)
 
 		utils.White_B.Println("\n🚀 Chaos new infrastructure connection successful!! 🎉")
-		utils.White_B.Println("👉 Litmus Chaos Infrastructure can be accessed here: " + fmt.Sprintf("%s/%s", credentials.Endpoint, utils.ChaosInfraPath))
 	},
 }
 

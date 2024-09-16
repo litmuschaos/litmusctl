@@ -21,11 +21,8 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"io"
 	"log"
-	"net/http"
 	"os"
-	"os/exec"
 	"path/filepath"
 
 	"k8s.io/client-go/discovery/cached/memory"
@@ -282,70 +279,8 @@ func ValidSA(namespace string, kubeconfig *string) (string, bool) {
 	return sa, false
 }
 
-// Token: Authorization token
-// EndPoint: Endpoint in .litmusconfig
-// YamlPath: Path of yaml file
-type ApplyYamlParams struct {
-	Token    string
-	Endpoint string
-	YamlPath string
-}
-
-func ApplyYaml(params ApplyYamlParams, kubeconfig string, isLocal bool) (output string, err error) {
-	path := params.YamlPath
-	if !isLocal {
-		path = fmt.Sprintf("%s%s/%s.yaml", params.Endpoint, params.YamlPath, params.Token)
-		req, err := http.NewRequest("GET", path, nil)
-		if err != nil {
-			return "", err
-		}
-		resp, err := http.DefaultClient.Do(req)
-		if err != nil {
-			return "", err
-		}
-		defer resp.Body.Close()
-		resp_body, err := io.ReadAll(resp.Body)
-		if err != nil {
-			return "", err
-		}
-		err = os.WriteFile("chaos-infra-manifest.yaml", resp_body, 0644)
-		if err != nil {
-			return "", err
-		}
-		path = "chaos-infra-manifest.yaml"
-	}
-
-	args := []string{"kubectl", "apply", "-f", path}
-	if kubeconfig != "" {
-		args = append(args, []string{"--kubeconfig", kubeconfig}...)
-	} else {
-		args = []string{"kubectl", "apply", "-f", path}
-	}
-
-	cmd := exec.Command(args[0], args[1:]...)
-	var stdout, stderr bytes.Buffer
-	cmd.Stdout = &stdout
-	cmd.Stderr = &stderr
-	err = cmd.Run()
-	outStr, errStr := stdout.String(), stderr.String()
-
-	// err, can have exit status 1
-	if err != nil {
-		// if we get standard error then, return the same
-		if errStr != "" {
-			return "", fmt.Errorf(errStr)
-		}
-
-		// if not standard error found, return error
-		return "", err
-	}
-
-	// If no error found, return standard output
-	return outStr, nil
-}
-
-// UpgradeInfra upgrades the Chaos Infrastructure using the provided manifest and kubeconfig with the help of client-go library.
-func UpgradeInfra(manifest []byte, kubeconfig string) (string, error) {
+// ApplyManifest applies the provided manifest and kubeconfig with the help of client-go library.
+func ApplyManifest(manifest []byte, kubeconfig string) (string, error) {
 
 	// Get Kubernetes and dynamic clients along with the configuration.
 	_, kubeClient, dynamicClient, err := getClientAndConfig(kubeconfig)
@@ -365,10 +300,7 @@ func UpgradeInfra(manifest []byte, kubeconfig string) (string, error) {
 		return "", err
 	}
 
-	logrus.Println("🚀 Successfully Upgraded Chaos Infra")
-
 	return "Success", nil
-
 }
 
 // retrieves the Kubernetes and dynamic clients along with the configuration.

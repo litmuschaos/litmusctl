@@ -174,14 +174,11 @@ Installation Mode: cluster
 
 🤷 Do you want to continue with the above details? [Y/N]: Y
 👍 Continuing Chaos Infrastructure connection!!
-Applying YAML:
-https://preview.litmuschaos.io/api/file/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbHVzdGVyX2lkIjoiMDUyZmFlN2UtZGM0MS00YmU4LWJiYTgtMmM4ZTYyNDFkN2I0In0.i31QQDG92X5nD6P_-7TfeAAarZqLvUTFfnAghJYXPiM.yaml
 
 💡 Connecting Chaos Infrastructure to ChaosCenter.
 🏃 Chaos Infrastructure is running!!
 
 🚀 Chaos Infrastructure Connection Successful!! 🎉
-👉 Litmus Chaos Infrastructure can be accessed here: https://preview.litmuschaos.io/targets
 ```
 
 #### Verify the new Chaos Infrastructure Connection\*\*

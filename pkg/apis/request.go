@@ -32,6 +32,7 @@ func SendRequest(params SendRequestParams, payload []byte, method string) (*http
 	}
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", params.Token)
+	req.Header.Set("Referer", params.Endpoint)
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {

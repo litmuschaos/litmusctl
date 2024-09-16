@@ -16,6 +16,7 @@ const (
 						infraID
 						name
 						token
+						manifest
 					  }
 					}
 					`
