@@ -63,8 +63,8 @@ const (
 	ChaosInfraPath = "targets"
 
 	// Graphql server api path
-	GQLAPIPath = "/api/query"
+	GQLAPIPath = "/query"
 
 	// Auth server api path
-	AuthAPIPath = "/auth"
+	AuthAPIPath = ""
 )
