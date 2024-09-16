@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/sirupsen/logrus"
 	"io"
 	"net/http"
 	"os"
@@ -125,11 +126,12 @@ func UpgradeInfra(c context.Context, cred types.Credentials, projectID string, i
 
 		}
 
-		yamlOutput, err := k8s.UpgradeInfra([]byte(manifest.Data.GetManifest), kubeconfig)
-
+		yamlOutput, err := k8s.ApplyManifest([]byte(manifest.Data.GetManifest), kubeconfig)
 		if err != nil {
 			return "", err
 		}
+		logrus.Println("🚀 Successfully Upgraded Chaos Infrastructure")
+
 		utils.White.Print("\n", yamlOutput)
 
 		// Creating a backup for current subscriber-config in the SUBSCRIBER

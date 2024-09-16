@@ -167,15 +167,12 @@ Service Account:  litmus (new)
 Installation Mode: cluster
 
 🤷 Do you want to continue with the above details? [Y/N]: Y
-👍 Continuing Chaos Delegate connection!!
-Applying YAML:
-https://preview.litmuschaos.io/api/file/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjbHVzdGVyX2lkIjoiMDUyZmFlN2UtZGM0MS00YmU4LWJiYTgtMmM4ZTYyNDFkN2I0In0.i31QQDG92X5nD6P_-7TfeAAarZqLvUTFfnAghJYXPiM.yaml
+👍 Continuing Chaos Infrastructure connection!!
 
-💡 Connecting Chaos Delegate to ChaosCenter.
+💡 Connecting Chaos Infrastructure to ChaosCenter.
 🏃 Chaos Delegate is running!!
 
-🚀 Chaos Delegate Connection Successful!! 🎉
-👉 Litmus Chaos Delegates can be accessed here: https://preview.litmuschaos.io/targets
+🚀 Chaos Infrastructure Connection Successful!! 🎉
 ```
 
 #### Verify the new Chaos Delegate Connection\*\*
