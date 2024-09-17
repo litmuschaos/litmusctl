@@ -41,3 +41,9 @@ type Credentials struct {
 	Endpoint       string
 	ServerEndpoint string
 }
+
+type UpdatePasswordInput struct {
+	Username    string `json:"username,omitempty"`
+	OldPassword string
+	NewPassword string
+}
