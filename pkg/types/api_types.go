@@ -43,7 +43,7 @@ type Credentials struct {
 }
 
 type UpdatePasswordInput struct {
-	Username    	string `json:"username,omitempty"`
-	OldPassword 	string 
-	NewPassword 	string 
+	Username    string `json:"username,omitempty"`
+	OldPassword string
+	NewPassword string
 }

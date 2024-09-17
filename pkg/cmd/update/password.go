@@ -47,7 +47,7 @@ var PasswordCmd = &cobra.Command{
 		if err != nil {
 			utils.PrintError(err)
 		}
-	
+
 	NEW_PASSWORD:
 
 		promptNewPassword := promptui.Prompt{
