@@ -5,6 +5,7 @@ import (
 	"errors"
 	"io"
 	"net/http"
+	"os"
 
 	"github.com/litmuschaos/litmusctl/pkg/apis"
 	"github.com/litmuschaos/litmusctl/pkg/types"
@@ -83,12 +84,14 @@ var PasswordCmd = &cobra.Command{
 		)
 		if err != nil {
 			utils.PrintError(err)
+			os.Exit(1)
 		}
 		defer resp.Body.Close()
 
 		bodyBytes, err := io.ReadAll(resp.Body)
 		if err != nil {
 			utils.PrintError(err)
+			os.Exit(1)
 		}
 
 		if resp.StatusCode == http.StatusOK {
@@ -97,6 +100,7 @@ var PasswordCmd = &cobra.Command{
 			err := errors.New("Unmatched status code: " + string(bodyBytes))
 			if err != nil {
 				utils.Red.Println("\nError updating password: ", err)
+				os.Exit(1)
 			}
 		}
 	},
