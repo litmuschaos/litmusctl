@@ -26,20 +26,26 @@ var PasswordCmd = &cobra.Command{
 		)
 
 		credentials, err := utils.GetCredentials(cmd)
-		utils.PrintError(err)
+		if err != nil {
+			utils.PrintError(err)
+		}
 
 		promptUsername := promptui.Prompt{
 			Label: "Username",
 		}
 		updatePasswordRequest.Username, err = promptUsername.Run()
-		utils.PrintError(err)
+		if err != nil {
+			utils.PrintError(err)
+		}
 
 		promptOldPassword := promptui.Prompt{
 			Label: "Old Password",
 			Mask:  '*',
 		}
 		updatePasswordRequest.OldPassword, err = promptOldPassword.Run()
-		utils.PrintError(err)
+		if err != nil {
+			utils.PrintError(err)
+		}
 	
 	NEW_PASSWORD:
 
@@ -48,14 +54,18 @@ var PasswordCmd = &cobra.Command{
 			Mask:  '*',
 		}
 		updatePasswordRequest.NewPassword, err = promptNewPassword.Run()
-		utils.PrintError(err)
+		if err != nil {
+			utils.PrintError(err)
+		}
 
 		promptConfirmPassword := promptui.Prompt{
 			Label: "Confirm New Password",
 			Mask:  '*',
 		}
 		confirmPassword, err := promptConfirmPassword.Run()
-		utils.PrintError(err)
+		if err != nil {
+			utils.PrintError(err)
+		}
 
 		if updatePasswordRequest.NewPassword != confirmPassword {
 			utils.Red.Println("\nPasswords do not match. Please try again.")
@@ -71,17 +81,23 @@ var PasswordCmd = &cobra.Command{
 			payloadBytes,
 			string(types.Post),
 		)
-		utils.PrintError(err)
+		if err != nil {
+			utils.PrintError(err)
+		}
 		defer resp.Body.Close()
 
 		bodyBytes, err := io.ReadAll(resp.Body)
-		utils.PrintError(err)
+		if err != nil {
+			utils.PrintError(err)
+		}
 
 		if resp.StatusCode == http.StatusOK {
 			utils.White_B.Println("\nPassword updated successfully!")
 		} else {
 			err := errors.New("Unmatched status code: " + string(bodyBytes))
-			utils.Red.Println("\nError updating password: ", err)
+			if err != nil {
+				utils.Red.Println("\nError updating password: ", err)
+			}
 		}
 	},
 }
