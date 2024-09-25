@@ -1,6 +1,6 @@
 name: release-pipeline
 on:
-  create:
+  push:
     tags:
       - '**'
 
