@@ -200,6 +200,18 @@ litmusctl create chaos-scenario -f custom-chaos-scenario.yml --project-id="" --c
 
 ### Additional commands
 
+- To change the ChaosCenter account's password use the `update password` command:
+
+```shell
+litmusctl update password
+✓ Username: admin
+✓ Old Password: ********
+✓ New Password: ********
+✓ Confirm Password: ********
+
+Password updated successfully!
+```
+
 - To view the current configuration of `.litmusconfig`, type:
 
 ```shell
