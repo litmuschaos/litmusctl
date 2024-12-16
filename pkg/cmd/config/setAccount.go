@@ -16,7 +16,9 @@ limitations under the License.
 package config
 
 import (
+	"encoding/json"
 	"fmt"
+	"io"
 	"net/url"
 	"os"
 	"strings"
@@ -173,6 +175,37 @@ var setAccountCmd = &cobra.Command{
 				utils.PrintError(err)
 			}
 			utils.White_B.Printf("\naccount.username/%s configured", claims["username"].(string))
+			credentials, err := utils.GetCredentials(cmd)
+			if err != nil {
+				utils.PrintError(err)
+			}
+			endpoint := credentials.Endpoint + utils.AuthAPIPath + "/get_user/" + claims["uid"].(string)
+			userResp, err := apis.SendRequest(
+				apis.SendRequestParams{
+					Endpoint: endpoint,
+					Token:    "Bearer " + credentials.Token,
+				},
+				nil,
+				string(types.Get), 
+			)
+			if err != nil {
+				utils.PrintError(err)
+			} 
+			bodyBytes, err := io.ReadAll(userResp.Body)
+			if err != nil {
+				utils.PrintError(err)
+			}
+			var userResponse map[string]interface{}
+			err = json.Unmarshal(bodyBytes, &userResponse)
+			if err != nil {
+				utils.PrintError(err)
+			}
+
+			isInitialLogin := userResponse["isInitialLogin"].(bool)
+			if isInitialLogin {
+				utils.White_B.Println("\n❗ This is your first time login. Update your default password to perform further operations.")
+				utils.White.Println(fmt.Sprintf("Use '%s' to update your password.", utils.White_B.Sprint("litmusctl update password")))
+			}
 		} else {
 			utils.Red.Println("\nError: some flags are missing. Run 'litmusctl config set-account --help' for usage. ")
 		}
