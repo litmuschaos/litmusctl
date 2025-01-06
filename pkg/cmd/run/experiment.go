@@ -46,6 +46,11 @@ type Node struct {
 type ChaosData struct {
 	Namespace string `json:"namespace"`
 	RunnerPod string `json:"runnerPod"`
+	ExpPod    string `json:"experimentPod"`
+}
+
+type ParsedLogs struct {
+	ChaosLogs map[string]string `json:"chaosLogs"`
 }
 
 func getEmojiForPhase(phase string) string {
@@ -73,7 +78,7 @@ func getEmojiForPhase(phase string) string {
 
 // logNodeDetails logs the node details in a standardized format
 func logNodeDetails(node Node, prefix string) {
-	utils.Cyan.Printf("\n🚀 %s: %s", prefix, node.Type)
+	utils.Cyan.Printf("%s: [%s]", prefix, node.Type)
 	info := fmt.Sprintf(" %s - Phase: %s %s | ⏰ Started At: %s",
 		node.Name, node.Phase, getEmojiForPhase(node.Phase), utils.FormatTimeStamp(node.StartedAt))
 
@@ -82,7 +87,7 @@ func logNodeDetails(node Node, prefix string) {
 		info += fmt.Sprintf(" | ⏰ Finished At: %s", utils.FormatTimeStamp(node.FinishedAt))
 	}
 
-	utils.Green.Println(info)
+	utils.White.Println(info)
 }
 
 // experimentCmd represents the project command
@@ -181,6 +186,7 @@ var experimentCmd = &cobra.Command{
 			}
 			// Create a map to keep track of seen nodes
 			seenNodes := make(map[string]string)
+			logsCache := make(map[string]string)
 
 			for {
 				exp, err = experiment.GetExperimentRun(project.ID, runExperiment.Data.RunExperimentDetails.NotifyID, credentials)
@@ -199,40 +205,62 @@ var experimentCmd = &cobra.Command{
 					if _, found := seenNodes[nodeName]; !found {
 						// Log new node found
 						logNodeDetails(node, "New node detected")
-
-						// Mark the node as seen
-						seenNodes[nodeName] = node.Phase
-
 					} else if node.Phase != seenNodes[nodeName] {
 						// Node already seen, but phase has changed
 						logNodeDetails(node, "Node phase updated")
-
-						// Check and log runnerPod if available
-						if node.ChaosData != nil && node.ChaosData.RunnerPod != "" && node.Phase == "Completed" {
+					}
+					// Save the node state
+					seenNodes[nodeName] = node.Phase
+					// Check and log runnerPod & experimentPod if available
+					if node.ChaosData != nil && node.Phase == "Running" {
+						podNames := []string{
+							node.ChaosData.RunnerPod,
+							node.ChaosData.ExpPod,
+						}
+						for _, podName := range podNames {
 							podLogReq := experiment.PodLogRequest{
 								InfraID:         exp.Data.ExperimentRunDetails.Infra.InfraID,
 								ExperimentRunID: exp.Data.ExperimentRunDetails.ExperimentRunID,
 								PodNamespace:    execution.Namespace,
 								PodType:         node.Type,
-								RunnerPod:       node.ChaosData.RunnerPod,
+								RunnerPod:       podName,
 								ChaosNamespace:  node.ChaosData.Namespace,
 							}
 							podLogRes, err := experiment.GetPodLogs(podLogReq, credentials)
 							if err != nil {
-								utils.White_B.Print("\n❌ Failed to fetch logs: " + err.Error())
+								utils.Red.Print("\n❌ Failed to fetch logs: " + err.Error())
 							}
-							utils.White_B.Println("\n🚀PodLogs: \n " + podLogRes.Data.GetPodLog.Log)
-						}
+							parsedLogs := &ParsedLogs{}
+							if err := json.Unmarshal([]byte(podLogRes.Data.GetPodLog.Log), &parsedLogs); err != nil {
+								utils.Red.Print("\n❌ Failed to parse logs: " + err.Error())
+							}
 
-						// Update the node phase
-						seenNodes[nodeName] = node.Phase
+							for pod, log := range parsedLogs.ChaosLogs {
+								diff := utils.Diff(logsCache[pod], log)
+								if diff != "" {
+									lines := strings.Split(diff, "\n")
+									for _, line := range lines {
+										utils.Green.Printf("[%s] ", pod)
+										utils.White.Println(line)
+									}
+								}
+								logsCache[pod] = log
+							}
+						}
 					}
 				}
 
-				if exp.Data.ExperimentRunDetails.Phase != "Running" {
+				if exp.Data.ExperimentRunDetails.Phase != "Running" &&
+					exp.Data.ExperimentRunDetails.Phase != "Queued" {
 					break
 				}
 				time.Sleep(time.Second * 1)
+			}
+			if exp.Data.ExperimentRunDetails.Phase == "Completed" {
+				utils.White_B.Println("🚀 Chaos Experiment finished successfully 🎉")
+			} else {
+				utils.Red.Println("💥 Chaos Experiment encountered a failure ❌")
+				os.Exit(1)
 			}
 		}
 	},
