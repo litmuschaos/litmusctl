@@ -29,18 +29,66 @@ const (
                       listExperimentRun(projectID: $projectID, request: $request) {
                         totalNoOfExperimentRuns
                         experimentRuns {
+                          projectID
                           experimentRunID
+                          experimentType
                           experimentID
-                          experimentName
-                          infra {
-                          name
+                          weightages {
+                              faultName
+                              weightage
                           }
                           updatedAt
-                          updatedBy{
-                              username
+                          createdAt
+                          infra {
+                              projectID
+                              infraID                              
+                              name
+                              description
+                              tags
+                              environmentID
+                              platformName
+                              isActive
+                              isInfraConfirmed
+                              isRemoved
+                              updatedAt
+                              createdAt
+                              noOfExperiments
+                              noOfExperimentRuns
+                              token
+                              infraNamespace
+                              serviceAccount
+                              infraScope
+                              infraNsExists
+                              infraSaExists
+                              lastExperimentTimestamp
+                              startTime
+                              version
+                              infraType
+                              updateStatus
                           }
+                          experimentName
                           phase
                           resiliencyScore
+                          faultsPassed
+                          faultsFailed
+                          faultsAwaited
+                          faultsStopped
+                          faultsNa
+                          totalFaults
+                          executionData
+                          isRemoved
+                          updatedBy{
+                              userID
+                              username
+                              email
+                          }
+                          createdBy{
+                              userID
+                              username
+                              email
+                          }
+                          notifyID
+                          runSequence
                         }
                       }
                     }`
