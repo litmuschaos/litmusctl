@@ -187,3 +187,13 @@ func FormatTimeStamp(timestampEpoch string) string {
 	formattedTime := time.Unix(timestampEpochInt, 0).UTC().Format("02 Jan 2006, 15:04:05 UTC")
 	return formattedTime
 }
+
+func Diff(old string, new string) string {
+	var diff = ""
+	if strings.HasPrefix(new, old) {
+		diff = strings.TrimSpace(new[len(old):])
+	} else {
+		diff = strings.TrimSpace(new)
+	}
+	return diff
+}
