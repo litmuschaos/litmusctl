@@ -212,7 +212,7 @@ var experimentCmd = &cobra.Command{
 					// Save the node state
 					seenNodes[nodeName] = node.Phase
 					// Check and log runnerPod & experimentPod if available
-					if node.ChaosData != nil && node.Phase == "Running" {
+					if node.ChaosData != nil {
 						podNames := []string{
 							node.ChaosData.RunnerPod,
 							node.ChaosData.ExpPod,
@@ -251,7 +251,8 @@ var experimentCmd = &cobra.Command{
 				}
 
 				if exp.Data.ExperimentRunDetails.Phase != "Running" &&
-					exp.Data.ExperimentRunDetails.Phase != "Queued" {
+					exp.Data.ExperimentRunDetails.Phase != "Queued" &&
+					exp.Data.ExperimentRunDetails.Phase != "Pending" {
 					break
 				}
 				time.Sleep(time.Second * 1)
