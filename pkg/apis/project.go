@@ -82,7 +82,8 @@ func CreateProjectRequest(projectName string, cred types.Credentials) (CreatePro
 }
 
 type listProjectResponse struct {
-	Data struct {
+	Message string `json:"message"`
+	Data    struct {
 		Projects []struct {
 			ID        string `json:"projectID"` // Adjusted field name
 			Name      string `json:"name"`
