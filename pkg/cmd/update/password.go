@@ -76,7 +76,7 @@ var PasswordCmd = &cobra.Command{
 
 		resp, err := apis.SendRequest(
 			apis.SendRequestParams{
-				Endpoint: credentials.Endpoint + utils.AuthAPIPath + "/update/password/",
+				Endpoint: credentials.Endpoint + utils.AuthAPIPath + "/update/password",
 				Token:    "Bearer " + credentials.Token,
 			},
 			payloadBytes,
