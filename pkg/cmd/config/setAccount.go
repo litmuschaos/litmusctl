@@ -186,11 +186,11 @@ var setAccountCmd = &cobra.Command{
 					Token:    "Bearer " + credentials.Token,
 				},
 				nil,
-				string(types.Get), 
+				string(types.Get),
 			)
 			if err != nil {
 				utils.PrintError(err)
-			} 
+			}
 			bodyBytes, err := io.ReadAll(userResp.Body)
 			if err != nil {
 				utils.PrintError(err)
