@@ -27,7 +27,7 @@ var CLIVersion string
 func main() {
 	err := os.Setenv("CLIVersion", CLIVersion)
 	if err != nil {
-		fmt.Println("Failed to fetch CLIVersion")
+		fmt.Println("Failed to set CLIVersion")
 	}
 
 	rootCmd.Execute()
