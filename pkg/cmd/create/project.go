@@ -59,7 +59,7 @@ var projectCmd = &cobra.Command{
 		var response apis.CreateProjectResponse
 		response, err = apis.CreateProjectRequest(projectName, credentials)
 		if err != nil {
-			utils.Red.Printf("❌ Error creating project: %v\n", err)
+			utils.PrintFormattedError("Error creating project", err)
 		} else {
 			fmt.Printf("Response: %+v\n", response)
 			projectID := response.Data.ID
