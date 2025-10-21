@@ -12,3 +12,9 @@ unused-package-check:
 	if [ -n "$${tidy}" ]; then \
 		echo "go mod tidy checking failed!"; echo "$${tidy}"; echo; \
 	fi
+.PHONY: format_and_lint
+format_and_lint:
+	@echo "------------------"
+	@echo "--> Formatting and linting the code"
+	@echo "------------------"
+	@bash scripts/lint-check.sh
