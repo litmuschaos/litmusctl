@@ -90,7 +90,7 @@ var GetChaosEnvironmentsCmd = &cobra.Command{
 				for _, environment := range environmentListData[start:end] {
 					intTime, err := strconv.ParseInt(environment.CreatedAt, 10, 64)
 					if err != nil {
-						fmt.Println("Error converting CreatedAt to int64:", err)
+						utils.PrintFormattedError("Error converting CreatedAt to int64", err)
 						continue
 					}
 					humanTime := time.Unix(intTime, 0)
@@ -132,12 +132,12 @@ var GetChaosEnvironmentsCmd = &cobra.Command{
 			writer.Flush()
 			intUpdateTime, err := strconv.ParseInt(environmentGetData.UpdatedAt, 10, 64)
 			if err != nil {
-				utils.Red.Println("Error converting UpdatedAt to int64:", err)
+				utils.PrintFormattedError("Error converting UpdatedAt to int64", err)
 			}
 			updatedTime := time.Unix(intUpdateTime, 0).String()
 			intCreatedTime, err := strconv.ParseInt(environmentGetData.CreatedAt, 10, 64)
 			if err != nil {
-				utils.Red.Println("Error converting CreatedAt to int64:", err)
+				utils.PrintFormattedError("Error converting CreatedAt to int64", err)
 			}
 			createdTime := time.Unix(intCreatedTime, 0).String()
 			writer.Flush()

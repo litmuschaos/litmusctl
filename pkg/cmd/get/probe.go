@@ -84,11 +84,11 @@ func getProbeList(projectID string, cmd *cobra.Command, credentials types.Creden
 			Label: "Do you want to enable advance filter probes?",
 			Items: []string{"Yes", "No"},
 		}
-		_, option, err := prompt.Run()
-		if err != nil {
-			fmt.Printf("Prompt failed %v\n", err)
-			return
-		}
+				_, option, err := prompt.Run()
+				if err != nil {
+					utils.PrintFormattedError("Prompt failed", err)
+					return
+				}
 		fmt.Printf("You chose %q\n", option)
 
 		if option == "Yes" {
@@ -106,7 +106,7 @@ func getProbeList(projectID string, cmd *cobra.Command, credentials types.Creden
 
 				selectedIndex, result, err := prompt.Run()
 				if err != nil {
-					fmt.Printf("Prompt failed %v\n", err)
+					utils.PrintFormattedError("Prompt failed", err)
 					os.Exit(1)
 				}
 
@@ -153,12 +153,12 @@ func getProbeList(projectID string, cmd *cobra.Command, credentials types.Creden
 		if end > totalProbes {
 			end = totalProbes
 		}
-		for _, probe := range probes_data[start:end] {
-			intTime, err := strconv.ParseInt(probe.CreatedAt, 10, 64)
-			if err != nil {
-				fmt.Println("Error converting CreatedAt to int64:", err)
-				continue
-			}
+            for _, probe := range probes_data[start:end] {
+            	intTime, err := strconv.ParseInt(probe.CreatedAt, 10, 64)
+            	if err != nil {
+            		utils.PrintFormattedError("Error converting CreatedAt to int64", err)
+            		continue
+            	}
 			humanTime := time.Unix(intTime, 0)
 			var probeReferencedBy int
 			if probe.ReferencedBy != nil {
@@ -201,12 +201,12 @@ func getProbeDetails(projectID, ProbeID string, credentials types.Credentials) {
 	writer := tabwriter.NewWriter(os.Stdout, 30, 8, 2, '\t', tabwriter.AlignRight)
 	intUpdateTime, err := strconv.ParseInt(probeGetData.UpdatedAt, 10, 64)
 	if err != nil {
-		utils.Red.Println("Error converting UpdatedAt to int64:", err)
+		utils.PrintFormattedError("Error converting UpdatedAt to int64", err)
 	}
 	updatedTime := time.Unix(intUpdateTime, 0).String()
 	intCreatedTime, err := strconv.ParseInt(probeGetData.CreatedAt, 10, 64)
 	if err != nil {
-		utils.Red.Println("Error converting CreatedAt to int64:", err)
+		utils.PrintFormattedError("Error converting CreatedAt to int64", err)
 	}
 	createdTime := time.Unix(intCreatedTime, 0).String()
 	utils.White_B.Fprintln(writer, "PROBE DETAILS")

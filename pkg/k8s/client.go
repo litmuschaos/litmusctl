@@ -16,6 +16,7 @@ limitations under the License.
 package k8s
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 
@@ -34,7 +35,7 @@ func ClientSet(kubeconfig *string) (*kubernetes.Clientset, error) {
 			kcfg := filepath.Join(home, ".kube", "config")
 			kubeconfig = &kcfg
 		} else {
-			utils.Red.Println("ERROR: Clientset generation failed!")
+			utils.PrintFormattedError("Clientset generation failed", fmt.Errorf("home directory not found"))
 			os.Exit(1)
 		}
 	}
@@ -42,14 +43,14 @@ func ClientSet(kubeconfig *string) (*kubernetes.Clientset, error) {
 	// create the config
 	config, err := clientcmd.BuildConfigFromFlags("", *kubeconfig)
 	if err != nil {
-		utils.Red.Println("ERROR: ", err.Error())
+		utils.PrintFormattedError("Failed to build kubernetes config", err)
 		os.Exit(1)
 	}
 
 	// create the clientset
 	clientset, err := kubernetes.NewForConfig(config)
 	if err != nil {
-		utils.Red.Println("ERROR: ", err.Error())
+		utils.PrintFormattedError("Failed to create kubernetes clientset", err)
 		os.Exit(1)
 	}
 	return clientset, err
