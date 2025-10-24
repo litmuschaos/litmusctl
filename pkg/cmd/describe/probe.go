@@ -79,18 +79,18 @@ var probeCmd = &cobra.Command{
 				Label: "Please select the probe mode ?",
 				Items: []string{"SOT", "EOT", "Edge", "Continuous", "OnChaos"},
 			}
-			_, option, err := prompt.Run()
-			if err != nil {
-				fmt.Printf("Prompt failed %v\n", err)
-				return
-			}
+				_, option, err := prompt.Run()
+				if err != nil {
+					utils.PrintFormattedError("Prompt failed", err)
+					return
+				}
 			probeMode = option
 			fmt.Printf("You chose %q\n", option)
 		}
 		getProbeYAMLRequest.Mode = model.Mode(probeMode)
 		getProbeYAML, err := apis.GetProbeYAMLRequest(pid, getProbeYAMLRequest, credentials)
 		if err != nil {
-			utils.Red.Println(err)
+			utils.PrintFormattedError("Failed to fetch probe YAML", err)
 			os.Exit(1)
 		}
 		getProbeYAMLData := getProbeYAML.Data.GetProbeYAML
@@ -104,7 +104,7 @@ var probeCmd = &cobra.Command{
 			var prettyJSON bytes.Buffer
 			err = json.Indent(&prettyJSON, jsonData, "", "    ")
 			if err != nil {
-				utils.Red.Println("❌ Error formatting JSON: " + err.Error())
+				utils.PrintFormattedError("Error formatting JSON", err)
 				os.Exit(1)
 			}
 

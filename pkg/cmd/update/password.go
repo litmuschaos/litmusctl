@@ -99,7 +99,7 @@ var PasswordCmd = &cobra.Command{
 		} else {
 			err := errors.New("Unmatched status code: " + string(bodyBytes))
 			if err != nil {
-				utils.Red.Println("\nError updating password: ", err)
+				utils.PrintFormattedError("Error updating password", err)
 				os.Exit(1)
 			}
 		}

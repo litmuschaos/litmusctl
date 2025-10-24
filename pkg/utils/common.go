@@ -47,13 +47,13 @@ func Scanner() string {
 		return scanner.Text()
 	}
 	if err := scanner.Err(); err != nil {
-		fmt.Fprintln(os.Stderr, "reading standard input:", err)
+		PrintFormattedError("Error reading standard input", err)
 	}
 	return ""
 }
 func PrintError(err error) {
 	if err != nil {
-		Red.Println(err)
+		PrintFormattedError("Error", err)
 		os.Exit(1)
 	}
 }
