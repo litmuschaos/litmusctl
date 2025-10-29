@@ -286,6 +286,52 @@ litmusctl.exe <command> <subcommand> <subcommand> [options and parameters]
 litmusctl version
 ```
 
+## Verbose Mode
+
+litmusctl supports a `--verbose` (or `-v`) flag to enable detailed logging during command execution. This is useful for debugging and understanding what's happening behind the scenes.
+
+### Usage
+
+Add the `--verbose` or `-v` flag to any litmusctl command:
+
+```shell
+litmusctl <command> --verbose
+# or
+litmusctl <command> -v
+```
+
+### What Gets Logged
+
+When verbose mode is enabled, litmusctl will print additional information including:
+
+- API endpoints being accessed
+- HTTP request methods and payloads
+- Response status codes
+- Internal processing steps
+- Project and resource details during operations
+
+### Examples
+
+```shell
+# Get projects with verbose logging
+litmusctl get projects --verbose
+
+# Create a project with detailed logs
+litmusctl create project --name my-project -v
+
+# Connect chaos infrastructure with debug information
+litmusctl connect chaos-infra --verbose --name my-infra --non-interactive
+```
+
+### Default Behavior
+
+By default, litmusctl operates in minimal logging mode, showing only:
+- Error messages
+- Warning messages
+- User-facing output
+
+Use `--verbose` when you need to troubleshoot issues or understand the internal operations of the CLI.
+
 ## Development Guide
 
 You can find the local setup guide for **`litmusctl`** [here](DEVELOPMENT.md).
