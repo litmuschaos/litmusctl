@@ -288,7 +288,7 @@ litmusctl version
 
 ## Verbose Mode
 
-litmusctl supports a `--verbose` (or `-v`) flag to enable detailed logging during command execution. This is useful for debugging and understanding what's happening behind the scenes.
+litmusctl supports a `--verbose` (or `-v`) flag to the enable detailed logging during command execution. This is useful for debugging and understanding what's happening behind the scenes.
 
 ### Usage
 
