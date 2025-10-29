@@ -24,7 +24,7 @@ func TestFormatError(t *testing.T) {
 	err := errors.New("connection failed")
 	result := FormatError("Error creating project", err)
 	expected := "❌ Error creating project: connection failed"
-	
+
 	if result != expected {
 		t.Errorf("FormatError() = %v, want %v", result, expected)
 	}

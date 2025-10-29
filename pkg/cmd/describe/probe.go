@@ -79,11 +79,11 @@ var probeCmd = &cobra.Command{
 				Label: "Please select the probe mode ?",
 				Items: []string{"SOT", "EOT", "Edge", "Continuous", "OnChaos"},
 			}
-				_, option, err := prompt.Run()
-				if err != nil {
-					utils.PrintFormattedError("Prompt failed", err)
-					return
-				}
+			_, option, err := prompt.Run()
+			if err != nil {
+				utils.PrintFormattedError("Prompt failed", err)
+				return
+			}
 			probeMode = option
 			fmt.Printf("You chose %q\n", option)
 		}
