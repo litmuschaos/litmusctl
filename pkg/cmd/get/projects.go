@@ -35,10 +35,14 @@ var projectsCmd = &cobra.Command{
 		credentials, err := utils.GetCredentials(cmd)
 		utils.PrintError(err)
 
+		utils.Debug("Fetching list of projects...")
+
 		outputFormat, _ := cmd.Flags().GetString("output")
 
 		projects, err := apis.ListProject(credentials)
 		utils.PrintError(err)
+
+		utils.Debugf("Retrieved %d projects", len(projects.Data.Projects))
 
 		switch outputFormat {
 		case "json":
