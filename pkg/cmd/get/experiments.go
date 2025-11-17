@@ -106,6 +106,12 @@ var experimentsCmd = &cobra.Command{
 				if end > totalExperiments {
 					end = totalExperiments
 				}
+				// check if there are no more experiments to display
+				if start >= totalExperiments {
+					utils.Red.Println("No more experiments to display")
+					break
+				}
+
 				writer := tabwriter.NewWriter(os.Stdout, 4, 8, 1, '\t', 0)
 				utils.White_B.Fprintln(writer, "CHAOS EXPERIMENT ID\tCHAOS EXPERIMENT NAME\tCHAOS EXPERIMENT TYPE\tNEXT SCHEDULE\tCHAOS INFRASTRUCTURE ID\tCHAOS INFRASTRUCTURE NAME\tLAST UPDATED By")
 
