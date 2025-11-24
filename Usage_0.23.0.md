@@ -313,7 +313,7 @@ Project 'project-name' created successfully!🎉
 - To create a new Environment, apply the following command :
 
 ```shell
-litmusctl create environment
+litmusctl create chaos-environment
 
 Enter the Project ID: eb7fc0a0-5878-4454-a9db-b67d283713bc
 
