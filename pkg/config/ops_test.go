@@ -499,4 +499,3 @@ func TestUpdateCurrent(t *testing.T) {
 		}
 	})
 }
-
