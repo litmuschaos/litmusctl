@@ -44,11 +44,41 @@ const (
                         }
                       }
                     }`
+
+	ExperimentRunsQuery = `query getExperimentRun($projectID: ID!, $experimentRunID: ID, $notifyID: ID) {
+                        getExperimentRun(
+                            projectID: $projectID
+                            experimentRunID: $experimentRunID
+                            notifyID: $notifyID
+                          ) 
+                          {
+                          experimentRunID
+                          experimentID
+                          experimentName
+                          infra {
+                          name
+                          infraID
+                          }
+                          updatedAt
+                          updatedBy{
+                              username
+                          }
+                          phase
+                          resiliencyScore
+                          executionData
+                        }
+                      }`
 	DeleteExperimentQuery = `mutation deleteChaosExperiment($projectID: ID!, $experimentID: String!, $experimentRunID: String) {
                       deleteChaosExperiment(
                         projectID: $projectID
                         experimentID: $experimentID
                         experimentRunID: $experimentRunID
                       )
+                    }`
+	GetPodLogsQuery = `subscription podLog($request: PodLogRequest!) {
+                      getPodLog(request: $request) {
+                        log
+                        __typename
+                      }
                     }`
 )
