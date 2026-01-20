@@ -1,0 +1,4 @@
+apiVersion: v2
+kind: InvalidConfig
+this is: not valid yaml content
+  - missing proper structure

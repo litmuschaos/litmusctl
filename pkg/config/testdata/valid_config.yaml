@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Config
+current-account: https://litmus.example.com
+current-user: testuser
+accounts:
+  - endpoint: https://litmus.example.com
+    serverEndpoint: https://litmus.example.com/api
+    users:
+      - username: testuser
+        token: test-token-123
+        expires_in: "1735689600"
+      - username: admin
+        token: admin-token-456
+        expires_in: "1735689600"
+  - endpoint: https://staging.litmus.io
+    serverEndpoint: https://staging.litmus.io/api
+    users:
+      - username: devuser
+        token: dev-token-789
+        expires_in: "1735689600"
