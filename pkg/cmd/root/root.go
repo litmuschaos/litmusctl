@@ -112,6 +112,21 @@ func initConfig() {
 		caCertPool := x509.NewCertPool()
 		caCertPool.AppendCertsFromPEM(caCert)
 		http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{RootCAs: caCertPool}
+	} else {
+		configFilePath := utils.GetLitmusConfigPath(rootCmd)
+		obj, err := config2.YamltoObject(configFilePath)
+		cobra.CheckErr(err)
+		// Check if CACert file string is present in the config file
+		if obj.CACert != "" {
+			configFilePath := utils.GetLitmusConfigPath(rootCmd)
+			obj, err := config2.YamltoObject(configFilePath)
+			cobra.CheckErr(err)
+			caCertFile, err := os.ReadFile(obj.CACert)
+			cobra.CheckErr(err)
+			caCertPool := x509.NewCertPool()
+			caCertPool.AppendCertsFromPEM(caCertFile)
+			http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{RootCAs: caCertPool}
+		}
 	}
 
 	// If a config file is found, read it in.
