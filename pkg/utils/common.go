@@ -25,7 +25,9 @@ import (
 	"math/big"
 	"os"
 	"regexp"
+	"strconv"
 	"strings"
+	"time"
 
 	"github.com/fatih/color"
 	"github.com/litmuschaos/litmusctl/pkg/config"
@@ -39,6 +41,8 @@ var (
 	Red     = color.New(color.FgRed)
 	White_B = color.New(color.FgWhite, color.Bold)
 	White   = color.New(color.FgWhite)
+	Cyan    = color.New(color.FgCyan)
+	Green   = color.New(color.FgGreen)
 )
 
 func Scanner() string {
@@ -169,4 +173,27 @@ func GenerateNameID(in string) string {
 	nameID := strings.ToLower(noHyphens)
 
 	return nameID
+}
+
+// FormatTimeStamp converts an epoch timestamp string to a formatted date-time string in UTC
+func FormatTimeStamp(timestampEpoch string) string {
+	timestampEpochInt, err := strconv.ParseInt(timestampEpoch, 10, 64)
+	if err != nil {
+		Red.Printf("Error converting epoch string to int: %v", err)
+		return "Invalid timestamp"
+	}
+
+	// Format the timestamp in a readable format
+	formattedTime := time.Unix(timestampEpochInt, 0).UTC().Format("02 Jan 2006, 15:04:05 UTC")
+	return formattedTime
+}
+
+func Diff(old string, new string) string {
+	var diff = ""
+	if strings.HasPrefix(new, old) {
+		diff = strings.TrimSpace(new[len(old):])
+	} else {
+		diff = strings.TrimSpace(new)
+	}
+	return diff
 }
