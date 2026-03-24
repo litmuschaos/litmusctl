@@ -18,6 +18,8 @@ package apis
 import (
 	"bytes"
 	"net/http"
+
+	"github.com/litmuschaos/litmusctl/pkg/utils"
 )
 
 type SendRequestParams struct {
@@ -26,18 +28,27 @@ type SendRequestParams struct {
 }
 
 func SendRequest(params SendRequestParams, payload []byte, method string) (*http.Response, error) {
+	utils.Debugf("API Request - Method: %s, Endpoint: %s", method, params.Endpoint)
+	if len(payload) > 0 {
+		utils.Debugf("API Request - Payload: %s", string(payload))
+	}
+
 	req, err := http.NewRequest(method, params.Endpoint, bytes.NewBuffer(payload))
 	if err != nil {
+		utils.Errorf("Failed to create HTTP request: %v", err)
 		return &http.Response{}, err
 	}
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", params.Token)
 	req.Header.Set("Referer", params.Endpoint)
 
+	utils.Debug("Sending HTTP request...")
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
+		utils.Errorf("HTTP request failed: %v", err)
 		return &http.Response{}, err
 	}
 
+	utils.Debugf("API Response - Status Code: %d", resp.StatusCode)
 	return resp, nil
 }

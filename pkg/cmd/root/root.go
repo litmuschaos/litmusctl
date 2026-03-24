@@ -85,6 +85,7 @@ func init() {
 	//rootCmd.PersistentFlags().StringVar(&kubeconfig, "kubeconfig", "", "kubeconfig file (default is $HOME/.kube/config")
 	rootCmd.PersistentFlags().BoolVar(&config2.SkipSSLVerify, "skipSSL", false, "skipSSL, litmusctl will skip ssl/tls verification while communicating with portal")
 	rootCmd.PersistentFlags().StringVar(&config2.CACert, "cacert", "", "cacert <path_to_crt_file> , custom ca certificate used for communicating with portal")
+	rootCmd.PersistentFlags().BoolVarP(&config2.VerboseMode, "verbose", "v", false, "enable verbose logging (shows request payloads, API endpoints, and additional details)")
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -103,6 +104,9 @@ func initConfig() {
 	}
 
 	viper.AutomaticEnv() // read in environment variables that match
+
+	// Configure verbose logging based on the flag
+	utils.ConfigureVerboseLogging()
 
 	if config2.SkipSSLVerify {
 		http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
