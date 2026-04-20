@@ -49,6 +49,8 @@ var infraCmd = &cobra.Command{
 		credentials, err := utils.GetCredentials(cmd)
 		utils.PrintError(err)
 
+		utils.Infof("Connecting chaos infrastructure with credentials for endpoint: %s", credentials.Endpoint)
+
 		nonInteractive, err := cmd.Flags().GetBool("non-interactive")
 		utils.PrintError(err)
 
@@ -61,6 +63,7 @@ var infraCmd = &cobra.Command{
 		utils.PrintError(err)
 
 		if newInfra.ProjectId == "" {
+			utils.Debug("Project ID not provided, fetching project details...")
 			userDetails, err := apis.GetProjectDetails(credentials)
 			utils.PrintError(err)
 
