@@ -33,6 +33,7 @@ type LitmuCtlConfig struct {
 	CurrentAccount string    `yaml:"current-account" json:"current-account"`
 	CurrentUser    string    `yaml:"current-user" json:"current-user"`
 	Kind           string    `yaml:"kind" json:"kind"`
+	CACert         string    `yaml:"cacert" json:"cacert"`
 }
 
 type Current struct {
