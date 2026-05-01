@@ -248,7 +248,7 @@ func GetExperimentList(pid string, in model.ListExperimentRequest, cred types.Cr
 // GetExperimentRunsList sends GraphQL API request for fetching a list of experiment runs.
 func GetExperimentRunsList(pid string, in model.ListExperimentRunRequest, cred types.Credentials) (ExperimentRunListData, error) {
 
-	var gqlReq GetChaosExperimentRunGraphQLRequest
+	var gqlReq GetChaosExperimentRunsGraphQLRequest
 	var err error
 
 	gqlReq.Query = ListExperimentRunsQuery
@@ -292,6 +292,56 @@ func GetExperimentRunsList(pid string, in model.ListExperimentRunRequest, cred t
 		return experimentRunList, nil
 	} else {
 		return ExperimentRunListData{}, errors.New("Error while fetching the Chaos Experiment runs")
+	}
+}
+
+// GetExperimentRun sends GraphQL API request for fetching an experiment run.
+func GetExperimentRun(pid string, nid string, cred types.Credentials) (ExperimentRunData, error) {
+
+	var gqlReq GetChaosExperimentRunGraphQLRequest
+	var err error
+
+	gqlReq.Query = ExperimentRunsQuery
+	gqlReq.Variables.ProjectID = pid
+	gqlReq.Variables.NotifyID = nid
+
+	query, err := json.Marshal(gqlReq)
+	if err != nil {
+		return ExperimentRunData{}, err
+	}
+
+	resp, err := apis.SendRequest(
+		apis.SendRequestParams{
+			Endpoint: cred.ServerEndpoint + utils.GQLAPIPath,
+			Token:    cred.Token,
+		},
+		query,
+		string(types.Post),
+	)
+	if err != nil {
+		return ExperimentRunData{}, err
+	}
+
+	bodyBytes, err := io.ReadAll(resp.Body)
+	defer resp.Body.Close()
+	if err != nil {
+		return ExperimentRunData{}, err
+	}
+
+	if resp.StatusCode == http.StatusOK {
+		var experimentRun ExperimentRunData
+		err = json.Unmarshal(bodyBytes, &experimentRun)
+		if err != nil {
+			return ExperimentRunData{}, err
+		}
+
+		if len(experimentRun.Errors) > 0 {
+			return ExperimentRunData{}, errors.New(experimentRun.Errors[0].Message)
+		}
+
+		return experimentRun, nil
+	} else {
+		return ExperimentRunData{}, errors.New("error while fetching the Chaos Experiment run")
 	}
 }
 
@@ -344,5 +394,53 @@ func DeleteChaosExperiment(projectID string, experimentID *string, cred types.Cr
 		return deletedExperiment, nil
 	} else {
 		return DeleteChaosExperimentData{}, errors.New("Error while deleting the Chaos Experiment")
+	}
+}
+
+// GetPodLogs sends GraphQL API request for fetching logs for a given Chaos Experiment.
+func GetPodLogs(podLogReq PodLogRequest, cred types.Credentials) (PodLogData, error) {
+
+	var gqlReq GetPodLogsGraphQLRequest
+	var err error
+
+	gqlReq.Query = GetPodLogsQuery
+	gqlReq.Variables.Request = podLogReq
+
+	query, err := json.Marshal(gqlReq)
+	if err != nil {
+		return PodLogData{}, err
+	}
+
+	resp, err := apis.SendRequest(
+		apis.SendRequestParams{
+			Endpoint: cred.ServerEndpoint + utils.GQLAPIPath,
+			Token:    cred.Token,
+		},
+		query,
+		string(types.Post),
+	)
+	if err != nil {
+		return PodLogData{}, err
+	}
+	bodyBytes, err := io.ReadAll(resp.Body)
+	defer resp.Body.Close()
+	if err != nil {
+		return PodLogData{}, err
+	}
+
+	if resp.StatusCode == http.StatusOK {
+		var podLogData PodLogData
+		err = json.Unmarshal(bodyBytes, &podLogData)
+		if err != nil {
+			return PodLogData{}, err
+		}
+
+		if len(podLogData.Errors) > 0 {
+			return PodLogData{}, errors.New(podLogData.Errors[0].Message)
+		}
+
+		return podLogData, nil
+	} else {
+		return PodLogData{}, errors.New("error while fetching logs")
 	}
 }
