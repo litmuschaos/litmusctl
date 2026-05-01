@@ -1,6 +1,9 @@
 #!/bin/bash
 
- # If there are whitespace errors, print the offending file names and fail.
+# Give execute permission to the pre-commit hook script
+chmod +x "$0"
+
+# If there are whitespace errors, print the offending file names and fail.
 # git diff-index --check --cached $against --
 
 # Execute steps extracted from GitHub Actions
