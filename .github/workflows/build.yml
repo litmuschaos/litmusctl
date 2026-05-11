@@ -11,7 +11,7 @@ jobs:
       # Install golang
       - uses: actions/setup-go@v4
         with:
-          go-version: '1.23'
+          go-version: '1.25.0'
 
       # Checkout to the latest commit
       # On specific directory/path
