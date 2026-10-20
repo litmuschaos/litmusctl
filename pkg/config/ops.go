@@ -26,6 +26,7 @@ import (
 var (
 	SkipSSLVerify bool   = false
 	CACert        string = ""
+	VerboseMode   bool   = false
 )
 
 func CreateNewLitmusCtlConfig(filename string, config types.LitmuCtlConfig) error {

@@ -39,9 +39,12 @@ var projectCmd = &cobra.Command{
 		credentials, err := utils.GetCredentials(cmd)
 		utils.PrintError(err)
 
+		utils.Debug("Starting project creation process...")
+
 		projectName, err := cmd.Flags().GetString("name")
 		utils.PrintError(err)
 		if projectName == "" {
+			utils.Debug("Project name not provided via flag, prompting user...")
 			// prompt to ask project name
 			prompt := promptui.Prompt{
 				Label:     "Enter a project name",
@@ -56,6 +59,7 @@ var projectCmd = &cobra.Command{
 
 			projectName = result
 		}
+		utils.Debugf("Creating project with name: %s", projectName)
 		var response apis.CreateProjectResponse
 		response, err = apis.CreateProjectRequest(projectName, credentials)
 		if err != nil {
@@ -63,6 +67,7 @@ var projectCmd = &cobra.Command{
 		} else {
 			fmt.Printf("Response: %+v\n", response)
 			projectID := response.Data.ID
+			utils.Debugf("Project created with ID: %s", projectID)
 			utils.White_B.Printf("Project '%s' created successfully with project ID - '%s'!🎉\n", projectName, projectID)
 		}
 	},
