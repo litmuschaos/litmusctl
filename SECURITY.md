@@ -48,6 +48,7 @@ A public disclosure date is negotiated by the LitmusChaos Security Committee and
 Defined below are the security contacts for this repository. In case you identify any security issue, please reach out to all of the security contacts.
 
 - @ksatchit (Karthik Satchitanand, karthik.s@harness.io)
-- @rajdas98 (Raj Babu Das, raj.das@harness.io)
+- @uditgaurav (Udit Gaurav, udit.gaurav@harness.io)
+- @ispeakc0de (Shubham Chaudhary, shubham.chaudhary@harness.io)
 
 The full LitmusChaos security policy is maintained at [litmuschaos/litmus](https://github.com/litmuschaos/litmus/blob/master/SECURITY.md).
